@@ -2,6 +2,18 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.44.0 — The Power BI report, messages and replies (B7)
+
+- **The messages are built in the report** (D300): every message ready to send, one per person across the cards, at most 25 CIs a part, with the reminder and its new points, the escalation, one message with every table for a team or for Procurement. The words are those of the HTML app: the check of every pull request compares each message of the samples with the recorded messages, word for word.
+- **The page *Messages*** lists them: first messages, reminders that are due and escalations.
+- **The Power App *SACM messages*** (D301) sits on that page. Open a message, change To, Cc or the subject if needed, and press **Send**: the flow *SACMSend* sends it from the shared mailbox exactly as shown, then the app records it on the cases and the report refreshes. **Test** sends it to you only. **Outlook** and **Teams** open the message or the chat, then ask whether you sent it.
+- **A colleague wrote lately** (D302): before a message goes, the app warns when a colleague wrote to the same person, or about the same cases, in the last 24 hours.
+- **Share out** (D303) in the app *SACM actions*: the free groups of a card go to the managers, the biggest first, to who has the fewest CIs.
+- **Replies** (D304): the flow *SACM - File replies* adds each reply to the list *SACM Replies* and refreshes the report.
+- **The set-up guide** in [powerbi/README.md](../powerbi/README.md) §6: the three new flows, the second app and the settings the messages read.
+- Every change is checked: a flow sends only what a manager pressed, one message a run, with the inputs of the app as To, Cc, Subject and Body; a flow that starts on a new email never sends.
+- The HTML app works as before: no check, number or message changed.
+
 ## 0.43.0 — The Power BI report, the actions (B6)
 
 - **The Power App *SACM actions*** (D294) sits in the report, on the pages Card, Case, Person and My work. A manager picks the lines (or the page gives them), picks what to do and presses **Save**: Note, Status, Request number, Assign, Stop following, Follow again, Fixed and Undo, Ask the owner and Back to SACM, Retirement date, Stage, The process does not exist, Hand over my work, Note about the person. It offers only what every line allows, with the words of the HTML app. The model decides which actions a line has, and the check of every pull request compares it with the HTML app.
