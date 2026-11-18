@@ -37,6 +37,9 @@ import { inList } from '../../src/core/sources/contracts/contract-reports.ts';
 import type { ContractConfig, SolusiContract } from '../../src/core/sources/contracts/contract-reports.ts';
 import { daysBetween, longDate } from '../../src/core/shared/dates.ts';
 import { activityRows, caseLines, checkedOf, exceptionRows, expectedHistory, HISTORY_FILES, historyKey, historyRows, replyLines, stateRows } from './history.ts';
+import type { HistoryKey } from './history.ts';
+import { draftRows, recordedChats, recordedDrafts, REF_TOKEN, SAMPLE_SENDER, SENDER_TOKEN } from './messages.ts';
+import type { DraftRow } from './messages.ts';
 
 type Row = Record<string, unknown>;
 
@@ -351,12 +354,68 @@ export async function parityProblems(folder: string): Promise<string[]> {
   const expected = (await expectedHistory()).map((item, at) => ({ Metric: item.metric, Expected: item.expected, Order: at + 1 }));
   problems.push(...compare('HistoryExpected', rows('HistoryExpected'), expected, 'Metric', ['Expected', 'Order']));
 
+  // 14. The messages (build B7, D300): the drafts of the samples with no journal, byte for byte as tests/recorded/
+  // messages.txt and teams-messages.txt hold them; the drafts with the team's state as buildDrafts gives them.
+  problems.push(...messageProblems(rows('DraftsRecorded'), rows('ChatsRecorded'), rows('Drafts'), key));
+
   for (const row of rows('SelfCheck')) {
     const id = norm(row.CheckId);
     if (built.has(id) && row.Match !== true) problems.push(`SelfCheck ${id}: no match: ${norm(row.Why)}`);
     if (!built.has(id) && row.Match === true) problems.push(`SelfCheck ${id}: a match for a check that is not built`);
   }
   return problems;
+}
+
+/**
+ * The messages of the Power Query against the answer key. A draft is matched by its keys; the Power App's tokens get the
+ * reference of the matched draft and the name of the sample manager, then every text must be the same, byte for byte.
+ */
+export function messageProblems(recordedRows: Row[], chatRows: Row[], draftRowsFound: Row[], key: HistoryKey): string[] {
+  const problems: string[] = [];
+  const { drafts: recorded, skipped } = recordedDrafts();
+  const fill = (value: unknown, ref: string): string => norm(value).split(REF_TOKEN).join(ref).split(SENDER_TOKEN).join(SAMPLE_SENDER);
+  const byKeys = new Map(recordedRows.map((row) => [norm(row.Keys), row]));
+  if (recordedRows.length !== recorded.length) problems.push(`DraftsRecorded: ${recordedRows.length} drafts, tests/recorded/messages.txt has ${recorded.length}`);
+  for (const want of recorded) {
+    const got = byKeys.get(want.keys);
+    if (!got) { problems.push(`DraftsRecorded: no draft with the keys of ${want.ref} (${want.keys})`); continue; }
+    const fields: Array<[string, string, string]> = [['Kind', norm(got.Kind), want.kind], ['Part', `${norm(got.PartIndex)} of ${norm(got.PartCount)}`, want.part], ['To', norm(got.To), want.to],
+      ['Cc', norm(got.Cc), want.cc], ['Subject', fill(got.Subject, want.ref), want.subject], ['Plain', fill(got.Plain, want.ref), want.plain], ['Body', fill(got.Body, want.ref), want.body]];
+    for (const [field, found, expected] of fields) if (found !== expected) problems.push(`DraftsRecorded ${want.ref}: ${field} differs from tests/recorded/messages.txt at ${firstDifference(found, expected)}`);
+  }
+  // Every open case of the record that no draft holds is one the HTML app left out (nobody to write to).
+  const inDrafts = new Set(recordedRows.flatMap((row) => norm(row.Keys).split(' ')));
+  const left = skipped.split(' ').filter((item) => item && inDrafts.has(item));
+  if (left.length) problems.push(`DraftsRecorded: ${left.length} keys the HTML app left out are in a draft (${left.slice(0, 3).join(' ')})`);
+  const chats = recordedChats();
+  if (chatRows.length !== chats.size) problems.push(`ChatsRecorded: ${chatRows.length} chats, tests/recorded/teams-messages.txt has ${chats.size}`);
+  for (const row of chatRows) {
+    const want = chats.get(norm(row.CheckId));
+    if (want === undefined) problems.push(`ChatsRecorded: a chat for ${norm(row.CheckId)}, which tests/recorded/teams-messages.txt does not have`);
+    else if (norm(row.Chat) !== want) problems.push(`ChatsRecorded ${norm(row.CheckId)}: differs from tests/recorded/teams-messages.txt at ${firstDifference(norm(row.Chat), want)}`);
+  }
+  // The table Drafts, with the journal of the samples.
+  const expected = draftRows(key);
+  const found = new Map(draftRowsFound.map((row) => [norm(row.Keys), row]));
+  if (draftRowsFound.length !== expected.length) problems.push(`Drafts: ${draftRowsFound.length} drafts, expected ${expected.length}`);
+  expected.forEach((want, at) => {
+    const got = found.get(want.Keys);
+    if (!got) { problems.push(`Drafts: no draft with the keys ${want.Keys.replace(/\n/g, ' ')}`); return; }
+    if (norm(got.DraftId) !== `D${String(at + 1).padStart(4, '0')}`) problems.push(`Drafts ${want.Keys.split('\n')[0]}: DraftId is ${norm(got.DraftId)}, expected the order of the HTML app (D${String(at + 1).padStart(4, '0')})`);
+    for (const field of Object.keys(want) as Array<keyof DraftRow>) {
+      if (field === 'Keys') continue;
+      if (norm(got[field]) !== norm(want[field])) problems.push(`Drafts ${want.Keys.split('\n')[0]}: ${field} differs at ${firstDifference(norm(got[field]), norm(want[field]))}`);
+    }
+  });
+  return problems;
+}
+
+/** Where two texts first differ, with a little of each around it. */
+function firstDifference(found: string, expected: string): string {
+  let at = 0;
+  while (at < found.length && at < expected.length && found[at] === expected[at]) at++;
+  const show = (text: string): string => JSON.stringify(text.slice(Math.max(0, at - 40), at + 60));
+  return `character ${at}: Power Query ${show(found)}, the answer key ${show(expected)}`;
 }
 
 /** One line of RealSize.Summary (tools/powerbi/probes.ts). */

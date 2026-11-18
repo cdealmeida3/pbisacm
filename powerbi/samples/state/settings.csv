@@ -1,3 +1,11 @@
 Title,Value
 reminderDays,3
 maxReminders,99
+portalLink,https://portal.example.com/sacm
+signature,SACM team
+epoOwnerName,Eve Inventory
+epoOwnerEmail,eve.inventory@example.com
+procurementName,Procurement
+procurementEmail,procurement@example.com
+team.process-management.name,Process Management
+team.process-management.people,Pat Process <pat.process@example.com>; Quinn Process <quinn.process@example.com>

@@ -35,6 +35,7 @@ import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml } 
 import { STATUSES } from '../../src/core/cases/cases.ts';
 import { EXCEPTION_REASONS } from '../../src/core/audit/audit.ts';
 import { statusWord } from '../../src/app/view/cases.ts';
+import { COLUMNS, CONTRACT_COLUMNS, EPO_ROLE, MAX_CIS_PER_MESSAGE, REQUESTS, ROLE_LABEL, ROLE_REQUEST, ROLE_WORD } from '../../src/core/messages/messages.ts';
 import type { FastForm, Node } from './regex.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -280,6 +281,8 @@ function packed(): Query[] {
     { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The five lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
     { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.',
       m: json(Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }]))) },
+    { name: 'MessageWords', group: 'Packed', description: 'GENERATED from src/core/messages/messages.ts (build B7, D300). The words of the messages: the requests of the Service Portal (id, name, the action inside its form, the name before 0.14.1), the words of the roles, EPO\'s names for them, the request that changes each role, the columns of the tables and the most CIs in one message.',
+      m: json({ requests: REQUESTS, roleLabel: ROLE_LABEL, roleWord: ROLE_WORD, epoRole: EPO_ROLE, roleRequest: ROLE_REQUEST, columns: COLUMNS, contractColumns: CONTRACT_COLUMNS, maxCis: MAX_CIS_PER_MESSAGE }) },
     { name: 'AppActions', group: 'Packed', description: 'GENERATED from powerbi/apps/actions.json (D294). The actions of the Power App SACM actions: id, label, the journal event, its scope and what the manager types; fnCaseActions gives each case the actions of scope line that apply.',
       m: json(JSON.parse(readFileSync(ACTIONS_FILE, 'utf8'))) },
     { name: 'ExpectedHistory', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team\'s state, for the Self-check page.', m: mText(JSON.stringify(EXPECTED_HISTORY)) },

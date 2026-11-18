@@ -38,7 +38,9 @@
                     EpoId = ci[AssetTag], Status = ci[Status], SupportGroup = ci[SupportGroup],
                     OwnedBy = nameOf(ci, "owned_by"), ManagedBy = nameOf(ci, "managed_by"), SupportedBy = nameOf(ci, "supported_by"),
                     Chips = own & List.Select(List.Distinct(finding[Chips]), (chip) => not List.Contains(own, chip)),
-                    Tags = ci[TagList]
+                    Tags = ci[TagList],
+                    // A contract (fnContractSubject): its number, name and vendor, for the table of a message (build B7); null for a CI.
+                    Contract = Record.FieldOrDefault(ci, "Contract", null)
                 ],
                 team = if pack = null or List.Contains(audience, "sacm") then null
                     else List.First(List.Select(teams, (candidate) => List.Contains(candidate[classes], ci[Class]) and List.Contains(candidate[checks], pack[id])), null),

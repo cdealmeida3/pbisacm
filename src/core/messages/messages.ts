@@ -138,12 +138,12 @@ export function escalationOf(fact: Fact, settings: MessageSettings): { name: str
   return { name: fact.escalateName ?? '', email: fact.escalateEmail };
 }
 
-const ROLE_LABEL: Record<string, string> = { owned_by: 'Owned by', managed_by: 'Managed by', supported_by: 'Supported by', assigned_to: 'Assigned to' };
-const ROLE_WORD: Record<string, string> = { owned_by: 'owner', managed_by: 'manager', supported_by: 'support person', assigned_to: 'assignee' };
+export const ROLE_LABEL: Record<string, string> = { owned_by: 'Owned by', managed_by: 'Managed by', supported_by: 'Supported by', assigned_to: 'Assigned to' };
+export const ROLE_WORD: Record<string, string> = { owned_by: 'owner', managed_by: 'manager', supported_by: 'support person', assigned_to: 'assignee' };
 /** The EPO names of the roles (instruction, 2.7). */
 export const EPO_ROLE: Record<string, string> = { owned_by: 'System Owner', managed_by: 'Primary Responsible', supported_by: 'Secondary Responsible' };
 /** The request that changes a role. Supported by has none in the portal. */
-const ROLE_REQUEST: Record<string, string> = { owned_by: 'owned-by-update', managed_by: 'managed-by-update' };
+export const ROLE_REQUEST: Record<string, string> = { owned_by: 'owned-by-update', managed_by: 'managed-by-update' };
 
 const plural = (count: number, word: string): string => `${count} ${word}${count === 1 ? '' : 's'}`;
 const orList = (items: string[]): string => items.length <= 1 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} or ${items[items.length - 1]}`;
@@ -293,8 +293,8 @@ function sectionTexts(section: Section, settings: MessageSettings): { heading: R
 }
 
 /** The columns of the table in a message: short names, so the header does not wrap in Outlook (build L4, D235). */
-const COLUMNS = ['Name', 'EPO ID', 'Class', 'Owned by', 'Managed by', 'Status', 'Support group'];
-const CONTRACT_COLUMNS = ['Contract number', 'Name', 'Vendor', 'What we found'];
+export const COLUMNS = ['Name', 'EPO ID', 'Class', 'Owned by', 'Managed by', 'Status', 'Support group'];
+export const CONTRACT_COLUMNS = ['Contract number', 'Name', 'Vendor', 'What we found'];
 
 const isContract = (item: Case): boolean => !!item.fact.ci?.contract;
 

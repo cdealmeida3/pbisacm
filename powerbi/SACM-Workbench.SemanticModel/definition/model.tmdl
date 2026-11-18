@@ -57,6 +57,7 @@ ref table HistoryChecked
 ref table HistoryRun
 ref table CaseLines
 ref table RepliesToRead
+ref table Drafts
 ref table Exceptions
 ref table Journal
 ref table JournalKeys

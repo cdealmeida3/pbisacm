@@ -22,9 +22,12 @@ export const EVAL_FOLDER = join(root, '.build', 'powerbi');
 /** A section member name: a plain identifier stays as it is, any other is written #"...". */
 const member = (name: string): string => (/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) ? name : `#"${name.replace(/"/g, '""')}"`);
 
-/** The names the evaluation runs: every table, and the unit cases of the reading functions. */
+/** The queries that only the answer key reads (build B7): the drafts and chats of the samples with no journal. */
+export const PARITY_QUERIES = ['DraftsRecorded', 'ChatsRecorded'];
+
+/** The names the evaluation runs: every table, the unit cases of the reading functions and the queries of the answer key. */
 export function evaluatedNames(): string[] {
-  return [...readTables().map((table) => table.name), ...unitQueryNames()];
+  return [...readTables().map((table) => table.name), ...unitQueryNames(), ...PARITY_QUERIES];
 }
 
 /** The M a calculated table of the fixed form (D284) gives, from the member Run (or HistoryRun): its part's rows, its columns renamed. */
