@@ -4,5 +4,6 @@
   "displayName": "Not followed",
   "height": 720,
   "width": 1280,
-  "displayOption": "FitToPage"
+  "displayOption": "FitToPage",
+  "visibility": "HiddenInViewMode"
 }

@@ -11,5 +11,6 @@
       "target": "verified",
       "type": "NoFilter"
     }
-  ]
+  ],
+  "visibility": "HiddenInViewMode"
 }

@@ -31,7 +31,7 @@ The report opens on the **My day** page. Look at:
 | **My work** | *Me* is Alex Example (in Sample mode the first active member of the team; in the workspace the person signed in). The 2 cases assigned to Alex. |
 | **Activity** | The 22 events of the sample journal, newest first, in the words of the app. **Day**, **Who** and **Type** filter them. |
 | **History** | To solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. **Card** filters one card. |
-| **Audit** | The verification record of the report date chosen (**Report date** at the top right). |
+| **Audit** | The verification record of the report date chosen (**Report date** at the top right). The buttons on the navy band at the left open the other parts of the audit: **Export**, **Not followed** and **Lifecycle review** (pages that are not in the tabs). |
 | **Audit export** | The export of a period (**Period of the export**): what was verified (2 findings solved on 11 November, with the days to verify), the actions of the team, the CI reports loaded, the findings per check and those new in the period, and what was open at the end. **More options (...)**, **Export data** on each table gives the Excel file. |
 | **Not followed** | The exceptions (the 3 decisions to stop following: 2 still run, 1 ended on 10 November) and the cases not followed up. The app *SACM actions* sits at the right for **Follow again** (section 6.4). |
 | **Lifecycle review** | The lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The marks, then the evidence (who checked, the case, when it was asked); the app *SACM audit* sits at the right (section 6.8). |

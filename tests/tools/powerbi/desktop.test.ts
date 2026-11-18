@@ -77,9 +77,9 @@ test('the line under a title and a text a measure writes are asked too, so an em
   assert.match(problems[0]!, /the text from .* is blank/);
 });
 
-test('the list of the pages: the drill-through pages and Self-check are hidden, every page is 1280 wide (D312)', () => {
+test('the list of the pages: the drill-through pages, Self-check and the parts of Audit are hidden, every page is 1280 wide (D312)', () => {
   const pages = pageList();
-  assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['card', 'case', 'person', 'selfcheck']);
+  assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['auditexport', 'auditfollow', 'auditreview', 'card', 'case', 'person', 'selfcheck']);
   assert.deepEqual(pages.filter((page) => page.drillThrough).map((page) => page.name).sort(), ['card', 'case', 'person']);
   for (const page of pages) assert.equal(page.width, 1280, page.name);
 });

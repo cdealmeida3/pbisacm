@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "kind",
   "position": {
-    "x": 744,
+    "x": 684,
     "y": 16,
     "z": 3000,
     "height": 56,
-    "width": 200,
+    "width": 260,
     "tabOrder": 3000
   },
   "visual": {
@@ -41,7 +41,7 @@
             "mode": {
               "expr": {
                 "Literal": {
-                  "Value": "'Dropdown'"
+                  "Value": "'Basic'"
                 }
               }
             }
@@ -55,6 +55,19 @@
               "expr": {
                 "Literal": {
                   "Value": "'Email, reminder or escalation'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "orientation": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

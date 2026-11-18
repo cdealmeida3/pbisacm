@@ -7,8 +7,7 @@
     "#5925dc",
     "#7d5700",
     "#b42318",
-    "#475467",
-    "#067647"
+    "#475467"
   ],
   "foreground": "#2b2623",
   "foregroundNeutralSecondary": "#655a52",
@@ -29,7 +28,7 @@
   "textClasses": {
     "title": {
       "fontFace": "Segoe UI Semibold",
-      "fontSize": 10,
+      "fontSize": 12,
       "color": "#2b2623"
     },
     "header": {
@@ -362,6 +361,71 @@
         "wordWrap": [
           {
             "show": true
+          }
+        ],
+        "title": [
+          {
+            "show": false,
+            "fontColor": {
+              "solid": {
+                "color": "#2b2623"
+              }
+            },
+            "fontFamily": "Segoe UI Semibold",
+            "fontSize": 10,
+            "titleWrap": false,
+            "alignment": "left"
+          }
+        ]
+      }
+    },
+    "cardVisual": {
+      "*": {
+        "value": [
+          {
+            "fontFamily": "Segoe UI Semibold",
+            "fontSize": 21,
+            "fontColor": {
+              "solid": {
+                "color": "#2b2623"
+              }
+            }
+          }
+        ],
+        "label": [
+          {
+            "show": true,
+            "fontFamily": "Segoe UI",
+            "fontSize": 9,
+            "fontColor": {
+              "solid": {
+                "color": "#655a52"
+              }
+            }
+          }
+        ],
+        "referenceLabelTitle": [
+          {
+            "show": true,
+            "titleFontFamily": "Segoe UI",
+            "titleFontSize": 9,
+            "titleFontColor": {
+              "solid": {
+                "color": "#655a52"
+              }
+            }
+          }
+        ],
+        "referenceLabelValue": [
+          {
+            "show": true,
+            "valueFontFamily": "Segoe UI Semibold",
+            "valueFontSize": 9,
+            "valueFontColor": {
+              "solid": {
+                "color": "#2b2623"
+              }
+            }
           }
         ],
         "title": [

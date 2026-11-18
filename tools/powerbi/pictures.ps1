@@ -184,7 +184,8 @@ foreach ($page in $list) {
   $seconds = [math]::Round([math]::Max(0, $clock.Elapsed.TotalSeconds - 1.0), 1)
   $file = Save-Picture $slug
   $words = Words (Window)
-  $broken = @($BROKEN | Where-Object { $words.Contains($_) })
+  # A word of a broken visual is often part of a longer name ("Replies to read (Blank)"), so each name is searched.
+  $broken = @($BROKEN | Where-Object { $word = $_; @($words | Where-Object { $_.Contains($word) }).Count -gt 0 })
   Say "$($page.displayName): drawn in $seconds s, $file$(if ($broken.Count) { ', shows: ' + ($broken -join '; ') })"
   $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken }
 }

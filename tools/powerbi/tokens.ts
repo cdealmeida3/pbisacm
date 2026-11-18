@@ -25,11 +25,9 @@ export const FONT_SEMIBOLD = 'Segoe UI Semibold';
 
 /** Text sizes in points (Power BI's unit). The smallest is 9 pt = 12 px (LOOK rule 8). */
 export const TEXT = {
-  /** The name of the page, at the top left. */
-  page: 18,
-  /** The line under the name of the page. */
-  pageNote: 9,
-  /** The title of a visual. */
+  /** The title text class of the theme (16 px, LOOK §3: a box title). */
+  heading: 12,
+  /** The title of a visual (13 px, design pass §3.1). */
   title: 10,
   /** The line under the title of a visual (its empty state, D318). */
   subtitle: 9,
@@ -54,12 +52,8 @@ export const GRID = {
   /** The tallest page: Case, the side sheet of one CI (D312). */
   tallest: { case: 1440 } as Record<string, number>,
   step: 4,
-  gutter: 12,
-  rail: { x: 0, y: 0, width: 188 },
+  /** Where the visuals go: right of the navy rail (0 to 188), with the name of the page at the top. */
   content: { left: 224, right: 1256, top: 16, bottom: 704 },
-  /** The name of the page and its line: the visuals start under it. */
-  header: { y: 16, height: 56 },
-  body: 84,
   /** At most this many visuals on a page (design pass §8.1): more is slow to draw and hard to read. */
   maxVisuals: 12,
   /** The corner of a visual. */
@@ -87,13 +81,8 @@ export const CELL_PADDING = 16;
 /** The part of a table's width the columns cannot use (the padding of the visual and a vertical scroll bar), in px. */
 export const TABLE_CHROME = 40;
 
-/** Each state of a card or a case, with its colour of LOOK §2 (one meaning per colour, rule 5). */
-export const STATE_COLOURS: Record<string, string> = {
-  'To solve': 'red', 'To check': 'blue', Waiting: 'amber', Known: 'violet', OK: 'green', 'Not tested': 'grey', 'All marked as fixed': 'teal'
-};
-
 /** The colours of the series of a chart, in order (design pass §3.1): navy first, then the state colours. */
-export const DATA_COLOURS = ['accent', 'blue', 'teal', 'violet', 'amber', 'red', 'grey', 'green'] as const;
+export const DATA_COLOURS = ['accent', 'blue', 'teal', 'violet', 'amber', 'red', 'grey'] as const;
 
 /**
  * The average width of one character of 9 pt Segoe UI, in pixels, and of the semibold face. The lint uses them to say

@@ -395,7 +395,6 @@ export function runTmdl(source: SourceTable = 'Run'): string {
 /* ------------------------------------------------------------------ the theme */
 
 /** The light colours of src/app/styles.css by name (tokens.ts); kept here for the files that import it from generate.ts. */
-export { lightColours };
 
 /** A colour of a formatting property, as a theme writes it. */
 const solid = (color: string) => ({ solid: { color } });
@@ -424,7 +423,7 @@ export function theme(): Record<string, unknown> {
     tableAccent: c.accent, hyperlink: c.accent, visitedHyperlink: c.accent,
     good: c.green, neutral: c.amber, bad: c.red, maximum: c.red, center: c.amber, minimum: c.green, null: c.grey,
     textClasses: {
-      title: text(TEXT.title, c.ink, FONT_SEMIBOLD),
+      title: text(TEXT.heading, c.ink, FONT_SEMIBOLD),
       header: text(TEXT.table, c.ink, FONT_SEMIBOLD),
       label: text(TEXT.label, c.muted),
       callout: text(TEXT.callout, c.ink, FONT_SEMIBOLD)
@@ -455,6 +454,14 @@ export function theme(): Record<string, unknown> {
         labels: [{ color: solid(c.ink!), fontFamily: FONT_SEMIBOLD, fontSize: TEXT.callout }],
         categoryLabels: [{ show: true, color: solid(c.muted!), fontFamily: FONT, fontSize: TEXT.label }],
         wordWrap: [{ show: true }],
+        title: [{ ...title, show: false }]
+      } },
+      // The new Card visual (D2 uses it for the tiles): the number, its word, and the reference labels under it on.
+      cardVisual: { '*': {
+        value: [{ fontFamily: FONT_SEMIBOLD, fontSize: TEXT.callout, fontColor: solid(c.ink!) }],
+        label: [{ show: true, fontFamily: FONT, fontSize: TEXT.label, fontColor: solid(c.muted!) }],
+        referenceLabelTitle: [{ show: true, titleFontFamily: FONT, titleFontSize: TEXT.label, titleFontColor: solid(c.muted!) }],
+        referenceLabelValue: [{ show: true, valueFontFamily: FONT_SEMIBOLD, valueFontSize: TEXT.label, valueFontColor: solid(c.ink!) }],
         title: [{ ...title, show: false }]
       } },
       multiRowCard: { '*': {

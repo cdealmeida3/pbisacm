@@ -6,10 +6,11 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 
 - **Every page fits the screen** (D312): 1280 × 720, with no scroll bar, at any window size (*Case*, the sheet of one CI, is longer and scrolls). A navy band at the left of every page, the name of the page and one line on what it is for at the top, the visuals in white boxes on the warm page of the app (design A, D310).
 - **A new theme** (D311): the colours of the HTML app, Segoe UI, no text under 12 px, thin lines and round corners, no shadow. Table headers are never cut, long texts wrap, and no table adds up text in a total row any more.
+- **Filters of a few values are buttons**: **Topic** on All cards, **Kind** on Messages and **Lines** on Mapping backlog.
 - **An empty box says why**: under the title of every table and chart a grey line says how many lines it shows, or why there is none ("No reply to read: a reply to a message of the team shows here.").
 - **Fixed**: blank lines in *To escalate* and *Reminders due* on My day; the SACM fix list of a card showed lines with no change; columns cut on the right of the wide tables.
 - **The Card page** shows every line of the card in one table, with its state and why it waits; Owned by, Managed by, Support group and tags are in *Export for Excel*.
-- **Audit is four pages** until design D3 draws it again: *Audit* (the record), *Audit export*, *Not followed* and *Lifecycle review* (the review, then its evidence).
+- **Audit has four parts** until design D3 draws it again: *Record*, *Export*, *Not followed* and *Lifecycle review* (the review, then its evidence). Only *Audit* is in the tabs; the buttons on the navy band open the parts.
 - **Card, Case, Person and Self-check** are hidden from the tabs: Card, Case and Person open by drill-through, as before.
 - **The Power Apps visuals have a place of their own** at the right of their page. An app you placed before this version: move it to its place ([powerbi/README.md](../powerbi/README.md) §6.4, the table *Where each app goes*).
 - **The Desktop check takes a picture of every page** (D318) and fails on a page that shows a broken visual, *(Blank)*, or takes more than 3 seconds to draw. It also fails when a line under a title would be blank. The lint checks every page against the rules of the design (`tools/powerbi/pages.ts`) and every formatting property against Microsoft's list.

@@ -178,9 +178,6 @@ jobs:
   powerbi-desktop:
     if: github.event.pull_request.draft != true && (inputs.jobs == '' || inputs.jobs == null || contains(inputs.jobs, 'desktop'))
     runs-on: windows-latest
-    # Write only for the step that commits the pictures, started by hand on a branch.
-    permissions:
-      contents: write
     timeout-minutes: 50
     defaults:
       run:
@@ -201,20 +198,34 @@ jobs:
         run: ./tools/powerbi/desktop.ps1 -Out .build/desktop
       - name: What Desktop would show wrong
         run: node tools/powerbi/desktop.ts judge .build/desktop/results.json .build/desktop/pictures/pictures.json
-      - name: Commit the pictures to the branch (started by hand with "pictures")
-        if: always() && github.event_name == 'workflow_dispatch' && inputs.pictures && github.ref_name != 'main'
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          rm -rf pictures && mkdir -p pictures
-          cp .build/desktop/pictures/* pictures/ 2>/dev/null || true
-          git add -f pictures
-          git commit -m "Pictures of the pages from the Desktop check (for review; remove before the merge)" || exit 0
-          git push origin "HEAD:${GITHUB_REF_NAME}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: powerbi-desktop
           path: .build/desktop/
           retention-days: 7
+
+  # D318: the pictures of the Desktop check, committed to the branch in pictures/ for the review, only when the run was
+  # started by hand with "pictures" (the repository rules refuse the folder at the merge). A job of its own, so only it
+  # can write to the repository.
+  powerbi-pictures:
+    needs: powerbi-desktop
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.pictures && github.ref_name != 'main' && needs.powerbi-desktop.result != 'skipped'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: powerbi-desktop
+          path: .build/desktop
+      - name: Commit the pictures to the branch
+        run: |
+          git config user.name "Desktop check"
+          git config user.email "desktop-check@example.com"
+          rm -rf pictures && mkdir -p pictures
+          cp .build/desktop/pictures/* pictures/ 2>/dev/null || true
+          git add -f pictures
+          git commit -m "Pictures of the pages from the Desktop check (for review; remove before the merge)" || exit 0
+          git push origin "HEAD:${GITHUB_REF_NAME}"

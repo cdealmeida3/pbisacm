@@ -3,11 +3,11 @@
 // powerbi/SACM-Workbench.Report/definition/ and Microsoft's schema of report themes, which lists every formatting
 // property of every visual type:
 //   1. Every page is 1280 × 720 and fits the page (Case, the tallest, at most 1440 and fits the width).
-//   2. At most 12 visuals on a page; at most one Power Apps visual, and none on the first page.
+//   2. At most 12 visuals on a page (the rail counts as one); at most one Power Apps visual, and none on the first page.
 //   3. Native visuals only (D311): no custom visual, no R or Python visual, no picture from the web.
 //   4. The grid: every place and size on the 4 px grid, inside the page, inside the content frame (the rail apart),
 //      no two visuals over each other, and none over the place a Power Apps visual is set by hand (APP_SLOTS).
-//   5. Tables: every column has its width, the widths fit the visual (no scroll bar to the side), each header fits on
+//   5. Tables: every column of a table has its width (a matrix makes a column per value, so it has none), the widths fit the visual (no scroll bar to the side), each header fits on
 //      one line (LOOK rule 3), totals stay off and the values wrap.
 //   6. Titles: a title written in the file fits on one line; every table, matrix and chart shows a line under its title
 //      that a measure writes, so a box with no lines says why (D318: never a blank box).
@@ -17,7 +17,7 @@
 //   9. The drill-through pages and Self-check are hidden from the team's tabs.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { APP_SLOTS, CELL_PADDING, GRID, MIN_TEXT_POINTS, TABLE_CHROME, textWidth } from './tokens.ts';
+import { APP_SLOTS, CELL_PADDING, GRID, MIN_TEXT_POINTS, TABLE_CHROME, TEXT, textWidth } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 export const REPORT_DEFINITION = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition');
@@ -93,6 +93,8 @@ export function readCatalogue(file = THEME_SCHEMA_FILE): Catalogue {
 export const NATIVE_TYPES = new Set(['tableEx', 'pivotTable', 'card', 'cardVisual', 'multiRowCard', 'textbox', 'actionButton', 'shape', 'slicer',
   'advancedSlicerVisual', 'listSlicer', 'textSlicer', 'lineChart', 'barChart', 'columnChart', 'clusteredBarChart', 'clusteredColumnChart',
   'lineClusteredColumnComboChart', 'pageNavigator', 'bookmarkNavigator', 'image']);
+/** The charts of that list: like a table, each shows a line under its title written by a measure. */
+const CHART_TYPES = new Set(['lineChart', 'barChart', 'columnChart', 'clusteredBarChart', 'clusteredColumnChart', 'lineClusteredColumnComboChart']);
 /** Visuals that may sit outside the content frame: the navy rail and what is on it. */
 const RAIL_VISUAL = /^rail/;
 
@@ -120,7 +122,9 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     }
     if (index === 0 && page.visibility === 'HiddenInViewMode') problems.push(`${where}: the first page is hidden`);
     // 2. How many.
-    if (visuals.length > GRID.maxVisuals) problems.push(`${where}: ${visuals.length} visuals, more than ${GRID.maxVisuals} (design pass §8.1)`);
+    // The navy rail and what is on it (its foot line, the parts of a split page) count as one: build D2 makes it one page navigator.
+    const counted = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name)).length + (visuals.some((visual) => RAIL_VISUAL.test(visual.name)) ? 1 : 0);
+    if (counted > GRID.maxVisuals) problems.push(`${where}: ${counted} visuals, more than ${GRID.maxVisuals} (design pass §8.1)`);
     const apps = visuals.filter((visual) => /powerapps/i.test(visual.visual?.visualType ?? ''));
     if (apps.length > 1) problems.push(`${where}: ${apps.length} Power Apps visuals; at most one on a page`);
     if (apps.length && index === 0) problems.push(`${where}: a Power Apps visual on the first page; it opens slowly`);
@@ -143,9 +147,10 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
         if (slot && overlap(visual.position, slot)) problems.push(`${at}: over the place of the Power Apps visual ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} × ${slot.height})`);
       }
       // 7. Text sizes.
-      const sizes = JSON.stringify(visual.visual?.objects ?? {}).matchAll(/"fontSize":\{"expr":\{"Literal":\{"Value":"(\d+(?:\.\d+)?)D"\}\}\}/g);
+      const formatting = JSON.stringify([visual.visual?.objects ?? {}, visual.visual?.visualContainerObjects ?? {}]);
+      const sizes = formatting.matchAll(/"fontSize":\{"expr":\{"Literal":\{"Value":"(\d+(?:\.\d+)?)D"\}\}\}/g);
       for (const size of sizes) if (Number(size[1]) < MIN_TEXT_POINTS) problems.push(`${at}: text of ${size[1]} pt, under ${MIN_TEXT_POINTS} pt (12 px, LOOK rule 8)`);
-      for (const run of JSON.stringify(visual.visual?.objects ?? {}).matchAll(/"fontSize":"(\d+(?:\.\d+)?)pt"/g)) {
+      for (const run of formatting.matchAll(/"fontSize":"(\d+(?:\.\d+)?)pt"/g)) {
         if (Number(run[1]) < MIN_TEXT_POINTS) problems.push(`${at}: text of ${run[1]} pt, under ${MIN_TEXT_POINTS} pt (12 px, LOOK rule 8)`);
       }
       // 8. Every property is one Power BI has.
@@ -167,9 +172,9 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
       const titleText = literal(title?.text);
       if (titleText && literal(title?.show) !== 'false') {
         const words = titleText.slice(1, -1).replace(/''/g, "'");
-        if (textWidth(words, 10, true) > width - 2 * GRID.padding) problems.push(`${at}: the title "${words}" does not fit on one line (LOOK rule 3)`);
+        if (textWidth(words, TEXT.title, true) > width - 2 * GRID.padding) problems.push(`${at}: the title "${words}" does not fit on one line (LOOK rule 3)`);
       }
-      if (['tableEx', 'pivotTable', 'lineChart'].includes(type)) {
+      if (type === 'tableEx' || type === 'pivotTable' || CHART_TYPES.has(type)) {
         const sub = container.subTitle?.[0]?.properties;
         if (literal(sub?.show) !== 'true' || !sub?.text?.expr?.Measure) problems.push(`${at}: no line under the title written by a measure: an empty box would say nothing (D318)`);
         if (!titleText) problems.push(`${at}: no title`);
@@ -178,7 +183,7 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
       if (type === 'tableEx' || type === 'pivotTable') {
         const objects = visual.visual?.objects ?? {};
         if (literal(objects.total?.[0]?.properties?.totals) === 'true') problems.push(`${at}: the total row is on (it adds up text; design pass §2.1)`);
-        for (const name of ['rowTotal', 'columnTotal']) if (literal(objects.subTotals?.[0]?.properties?.[name === 'rowTotal' ? 'rowSubtotals' : 'columnSubtotals']) === 'true') problems.push(`${at}: subtotals are on`);
+        for (const name of ['rowSubtotals', 'columnSubtotals']) if (literal(objects.subTotals?.[0]?.properties?.[name]) === 'true') problems.push(`${at}: subtotals are on`);
         if (literal(objects.values?.[0]?.properties?.wordWrap) === 'false') problems.push(`${at}: the values do not wrap: a long text is cut`);
       }
       if (type === 'tableEx') {
@@ -188,7 +193,7 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
           const columnWidth = widths.get(projection.queryRef);
           if (!columnWidth) { problems.push(`${at}: the column "${header(projection)}" has no width: Power BI sizes it to its text and the table scrolls to the side`); continue; }
           sum += columnWidth;
-          const need = textWidth(header(projection), 9, true) + CELL_PADDING;
+          const need = textWidth(header(projection), TEXT.table, true) + CELL_PADDING;
           if (columnWidth < need) problems.push(`${at}: the header "${header(projection)}" needs ${need} px, its column is ${columnWidth} (LOOK rule 3: no cut header)`);
         }
         if (sum > width - TABLE_CHROME) problems.push(`${at}: the columns take ${sum} px, the table has ${width - TABLE_CHROME}: it scrolls to the side`);
