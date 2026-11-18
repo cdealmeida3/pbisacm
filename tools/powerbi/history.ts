@@ -181,6 +181,8 @@ export function caseLines(key: HistoryKey): Array<Record<string, string | number
     if ((remind === 'escalation' && from <= RECORD_DATE) !== item.overLimit) throw new Error(`${item.key}: Remind and ReminderFrom do not give the escalation of the app`);
     const inLatest = latest.has(item.key);
     const exception = item.exception;
+    // Who marked it fixed: the last status or exception of its timeline, which set the status Fixed.
+    const fixed = item.status === 'Fixed' ? [...item.timeline].reverse().find((event) => event.type === 'status' || event.type === 'exception') : undefined;
     return {
       Key: item.key, CheckId: item.fact.checkId, CiKey: item.fact.ciKey, Field: item.fact.field,
       // A finding the newest report no longer shows: Power BI knows its key only (the history has the rest).
@@ -191,7 +193,8 @@ export function caseLines(key: HistoryKey): Array<Record<string, string | number
       LastMessageTo: item.messages[item.messages.length - 1]?.to ?? '', LastRef: item.messages[item.messages.length - 1]?.ref ?? '',
       ReminderFrom: from, Remind: remind, Replies: item.replies.length, LastReplyOn: isoDate(item.replies[item.replies.length - 1]?.received ?? ''),
       ExceptionReason: exception ? (exception.type === 'status' ? 'Set before version 0.12 (no reason)' : exception.reason ?? '') : '',
-      ReviewOn: exception?.reviewOn ?? '', ExceptionEnded: item.exceptionEnded, RetireOn: item.retireOn, VerifiedOn: item.verifiedOn, Events: item.timeline.length
+      ReviewOn: exception?.reviewOn ?? '', ExceptionEnded: item.exceptionEnded, RetireOn: item.retireOn, VerifiedOn: item.verifiedOn,
+      FixedBy: fixed ? fixed.byName || fixed.by : '', FixedOn: fixed ? isoDate(fixed.at) : '', Events: item.timeline.length
     };
   });
 }

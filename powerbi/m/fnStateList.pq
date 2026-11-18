@@ -22,7 +22,7 @@
                 found = Table.SelectRows(lists, each [Title] = spec[list])
             in
                 if Table.IsEmpty(found) then {} else Table.ToRecords(found{0}[Items]),
-        rows = if StateMode = "SharePoint" then sharePointRows else sampleRows,
+        rows = if StateMode = "SharePoint" then sharePointRows else if StateMode = "None" then {} else sampleRows,
         asText = (value as any) as text =>
             if value = null then ""
             else if value is datetimezone then DateTime.ToText(DateTimeZone.RemoveZone(DateTimeZone.ToLocal(value)), [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])

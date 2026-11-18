@@ -70,6 +70,21 @@ table CaseLines
 			RETURN
 			    IF ( answered > 0, "Reply", IF ( escalate > 0, "Escalate", IF ( remind > 0, "Remind", IF ( asked > 0, "Wait for the answer", IF ( fresh > 0, "Email" ) ) ) ) )
 
+	/// On a line of Findings (the Card, Case and Person pages): the status of its case, as the pages say it (New, Asked, Answered, Marked fixed, …).
+	measure 'Line status' = CALCULATE ( SELECTEDVALUE ( CaseLines[StatusLabel] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ) )
+
+	/// On a line of Findings: the memory of its case ("Asked 2 times · last 4 Nov · no reply", or "Not asked yet").
+	measure 'Line follow-up' = CALCULATE ( [Follow-up], TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ) )
+
+	/// On a line of Findings: who has its case (assigned or handed over), and who marked it fixed and when.
+	measure 'Line who' =
+			VAR keys = VALUES ( Findings[Key] )
+			VAR assigned = CALCULATE ( SELECTEDVALUE ( CaseLines[AssignedTo] ), TREATAS ( keys, CaseLines[Key] ) )
+			VAR fixedBy = CALCULATE ( SELECTEDVALUE ( CaseLines[FixedBy] ), TREATAS ( keys, CaseLines[Key] ) )
+			VAR fixedOn = CALCULATE ( MAX ( CaseLines[FixedOn] ), TREATAS ( keys, CaseLines[Key] ) )
+			VAR fixedText = IF ( fixedBy <> "", "Marked fixed by " & fixedBy & " on " & FORMAT ( fixedOn, "d mmm" ) )
+			RETURN assigned & IF ( assigned <> "" && fixedText <> "", " · " ) & fixedText
+
 	/// The first report date that showed the finding of a case.
 	measure 'Case first seen' = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( History ), TREATAS ( VALUES ( CaseLines[Key] ), History[Key] ) )
 		formatString: d mmm yyyy
@@ -273,6 +288,22 @@ table CaseLines
 		isNameInferred
 		sourceColumn: [VerifiedOn]
 
+	/// Who marked the case fixed, when its status is Fixed (the name, else the email of the journal event).
+	column FixedBy
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixedBy]
+
+	/// The day the case was marked fixed, when its status is Fixed.
+	column FixedOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [FixedOn]
+
 	column Events
 		dataType: int64
 		isDataTypeInferred
@@ -315,5 +346,7 @@ table CaseLines
 					"ExceptionEnded", Run[CaseLines.ExceptionEnded],
 					"RetireOn", Run[CaseLines.RetireOn],
 					"VerifiedOn", Run[CaseLines.VerifiedOn],
+					"FixedBy", Run[CaseLines.FixedBy],
+					"FixedOn", Run[CaseLines.FixedOn],
 					"Events", Run[CaseLines.Events]
 				)

@@ -15,7 +15,8 @@ table RepliesToRead
 	/// On a line of My work: Mine when one of its cases is assigned to me.
 	measure 'Reply mine' =
 			VAR me = [Me]
-			RETURN IF ( NOT ISBLANK ( me ) && CONTAINSSTRING ( SELECTEDVALUE ( RepliesToRead[AssignedTo] ), me ), "Mine", "Reply" )
+			VAR names = SUBSTITUTE ( SELECTEDVALUE ( RepliesToRead[AssignedTo] ), ", ", "|" )
+			RETURN IF ( NOT ISBLANK ( me ) && names <> "" && PATHCONTAINS ( names, me ), "Mine", "Reply" )
 
 	column File
 		dataType: string

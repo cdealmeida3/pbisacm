@@ -25,9 +25,9 @@ The report opens on the **My day** page. Look at:
 
 | Page | What you should see |
 |---|---|
-| **My day** | For the samples: 1 reply to read, 1 reminder due, 3 cases to escalate, and the findings new since the report before (the samples have two CI reports: 4 and 11 November). The line at the top: "Since the report of 4 Nov: 23 new, 2 solved." |
+| **My day** | The Reports line and **Open Reports** at the top. For the samples: 1 reply to read, 1 reminder due, 3 cases to escalate, and the findings new since the report before (the samples have two CI reports: 4 and 11 November). The line at the top: "Since the report of 4 Nov: 23 new, 2 solved." |
 | **My work** | *Me* is Alex Example (in Sample mode the first active member of the team; in the workspace the person signed in). The 2 cases assigned to Alex. |
-| **Activity** | The 20 events of the sample journal, newest first, in the words of the app. **Who** and **Type** filter them. |
+| **Activity** | The 20 events of the sample journal, newest first, in the words of the app. **Day**, **Who** and **Type** filter them. |
 | **History** | To solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. **Card** filters one card. |
 | **Audit** | The verification record of the report date chosen, what was verified (2 findings solved on 11 November), the actions of the team, the 3 decisions to stop following (2 still run, 1 ended on 10 November), and the lifecycle review marks. **More options (...)**, **Export data** gives the Excel file. |
 | **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. Below: the runs, the classes and the files that could not be read (none for the samples). |
@@ -74,9 +74,10 @@ fails if one is committed.
 ## 3. Read the real reports from SharePoint (when you are ready)
 
 **Ready for the real reports.** On invented reports as big as the real ones (3,230 CIs, 5,100 relationships, 1,020 EPO
-systems, 1,190 Solusi and 1,700 ServiceNow contracts), a refresh takes about TIME_B5 seconds on the Windows test machine
-(version 0.42.0, D283). The slowest tables are the hidden tables *Run* (the newest report and its cases) and *HistoryRun*
-(the history). Your laptop may be slower or faster; the budget is 2 minutes.
+systems, 1,190 Solusi and 1,700 ServiceNow contracts), a refresh takes about 100 seconds on the Windows test machine
+(version 0.42.0, D283). The slowest tables are the hidden tables *Run* (the newest report and its cases, about 48 seconds)
+and *HistoryRun* (the history, about 32 seconds for one report date). In the workspace *HistoryRun* computes only a
+new or changed day. Your laptop may be slower or faster; the budget is 2 minutes.
 
 The model reads the reports from one folder of the team's SharePoint site. Power Automate puts the scheduled ServiceNow
 reports there (flow F1 of the plan). The real site and folder are typed in Power BI only, **never in this repository**.
@@ -104,7 +105,8 @@ How a file is read:
 To go back to the samples, set **SourceMode** to `Sample` again.
 
 The team's lists are read from the same site. **StateMode** picks them: `Sample` (the invented journal, replies,
-settings, team and reviews inside the model) or `SharePoint` (the five lists of section 5). You can switch the reports to
+settings, team and reviews inside the model), `SharePoint` (the five lists of section 5) or `None` (no lists: every case
+is *New*). You can switch the reports to
 SharePoint and keep the sample lists, or the other way round.
 
 **Do not save a .pbix or the project into the repository after a SharePoint refresh**: it would hold real data.
@@ -136,6 +138,10 @@ first: the report reads the reports and the lists of the team's site.
    **Audience** the managers. They open it from **Apps**, always on the newest refresh. After you publish again, press
    **Update app**.
 
+8. **Later: a test workspace.** Once the team uses the report every day, make a second workspace (for example *SACM
+   Workbench test*) and a **deployment pipeline** (PPU has them): publish a new version to the test workspace first,
+   look at it, then deploy it to the team's workspace.
+
 Who is *Me*: the report finds the person signed in by their email in the list *SACM Team*. A manager whose email is not
 there sees no *My work*.
 
@@ -151,10 +157,13 @@ In the site: **New → List → Blank list**, the name, then **Add column** for 
 | List | Columns (type) | One row is |
 |---|---|---|
 | **SACM Journal** | Title (the event id), At (Date and time), By (Single line: the email), ByName, Type, Keys (Multiple lines: one finding key per line), Text (Multiple lines), Ref, To, Cc, Subject, Kind, Channel, Person, Reason, ReviewOn (Date), RetireOn (Date), CheckId, CiKey, CiName: all Single line of text unless said | One action of a manager: a message, a reminder, an escalation, a note, fixed, not followed up, assigned, … (the events of [DATA-MODEL.md](../docs/DATA-MODEL.md) §3) |
-| **SACM Replies** | Title (the reference, `SACM-…`), From, Received (Date and time), Subject, Body (Multiple lines) | One reply that came to the shared mailbox |
-| **SACM Settings** | Title (the setting, for example `reminderDays`), Value | One setting of the team. A number outside its range is not used, its default is |
+| **SACM Replies** | Title (the reference, `SACM-…`), From, Received (Date and time), Subject, Body (Multiple lines, plain text), ConversationId (for the flows of stage 2; not read yet) | One reply that came to the shared mailbox |
+| **SACM Settings** | Title (the setting, for example `reminderDays`), Value | One setting of the team. A number outside its range is not used, its default is. You may add column validation for the ranges. In B5 the report reads `reminderDays` and `maxReminders`; the other settings keep their defaults until build B8 |
 | **SACM Team** | Title (the name), Email, Active (Yes/No) | One manager of the team |
 | **SACM Reviews** | ReviewDate (Date), CiKey, CiName, Class, StatusInEpo, Answer, Note, By, At (Date and time) | One mark of the lifecycle review |
+
+**By** is a text column with the email, not a Person column: a Person column comes to Power BI as a number, and the
+flows of stage 2 write the email. **Body** is plain text, so the first line of a reply reads well.
 
 The invented rows in `powerbi/samples/state/` show what a row looks like. Dates and times are shown in the local time of
 the refresh.

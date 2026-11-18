@@ -15,10 +15,19 @@
         steps = List.Combine(List.Transform(JournalEvents, (event) =>
             if event[Type] = "exception" and List.IsEmpty(event[Keys]) and event[CiKey] <> "" then {[Target = (if event[CheckId] = "" then "*" else event[CheckId]) & "|" & event[CiKey], Event = event, Exception = true]}
             else List.Transform(List.Select(event[Keys], (key) => isException(event) or event[Type] = "status"), (key) => [Target = key, Event = event, Exception = isException(event)]))),
-        state = List.Accumulate(steps, [Last = [], After = []], (memory, step) =>
-            if step[Exception] then [Last = Record.AddField(Record.RemoveFields(memory[Last], {step[Target]}, MissingField.Ignore), step[Target], step[Event]), After = Record.RemoveFields(memory[After], {step[Target]}, MissingField.Ignore)]
-            else if Record.HasFields(memory[Last], step[Target]) then [Last = memory[Last], After = Record.AddField(Record.RemoveFields(memory[After], {step[Target]}, MissingField.Ignore), step[Target], true)]
-            else memory),
+        // Per target, in the order of the journal: its last exception, and whether a status came after it (speed rule 6:
+        // grouped once, no growing record).
+        byTarget = fnGroupBy(steps, (step) => step[Target]),
+        summaries = List.Buffer(List.RemoveNulls(List.Transform(Record.FieldNames(byTarget), (target) =>
+            let
+                group = List.Buffer(Record.Field(byTarget, target)),
+                lastAt = List.Last(List.Select(List.Positions(group), (at) => group{at}[Exception]), null)
+            in
+                if lastAt = null then null else [Target = target, Event = group{lastAt}[Event], After = lastAt < List.Count(group) - 1]))),
+        state = [
+            Last = Record.FromList(List.Transform(summaries, (item) => item[Event]), List.Transform(summaries, (item) => item[Target])),
+            After = fnKeySet(List.Transform(List.Select(summaries, (item) => item[After]), (item) => item[Target]))
+        ],
         targets = Record.FieldNames(state[Last]),
         line = (target as text) as list =>
             let

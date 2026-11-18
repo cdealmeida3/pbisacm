@@ -1,6 +1,14 @@
 /// Every reply of the list SACM Replies (D291), newest first. Matched: a message of the journal has its reference.
 table Replies
 
+	/// On a line of the replies of the Case and Person pages: the reference of the message it answers, when that message is about a finding of the page; blank hides the line.
+	measure 'Reply mark' =
+			VAR keys = VALUES ( Findings[Key] )
+			VAR ids = CALCULATETABLE ( VALUES ( JournalKeys[EventId] ), REMOVEFILTERS ( Journal ), TREATAS ( keys, JournalKeys[Key] ) )
+			VAR refs = CALCULATETABLE ( VALUES ( Journal[Ref] ), REMOVEFILTERS ( Journal ), TREATAS ( ids, Journal[Id] ), Journal[Type] = "message" )
+			VAR here = SELECTEDVALUE ( Replies[Ref] )
+			RETURN IF ( NOT ISBLANK ( here ) && here IN refs, here )
+
 	column Ref
 		dataType: string
 		sourceColumn: Ref

@@ -148,7 +148,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Actions of the team (the journal)'"
+                  "Value": "'Actions of the team (the journal), in the period chosen'"
                 }
               }
             }
@@ -168,7 +168,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Actions of the team (the journal)'"
+                  "Value": "'Actions of the team (the journal), in the period chosen'"
                 }
               }
             }

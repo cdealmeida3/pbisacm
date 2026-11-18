@@ -5,6 +5,12 @@ table Journal
 	measure Events = COUNTROWS ( Journal ) + 0
 		formatString: #,0
 
+	/// On a line of the timeline of the Case and Person pages: how many findings of the page (the CI or the person of the drill through) the event names ("2 findings"); blank hides the line.
+	measure 'Timeline mark' =
+			VAR keys = VALUES ( Findings[Key] )
+			VAR n = CALCULATE ( COUNTROWS ( JournalKeys ), TREATAS ( keys, JournalKeys[Key] ) )
+			RETURN IF ( n > 0, n & IF ( n = 1, " finding", " findings" ) )
+
 	column Id
 		dataType: string
 		sourceColumn: Id
@@ -14,6 +20,12 @@ table Journal
 		formatString: d mmm yyyy hh:nn
 		summarizeBy: none
 		sourceColumn: At
+
+	column Day
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: Day
 
 	column By
 		dataType: string

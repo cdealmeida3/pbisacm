@@ -16,6 +16,12 @@ table Activity
 		summarizeBy: none
 		sourceColumn: At
 
+	column Day
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: Day
+
 	column Type
 		dataType: string
 		sourceColumn: Type

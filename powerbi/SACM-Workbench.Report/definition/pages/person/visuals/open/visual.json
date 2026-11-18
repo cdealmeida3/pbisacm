@@ -119,6 +119,51 @@
               "queryRef": "Findings.Cc",
               "nativeQueryRef": "Cc",
               "displayName": "Copied"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Line status"
+                }
+              },
+              "queryRef": "CaseLines.Line status",
+              "nativeQueryRef": "Line status",
+              "displayName": "Status"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Line follow-up"
+                }
+              },
+              "queryRef": "CaseLines.Line follow-up",
+              "nativeQueryRef": "Line follow-up",
+              "displayName": "Follow-up"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Line who"
+                }
+              },
+              "queryRef": "CaseLines.Line who",
+              "nativeQueryRef": "Line who",
+              "displayName": "Who has it"
             }
           ]
         }

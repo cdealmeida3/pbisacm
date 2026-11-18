@@ -11,8 +11,8 @@
         from = DateTime.Date(start),
         to = DateTime.Date(end),
         files = fnReadFiles(Date.AddDays(from, -ReadDays), to),
-        cis = Table.Sort(Table.SelectRows(files, each [Kind] = "ci" and [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
-            {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}}),
+        cis = Table.Buffer(Table.Sort(Table.SelectRows(files, each [Kind] = "ci" and [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
+            {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})),
         days = List.Buffer(List.Distinct(cis[ReportDate])),
         runOf = (day as date) as record => fnCheckRun(Table.Last(Table.SelectRows(cis, each [ReportDate] = day)), files),
         partsOf = (run as record) as list => {

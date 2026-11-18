@@ -15,6 +15,31 @@
       "source": "date",
       "target": "actions",
       "type": "NoFilter"
+    },
+    {
+      "source": "period",
+      "target": "record",
+      "type": "NoFilter"
+    },
+    {
+      "source": "period",
+      "target": "verified",
+      "type": "NoFilter"
+    },
+    {
+      "source": "period",
+      "target": "exceptions",
+      "type": "NoFilter"
+    },
+    {
+      "source": "period",
+      "target": "reviews",
+      "type": "NoFilter"
+    },
+    {
+      "source": "period",
+      "target": "date",
+      "type": "NoFilter"
     }
   ]
 }

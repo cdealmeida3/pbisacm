@@ -48,15 +48,15 @@
                 key = fact[Key],
                 own = eventsOf(key),
                 covering = List.Select(standing, (event) => covers(event, fact[CheckId], fact[CiKey])),
-                timeline = if List.IsEmpty(covering) then own else List.Sort(own & covering, order),
+                timeline = List.Buffer(if List.IsEmpty(covering) then own else List.Sort(own & covering, order)),
                 inLatest = fact[InLatest],
                 untested = not inLatest and not Record.HasFields(tested, fact[CheckId] & ":" & fact[Field]),
                 // A contract is not in the CI report: the contract files are complete lists, so a contract gone from a tested check is solved.
                 ciMissing = not inLatest and not Record.HasFields(reportCis, fact[CiKey]) and not Text.StartsWith(fact[CiKey], "contract:"),
-                messages = List.Select(timeline, (event) => event[Type] = "message"),
+                messages = List.Buffer(List.Select(timeline, (event) => event[Type] = "message")),
                 lastMessage = List.Last(messages, null),
-                replies = List.Sort(List.Distinct(List.Combine(List.Transform(messages, (message) => Record.FieldOrDefault(repliesByRef, message[Ref], {})))),
-                    (a, b) => Value.Compare(a[Received], b[Received])),
+                replies = List.Buffer(List.Sort(List.Distinct(List.Combine(List.Transform(messages, (message) => Record.FieldOrDefault(repliesByRef, message[Ref], {})))),
+                    (a, b) => Value.Compare(a[Received], b[Received]))),
                 manual = List.Last(List.Select(timeline, (event) => event[Type] = "status" or event[Type] = "exception"), null),
                 asked = if lastMessage = null then "New" else if List.AnyTrue(List.Transform(replies, (reply) => reply[Received] >= lastMessage[At])) then "Answered" else "Contacted",
                 // An exception stands until a manager sets another status or its review date comes; a status stands until a later message.
@@ -98,7 +98,9 @@
                     Replies = replies, LastReplyOn = if List.IsEmpty(replies) then null else dateOf(List.Last(replies)[Received]),
                     ExceptionReason = if exception = null then "" else if legacy then "Set before version 0.12 (no reason)" else exception[Reason],
                     ReviewOn = if exception = null then null else dateOf(exception[ReviewOn]), ExceptionEnded = dateOf(ended), RetireOn = dateOf(retireOn),
-                    VerifiedOn = if solved then date else null, Events = List.Count(timeline),
+                    VerifiedOn = if solved then date else null,
+                    FixedBy = if status = "Fixed" and manual <> null then (if manual[ByName] <> "" then manual[ByName] else manual[By]) else "",
+                    FixedOn = if status = "Fixed" and manual <> null then dateOf(manual[At]) else null, Events = List.Count(timeline),
                     // The last time a manager acted on the case (a status, an exception, a message): a reply before it is read.
                     Acted = List.Max(List.Transform(List.Select(timeline, (event) => List.Contains({"status", "exception", "message"}, event[Type])), (event) => event[At]), ""),
                     Closed = status = "Verified" or status = "Not followed up"

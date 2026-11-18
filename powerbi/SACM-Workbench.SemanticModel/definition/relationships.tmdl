@@ -78,3 +78,11 @@ relationship JournalKeys_Journal
 relationship JournalKeys_CaseLines
 	fromColumn: JournalKeys.Key
 	toColumn: CaseLines.Key
+
+relationship Journal_Date
+	fromColumn: Journal.Day
+	toColumn: Date.Date
+
+relationship Activity_Date
+	fromColumn: Activity.Day
+	toColumn: Date.Date

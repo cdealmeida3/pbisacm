@@ -22,8 +22,8 @@ expression SharePointSite = "https://contoso.sharepoint.com/sites/sacm" meta [Is
 expression SourceMode = "Sample" meta [IsParameterQuery = true, List = {"Sample", "SharePoint"}, DefaultValue = "Sample", Type = "Text", IsParameterQueryRequired = true]
 	queryGroup: Parameters
 
-/// Where the team's state comes from (D291): the journal, the replies, the settings, the team and the lifecycle reviews. "Sample": invented rows packed in this file (powerbi/samples/state/), so the history pages show something. "SharePoint": the five lists of the team site (SharePointSite; powerbi/README.md says how to make them). Empty lists are fine: every case is then New.
-expression StateMode = "Sample" meta [IsParameterQuery = true, List = {"Sample", "SharePoint"}, DefaultValue = "Sample", Type = "Text", IsParameterQueryRequired = true]
+/// Where the team's state comes from (D291): the journal, the replies, the settings, the team and the lifecycle reviews. "Sample": invented rows packed in this file (powerbi/samples/state/), so the history pages show something. "SharePoint": the five lists of the team site (SharePointSite; powerbi/README.md says how to make them). Empty lists are fine: every case is then New. "None": no state at all (every case New), for the real reports before the lists exist.
+expression StateMode = "Sample" meta [IsParameterQuery = true, List = {"Sample", "SharePoint", "None"}, DefaultValue = "Sample", Type = "Text", IsParameterQueryRequired = true]
 	queryGroup: Parameters
 
 /// GENERATED from checks/packs/. Every check file, in the order of the file names, with its folder.
@@ -133,6 +133,8 @@ expression RunColumnTypes =
 		    {"CaseLines.ExceptionEnded", type nullable date},
 		    {"CaseLines.RetireOn", type nullable date},
 		    {"CaseLines.VerifiedOn", type nullable date},
+		    {"CaseLines.FixedBy", type nullable text},
+		    {"CaseLines.FixedOn", type nullable date},
 		    {"CaseLines.Events", Int64.Type},
 		    {"Exceptions.Target", type nullable text},
 		    {"Exceptions.CheckId", type nullable text},
@@ -390,7 +392,7 @@ expression fnCapabilitySheetPart =
 expression fnCapital = (value as text) as text => Text.Upper(Text.Start(value, 1), "en-US") & Text.Middle(value, 1)
 	queryGroup: Reading
 
-/// The part CaseLines of the table Run (D292), which the DAX table CaseLines shows: one line per case of the newest report (fnCases), with its status (StatusLabel: the word the pages show, "Asked" for Contacted), how it is listed, who has it, the messages, the replies, the decision to stop following it and when the newest report verified it. `cases` is fnCases(CheckRun).
+/// The part CaseLines of the table Run (D292), which the DAX table CaseLines shows: one line per case of the newest report (fnCases), with its status (StatusLabel: the word the pages show, "Asked" for Contacted), how it is listed, who has it, the messages, the replies, the decision to stop following it, who marked it fixed and when, and when the newest report verified it. `cases` is fnCases(CheckRun).
 expression fnCaseLinesPart =
 		(cases as list) as table =>
 		    #table(
@@ -398,12 +400,12 @@ expression fnCaseLinesPart =
 		            InLatest = logical, Untested = logical, CiMissing = logical, State = text, StateLabel = text, Status = text, StatusLabel = text,
 		            AssignedTo = text, HandoverNote = text, Request = text, Messages = Int64.Type, SentOn = date, LastMessageTo = text, LastRef = text,
 		            ReminderFrom = date, Remind = text, Replies = Int64.Type, LastReplyOn = date, ExceptionReason = text, ReviewOn = date,
-		            ExceptionEnded = date, RetireOn = date, VerifiedOn = date, Events = Int64.Type],
+		            ExceptionEnded = date, RetireOn = date, VerifiedOn = date, FixedBy = text, FixedOn = date, Events = Int64.Type],
 		        List.Transform(cases, (item) => {
 		            item[Key], item[CheckId], item[CiKey], item[CiName], item[ClassLabel], item[Field], item[ContactName], item[InLatest], item[Untested], item[CiMissing],
 		            item[State], item[StateLabel], item[Status], item[StatusLabel], item[AssignedTo], item[HandoverNote], item[Request], item[Messages], item[SentOn], item[LastMessageTo],
 		            item[LastRef], item[ReminderFrom], item[Remind], List.Count(item[Replies]), item[LastReplyOn], item[ExceptionReason], item[ReviewOn],
-		            item[ExceptionEnded], item[RetireOn], item[VerifiedOn], item[Events]}))
+		            item[ExceptionEnded], item[RetireOn], item[VerifiedOn], item[FixedBy], item[FixedOn], item[Events]}))
 	queryGroup: Reading
 
 /// The cases of the newest report (D292), as the app works out its cases (src/core/cases/cases.ts, buildCases), from the findings of the newest report, the journal and the replies. A case is every finding of the newest report that is not parked, and every key the journal names that the newest report no longer shows (the team worked on it). Status (DOMAIN-RULES §17): New, Contacted, Answered (a reply after the last message), Fix in progress, Fixed, Not followed up (until its review date), Verified (the newest report contains the CI, tested the check and no longer shows the finding). State: how the case is listed, from the finding (a planned retirement date after today makes it wait; "Ask the owner" makes a finding to check one to solve); "" for a key the newest report no longer shows. Remind: "reminder" or "escalation" once ReminderFrom comes, for a case that was asked and did not answer (D39, D40); the measures compare ReminderFrom with today, so it is right between two refreshes. Every message counts as sent on the day it was recorded (the outbox is the app's, D162). `run` is CheckRun (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run.
@@ -447,15 +449,15 @@ expression fnCases =
 		                key = fact[Key],
 		                own = eventsOf(key),
 		                covering = List.Select(standing, (event) => covers(event, fact[CheckId], fact[CiKey])),
-		                timeline = if List.IsEmpty(covering) then own else List.Sort(own & covering, order),
+		                timeline = List.Buffer(if List.IsEmpty(covering) then own else List.Sort(own & covering, order)),
 		                inLatest = fact[InLatest],
 		                untested = not inLatest and not Record.HasFields(tested, fact[CheckId] & ":" & fact[Field]),
 		                // A contract is not in the CI report: the contract files are complete lists, so a contract gone from a tested check is solved.
 		                ciMissing = not inLatest and not Record.HasFields(reportCis, fact[CiKey]) and not Text.StartsWith(fact[CiKey], "contract:"),
-		                messages = List.Select(timeline, (event) => event[Type] = "message"),
+		                messages = List.Buffer(List.Select(timeline, (event) => event[Type] = "message")),
 		                lastMessage = List.Last(messages, null),
-		                replies = List.Sort(List.Distinct(List.Combine(List.Transform(messages, (message) => Record.FieldOrDefault(repliesByRef, message[Ref], {})))),
-		                    (a, b) => Value.Compare(a[Received], b[Received])),
+		                replies = List.Buffer(List.Sort(List.Distinct(List.Combine(List.Transform(messages, (message) => Record.FieldOrDefault(repliesByRef, message[Ref], {})))),
+		                    (a, b) => Value.Compare(a[Received], b[Received]))),
 		                manual = List.Last(List.Select(timeline, (event) => event[Type] = "status" or event[Type] = "exception"), null),
 		                asked = if lastMessage = null then "New" else if List.AnyTrue(List.Transform(replies, (reply) => reply[Received] >= lastMessage[At])) then "Answered" else "Contacted",
 		                // An exception stands until a manager sets another status or its review date comes; a status stands until a later message.
@@ -497,7 +499,9 @@ expression fnCases =
 		                    Replies = replies, LastReplyOn = if List.IsEmpty(replies) then null else dateOf(List.Last(replies)[Received]),
 		                    ExceptionReason = if exception = null then "" else if legacy then "Set before version 0.12 (no reason)" else exception[Reason],
 		                    ReviewOn = if exception = null then null else dateOf(exception[ReviewOn]), ExceptionEnded = dateOf(ended), RetireOn = dateOf(retireOn),
-		                    VerifiedOn = if solved then date else null, Events = List.Count(timeline),
+		                    VerifiedOn = if solved then date else null,
+		                    FixedBy = if status = "Fixed" and manual <> null then (if manual[ByName] <> "" then manual[ByName] else manual[By]) else "",
+		                    FixedOn = if status = "Fixed" and manual <> null then dateOf(manual[At]) else null, Events = List.Count(timeline),
 		                    // The last time a manager acted on the case (a status, an exception, a message): a reply before it is read.
 		                    Acted = List.Max(List.Transform(List.Select(timeline, (event) => List.Contains({"status", "exception", "message"}, event[Type])), (event) => event[At]), ""),
 		                    Closed = status = "Verified" or status = "Not followed up"
@@ -664,10 +668,19 @@ expression fnExceptionsPart =
 		        steps = List.Combine(List.Transform(JournalEvents, (event) =>
 		            if event[Type] = "exception" and List.IsEmpty(event[Keys]) and event[CiKey] <> "" then {[Target = (if event[CheckId] = "" then "*" else event[CheckId]) & "|" & event[CiKey], Event = event, Exception = true]}
 		            else List.Transform(List.Select(event[Keys], (key) => isException(event) or event[Type] = "status"), (key) => [Target = key, Event = event, Exception = isException(event)]))),
-		        state = List.Accumulate(steps, [Last = [], After = []], (memory, step) =>
-		            if step[Exception] then [Last = Record.AddField(Record.RemoveFields(memory[Last], {step[Target]}, MissingField.Ignore), step[Target], step[Event]), After = Record.RemoveFields(memory[After], {step[Target]}, MissingField.Ignore)]
-		            else if Record.HasFields(memory[Last], step[Target]) then [Last = memory[Last], After = Record.AddField(Record.RemoveFields(memory[After], {step[Target]}, MissingField.Ignore), step[Target], true)]
-		            else memory),
+		        // Per target, in the order of the journal: its last exception, and whether a status came after it (speed rule 6:
+		        // grouped once, no growing record).
+		        byTarget = fnGroupBy(steps, (step) => step[Target]),
+		        summaries = List.Buffer(List.RemoveNulls(List.Transform(Record.FieldNames(byTarget), (target) =>
+		            let
+		                group = List.Buffer(Record.Field(byTarget, target)),
+		                lastAt = List.Last(List.Select(List.Positions(group), (at) => group{at}[Exception]), null)
+		            in
+		                if lastAt = null then null else [Target = target, Event = group{lastAt}[Event], After = lastAt < List.Count(group) - 1]))),
+		        state = [
+		            Last = Record.FromList(List.Transform(summaries, (item) => item[Event]), List.Transform(summaries, (item) => item[Target])),
+		            After = fnKeySet(List.Transform(List.Select(summaries, (item) => item[After]), (item) => item[Target]))
+		        ],
 		        targets = Record.FieldNames(state[Last]),
 		        line = (target as text) as list =>
 		            let
@@ -867,8 +880,8 @@ expression fnHistoryRun =
 		        from = DateTime.Date(start),
 		        to = DateTime.Date(end),
 		        files = fnReadFiles(Date.AddDays(from, -ReadDays), to),
-		        cis = Table.Sort(Table.SelectRows(files, each [Kind] = "ci" and [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
-		            {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}}),
+		        cis = Table.Buffer(Table.Sort(Table.SelectRows(files, each [Kind] = "ci" and [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
+		            {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})),
 		        days = List.Buffer(List.Distinct(cis[ReportDate])),
 		        runOf = (day as date) as record => fnCheckRun(Table.Last(Table.SelectRows(cis, each [ReportDate] = day)), files),
 		        partsOf = (run as record) as list => {
@@ -1926,7 +1939,7 @@ expression fnStateList =
 		                found = Table.SelectRows(lists, each [Title] = spec[list])
 		            in
 		                if Table.IsEmpty(found) then {} else Table.ToRecords(found{0}[Items]),
-		        rows = if StateMode = "SharePoint" then sharePointRows else sampleRows,
+		        rows = if StateMode = "SharePoint" then sharePointRows else if StateMode = "None" then {} else sampleRows,
 		        asText = (value as any) as text =>
 		            if value = null then ""
 		            else if value is datetimezone then DateTime.ToText(DateTimeZone.RemoveZone(DateTimeZone.ToLocal(value)), [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])
@@ -4104,13 +4117,13 @@ expression ActivityRows =
 		            checks = List.Transform(event[Keys], checkOf) & (if List.IsEmpty(event[Keys]) and event[CheckId] <> "" and event[CheckId] <> "*" then {event[CheckId]} else {})
 		        in
 		            {
-		                event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), event[Type], said[Icon], said[What],
+		                event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), Date.FromText(Text.Start(event[At], 10), [Format = "yyyy-MM-dd", Culture = "en-US"]), event[Type], said[Icon], said[What],
 		                if event[ByName] <> "" then event[ByName] else event[By], said[Text], cardWords(checks),
 		                List.Count(List.Distinct(List.Select(List.Transform(event[Keys], ciOf), (key) => key <> ""))), List.Count(event[Keys])
 		            },
 		    lines = List.Transform(List.Reverse(JournalEvents), line)
 		in
-		    #table(type table [Id = text, At = datetime, Type = text, Icon = text, What = text, By = text, Text = text, Cards = text, CIs = Int64.Type, Keys = Int64.Type], lines)
+		    #table(type table [Id = text, At = datetime, Day = date, Type = text, Icon = text, What = text, By = text, Text = text, Cards = text, CIs = Int64.Type, Keys = Int64.Type], lines)
 	queryGroup: Tables
 
 /// Table Checks: one row per check file that is not "off" (D141), from the check files packed by the generator (CheckFiles). The check files stay the one place where a check is described (D16).
@@ -4285,17 +4298,17 @@ expression JournalKeysRows =
 		    #table(type table [EventId = text, Key = text, CheckId = text, Type = text, At = datetime], rows)
 	queryGroup: Tables
 
-/// Table Journal (D291): every event of the list SACM Journal, oldest first (JournalEvents). Keys holds the finding keys of the event, one per line, as the list does; the table JournalKeys has one row per key.
+/// Table Journal (D291): every event of the list SACM Journal, oldest first (JournalEvents). Keys holds the finding keys of the event, one per line, as the list does; the table JournalKeys has one row per key. Day: the day of At, for the period of the Audit page (the table Date).
 expression JournalRows =
 		let
 		    dateOf = (value as text) as nullable date => if value = "" then null else Date.FromText(Text.Start(value, 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
 		    rows = List.Transform(JournalEvents, (event) => {
-		        event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), event[By], event[ByName], if event[ByName] <> "" then event[ByName] else event[By],
+		        event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), dateOf(event[At]), event[By], event[ByName], if event[ByName] <> "" then event[ByName] else event[By],
 		        event[Type], Text.Combine(event[Keys], "#(lf)"), List.Count(event[Keys]), event[Text], event[Ref], event[To], event[Cc], event[Subject], event[Kind],
 		        event[Channel], event[Person], event[Reason], dateOf(event[ReviewOn]), dateOf(event[RetireOn]), event[CheckId], event[CiKey], event[CiName]})
 		in
 		    #table(
-		        type table [Id = text, At = datetime, By = text, ByName = text, Who = text, Type = text, Keys = text, KeyCount = Int64.Type, Text = text, Ref = text,
+		        type table [Id = text, At = datetime, Day = date, By = text, ByName = text, Who = text, Type = text, Keys = text, KeyCount = Int64.Type, Text = text, Ref = text,
 		            To = text, Cc = text, Subject = text, Kind = text, Channel = text, Person = text, Reason = text, ReviewOn = date, RetireOn = date,
 		            CheckId = text, CiKey = text, CiName = text],
 		        rows)
@@ -4426,7 +4439,7 @@ expression TeamRows =
 		    rows = Table.ToRecords(fnStateList("team")),
 		    lines = List.Transform(rows, (row) => {row[Title], Text.Lower(Text.Trim(row[Email]), "en-US"), not List.Contains({"no", "false", "0"}, Text.Lower(Text.Trim(row[Active]), "en-US"))}),
 		    firstActive = List.First(List.Select(lines, (item) => item{2}), null),
-		    marked = List.Transform(lines, (item) => item & {SourceMode = "Sample" and firstActive <> null and item{1} = firstActive{1}})
+		    marked = List.Transform(lines, (item) => item & {StateMode = "Sample" and firstActive <> null and item{1} = firstActive{1}})
 		in
 		    #table(type table [Name = text, Email = text, Active = logical, SampleMe = logical], marked)
 	queryGroup: Tables

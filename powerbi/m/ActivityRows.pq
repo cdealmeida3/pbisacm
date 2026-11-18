@@ -51,10 +51,10 @@ let
             checks = List.Transform(event[Keys], checkOf) & (if List.IsEmpty(event[Keys]) and event[CheckId] <> "" and event[CheckId] <> "*" then {event[CheckId]} else {})
         in
             {
-                event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), event[Type], said[Icon], said[What],
+                event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), Date.FromText(Text.Start(event[At], 10), [Format = "yyyy-MM-dd", Culture = "en-US"]), event[Type], said[Icon], said[What],
                 if event[ByName] <> "" then event[ByName] else event[By], said[Text], cardWords(checks),
                 List.Count(List.Distinct(List.Select(List.Transform(event[Keys], ciOf), (key) => key <> ""))), List.Count(event[Keys])
             },
     lines = List.Transform(List.Reverse(JournalEvents), line)
 in
-    #table(type table [Id = text, At = datetime, Type = text, Icon = text, What = text, By = text, Text = text, Cards = text, CIs = Int64.Type, Keys = Int64.Type], lines)
+    #table(type table [Id = text, At = datetime, Day = date, Type = text, Icon = text, What = text, By = text, Text = text, Cards = text, CIs = Int64.Type, Keys = Int64.Type], lines)

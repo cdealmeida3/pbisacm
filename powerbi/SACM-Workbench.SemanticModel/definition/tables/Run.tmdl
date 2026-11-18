@@ -218,6 +218,16 @@ table Run
 		summarizeBy: none
 		sourceColumn: CaseLines.VerifiedOn
 
+	column 'CaseLines.FixedBy'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CaseLines.FixedBy
+
+	column 'CaseLines.FixedOn'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: CaseLines.FixedOn
+
 	column 'CaseLines.Events'
 		dataType: int64
 		summarizeBy: none
