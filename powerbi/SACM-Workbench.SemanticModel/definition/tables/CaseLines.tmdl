@@ -53,7 +53,8 @@ table CaseLines
 			VAR n = MAX ( CaseLines[Messages] )
 			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "Answered" )
 			RETURN
-			    IF (
+			    SWITCH (
+			        TRUE (),
 			        COUNTROWS ( CaseLines ) = 0,
 			        BLANK (),
 			        n = 0,

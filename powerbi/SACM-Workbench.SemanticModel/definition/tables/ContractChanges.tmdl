@@ -5,10 +5,10 @@ table ContractChanges
 	measure 'Changes line' =
 			VAR added = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "New contract" ) + 0
 			VAR gone = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "No longer in the file" ) + 0
-			VAR status = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Status change" ) + 0
+			VAR statusChanges = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Status change" ) + 0
 			VAR fields = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Changed field" ) + 0
 			RETURN
-			    added & " new · " & gone & " no longer in the file · " & status & IF ( status = 1, " status change", " status changes" ) & " · " & fields & IF ( fields = 1, " changed field", " changed fields" )
+			    added & " new · " & gone & " no longer in the file · " & statusChanges & IF ( statusChanges = 1, " status change", " status changes" ) & " · " & fields & IF ( fields = 1, " changed field", " changed fields" )
 
 	/// Which two Solusi contract files are compared, or why nothing is. From the files themselves, so it is right when nothing changed.
 	measure 'Changes head' =

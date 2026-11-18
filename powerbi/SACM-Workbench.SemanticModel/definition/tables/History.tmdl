@@ -146,10 +146,10 @@ table History
 
 	/// Of the findings of the period, those first seen in it (findings.csv, "New in the period").
 	measure 'New in the period' =
-			VAR from = [Period from]
-			VAR to = [Period to]
-			VAR keys = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= from, Runs[ReportDate] <= to, History[State] = "open" )
-			VAR fresh = FILTER ( keys, VAR firstSeen = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( Runs ), ALLEXCEPT ( History, History[Key] ) ) RETURN firstSeen >= from && firstSeen <= to )
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			VAR keys = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= fromDate, Runs[ReportDate] <= toDate, History[State] = "open" )
+			VAR fresh = FILTER ( keys, VAR firstSeen = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( Runs ), ALLEXCEPT ( History, History[Key] ) ) RETURN firstSeen >= fromDate && firstSeen <= toDate )
 			RETURN IF ( NOT ISEMPTY ( keys ), COUNTROWS ( fresh ) + 0 )
 		formatString: #,0
 
@@ -178,11 +178,11 @@ table History
 
 	/// The line over the verified findings: how many a report of the period verified, the average and the longest days to verify.
 	measure 'Verified line' =
-			VAR from = [Period from]
-			VAR to = [Period to]
-			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < from )
-			VAR candidates = CALCULATETABLE ( SUMMARIZE ( History, History[Key], History[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < to, Runs[ReportDate] >= COALESCE ( priorDate, from ) )
-			VAR verified = FILTER ( ADDCOLUMNS ( candidates, "@on", [Verified on], "@days", [Days to verify] ), NOT ISBLANK ( [@on] ) && [@on] >= from && [@on] <= to )
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < fromDate )
+			VAR candidates = CALCULATETABLE ( SUMMARIZE ( History, History[Key], History[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < toDate, Runs[ReportDate] >= COALESCE ( priorDate, fromDate ) )
+			VAR verified = FILTER ( ADDCOLUMNS ( candidates, "@on", [Verified on], "@days", [Days to verify] ), NOT ISBLANK ( [@on] ) && [@on] >= fromDate && [@on] <= toDate )
 			VAR n = COUNTROWS ( verified ) + 0
 			RETURN
 			    IF (

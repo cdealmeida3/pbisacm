@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization.Metadata;
 using Microsoft.AnalysisServices.AdomdClient;
 using Tom = Microsoft.AnalysisServices.Tabular;
 
@@ -17,7 +18,7 @@ var repository = Path.GetFullPath(args[1]);
 var outFolder = Path.GetFullPath(args[2]);
 Directory.CreateDirectory(outFolder);
 var result = new JsonObject { ["opened"] = false, ["modelErrors"] = new JsonArray(), ["results"] = new JsonArray() };
-void Save() => File.WriteAllText(Path.Combine(outFolder, "results.json"), result.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+void Save() => File.WriteAllText(Path.Combine(outFolder, "results.json"), result.ToJsonString(new JsonSerializerOptions { WriteIndented = true, TypeInfoResolver = new DefaultJsonTypeInfoResolver() }));
 
 // 1. The model Desktop loaded: wait until the database is there (Desktop loads it after it starts the engine).
 var server = new Tom.Server();
