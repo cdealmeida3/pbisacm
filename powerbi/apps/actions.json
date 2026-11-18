@@ -1,0 +1,21 @@
+{
+  "note": "The actions of the Power App SACM actions (build B6, D294). One entry per action: what it is called, the journal event it adds to the list SACM Journal (type and fixed text; DATA-MODEL §3) and what the manager types or picks (asks). scope 'line': the model gives the action to each case it applies to (the column Actions of CaseLines, fnCaseActions); the app offers it when every selected line has it. scope 'mine': on the open lines assigned to the manager. scope 'person': when every selected line is about one person. The app only adds rows, never changes or removes one (D272). The words of the buttons are those of the HTML app; a check file can give its own (playbook askAfterReview, askWhenUnsure, markWord).",
+  "actions": [
+    { "id": "note", "label": "Note", "type": "note", "scope": "line", "asks": ["text"] },
+    { "id": "status", "label": "Status", "type": "status", "scope": "line", "asks": ["status"] },
+    { "id": "request", "label": "Request number", "type": "request", "scope": "line", "asks": ["request"] },
+    { "id": "assign", "label": "Assign", "type": "assign", "scope": "line", "asks": ["member"] },
+    { "id": "stop", "label": "Stop following", "type": "exception", "scope": "line", "asks": ["reason", "reviewOn", "text"] },
+    { "id": "follow-again", "label": "Follow again", "type": "exception", "scope": "line", "text": "Ended by hand", "asks": [] },
+    { "id": "fixed", "label": "Fixed", "type": "status", "scope": "line", "text": "Fixed", "asks": [] },
+    { "id": "undo-fixed", "label": "Undo the mark", "type": "status", "scope": "line", "text": "New", "asks": [] },
+    { "id": "ask-owner", "label": "Ask the owner", "type": "reviewed", "scope": "line", "text": "Ask the owner", "asks": [] },
+    { "id": "back-to-sacm", "label": "Back to SACM", "type": "reviewed", "scope": "line", "text": "Back to review", "asks": [] },
+    { "id": "retirement", "label": "Retirement date", "type": "retirement", "scope": "line", "asks": ["retireOn"] },
+    { "id": "stage", "label": "Stage", "type": "stage", "scope": "line", "asks": ["stage"] },
+    { "id": "no-process", "label": "The process does not exist", "type": "no-process", "scope": "line", "text": "yes", "asks": [] },
+    { "id": "no-process-undo", "label": "Undo: the process does not exist", "type": "no-process", "scope": "line", "text": "no", "asks": [] },
+    { "id": "handover", "label": "Hand over my work", "type": "handover", "scope": "mine", "asks": ["member", "text"] },
+    { "id": "person-note", "label": "Note about the person", "type": "person-note", "scope": "person", "asks": ["text"] }
+  ]
+}

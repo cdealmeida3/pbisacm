@@ -31,6 +31,10 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES, tmdlName } from './t
 import type { SourceTable } from './tmdl.ts';
 import { expectedHistory, HISTORY_FILES, STATE_LISTS } from './history.ts';
 import { compilePattern, fastForm } from './regex.ts';
+import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml } from './actions.ts';
+import { STATUSES } from '../../src/core/cases/cases.ts';
+import { EXCEPTION_REASONS } from '../../src/core/audit/audit.ts';
+import { statusWord } from '../../src/app/view/cases.ts';
 import type { FastForm, Node } from './regex.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -276,6 +280,8 @@ function packed(): Query[] {
     { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The five lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
     { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.',
       m: json(Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }]))) },
+    { name: 'AppActions', group: 'Packed', description: 'GENERATED from powerbi/apps/actions.json (D294). The actions of the Power App SACM actions: id, label, the journal event, its scope and what the manager types; fnCaseActions gives each case the actions of scope line that apply.',
+      m: json(JSON.parse(readFileSync(ACTIONS_FILE, 'utf8'))) },
     { name: 'ExpectedHistory', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team\'s state, for the Self-check page.', m: mText(JSON.stringify(EXPECTED_HISTORY)) },
     { name: 'ExpectedResult', group: 'Packed', description: 'GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.', m: mText(JSON.stringify(expectedResult())) },
     { name: 'WorkbenchVersion', group: 'Packed', description: 'GENERATED from package.json. The version of the Workbench.', m: mText(version) },
@@ -414,6 +420,14 @@ export function theme(): Record<string, unknown> {
 
 const themeText = (): string => `${JSON.stringify(theme(), null, 2)}\n`;
 
+/* ------------------------------------------------------------------ the Power App (build B6) */
+
+/** The generated files of the Power App SACM actions, by path: its named formulas and its App (D294). */
+export function appFiles(): Array<{ file: string; text: string }> {
+  const formulas = appFormulas(STATUSES, statusWord, EXCEPTION_REASONS, DEFAULT_SETTINGS.exceptionMonths);
+  return [{ file: APP_FORMULAS_FILE, text: formulas }, { file: APP_YAML_FILE, text: appYaml(formulas) }];
+}
+
 /* ------------------------------------------------------------------ write or check */
 
 /** The queries whose M differs from what the generator writes, and the queries missing or not generated. */
@@ -431,6 +445,7 @@ export function staleQueries(): string[] {
     if (!existsSync(file) || readFileSync(file, 'utf8').replace(/\r\n/g, '\n') !== runTmdl(source)) problems.push(`${relative(root, file)}: not the columns of the calculated tables`);
   }
   if (!existsSync(THEME_FILE) || readFileSync(THEME_FILE, 'utf8').replace(/\r\n/g, '\n') !== themeText()) problems.push(`${relative(root, THEME_FILE)}: not the theme of the colours of LOOK.md`);
+  for (const { file, text } of appFiles()) if (!existsSync(file) || readFileSync(file, 'utf8').replace(/\r\n/g, '\n') !== text) problems.push(`${relative(root, file)}: not what actions.json and formulas.fx give`);
   return problems;
 }
 
@@ -444,5 +459,6 @@ if (process.argv[1] === import.meta.filename) {
   writeFileSync(EXPRESSIONS_FILE, expressionsTmdl());
   writeFileSync(THEME_FILE, themeText());
   for (const source of SOURCE_TABLES) writeFileSync(SOURCE_FILES[source], runTmdl(source));
-  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${SOURCE_TABLES.map((source) => relative(root, SOURCE_FILES[source])).join(', ')} and ${relative(root, THEME_FILE)}.`);
+  for (const { file, text } of appFiles()) writeFileSync(file, text);
+  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${SOURCE_TABLES.map((source) => relative(root, SOURCE_FILES[source])).join(', ')}, ${relative(root, THEME_FILE)} and the Power App\'s formulas.`);
 }

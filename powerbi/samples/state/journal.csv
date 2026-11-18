@@ -31,3 +31,5 @@ J0017,2026-11-10T09:20:00,sam@example.com,Sam Example,reviewed,CRIT-ABOVE-PARENT
 J0018,2026-11-10T11:00:00,sam@example.com,Sam Example,message,MAPPING:event gateway - prod:mapping,,SACM-JK90LM,Dee Owner,,Event Gateway - PROD: mapping session,first,teams,,,,,,,
 J0019,2026-11-10T11:30:00,alex@example.com,Alex Example,person-note,,Prefers a Teams chat to an email,,,,,,,cy01,,,,,,
 J0020,2026-11-11T08:05:00,alex@example.com,Alex Example,note,RESP-MISSING:close the month:managed_by,Asked the Process Management team in the weekly meeting,,,,,,,,,,,,,
+J0021,2026-11-10T13:00:00,sam@example.com,Sam Example,stage,MAPPING:event desk:mapping,session-held,,,,,,,,,,,,,
+J0022,2026-11-10T13:05:00,sam@example.com,Sam Example,no-process,MAPPING:event desk:mapping,yes,,,,,,,,,,,,,

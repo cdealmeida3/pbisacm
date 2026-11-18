@@ -234,7 +234,7 @@ A changed number of days is used when the next CI report is loaded. Every number
 | `npm run docs` | Writes [CHECKS.md](CHECKS.md) again from the check files |
 | `npm run browser` | The browser checks on invented data |
 
-## 13. The Power BI report (build B5)
+## 13. The Power BI report (build B6)
 
 The Power BI version of the Workbench (D268) is in `powerbi/`. How to open it: [powerbi/README.md](../powerbi/README.md). Build B5 runs the checks of the CI report, the Relationship report, the EPO systems report and the two contract files on every CI report date (the history, D290), reads the team's journal, replies, settings, team and lifecycle reviews from five SharePoint lists (D291), works out the cases as the app does (D292) and has thirteen pages (D293). The report opens on **My day**.
 
@@ -255,5 +255,7 @@ The Power BI version of the Workbench (D268) is in `powerbi/`. How to open it: [
 | **Self-check** (hidden) | How many checks give the result the HTML app records for the invented samples ("38 of 39": *Lifecycle review* is manual), and for each check what differs. Since B5 also the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up) against what the app counts on the two sample dates. |
 
 A refresh at the size of the real reports takes about 100 seconds on the test machine (version 0.42.0, with the history, D283), so the report is ready for the real reports. In the workspace an old report date is computed once and kept for 24 months (D290).
+
+**The Power App *SACM actions*** (build B6, D294 to D296) sits on the pages Card, Case, Person and My work (the Power Apps visual). It gets the lines of the page or the lines selected, and its menu **What to do** offers the actions every line has (the column *Actions* of the model, as the case panel of the HTML app): Note, Status, Request number, Assign, Stop following, Follow again, Fixed or Deleted and Undo the mark, Ask the owner and Back to SACM (or the words of the check file), Retirement date, Stage, The process does not exist and its undo, Hand over my work, Note about the person. Under it, what the action asks (a status, a request number, a member, a reason and a review date, a date, a stage, a note). **Save** adds one row to the list *SACM Journal* and starts the refresh (flow *SACMRefresh*); it is off until what the action asks is filled in, and at 1,000 lines. **Refresh now** starts the refresh only. Below: **Done lately**, the journal rows of the last 60 days about these lines, newest first, read from the list at once. The pages *My day* and *Reports* have a **Refresh now** button (the Power Automate visual, flow *SACM refresh now*). The app and the flows are made once in the company tenant: [powerbi/README.md](../powerbi/README.md) §6.
 
 Every page ends with the version, the data (invented samples or SharePoint) and the time of the last refresh. In Sample mode "today" is the date of the samples, 11 Nov 2026.

@@ -29,7 +29,7 @@ import { buildGraph, CLASS_WORDS } from '../../src/core/checks/detectors/relatio
 import type { RelationshipModel } from '../../src/core/checks/detectors/relationship-detectors.ts';
 import { systemsById } from '../../src/core/sources/epo/epo-report.ts';
 import { epoCorrection } from '../../src/app/view/cases.ts';
-import { mappingConfig, stagesFor } from '../../src/core/mapping/backlog.ts';
+import { mappingConfig, stageOf } from '../../src/core/mapping/backlog.ts';
 import type { Case, Run } from '../../src/core/cases/cases.ts';
 import type { CiPeople } from '../../src/app/view/people.ts';
 import { contractChanges, contractInformation } from '../../src/core/sources/contracts/contract-changes.ts';
@@ -272,11 +272,13 @@ export async function parityProblems(folder: string): Promise<string[]> {
   const numbered = (list: Row[]): Row[] => list.map((row, index) => ({ ...row, Line: `${index}` }));
   problems.push(...compare('RelationshipLinks', numbered(rows('RelationshipLinks')), numbered(links), 'Line', ['CiKey', 'Relation', 'Other', 'OtherClass', 'OtherStatus', 'Type', 'Counts', 'Excluded']));
 
-  // 10. The mapping backlog: one line per case of the mapping check, its stage the first of its class (no journal before build B5).
+  // 10. The mapping backlog: one line per case of the mapping check, its stage the one of the journal (stageOf; build B6),
+  // else the first of its class.
   const mapping = mappingConfig(references)!;
+  const timelines = new Map((await historyKey()).cases.map((item) => [item.key, item.timeline]));
   const backlog = run.facts.filter((fact) => fact.checkId === 'MAPPING').map((fact) => ({
     Key: fact.key, CiName: fact.ciName, ClassLabel: fact.classLabel, Owner: people[fact.ciKey]?.owned_by?.name ?? fact.contactName, ReasonIds: (fact.mapping ?? []).join(', '),
-    Stage: stagesFor(mapping, fact.className)[0]?.label ?? '', StateLabel: ({ open: 'To solve', review: 'To check', waiting: 'Waiting', known: 'Planned' } as Record<string, string>)[fact.state ?? 'open'],
+    Stage: stageOf(timelines.get(fact.key) ?? [], mapping, fact.className).stage?.label ?? '', StateLabel: ({ open: 'To solve', review: 'To check', waiting: 'Waiting', known: 'Planned' } as Record<string, string>)[fact.state ?? 'open'],
     Criticality: Array.from(new Set(run.facts.filter((other) => other.ciKey === fact.ciKey && (mapping.criticality ?? []).includes(other.checkId))
       .map((other) => loadPackFiles().map((file) => file.pack as { id: string; cardLabel?: string }).find((pack) => pack.id === other.checkId)?.cardLabel ?? other.checkId))).join(', ')
   }));
