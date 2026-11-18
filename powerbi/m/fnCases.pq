@@ -43,7 +43,7 @@
         exceptionWords = {"Waived", "Exception accepted", "Not followed up"},
         lastText = (timeline as list, kind as text) as text => let found = List.Last(List.Select(timeline, (event) => event[Type] = kind), null) in if found = null then "" else found[Text],
         dateOf = (value as text) as nullable date => if value = "" then null else Date.FromText(Text.Start(value, 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
-        line = (fact as record) as list =>
+        line = (fact as record) as record =>
             let
                 key = fact[Key],
                 own = eventsOf(key),
