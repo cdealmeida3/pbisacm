@@ -9,8 +9,11 @@
 //   - the EPO systems report is scaled like the CI report (about 1,000 systems);
 //   - each copy of the Relationship report links the CIs of its copy, and once more a parent of its copy to a child of
 //     the next copy, so there are about 1.6 relationships per CI, as in the real reports.
-// People, statuses, tags and criticality stay as in the samples (one person owns many CIs in real data too). The
-// contract files stay as they are. Everything stays invented: only the samples, with a number in front.
+//   - the contract files are scaled the same way (about 1,200 Solusi contracts, 1,700 ServiceNow contracts): each copy
+//     has its own contract numbers ("CT000001-C5", in the Vendor contract of ServiceNow too), names and EPO IDs; the label
+//     row of the Solusi file stays once.
+// People, statuses, tags and criticality stay as in the samples (one person owns many CIs in real data too). Everything
+// stays invented: only the samples, with a number in front.
 //   node tools/powerbi/scaled.ts --write <folder> [--copies <n>] [--history <k>]   writes the scaled files as CSV
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -41,6 +44,9 @@ export const copyDescription = (text: string, copy: number, name = ''): string =
   const close = /(<\/[a-z0-9]+>\s*)$/i.exec(text);
   return close ? `${text.slice(0, close.index)} (copy ${copy})${close[1]}` : `${text} (copy ${copy})`;
 };
+
+/** A contract number of copy n: CT000001 becomes CT000001-C5 in copy 5. An empty number stays empty. */
+export const copyNumber = (number: string, copy: number): string => (copy === 0 || number.trim() === '' ? number : `${number}-C${copy}`);
 
 /** The rows of a sample CSV file: the header and the rows, and its delimiter. */
 function sample(path: string): { header: string[]; rows: string[][]; delimiter: string; bom: boolean } {
@@ -95,6 +101,30 @@ function scaledEpo(copies: number): string {
   return (epo.bom ? BOM : '') + csv([epo.header, ...rows], epo.delimiter);
 }
 
+/** A Solusi contract file of the copies: numbers, names and EPO IDs of each copy; the label row (row 2) once. */
+function scaledSolusi(path: string, copies: number): string {
+  const solusi = sample(path);
+  const lower = solusi.header.map((value) => value.trim().toLowerCase());
+  const number = lower.indexOf('contract_no');
+  const name = lower.indexOf('contract_name');
+  const epoId = lower.indexOf('clm_contract_epo_id');
+  const [labels, ...rows] = solusi.rows;
+  const copied = Array.from({ length: copies }, (_, copy) => rows.map((row) => row.map((value, at) =>
+    at === number ? copyNumber(value, copy) : at === name ? copyName(value, copy) : at === epoId ? copyEpoId(value, copy) : value))).flat();
+  return (solusi.bom ? BOM : '') + csv([solusi.header, labels!, ...copied], solusi.delimiter);
+}
+
+/** The ServiceNow contract report of the copies: its own and its Solusi number (Vendor contract) and name per copy. */
+function scaledServiceNowContracts(copies: number): string {
+  const report = sample(SAMPLE_FILES.contracts.path);
+  const number = report.header.indexOf('number');
+  const vendorContract = report.header.indexOf('vendor_contract');
+  const name = report.header.indexOf('short_description');
+  const rows = Array.from({ length: copies }, (_, copy) => report.rows.map((row) => row.map((value, at) =>
+    at === number || at === vendorContract ? copyNumber(value, copy) : at === name ? copyName(value, copy) : value))).flat();
+  return (report.bom ? BOM : '') + csv([report.header, ...rows], report.delimiter);
+}
+
 /** A date `days` days before the yyyy-mm-dd date. */
 const daysBefore = (date: string, days: number): string => new Date(Date.parse(`${date}T00:00:00Z`) - days * 86_400_000).toISOString().slice(0, 10);
 
@@ -108,25 +138,27 @@ export interface ScaledFile { name: string; text?: string; base64: string }
 export function scaledSampleFiles(copies = REAL_SIZE_COPIES, history = 0): ScaledFile[] {
   const base64 = (text: string): string => Buffer.from(text, 'utf8').toString('base64');
   const scaled = (name: string, text: string): ScaledFile => ({ name, text, base64: base64(text) });
-  const asIs = (file: { path: string; name: string }, date: string): ScaledFile => ({ name: `${date}_${file.name}`, base64: readFileSync(file.path).toString('base64') });
   const ci = scaledCi(copies);
   const relationships = scaledRelationships(copies);
   const dates = [RECORD_DATE, ...Array.from({ length: history }, (_, at) => daysBefore(RECORD_DATE, 7 * (at + 1)))];
-  const { ci: _ci, relationship: _relationship, epo: _epo, solusiEarlier, ...rest } = SAMPLE_FILES;
   return [
     ...dates.flatMap((date) => [scaled(`${date}_${SAMPLE_FILES.ci.name}`, ci), scaled(`${date}_${SAMPLE_FILES.relationship.name}`, relationships)]),
     scaled(`${RECORD_DATE}_${SAMPLE_FILES.epo.name}`, scaledEpo(copies)),
-    ...Object.values(rest).map((file) => asIs(file, RECORD_DATE)),
-    asIs(solusiEarlier, EARLIER)
+    scaled(`${RECORD_DATE}_${SAMPLE_FILES.solusi.name}`, scaledSolusi(SAMPLE_FILES.solusi.path, copies)),
+    scaled(`${EARLIER}_${SAMPLE_FILES.solusiEarlier.name}`, scaledSolusi(SAMPLE_FILES.solusiEarlier.path, copies)),
+    scaled(`${RECORD_DATE}_${SAMPLE_FILES.contracts.name}`, scaledServiceNowContracts(copies))
   ].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** How many CIs, relationships and EPO systems the scaled samples hold. */
-export function scaledSizes(copies = REAL_SIZE_COPIES): { cis: number; relationships: number; epoSystems: number } {
+/** How many CIs, relationships, EPO systems and contracts (Solusi, ServiceNow) the scaled samples hold. */
+export function scaledSizes(copies = REAL_SIZE_COPIES): { cis: number; relationships: number; epoSystems: number; solusiContracts: number; servicenowContracts: number } {
   return {
     cis: sample(SAMPLE_FILES.ci.path).rows.length * copies,
     relationships: sample(SAMPLE_FILES.relationship.path).rows.length * 2 * copies,
-    epoSystems: sample(SAMPLE_FILES.epo.path).rows.length * copies
+    epoSystems: sample(SAMPLE_FILES.epo.path).rows.length * copies,
+    // The first row of the Solusi file holds labels: it stays once.
+    solusiContracts: (sample(SAMPLE_FILES.solusi.path).rows.length - 1) * copies,
+    servicenowContracts: sample(SAMPLE_FILES.contracts.path).rows.length * copies
   };
 }
 
@@ -149,5 +181,5 @@ if (process.argv[1] === import.meta.filename) {
   const files = scaledSampleFiles(copies, numberArgument(args, '--history', 0));
   for (const file of files) writeFileSync(join(folder, file.name), Buffer.from(file.base64, 'base64'));
   const sizes = scaledSizes(copies);
-  console.log(`Scaled samples: ${files.length} files in ${folder}: ${sizes.cis} CIs, ${sizes.relationships} relationships, ${sizes.epoSystems} EPO systems (invented).`);
+  console.log(`Scaled samples: ${files.length} files in ${folder}: ${sizes.cis} CIs, ${sizes.relationships} relationships, ${sizes.epoSystems} EPO systems, ${sizes.solusiContracts} Solusi and ${sizes.servicenowContracts} ServiceNow contracts (invented).`);
 }

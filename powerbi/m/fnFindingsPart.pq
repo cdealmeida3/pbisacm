@@ -2,8 +2,9 @@
 // report (fnCheckRun), with who is asked, how it is listed, where it is fixed and the CI as the message table shows it
 // (DATA-MODEL §3, a fact). Key never changes: <check>:<CI key>:<field>. Group: the findings of one check that go to the
 // same person by the same route, in the same state (one piece of work). Mapping: the reasons of a case of the mapping
-// backlog, by id. EpoCorrection: what EPO already says (fnEpoCorrections). `run` is CheckRun (null when no CI report is
-// loaded).
+// backlog, by id. EpoCorrection: what EPO already says (fnEpoCorrections). Problem: the kind of problem a line is listed
+// under (a problem of the contract data, a field of the upload check; D146), "" for most checks. `run` is CheckRun (null
+// when no CI report is loaded).
 (run as nullable record) as table =>
     let
         facts = if run = null then {} else run[Facts],
@@ -25,7 +26,7 @@
                     fact[CheckId] & "|" & fact[Route] & "|" & person & (if fact[State] = "open" then "" else "|" & fact[State]),
                     fact[EpoId], fact[Status], fact[SupportGroup], fact[OwnedBy], fact[ManagedBy], fact[SupportedBy], Text.Combine(fact[Chips], ", "), Text.Combine(fact[Tags], ", "),
                     fnServiceNowLink(address, fact[CiName], fact[Class], fix(fact, "RelatedTo")),
-                    Text.Combine(fact[Mapping], ", "), correction
+                    Text.Combine(fact[Mapping], ", "), correction, fact[Problem]
                 }
     in
         #table(
@@ -34,5 +35,5 @@
                 Review = text, ContactId = text, ContactName = text, ContactEmail = text, ContactVia = text, AskWho = text, Cc = text, EscalateName = text,
                 EscalateEmail = text, EscalateVia = text, FixChange = text, FixCurrent = text, FixSet = text, FixValue = text, FixRelatedTo = text,
                 Group = text, EpoId = text, Status = text, SupportGroup = text, OwnedBy = text, ManagedBy = text, SupportedBy = text, Chips = text, Tags = text,
-                ServiceNowLink = text, Mapping = text, EpoCorrection = text],
+                ServiceNowLink = text, Mapping = text, EpoCorrection = text, Problem = text],
             List.Transform(List.Positions(facts), (at) => row(facts{at}, corrections{at})))

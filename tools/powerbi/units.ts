@@ -10,6 +10,7 @@ import { recogniseReport } from '../../src/core/sources/report-types.ts';
 import { serviceNowAddress } from '../../src/core/cases/record-search.ts';
 import { lettersOf, plainText } from '../../src/core/sources/epo/epo-report.ts';
 import { environmentOf } from '../../src/core/checks/detectors/relationship-detectors.ts';
+import { epoIdsOf } from '../../src/core/checks/detectors/contract-detectors.ts';
 import type { RelationshipModel } from '../../src/core/checks/detectors/relationship-detectors.ts';
 import { loadReferences } from '../../src/hosts/cli.ts';
 import { mText, patternKey, patternUses } from './generate.ts';
@@ -46,6 +47,9 @@ const ENVIRONMENTS: Array<[string, string]> = [['Index - TEST', ''], ['Index - P
   ['Index - DEV', 'acc'], ['Index - disaster recovery', ''], ['Testing', ''], ['Pre-prod Index', ''], ['Index pre-prod', ''], ['Index', 'Sandbox']];
 /** The patterns read for where they match (fnSearch), on texts around them. */
 const SEARCH_TEXTS = ['Fines_BA', 'Fines BA ', 'Fines-ba', 'BA', 'Booking', 'Member Engine - PROD', 'Member Engine - prod', 'Index - TEST', 'x - PROD - TEST', 'Index (UAT)', 'Index tst'];
+/** The EPO ID column of Solusi (free text): the EPO IDs written in it (epoIdsOf), with 3 digits at least and with 1. */
+const EPO_ID_TEXTS = ['AST-0006', '9999', 'AST-0006, AST-0009', 'ast-0006 and 12', 'A-B-1234', '-123', 'x12', 'Ref: 12 34', '', 'AB12CD345', 'AST-0006 AST-0006',
+  'AST-0006 / 0006', '\u00d61234', '1234-5678', 'AST--123', 'EPO 1001; EPO 1002', 'n/a'];
 const MODIFIED_MS = Date.UTC(2026, 10, 1, 10, 0, 0);
 const HEADER_ROWS = [['name', 'sys_class_name'], ['parent', 'type', 'child'], ['epoid', 'systemname', 'systemstatus'], ['contract_no', 'contract_status', 'partner_name'],
   ['number', 'vendor_contract', 'state'], ['number', 'vendor_contract', 'state', 'name', 'sys_class_name'], ['foo']];
@@ -82,6 +86,12 @@ export function unitCases(): UnitCase[] {
   }
   for (const input of ADDRESSES) cases.push({ name: 'fnServiceNowAddress', input, expected: show(serviceNowAddress(input)), m: `fnServiceNowAddress(${mText(input)})` });
   for (const input of HTML) cases.push({ name: 'fnPlainText', input, expected: show(plainText(input)), m: `fnPlainText(${mText(input)})` });
+  for (const input of EPO_ID_TEXTS) {
+    for (const digits of [3, 1]) {
+      cases.push({ name: `fnEpoIds ${digits}`, input, expected: show(epoIdsOf(input, digits).map((id) => `${id.written}/${id.digits}`).join('; ')),
+        m: `Text.Combine(List.Transform(fnEpoIds(${mText(input)}, ${digits}), (id) => id[Written] & "/" & id[Digits]), "; ")` });
+    }
+  }
   for (const input of LETTERS) cases.push({ name: 'fnLetters', input, expected: show(lettersOf(input)), m: `fnLetters(${mText(input)})` });
   const model = loadReferences()['reference/relationship-model'] as RelationshipModel;
   for (const [name, field] of ENVIRONMENTS) {

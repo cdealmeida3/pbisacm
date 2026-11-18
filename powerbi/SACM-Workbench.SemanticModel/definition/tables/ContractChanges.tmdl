@@ -1,0 +1,134 @@
+/// The page Contract changes: the newest Solusi contract file against the one before it, and the running contracts to watch. For information only: nobody is asked, no case is opened.
+table ContractChanges
+
+	/// Lines of the newest file against the one before: new, no longer in the file, status changes, changed fields.
+	measure 'Changes line' =
+			VAR added = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "New contract" ) + 0
+			VAR gone = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "No longer in the file" ) + 0
+			VAR status = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Status change" ) + 0
+			VAR fields = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Changed field" ) + 0
+			RETURN
+			    added & " new · " & gone & " no longer in the file · " & status & IF ( status = 1, " status change", " status changes" ) & " · " & fields & IF ( fields = 1, " changed field", " changed fields" )
+
+	/// Which two Solusi contract files are compared, or why nothing is.
+	measure 'Changes head' =
+			VAR fileDate = CALCULATE ( MAX ( ReportFiles[ReportDate] ), ReportFiles[Kind] = "solusi" )
+			VAR earlier = MAX ( ContractChanges[EarlierDate] )
+			RETURN
+			    IF ( ISBLANK ( fileDate ), "No Solusi contract file is loaded yet.",
+			        IF ( ISBLANK ( earlier ), "The Solusi contract file of " & FORMAT ( fileDate, "d mmm yyyy" ) & " is the first one: nothing to compare with yet.",
+			            "The Solusi contract file of " & FORMAT ( MAX ( ContractChanges[FileDate] ), "d mmm yyyy" ) & " against the one of " & FORMAT ( earlier, "d mmm yyyy" ) & "." ) )
+
+	/// Days from today (the date of the samples in Sample mode) to the end date of a Concluded contract; empty when it has ended.
+	measure 'Days left' =
+			VAR ends = MAX ( ContractChanges[End] )
+			VAR today = [Today]
+			RETURN
+			    IF ( NOT ISBLANK ( ends ) && ends >= today, DATEDIFF ( today, ends, DAY ) )
+		formatString: #,0
+
+	/// Days left, only for a contract that ends in the next 30 days (the other lines of the table stay empty and are not shown).
+	measure 'Ends in 30 days' =
+			VAR days = [Days left]
+			RETURN
+			    IF ( NOT ISBLANK ( days ) && days <= 30, days )
+		formatString: #,0
+
+	/// Days left, only for a contract that ends in the next 90 days.
+	measure 'Ends in 90 days' =
+			VAR days = [Days left]
+			RETURN
+			    IF ( NOT ISBLANK ( days ) && days <= 90, days )
+		formatString: #,0
+
+	/// The running contracts to watch: Concluded contracts that end in the next 30 and 90 days, running contracts with no daily responsible.
+	measure 'Watch line' =
+			VAR today = [Today]
+			VAR ending = FILTER ( ContractChanges, ContractChanges[Kind] = "Concluded with an end date" && ContractChanges[End] >= today )
+			VAR in30 = COUNTROWS ( FILTER ( ending, ContractChanges[End] <= today + 30 ) ) + 0
+			VAR in90 = COUNTROWS ( FILTER ( ending, ContractChanges[End] <= today + 90 ) ) + 0
+			VAR noDaily = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "No daily responsible" ) + 0
+			RETURN
+			    in30 & " Concluded " & IF ( in30 = 1, "contract ends", "contracts end" ) & " in the next 30 days, " & in90 & " in the next 90 days · " & noDaily & " running " & IF ( noDaily = 1, "contract has", "contracts have" ) & " no daily responsible"
+
+	/// The order of the line on the page and in its export.
+	column Line
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Line
+
+	/// New contract, No longer in the file, Status change, Changed field (what changed), Concluded with an end date, No daily responsible (to watch).
+	column Kind
+		dataType: string
+		sortByColumn: KindOrder
+		sourceColumn: Kind
+
+	/// The order of the kind of line.
+	column KindOrder
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: KindOrder
+
+	/// The Solusi contract number.
+	column Number
+		dataType: string
+		sourceColumn: Number
+
+	column Name
+		dataType: string
+		sourceColumn: Name
+
+	column Vendor
+		dataType: string
+		sourceColumn: Vendor
+
+	/// The field that changed (Status, End date, Contract owner …).
+	column Field
+		dataType: string
+		sourceColumn: Field
+
+	/// The value in the file before (a new contract: empty).
+	column Before
+		dataType: string
+		sourceColumn: Before
+
+	/// The value in the newest file (a contract no longer in the file: empty).
+	column After
+		dataType: string
+		sourceColumn: After
+
+	/// The Solusi status of the contract.
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	/// The end date of the contract.
+	column End
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: End
+
+	/// Days from the date of the newest file to the end date (a Concluded contract). The page counts from today: measure Days left.
+	column DaysLeft
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: DaysLeft
+
+	/// The date of the newest Solusi contract file.
+	column FileDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: FileDate
+
+	/// The date of the Solusi contract file before it (empty: it is the first one).
+	column EarlierDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: EarlierDate
+
+	partition ContractChanges = m
+		mode: import
+		source = ContractChangesRows

@@ -6,14 +6,19 @@
     let
         cis = run[Cis],
         columns = run[Columns],
-        ciByKey = Record.FromList(cis, List.Transform(cis, (ci) => ci[Key])),
+        // The contracts (and other records that are not CIs) findings are about: the first of each key; never a CI of the report.
+        subjectGroups = fnGroupBy(Record.FieldOrDefault(run, "Subjects", {}), (subject) => subject[Key]),
+        subjects = Record.FromList(List.Transform(Record.FieldValues(subjectGroups), List.First), Record.FieldNames(subjectGroups)),
+        ciByKey = subjects & Record.FromList(cis, List.Transform(cis, (ci) => ci[Key])),
+        // A contract says which roles it has; a CI has the columns of its report.
+        columnsOf = (ci as record) as list => Record.FieldOrDefault(ci, "SubjectColumns", columns),
         packById = Record.FromList(packs, List.Transform(packs, (pack) => pack[id])),
         chipRules = List.Buffer(List.Transform(Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "tag-chips", []), "chips", {}), (rule) => rule & [TagKey = fnNameKey(rule[tag], "")])),
         teams = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "record-teams", []), "teams", {}),
         chipsOf = (ci as record) as list =>
             List.Distinct(List.Transform(List.Select(chipRules, (rule) => List.Contains(ci[TagKeys], rule[TagKey])), (rule) => rule[chip])),
         nameOf = (ci as record, role as text) as text =>
-            let person = fnPerson(ci, role, columns), shown = if person = null then "" else if person[Name] <> "" then person[Name] else person[Email] in
+            let person = fnPerson(ci, role, columnsOf(ci)), shown = if person = null then "" else if person[Name] <> "" then person[Name] else person[Email] in
             if shown = "" then "" else shown & (if person[Active] = false then " (inactive)" else ""),
         nobody = [EscalateName = "", EscalateEmail = "", EscalateVia = ""],
         factOf = (finding as record) as record =>
@@ -38,11 +43,11 @@
                 team = if pack = null or List.Contains(audience, "sacm") then null
                     else List.First(List.Select(teams, (candidate) => List.Contains(candidate[classes], ci[Class]) and List.Contains(candidate[checks], pack[id])), null),
                 other = if finding[ContactCi] <> "" then Record.FieldOrDefault(ciByKey, finding[ContactCi], null) else null,
-                theirs = if other = null then null else fnContact(other, "", audience, columns),
+                theirs = if other = null then null else fnContact(other, "", audience, columnsOf(other)),
                 contact =
                     if theirs <> null and theirs[To] <> null then
                         [To = theirs[To] & [Via = theirs[To][Via] & " of " & (if other[SourceClass] <> "" then other[SourceClass] else "Business Service") & " " & other[Name]], Cc = theirs[Cc]]
-                    else fnContact(ci, finding[Field], audience, columns),
+                    else fnContact(ci, finding[Field], audience, columnsOf(ci)),
                 to = contact[To],
                 above = if to = null then null else to[Above]
             in

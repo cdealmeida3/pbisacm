@@ -4,7 +4,7 @@
 // as its own PQTest call, as Power BI evaluates each table on its own, and subtracts the time of Time.Empty.
 //   Time.<Table>       every table the model loads with Power Query (the M partitions of tables/)
 //   Time.Stage.<name>  the stages of the checks (with --stages): reading, the CIs, the graph, the parked CIs, the EPO
-//                      comparison, each built check alone (Time.Check.<id>), all checks, the source first, the facts, the key-set idiom
+//                      comparison, the contract comparison, each built check alone (Time.Check.<id>), all checks, the source first, the facts, the key-set idiom
 //   RealSize.Summary   the counts that tools/powerbi/parity.ts --real-size compares with src/core at the same size
 import { readExpressions, readTables } from './tmdl.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
@@ -53,6 +53,7 @@ export function probes(stages: boolean): Probe[] {
   stage('Graph', `let graph = ${run}[Graph] in ProbeList(List.Transform(graph[Edges], (edge) => [Parent = edge[Parent][Key], Child = edge[Child][Key], Up = edge[Parent][Environment], Down = edge[Child][Environment]]) & {[Parent = Text.From(graph[Unmatched] + graph[Ambiguous])]}, {"Parent", "Child", "Up", "Down"})`);
   stage('Parked', `let parked = ${run}[Parked] in ProbeList(List.Transform(parked[Keys], (key) => [Key = key]) & List.Transform(parked[Lines], (line) => [Key = line]), {"Key"})`);
   stage('EpoCompare', `let comparison = ${run}[RunContext][EpoComparison] in ProbeList(List.Transform(comparison[Pairs], (pair) => [Ci = pair[Ci][Key], Differences = List.Transform(pair[Differences], (difference) => difference[Field])]), {"Ci", "Differences"})`);
+  stage('ContractCompare', `let comparison = ${run}[RunContext][Contracts] in ProbeList(List.Transform(comparison[Pairs], (pair) => [Key = pair[Subject][Key], Differences = List.Transform(pair[Differences], (difference) => difference[Field])]) & List.Transform(comparison[NotInSolusi] & comparison[NoNumber] & comparison[NotInServiceNow], (contract) => [Key = contract[Number]]), {"Key", "Differences"})`);
   // The reader of the CI report step by step (Probe.ReadCi.<step>: fnReadCiReport stopped after that step), and a
   // generated member read 15,000 times, as is and once named in a let: is a shared member computed once?
   for (const step of READ_CI_STEPS) stage(`ReadCi.${step}`, `ProbeAny(#"Probe.ReadCi.${step}"(fnNewest("ci"){0}[Read]))`);
@@ -92,7 +93,7 @@ export const SUMMARY = `let
     notes = List.Transform(Table.ToRecords(noteGroups), (row) => {"notes", row[CheckId], row[Count], 0, row[Chars]}),
     built = List.Transform(Table.SelectRows(Checks, each [Built])[CheckId], (id) => {"built", id, 1, 0, 0}),
     rows = List.Transform({{"Inventory", Inventory}, {"Relationships", Relationships}, {"RelationshipLinks", RelationshipLinks}, {"MappingBacklog", MappingBacklog},
-        {"CapabilitySheet", CapabilitySheet}, {"Parked", Parked}, {"EpoSystems", EpoSystems}}, (pair) => {"rows", pair{0}, Table.RowCount(pair{1}), 0, 0})
+        {"CapabilitySheet", CapabilitySheet}, {"Parked", Parked}, {"EpoSystems", EpoSystems}, {"ContractChanges", ContractChanges}}, (pair) => {"rows", pair{0}, Table.RowCount(pair{1}), 0, 0})
 in
     #table(type table [Kind = text, Id = text, Count = Int64.Type, Cis = Int64.Type, Chars = Int64.Type], found & tested & notes & built & rows)`;
 

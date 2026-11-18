@@ -32,6 +32,10 @@ import { epoCorrection } from '../../src/app/view/cases.ts';
 import { mappingConfig, stagesFor } from '../../src/core/mapping/backlog.ts';
 import type { Case, Run } from '../../src/core/cases/cases.ts';
 import type { CiPeople } from '../../src/app/view/people.ts';
+import { contractChanges, contractInformation } from '../../src/core/sources/contracts/contract-changes.ts';
+import { inList } from '../../src/core/sources/contracts/contract-reports.ts';
+import type { ContractConfig, SolusiContract } from '../../src/core/sources/contracts/contract-reports.ts';
+import { daysBetween, longDate } from '../../src/core/shared/dates.ts';
 
 type Row = Record<string, unknown>;
 
@@ -69,6 +73,35 @@ function compare(what: string, found: Row[], expected: Row[], key: string, field
   return problems;
 }
 
+
+/**
+ * The lines of the table ContractChanges, from src/core: what changed between the two Solusi contract files (as the export
+ * of the page, src/app/view/exports.ts changesCsv), then the Concluded contracts of the active tab that end on or after
+ * the date of the newest file, by end date, then the running contracts with no daily responsible
+ * (contract-changes.ts, contractInformation). The page shows the next 30 and 90 days of the Concluded ones.
+ */
+export function contractChangeRows(previous: { contracts: SolusiContract[]; date: string } | null, current: { contracts: SolusiContract[]; date: string }, config: ContractConfig): Row[] {
+  const changes = contractChanges(previous, current);
+  const whole = (contract: SolusiContract): string => [contract.status, contract.start && `starts ${longDate(contract.start)}`, contract.end && `ends ${longDate(contract.end)}`].filter(Boolean).join(', ');
+  const byNumber = new Map(current.contracts.map((contract) => [contract.number.toLowerCase(), contract]));
+  const rows: Row[] = [];
+  const line = (kind: string, contract: SolusiContract | undefined, number: string, name: string, vendor: string, field: string, before: string, after: string, daysLeft: number | null = null): void => {
+    rows.push({ Line: `${rows.length + 1}`, Kind: kind, Number: number, Name: name, Vendor: vendor, Field: field, Before: before, After: after, Status: contract?.status ?? '',
+      End: contract?.end ?? '', DaysLeft: daysLeft === null ? '' : `${daysLeft}`, FileDate: current.date, EarlierDate: previous?.date ?? '' });
+  };
+  for (const contract of changes.added) line('New contract', contract, contract.number, contract.name, contract.vendor, '', '', whole(contract));
+  for (const contract of changes.left) line('No longer in the file', contract, contract.number, contract.name, contract.vendor, '', whole(contract), '');
+  for (const change of changes.status) line('Status change', byNumber.get(change.number.toLowerCase()), change.number, change.name, change.vendor, change.what, change.before, change.after);
+  for (const change of changes.fields) line('Changed field', byNumber.get(change.number.toLowerCase()), change.number, change.name, change.vendor, change.what, change.before, change.after);
+  const active = current.contracts.filter((contract) => contract.sheet === 'active');
+  const ending = active.filter((contract) => inList(config.concludedStatuses, contract.status) && contract.end && contract.end >= current.date)
+    .sort((a, b) => a.end.localeCompare(b.end));
+  for (const contract of ending) line('Concluded with an end date', contract, contract.number, contract.name, contract.vendor, '', '', '', daysBetween(current.date, contract.end));
+  for (const contract of active.filter((item) => inList(config.runningStatuses, item.status) && !item.dailyResponsible)) {
+    line('No daily responsible', contract, contract.number, contract.name, contract.vendor, '', '', '');
+  }
+  return rows;
+}
 
 export async function parityProblems(folder: string): Promise<string[]> {
   const problems: string[] = [];
@@ -188,7 +221,7 @@ export async function parityProblems(folder: string): Promise<string[]> {
     FixChange: fact.fix?.change, FixCurrent: fact.fix?.current, FixSet: fact.fix?.set, FixValue: fact.fix?.value, FixRelatedTo: fact.fix?.relatedTo,
     EpoId: fact.ci?.epoId, Status: fact.ci?.status, SupportGroup: fact.ci?.supportGroup, OwnedBy: fact.ci?.ownedBy, ManagedBy: fact.ci?.managedBy, SupportedBy: supportedBy(fact.ciKey),
     Chips: (fact.ci?.chips ?? []).join(', '), Tags: (fact.ci?.tags ?? []).join(', '), ServiceNowLink: recordSearch('https://contoso.service-now.com', fact),
-    Mapping: (fact.mapping ?? []).join(', '), EpoCorrection: correctionOf(fact)
+    Mapping: (fact.mapping ?? []).join(', '), EpoCorrection: correctionOf(fact), Problem: fact.group
   }));
   problems.push(...compare('Findings', rows('Findings'), facts, 'Key', Object.keys(facts[0] ?? {}).filter((field) => field !== 'Key')));
 
@@ -247,6 +280,22 @@ export async function parityProblems(folder: string): Promise<string[]> {
   }));
   problems.push(...compare('MappingBacklog', rows('MappingBacklog'), backlog, 'Key', ['CiName', 'ClassLabel', 'Owner', 'ReasonIds', 'Stage', 'StateLabel', 'Criticality']));
 
+  // 11. Contract changes: every line, and the contracts to watch as the HTML app counts them (contractInformation).
+  const solusiOf = (name: string, date: string) => {
+    const table = read[name]!;
+    return { contracts: readSolusiFile(table.sheets ?? [{ name: '', rows: table.rows }], contracts).contracts, date };
+  };
+  const current = solusiOf(SAMPLE_FILES.solusi.name, RECORD_DATE);
+  const changeRows = contractChangeRows(solusiOf(SAMPLE_FILES.solusiEarlier.name, EARLIER), current, contracts);
+  problems.push(...compare('ContractChanges', rows('ContractChanges'), changeRows, 'Line', ['Kind', 'Number', 'Name', 'Vendor', 'Field', 'Before', 'After', 'Status', 'End', 'DaysLeft', 'FileDate', 'EarlierDate']));
+  const information = contractInformation(current.contracts, RECORD_DATE, contracts);
+  for (const { days, contracts: ending } of information.ending) {
+    const within = changeRows.filter((row) => row.Kind === 'Concluded with an end date' && Number(row.DaysLeft) <= days).map((row) => row.Number).join(' ');
+    if (within !== ending.map((contract) => contract.number).join(' ')) problems.push(`ContractChanges: ending in ${days} days [${within}], the HTML app [${ending.map((contract) => contract.number).join(' ')}]`);
+  }
+  const noDaily = changeRows.filter((row) => row.Kind === 'No daily responsible').map((row) => row.Number).join(' ');
+  if (noDaily !== information.noDailyResponsible.map((contract) => contract.number).join(' ')) problems.push(`ContractChanges: no daily responsible [${noDaily}], the HTML app [${information.noDailyResponsible.map((contract) => contract.number).join(' ')}]`);
+
   for (const row of rows('SelfCheck')) {
     const id = norm(row.CheckId);
     if (built.has(id) && row.Match !== true) problems.push(`SelfCheck ${id}: no match: ${norm(row.Why)}`);
@@ -297,9 +346,14 @@ export async function expectedSummary(copies: number, history = 0, built?: Set<s
     const graph = buildGraph(cis, relationships, references['reference/relationship-model'] as RelationshipModel);
     const links = graph.edges.reduce((sum, edge) => sum + (edge.parent.ci ? 1 : 0) + (edge.child.ci ? 1 : 0), 0);
     const epo = readEpoReport((await tableOf(at(SAMPLE_FILES.epo.name).path)).rows, epoConfig(references)!).systems.length;
+    const solusiAt = async (name: string, date: string) => {
+      const table = await tableOf(at(name, date).path);
+      return { contracts: readSolusiFile(table.sheets ?? [{ name: '', rows: table.rows }], contractConfig(references)!).contracts, date };
+    };
+    const changes = contractChangeRows(await solusiAt(SAMPLE_FILES.solusiEarlier.name, EARLIER), await solusiAt(SAMPLE_FILES.solusi.name, RECORD_DATE), contractConfig(references)!).length;
     const rows: Array<[string, number]> = [['Inventory', cis.length], ['Relationships', relationships.length], ['RelationshipLinks', links],
       ['MappingBacklog', run.facts.filter((fact) => fact.checkId === 'MAPPING').length], ['CapabilitySheet', (run.capabilities ?? []).length],
-      ['Parked', (run.parked?.lines ?? []).length], ['EpoSystems', epo]];
+      ['Parked', (run.parked?.lines ?? []).length], ['EpoSystems', epo], ['ContractChanges', changes]];
     for (const [id, count] of rows) lines.push({ Kind: 'rows', Id: id, Count: count, Cis: 0, Chars: 0 });
     return lines;
   } finally { rmSync(folder, { recursive: true, force: true }); }

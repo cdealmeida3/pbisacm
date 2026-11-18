@@ -1,7 +1,8 @@
 // The checks on one CI report (src/core/checks/engine.ts, runChecks, then src/core/cases/cases.ts, buildRun): the
 // reports of the other types that go with it (fnPaired), the scope of each check, the built detectors, the source first
 // (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles.
-// Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo]; Notes are [CheckId, Note].
+// Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo, Subjects]; Notes are
+// [CheckId, Note]; Subjects are the contracts findings are about (fnContractSubject).
 // Outputs (one lazy field per built check), RunContext and Stages are read only by the probes of the refresh time.
 // Each CI gets its normal forms once (StatusKey, NameKey, IdentityKey, TagKeys, Squashed: the compared text of the six
 // fields a rule counts), so no check normalises a CI field again (ARCHITECTURE §12, the speed rules).
@@ -14,6 +15,8 @@
         relationships = fnPaired("relationship", date),
         epoFile = fnPairedFile("epo", date),
         epo = if epoFile = null then null else epoFile[Rows],
+        solusiFile = fnPairedFile("solusi", date),
+        contractFile = fnPairedFile("contract", date),
 
         // Hidden characters: the name itself, else the name as the Relationship report holds it (a CSV writes "?").
         known = if read[Lossless] or relationships = null then [] else
@@ -54,6 +57,8 @@
         graph = if relationships = null or model = null then null else fnRelationshipGraph(cis, relationships, model),
         epoConfig = let config = fnReference("reference/epo-systems-report") in
             if config <> null and Record.HasFields(config, {"columns", "statuses", "roles"}) then config else null,
+        contractConfig = let config = fnReference("reference/contract-reports") in
+            if config <> null and Record.HasFields(config, {"solusi", "servicenow", "fields"}) and Value.Is(config[fields], type list) then config else null,
         // How many CIs of the whole report share each value (compared form), per field of a rule; the same for the live
         // CIs per class (the operators duplicatedMoreThan and duplicatedInClass of fnDetectRule).
         textFields = {"description", "name", "exception_justification", "exception_status", "support_group", "operational_status"},
@@ -71,7 +76,9 @@
             ClassCounts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(live, (ci) =>
                 let key = Record.Field(ci[Squashed], field) in if key = "" then "" else ci[Class] & "|" & key))), textFields),
             Epo = if epoFile = null then null else [Systems = epo, Date = epoFile[ReportDate], Report = epoFile[FileName], PreviousDate = epoFile[PreviousDate]],
-            EpoComparison = if epo = null or epoConfig = null then null else fnEpoCompare(cis, epo, columns, epoConfig)
+            EpoComparison = if epo = null or epoConfig = null then null else fnEpoCompare(cis, epo, columns, epoConfig),
+            // The two contract files matched, once, when a contract check reads it.
+            Contracts = if contractConfig = null or solusiFile = null or contractFile = null then null else fnContractCompare(solusiFile, contractFile, contractConfig)
         ],
 
         parked = fnParked(cis),
@@ -98,6 +105,14 @@
             #"relationships/application-instance" = fnDetectRelationshipsApplicationInstance,
             #"relationships/offering-owner" = fnDetectRelationshipsOfferingOwner, #"relationships/offering-parent" = fnDetectRelationshipsOfferingParent
         ],
+        contractDetectors = [
+            #"contracts/not-in-solusi" = fnDetectContractsNotInSolusi, #"contracts/to-clear" = fnDetectContractsToClear,
+            #"contracts/status" = fnDetectContractsStatus, #"contracts/upload-check" = fnDetectContractsUploadCheck,
+            #"contracts/problems" = fnDetectContractsProblems
+        ],
+        noContracts = [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Not tested: "
+            & Text.Combine(List.Select({if solusiFile = null then "no Solusi contract file" else "", if contractFile = null then "no ServiceNow contract report" else ""}, (part) => part <> ""), " and ")
+            & ". Load the Solusi contract file and the ServiceNow contract report with the CI report."}],
         detect = (pack as record) as record =>
             let
                 module = moduleOf(pack),
@@ -123,6 +138,11 @@
                     else if epo = null then [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Not tested: no EPO systems report. Load the EPO systems report with the CI report."}]
                     else if not List.Contains(columns, "assetTag") then [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Not tested: the CI report has no column for the EPO ID (asset_tag)."}]
                     else if module = "epo/differs" then fnDetectEpoDiffers(pack, run, epoConfig) else fnDetectEpoNotArrived(pack, run, epoConfig))
+                // The contract checks: the Solusi contract file and the ServiceNow contract report dated on or before the CI report.
+                else if Record.HasFields(contractDetectors, module) then
+                    (if contractConfig = null then skipped("reference/contract-reports")
+                    else if solusiFile = null or contractFile = null then noContracts
+                    else Record.Field(contractDetectors, module)(pack, run, contractConfig))
                 else if module = "process/stage" then
                     (if stages = null then skipped(ref & ", processStages") else fnDetectProcessStage(pack, run, inScope, stages))
                 else if module = "mapping/backlog" then
@@ -151,6 +171,8 @@
             & (if graph[Ambiguous] > 0 then {[CheckId = "RELATIONSHIPS", Note = Text.From(graph[Ambiguous]) & " relationship ends name a CI that two CIs share, and neither class nor asset tag told them apart. The first was used."]} else {}),
 
         source = fnSourceFirst(combined[Findings], run, packs),
+        // The records findings are about that are not CIs of the report (contracts): the first of each key, for fnFacts.
+        subjects = List.Buffer(List.RemoveNulls(List.Transform(combined[Findings], (finding) => finding[Subject]))),
         parkedFields = if parked = null then [] else parked[FieldSet],
         kept = List.Buffer(List.Select(source[Findings], (finding) => not Record.HasFields(parkedFields, finding[CheckId] & ":" & finding[Field]) and not Record.HasFields(parkedSet, finding[CiKey]))),
         parkedNotes = if parked = null then {[CheckId = "PARKED", Note = "Parked classes: reference data missing (reference/parked-classes), so every class is checked."]} else {},
@@ -170,7 +192,7 @@
     in
         [
             Date = date, FileName = file[FileName], Cis = cis, Columns = columns,
-            Facts = List.Buffer(fnFacts(kept, run, packs)),
+            Facts = List.Buffer(fnFacts(kept, run & [Subjects = subjects], packs)), Subjects = subjects,
             Tested = combined[Tested], Evaluated = combined[Evaluated],
             Notes = graphNotes & combined[Notes] & source[Notes] & parkedNotes & routingNotes & listingNotes & hiddenNotes,
             Parked = parked, Graph = graph, Epo = run[Epo], CheckableKeys = checkableKeys,

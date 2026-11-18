@@ -38,6 +38,7 @@ ref table Relationships
 ref table EpoSystems
 ref table SolusiContracts
 ref table ServiceNowContracts
+ref table ContractChanges
 ref table Checks
 ref table Findings
 ref table Tested

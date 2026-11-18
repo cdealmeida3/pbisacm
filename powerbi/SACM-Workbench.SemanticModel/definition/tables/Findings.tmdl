@@ -293,6 +293,13 @@ table Findings
 		isNameInferred
 		sourceColumn: [EpoCorrection]
 
+	/// The kind of problem a line is listed under: a problem of the contract data (For Procurement, Contracts to fix in ServiceNow) or a field of the upload check (D146). Empty for most checks.
+	column Problem
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Problem]
+
 	partition Findings = calculated
 		mode: import
 		source =
@@ -341,5 +348,6 @@ table Findings
 					"Tags", Run[Findings.Tags],
 					"ServiceNowLink", Run[Findings.ServiceNowLink],
 					"Mapping", Run[Findings.Mapping],
-					"EpoCorrection", Run[Findings.EpoCorrection]
+					"EpoCorrection", Run[Findings.EpoCorrection],
+					"Problem", Run[Findings.Problem]
 				)
