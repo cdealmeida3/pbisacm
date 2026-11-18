@@ -1,0 +1,253 @@
+# The one screen of the Power App "SACM actions" (build B6, D294 to D296), written by hand. To use it: in Power Apps Studio,
+# select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6). Structure only: the
+# visual design pass comes later.
+# What it does: the manager picks an action the selected lines all have, types or picks what it asks, and presses Save.
+# Save adds ONE row to the list SACM Journal (never changes or removes a row, D272), then asks flow F5 (SACMRefresh) to
+# refresh the report. Below: what the team did lately on these lines, read from the list at once (before the refresh).
+# Nothing is sent from this app (messages come with build B7).
+Screens:
+  ActionsScreen:
+    Properties:
+      Fill: =RGBA(255, 255, 255, 1)
+    Children:
+      - TitleLabel:
+          Control: Label
+          Properties:
+            Text: |-
+              ="SACM actions: " & LineCount & If(LineCount = 1, " line", " lines") & If(IsBlank(MeName), "", " · " & MeName)
+            FontWeight: =FontWeight.Semibold
+            Size: =14
+            X: =16
+            Y: =8
+            Width: =Parent.Width - 32
+            Height: =32
+      - EmptyLabel:
+          Control: Label
+          Properties:
+            Text: |-
+              ="Select lines in the report (on a card, a case or a person), then pick what to do."
+            Visible: =LineCount = 0
+            X: =16
+            Y: =44
+            Width: =Parent.Width - 32
+            Height: =48
+      - ActionPick:
+          Control: Classic/DropDown
+          Properties:
+            Items: =AvailableActions
+            AccessibleLabel: ="What to do"
+            Visible: =LineCount > 0
+            X: =16
+            Y: =44
+            Width: =Parent.Width - 32
+            Height: =36
+      - StatusPick:
+          Control: Classic/DropDown
+          Properties:
+            Items: =StatusChoices
+            AccessibleLabel: ="Status"
+            Visible: |-
+              =",status," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 32
+            Height: =36
+      - RequestText:
+          Control: Classic/TextInput
+          Properties:
+            Default: =""
+            HintText: ="Request number, for example RITM0012345"
+            AccessibleLabel: ="Request number"
+            Visible: |-
+              =",request," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 32
+            Height: =36
+      - MemberPick:
+          Control: Classic/DropDown
+          Properties:
+            Items: =TeamNames
+            Default: =MeName
+            AccessibleLabel: ="Team member"
+            Visible: |-
+              =",member," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 32
+            Height: =36
+      - ReasonPick:
+          Control: Classic/DropDown
+          Properties:
+            Items: =ExceptionReasons
+            AccessibleLabel: ="Reason"
+            Visible: |-
+              =",reason," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 32
+            Height: =36
+      - ReviewDate:
+          Control: Classic/DatePicker
+          Properties:
+            DefaultDate: =DateAdd(Today(), ExceptionMonths, TimeUnit.Months)
+            AccessibleLabel: ="Review date"
+            Visible: |-
+              =",reviewOn," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =132
+            Width: =Parent.Width - 32
+            Height: =36
+      - RetireDate:
+          Control: Classic/DatePicker
+          Properties:
+            DefaultDate: =First(Lines).RetireOn
+            AccessibleLabel: ="Planned retirement date (empty takes it away)"
+            Visible: |-
+              =",retireOn," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 32
+            Height: =36
+      - StagePick:
+          Control: Classic/DropDown
+          Properties:
+            Items: =StageChoices
+            AccessibleLabel: ="Stage"
+            Visible: |-
+              =",stage," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 32
+            Height: =36
+      - NoteText:
+          Control: Classic/TextInput
+          Properties:
+            Default: =""
+            Mode: =TextMode.MultiLine
+            HintText: |-
+              =If(ActionPick.Selected.Id = "stop", "Note (needed for Other): who agreed, a request number, a reference", "Note for the team")
+            AccessibleLabel: ="Note"
+            Visible: |-
+              =",text," in "," & ActionPick.Selected.Asks & ","
+            X: =16
+            Y: =176
+            Width: =Parent.Width - 32
+            Height: =72
+      - SaveButton:
+          Control: Classic/Button
+          Properties:
+            Text: ="Save"
+            Visible: =LineCount > 0
+            DisplayMode: |-
+              =If(
+                  !IsBlank(ActionPick.Selected.Id) &&
+                  Switch(
+                      ActionPick.Selected.Id,
+                      "note", !IsBlank(Trim(NoteText.Text)),
+                      "person-note", !IsBlank(Trim(NoteText.Text)),
+                      "request", !IsBlank(Trim(RequestText.Text)),
+                      "assign", !IsBlank(MemberPick.Selected.Value),
+                      "handover", !IsBlank(MemberPick.Selected.Value) && MemberPick.Selected.Value <> MeName,
+                      "status", !IsBlank(StatusPick.Selected.Status),
+                      "stage", !IsBlank(StagePick.Selected.Id),
+                      "stop", ReviewDate.SelectedDate > Today() && (ReasonPick.Selected.Value <> "Other" || !IsBlank(Trim(NoteText.Text))),
+                      true
+                  ),
+                  DisplayMode.Edit,
+                  DisplayMode.Disabled
+              )
+            OnSelect: |-
+              =Set(varError, "");
+              With(
+                  { action: ActionPick.Selected },
+                  Set(
+                      varSaved,
+                      IfError(
+                          Patch(
+                              'SACM Journal',
+                              Defaults('SACM Journal'),
+                              {
+                                  Title: Text(GUID()),
+                                  At: Now(),
+                                  By: Lower(User().Email),
+                                  ByName: MeName,
+                                  Type: action.Type,
+                                  Keys: Switch(action.Scope, "mine", KeysFor.mine, "person", "", KeysFor.lines),
+                                  Text: Switch(
+                                      action.Id,
+                                      "status", StatusPick.Selected.Status,
+                                      "request", Trim(RequestText.Text),
+                                      "assign", MemberPick.Selected.Value,
+                                      "stage", StagePick.Selected.Id,
+                                      If(",text," in "," & action.Asks & ",", Trim(NoteText.Text), action.Text)
+                                  ),
+                                  To: If(action.Id = "handover", MemberPick.Selected.Value, ""),
+                                  Person: If(action.Scope = "person", First(LinePeople).Value, ""),
+                                  Reason: Switch(action.Id, "stop", ReasonPick.Selected.Value, "follow-again", FollowAgainReason, ""),
+                                  ReviewOn: Switch(action.Id, "stop", ReviewDate.SelectedDate, "follow-again", Today(), Blank()),
+                                  RetireOn: If(action.Id = "retirement", RetireDate.SelectedDate, Blank())
+                              }
+                          ),
+                          Set(varError, FirstError.Message);
+                          Blank()
+                      )
+                  );
+                  If(
+                      IsBlank(varSaved),
+                      Notify("Not saved: " & varError, NotificationType.Error),
+                      Notify("Saved: " & action.Value & ". The report shows it after the next refresh, in about a minute.", NotificationType.Success);
+                      IfError(SACMRefresh.Run(), Notify("Saved. The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning));
+                      Reset(NoteText);
+                      Reset(RequestText)
+                  )
+              )
+            X: =16
+            Y: =256
+            Width: =120
+            Height: =36
+      - RefreshButton:
+          Control: Classic/Button
+          Properties:
+            Text: ="Refresh now"
+            OnSelect: |-
+              =IfError(
+                  SACMRefresh.Run();
+                  Notify("The report refreshes now, in about a minute.", NotificationType.Success),
+                  Notify("The refresh could not start now. Try again in two minutes.", NotificationType.Warning)
+              )
+            X: =144
+            Y: =256
+            Width: =140
+            Height: =36
+      - RecentLabel:
+          Control: Label
+          Properties:
+            Text: |-
+              =If(CountRows(RecentEvents) = 0, "Nothing done on these lines in the last 60 days.", "Done lately on these lines (also before the report shows it):")
+            Visible: =LineCount > 0
+            X: =16
+            Y: =300
+            Width: =Parent.Width - 32
+            Height: =28
+      - RecentGallery:
+          Control: Gallery
+          Variant: Vertical
+          Properties:
+            Items: =RecentEvents
+            TemplateSize: =44
+            Visible: =LineCount > 0
+            X: =16
+            Y: =332
+            Width: =Parent.Width - 32
+            Height: =Parent.Height - 340
+          Children:
+            - RecentLine:
+                Control: Label
+                Properties:
+                  Text: |-
+                    =Text(ThisItem.At, "d mmm hh:mm") & " · " & Coalesce(ThisItem.ByName, ThisItem.By) & " · " & ThisItem.Type & If(IsBlank(ThisItem.Text), "", ": " & ThisItem.Text)
+                  X: =0
+                  Y: =0
+                  Width: =Parent.TemplateWidth
+                  Height: =Parent.TemplateHeight

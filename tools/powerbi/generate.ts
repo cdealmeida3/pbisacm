@@ -31,7 +31,10 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES, tmdlName } from './t
 import type { SourceTable } from './tmdl.ts';
 import { expectedHistory, HISTORY_FILES, STATE_LISTS } from './history.ts';
 import { compilePattern, fastForm } from './regex.ts';
-import { ACTIONS_FILE } from './actions.ts';
+import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml } from './actions.ts';
+import { STATUSES } from '../../src/core/cases/cases.ts';
+import { EXCEPTION_REASONS } from '../../src/core/audit/audit.ts';
+import { statusWord } from '../../src/app/view/cases.ts';
 import type { FastForm, Node } from './regex.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -417,6 +420,14 @@ export function theme(): Record<string, unknown> {
 
 const themeText = (): string => `${JSON.stringify(theme(), null, 2)}\n`;
 
+/* ------------------------------------------------------------------ the Power App (build B6) */
+
+/** The generated files of the Power App SACM actions, by path: its named formulas and its App (D294). */
+export function appFiles(): Array<{ file: string; text: string }> {
+  const formulas = appFormulas(STATUSES, statusWord, EXCEPTION_REASONS, DEFAULT_SETTINGS.exceptionMonths);
+  return [{ file: APP_FORMULAS_FILE, text: formulas }, { file: APP_YAML_FILE, text: appYaml(formulas) }];
+}
+
 /* ------------------------------------------------------------------ write or check */
 
 /** The queries whose M differs from what the generator writes, and the queries missing or not generated. */
@@ -434,6 +445,7 @@ export function staleQueries(): string[] {
     if (!existsSync(file) || readFileSync(file, 'utf8').replace(/\r\n/g, '\n') !== runTmdl(source)) problems.push(`${relative(root, file)}: not the columns of the calculated tables`);
   }
   if (!existsSync(THEME_FILE) || readFileSync(THEME_FILE, 'utf8').replace(/\r\n/g, '\n') !== themeText()) problems.push(`${relative(root, THEME_FILE)}: not the theme of the colours of LOOK.md`);
+  for (const { file, text } of appFiles()) if (!existsSync(file) || readFileSync(file, 'utf8').replace(/\r\n/g, '\n') !== text) problems.push(`${relative(root, file)}: not what actions.json and formulas.fx give`);
   return problems;
 }
 
@@ -447,5 +459,6 @@ if (process.argv[1] === import.meta.filename) {
   writeFileSync(EXPRESSIONS_FILE, expressionsTmdl());
   writeFileSync(THEME_FILE, themeText());
   for (const source of SOURCE_TABLES) writeFileSync(SOURCE_FILES[source], runTmdl(source));
-  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${SOURCE_TABLES.map((source) => relative(root, SOURCE_FILES[source])).join(', ')} and ${relative(root, THEME_FILE)}.`);
+  for (const { file, text } of appFiles()) writeFileSync(file, text);
+  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${SOURCE_TABLES.map((source) => relative(root, SOURCE_FILES[source])).join(', ')}, ${relative(root, THEME_FILE)} and the Power App\'s formulas.`);
 }

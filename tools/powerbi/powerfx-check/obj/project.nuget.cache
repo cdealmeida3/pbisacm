@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "7uqGHiBV3OnmvnTuGNgydITxjwZ3LG0zwPs3JGNz6jv/CCjbuec0r5zGQ4yseUjEWkAtodS+pRM0tg6mEXeKRg==",
+  "success": true,
+  "projectFilePath": "/home/claude/pbisacm/tools/powerbi/powerfx-check/PowerFxCheck.csproj",
+  "expectedPackageFiles": [
+    "/root/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.powerfx.core/1.8.1/microsoft.powerfx.core.1.8.1.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.powerfx.transport.attributes/1.8.1/microsoft.powerfx.transport.attributes.1.8.1.nupkg.sha512",
+    "/root/.nuget/packages/system.collections.immutable/6.0.0/system.collections.immutable.6.0.0.nupkg.sha512",
+    "/root/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "/root/.nuget/packages/yamldotnet/16.3.0/yamldotnet.16.3.0.nupkg.sha512"
+  ],
+  "logs": []
+}
