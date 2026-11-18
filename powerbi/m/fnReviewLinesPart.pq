@@ -24,7 +24,6 @@
             if system = null then [Status = "", Words = ""] else [Status = system[Status], Words = if system[Status] <> "" then system[StatusWord] & " (" & system[Status] & ")" else system[StatusWord]],
         casesByKey = Record.FromList(cases, List.Transform(cases, (item) => item[Key])),
         cis = if run = null then [] else Record.FromList(run[Cis], List.Transform(run[Cis], (ci) => ci[Key])),
-        months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
         longDate = (iso as text) as text => if Text.Length(iso) < 10 then iso else fnLongDate(Date.FromText(Text.Start(iso, 10), [Format = "yyyy-MM-dd", Culture = "en-US"])),
         dateOf = (iso as text) as nullable date => if Text.Length(iso) < 10 then null else Date.FromText(Text.Start(iso, 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
         reviews = LifecycleReviews,
@@ -53,8 +52,8 @@
                 },
         draw = fnReviewDraw(run),
         nextReview = if draw = null then null else [Id = "next", Date = "", Report = draw[Report], ReportDate = Date.ToText(draw[ReportDate], [Format = "yyyy-MM-dd", Culture = "en-US"]), Marks = []],
-        lines = List.Combine(List.Transform(List.Reverse(reviews), (review) => List.Transform(review[Items], (item) => line(review, item, false))))
-            & (if draw = null then {} else List.Transform(draw[Items], (item) => line(nextReview, item, true))),
+        lines = List.Buffer(List.Combine(List.Transform(List.Reverse(reviews), (review) => List.Transform(review[Items], (item) => line(review, item, false))))
+            & (if draw = null then {} else List.Transform(draw[Items], (item) => line(nextReview, item, true)))),
         numbered = List.Transform(List.Positions(lines), (at) => lines{at} & {at + 1})
     in
         #table(

@@ -87,9 +87,12 @@ table Checks
 			VAR state = [Card state]
 			VAR size = IF ( state IN { "To solve", "All marked as fixed" }, [To solve], IF ( state = "To check", [To check], 0 ) )
 			RETURN
-			    SELECTEDVALUE ( Checks[SectionOrder] ) * 1000000000
-			        + IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", 100000000, 0 )
-			        + [Card rank] * 10000000 + ( 99999 - MIN ( size, 99999 ) ) * 100 + SELECTEDVALUE ( Checks[FileOrder] )
+			    IF (
+			        NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ),
+			        SELECTEDVALUE ( Checks[SectionOrder] ) * 1000000000
+			            + IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", 100000000, 0 )
+			            + [Card rank] * 10000000 + ( 99999 - MIN ( size, 99999 ) ) * 100 + SELECTEDVALUE ( Checks[FileOrder] )
+			    )
 		formatString: 0
 
 	/// Checks that are not off.

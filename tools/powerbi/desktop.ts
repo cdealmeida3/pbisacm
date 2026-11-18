@@ -74,7 +74,8 @@ export function daxFilters(filters: Filter[]): { tables: string[]; measures: Arr
         tables.push(negated ? `FILTER ( ALL ( ${field.dax} ), NOT ${field.dax} IN { ${values} } )` : `TREATAS ( { ${values} }, ${field.dax} )`);
       } else if (inner.Comparison) {
         const field = daxField(inner.Comparison.Left, sources);
-        const operator = ['=', '>', '>=', '<', '<='][inner.Comparison.ComparisonKind] ?? '=';
+        const operator = ['=', '>', '>=', '<', '<='][inner.Comparison.ComparisonKind];
+        if (!operator) throw new Error(`desktop.ts: a comparison it does not read: ${JSON.stringify(condition)}`);
         const right = daxLiteral(inner.Comparison.Right.Literal!.Value!);
         if (field.measure) measures.push({ dax: field.dax, test: (column) => `${negated ? 'NOT ' : ''}( [${column}] ${operator} ${right} )` });
         else tables.push(`FILTER ( ALL ( ${field.dax} ), ${negated ? 'NOT ' : ''}( ${field.dax} ${operator} ${right} ) )`);
@@ -197,7 +198,8 @@ export function judge(results: Results): { problems: string[]; notes: string[] }
     const lines = rows ?? [];
     const groups = query.groups.length;
     if (query.type === 'card') {
-      if (!lines.length || lines[0]!.slice(groups).every(blank)) problems.push(`${where(query)}: the card shows "(Blank)" (${query.values.join(', ')})`);
+      // A card of a column only (no measure) shows the column; one with measures shows the measures.
+      if (!lines.length || lines[0]!.slice(query.values.length ? groups : 0).every(blank)) problems.push(`${where(query)}: the card shows "(Blank)" (${query.values.join(', ')})`);
       continue;
     }
     if (!lines.length) { if (!query.drill || query.drill.value) notes.push(`${where(query)}: empty`); continue; }

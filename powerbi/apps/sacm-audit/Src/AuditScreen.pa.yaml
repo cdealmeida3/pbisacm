@@ -193,7 +193,7 @@ Screens:
                 Control: Label
                 Properties:
                   Text: |-
-                    =ThisItem.Label & Char(10) & "A whole number from " & ThisItem.Min & " to " & ThisItem.Max & ". Default " & ThisItem.Default & "."
+                    =ThisItem.Label & Char(10) & "A whole number from " & ThisItem.Min & " to " & ThisItem.Max & ". Default " & ThisItem.Default & "." & If(ThisItem.Unused <> "", " The saved value " & ThisItem.Unused & " is not used: the default counts.", "")
                   X: =0
                   Y: =0
                   Width: =Parent.TemplateWidth - 140
@@ -207,6 +207,17 @@ Screens:
                   Y: =10
                   Width: =120
                   Height: =36
+            - ValueBadLine:
+                Control: Label
+                Properties:
+                  # The red line under a number Save refuses (D158).
+                  Text: =""
+                  Fill: =RGBA(164, 38, 44, 1)
+                  Visible: =!(IsMatch(Trim(ValueInput.Text), "\d+") && Value(Trim(ValueInput.Text)) >= ThisItem.Min && Value(Trim(ValueInput.Text)) <= ThisItem.Max)
+                  X: =Parent.TemplateWidth - 128
+                  Y: =47
+                  Width: =120
+                  Height: =3
       - SettingsWhy:
           Control: Label
           Properties:

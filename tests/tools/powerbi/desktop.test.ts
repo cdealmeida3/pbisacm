@@ -47,7 +47,8 @@ test('the judge finds the faults of 0.44.0: a failing query, "(Blank)" on a card
       { query: visual('card', [], ['Card title']), rows: [[null]] },
       { query: visual('tableEx', ['Card'], ['State']), rows: [[null, 'Not tested'], ['Description', 'To solve']] },
       { query: visual('tableEx', ['Card'], ['State']), rows: [['Description', 'To solve']] },
-      { query: visual('card', [], ['To solve']), rows: [['3']] }
+      { query: visual('card', [], ['To solve']), rows: [['3']] },
+      { query: visual('card', ['CardLabel'], []), rows: [['Description']] }
     ]
   };
   const { problems } = judge(results);

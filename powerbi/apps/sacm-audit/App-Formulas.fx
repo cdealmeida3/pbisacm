@@ -65,5 +65,7 @@ SettingRows = ForAll(
         { raw: Trim(Last(Filter('SACM Settings', Title = setting.Key)).Value) },
         {
             Key: setting.Key, Label: setting.Label, Min: setting.Min, Max: setting.Max, Default: setting.Default, Order: setting.Order,
-            Current: If(IsMatch(raw, "\d+") && Value(raw) >= setting.Min && Value(raw) <= setting.Max, Value(raw), setting.Default)
+            Current: If(IsMatch(raw, "\d+") && Value(raw) >= setting.Min && Value(raw) <= setting.Max, Value(raw), setting.Default),
+            // A saved value that is not used (D158: "Settings says so").
+            Unused: If(!IsBlank(raw) && !(IsMatch(raw, "\d+") && Value(raw) >= setting.Min && Value(raw) <= setting.Max), raw, "")
         }));

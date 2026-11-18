@@ -398,8 +398,8 @@ powerbi/
 ├── apps/                                  stage 2 (B6, B7, D294 to D304): actions.json (the catalogue), flows.json (F1 to F6)
 │   ├── sacm-actions/                      the Power App: formulas.fx (hand-written), Src/ActionsScreen.pa.yaml (hand-written),
 │   │                                      App-Formulas.fx and Src/App.pa.yaml GENERATED
-│   └── sacm-messages/                     the Power App that sends (B7): formulas.fx, Src/MessagesScreen.pa.yaml (hand-written),
-│                                          App-Formulas.fx and Src/App.pa.yaml GENERATED
+│   ├── sacm-messages/                     the Power App that sends (B7): formulas.fx, Src/MessagesScreen.pa.yaml (hand-written),
+│   │                                      App-Formulas.fx and Src/App.pa.yaml GENERATED
 │   └── sacm-audit/                        the Power App of the Audit page (B8): the lifecycle review and the Settings;
 │                                          formulas.fx, Src/AuditScreen.pa.yaml (hand-written),
 │                                          App-Formulas.fx and Src/App.pa.yaml GENERATED
@@ -453,8 +453,9 @@ lists ─▶ fnStateList ─▶ Journal, JournalKeys, Replies, Settings, Team, A
 | `tools/powerbi/time.ps1` | The job *powerbi-time* (Windows): runs each probe as its own PQTest call, with a time cap, minus the start of PQTest; writes the table of times, the growth per doubling and T1 (the sum of the tables) to the job summary; with `-Gate` fails over the budget of D283 |
 | `tools/powerbi/load-check.ps1` | When Power Query refuses the whole test connector (every query says "SacmEval.Contents wasn't recognized"), finds the query that stops it |
 | `tools/powerbi/units.ts` | The unit cases of the reading functions, of every pattern of the checks (against JavaScript), of the search and replace of the relationship patterns, of the environment, the plain text of an EPO description and the ServiceNow address: the same inputs through `src/core/` and through Power Query, in queries of 900 rows (`Units1`, `Units2`: PQTest returns at most 1,000) |
-| `tools/powerbi/history.ts` | The answer key of B5: the runs of the two sample dates, the history, the cases, the replies, the activity and the lists, worked out by `src/core/`; `STATE_LISTS` names the five lists and their columns; `expectedHistory()` gives `ExpectedHistory` |
-| `tools/powerbi/actions.ts` | The catalogue of `powerbi/apps/actions.json`; `caseActions`, the answer key of the actions of each case; `appFormulas`, `messagesFormulas` and `appYaml`, the generated part of the two Power Apps |
+| `tools/powerbi/history.ts` | The answer key of B5: the runs of the two sample dates, the history, the cases, the replies, the activity and the lists, worked out by `src/core/`; `STATE_LISTS` names the four lists and their columns; `expectedHistory()` gives `ExpectedHistory` |
+| `tools/powerbi/actions.ts` | The catalogue of `powerbi/apps/actions.json`; `caseActions`, the answer key of the actions of each case; `appFormulas`, `messagesFormulas` and `appYaml`, the generated part of the three Power Apps |
+| `tools/powerbi/review.ts` | The answer key of B8: the draw of the lifecycle review (the same FNV-1a ranking as `fnReviewDraw`), the sample reviews and their marks, for `parity.ts` (D306) |
 | `tools/powerbi/messages.ts` | The answer key of B7: the message settings of the samples, the rows of *Drafts* (`draftRows`), the recorded messages read back, share out (`shareOutOf`) |
 | `tools/powerbi/app-rules.ts` | The rules of the Power Apps and their flows (D296, D304): the apps only add rows to *SACM Journal* and call only the flows of `flows.json` with the trigger Power Apps; the flows refresh, wait, file a report or a reply (only in *SACM Replies*), or send one message a run whose To, Cc, Subject and Body are the inputs of the trigger, one run at a time; a flow that starts on a new email never sends; the catalogue agrees with `fnCaseActions`. `npm test` runs them on the catalogue and the flows, the lint on the app source |
 | `tools/powerbi/powerfx-check/` | .NET 8: parses every formula of the app source with Microsoft's Power Fx library (`Microsoft.PowerFx.Core`) and gives its calls (function, data source, fields) as JSON, for the lint. The app source is also checked against Microsoft's schema of `pa.yaml` (`schemas/pa-yaml/`, MIT) |

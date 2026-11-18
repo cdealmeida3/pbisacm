@@ -370,9 +370,9 @@ What to know:
   the app gets all your open work.
 - **Assign** to *Nobody (free)* makes the lines free again.
 - A case the newest report no longer shows (solved, or not followed up) is not on these pages. **Follow again** for it
-  is on the page **Audit** (build B8): copy the visual there too (Ctrl+V), at the right of the table *Exceptions*, and
-  change its filter from *For the app* to **CaseLines → Status** *is* `Not followed up`. Select a line of the table, or
-  none for all, pick **Follow again**, **Save**.
+  is on the page **Audit** (build B8), section *Not followed*: copy the visual there too (Ctrl+V), at the right of the
+  table *Cases not followed up*, and change its filter from *For the app* to **CaseLines → Status** *is* `Not followed
+  up`. Select lines of that table (the app then gets only those), pick **Follow again**, **Save**.
 
 ### 6.5 How many refreshes (spike S5)
 

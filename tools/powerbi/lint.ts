@@ -186,9 +186,15 @@ for (const table of tables) {
       }
       if (commas > 2) problems.push(`DAX: measure ${table.name}[${measure.name}] gives IF ${commas + 1} arguments; IF takes at most 3 (use SWITCH ( TRUE (), … )): Desktop drops the measure`);
     }
+    // A measure inside a filter of CALCULATE (Runs[ReportDate] <= [Period to]): Desktop refuses it ("A function
+    // 'PLACEHOLDER' has been used in a True/False expression that is used as a table filter expression"). Put the
+    // measure in a variable first.
+    for (const match of dax.matchAll(/(?:\w|')\[[^\]]+\]\s*(?:<=|>=|<>|=|<|>)\s*\[(?!@)([^\]]+)\]/g)) {
+      problems.push(`DAX: measure ${table.name}[${measure.name}] compares a column with the measure [${match[1]}] in place: put the measure in a variable first (Desktop refuses a measure in a filter of CALCULATE)`);
+    }
   }
 }
-done.push(`DAX: no variable of a measure is one of the ${kept.size} words DAX keeps, and none is named twice in one measure; every IF has at most 3 arguments`);
+done.push(`DAX: no variable of a measure is one of the ${kept.size} words DAX keeps, and none is named twice in one measure; every IF has at most 3 arguments; no filter compares a column with a measure in place`);
 
 /* 5. Generated */
 for (const problem of staleQueries()) problems.push(`Generated: ${problem} (npm run powerbi:generate)`);

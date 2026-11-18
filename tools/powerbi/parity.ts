@@ -36,9 +36,8 @@ import { contractChanges, contractInformation } from '../../src/core/sources/con
 import { inList } from '../../src/core/sources/contracts/contract-reports.ts';
 import type { ContractConfig, SolusiContract } from '../../src/core/sources/contracts/contract-reports.ts';
 import { daysBetween, longDate } from '../../src/core/shared/dates.ts';
-import { activityRows, caseLines, checkedOf, exceptionRows, expectedHistory, HISTORY_FILES, historyKey, historyRows, replyLines, settingsRows, stateRows } from './history.ts';
+import { activityRows, caseLines, checkedOf, exceptionRows, expectedHistory, HISTORY_FILES, historyKey, historyRows, replyLines, sampleEvents, settingsRows, stateRows } from './history.ts';
 import type { HistoryKey } from './history.ts';
-import { sampleEvents } from './history.ts';
 import { reviewLines, withSampleReviews } from './review.ts';
 import { draftRows, recordedChats, recordedDrafts, REF_TOKEN, SAMPLE_SENDER, SENDER_TOKEN } from './messages.ts';
 import type { DraftRow } from './messages.ts';

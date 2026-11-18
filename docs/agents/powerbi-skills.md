@@ -36,7 +36,8 @@ Where the skills pull the other way:
 - **TMDL is written by hand here, on purpose.** `tmdl` calls itself "a last resort" and tells the agent to prefer the Tabular Editor CLI (`te`), a modeling server or Power BI Desktop over TOM, and to run a `pbip-validator` agent. None of these is in this repository, and none is installed. Edit the `.tmdl` files directly.
 - **`expressions.tmdl` is never edited.** `npm run powerbi:generate` writes it from `powerbi/m/` (D275). Change the `.pq` file, then run the generator.
 - **The report files are edited by hand too.** `pbip` says "use `pbir` for every report mutation, never hand-edit PBIR JSON". Here there is no `pbir` command, and the `visual.json` files are written by hand and checked by `npm run powerbi:lint`.
-- **DAX: no column of a virtual table.** Our DAX lint reads any `[x]` as a measure. Use `SUMX` and `CALCULATE` instead of a column reference into a table made inside the measure, whatever a DAX example shows.
+- **DAX: a column of a virtual table starts with `@`.** Our DAX lint reads any other `[x]` as a measure. A column added inside a measure (`ADDCOLUMNS ( t, "@days", … )`) is named `@…` and read as `[@days]`; otherwise use `SUMX` and `CALCULATE`.
+- **The DAX lint reads the function list of `dax-reference`** (`generated/catalog.json`): a variable may not be named like a function (D309). An update of that skill can therefore make the lint refuse a variable name; rename the variable.
 - **Do not install** `te`, `pbir`, `fab` (the Fabric command line), a modeling server, the library `dax-lib`, or anything else a skill names. Nothing new for the team (CLAUDE.md, "No network").
 
 The check is `npm run powerbi:lint`, and for Carlos, opening the project in Power BI Desktop.

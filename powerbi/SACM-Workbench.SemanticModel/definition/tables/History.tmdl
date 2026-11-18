@@ -134,13 +134,17 @@ table History
 
 	/// The export of the Audit page, the findings per check (findings.csv of the HTML app): the findings to solve on the CI reports dated in the period; blank when none.
 	measure 'Period findings' =
-			VAR n = CALCULATE ( DISTINCTCOUNT ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= [Period from], Runs[ReportDate] <= [Period to], History[State] = "open" )
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			VAR n = CALCULATE ( DISTINCTCOUNT ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= fromDate, Runs[ReportDate] <= toDate, History[State] = "open" )
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 
 	/// The CIs with a finding to solve on the CI reports dated in the period (findings.csv).
 	measure 'Period CIs' =
-			VAR n = CALCULATE ( DISTINCTCOUNT ( History[CiKey] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= [Period from], Runs[ReportDate] <= [Period to], History[State] = "open" )
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			VAR n = CALCULATE ( DISTINCTCOUNT ( History[CiKey] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= fromDate, Runs[ReportDate] <= toDate, History[State] = "open" )
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 
@@ -154,7 +158,9 @@ table History
 		formatString: #,0
 
 	/// The newest CI report dated on or before the end of the period: the report of "Open at the end".
-	measure 'End report date' = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] <= [Period to] )
+	measure 'End report date' =
+			VAR toDate = [Period to]
+			RETURN CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] <= toDate )
 		formatString: d mmm yyyy
 
 	/// The export of the Audit page, open at the end (open.csv of the HTML app): the first report date of a finding the report of the end of the period still shows; blank for the others.

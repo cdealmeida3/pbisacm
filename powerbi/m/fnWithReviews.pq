@@ -30,7 +30,7 @@
                 from = List.Min(List.Transform(reviews, (review) => review[ReportDate])),
                 date = Date.ToText(run[Date], [Format = "yyyy-MM-dd", Culture = "en-US"]),
                 cis = Record.FromList(run[Cis], List.Transform(run[Cis], (ci) => ci[Key])),
-                retired = List.Transform(config[retiredStatuses], (word) => fnNameKey(word, "")),
+                retired = List.Buffer(List.Transform(config[retiredStatuses], (word) => fnNameKey(word, ""))),
                 columns = run[Columns],
                 months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
                 screenDate = (iso as text) as text => if Text.Length(iso) < 10 then iso
