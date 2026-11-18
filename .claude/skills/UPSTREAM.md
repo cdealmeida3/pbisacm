@@ -54,7 +54,7 @@ Checked on 14 Nov 2026 with Claude Code 2.1.325 in a session started in this rep
 One pull request:
 
 1. Download the new tag: `git clone --depth 1 --branch <tag> <the repository above> /tmp/mp`. Check the commit with `git -C /tmp/mp rev-parse HEAD`.
-2. Delete the folders of Matt Pocock's skills here (keep this file, the folders and licence files of the other sources, `docs/agents/` and the `CLAUDE.md` section). For each path in `/tmp/mp/.claude-plugin/plugin.json` `skills[]`, copy the folder to `.claude/skills/<last part of the path>/`, without `agents/`.
+2. Delete the folders of Matt Pocock's skills here (keep this file, the folders, licence and notice files of the other sources, `docs/agents/` and the `CLAUDE.md` section). For each path in `/tmp/mp/.claude-plugin/plugin.json` `skills[]`, copy the folder to `.claude/skills/<last part of the path>/`, without `agents/`.
 3. Copy `LICENSE` to `UPSTREAM-LICENSE`. Write the source's entry under `sources` in `upstream.json` again (`mattpocock-skills`): the tag, the commit, and for every copied file its path from the repository root and the sha256 of its text with LF line ends, sorted by path (the same input gives the same bytes). Leave the other source as it is. Then run `npm test`: it fails until `upstream.json` lists every copied file with its right sha256.
 4. Update the tables of this file. Read upstream's `CHANGELOG.md`: it says when the templates of `docs/agents/` changed.
 5. Review the difference of the copied files, as for any other change.
@@ -150,7 +150,8 @@ One pull request:
 2. Replace `m-reference/` here with `/tmp/pqm/plugins/powerquery-m-for-agents/skills/m-reference/`. Copy the licence and the notices again, as above.
 3. Write the source's entry under `sources` in `upstream.json` again (`powerquery-m-for-agents`): the tag, the commit and the sha256 of every copied file, sorted by path. Leave the other sources as they are.
 4. Run `npm test`, and once with `PRIVACY_TERMS` set to the private word list (never print the words). A copied file that holds a private word is left out, and this section says which and why.
-5. Review the difference of `SKILL.md` closely: it is what the agent obeys. Look for new commands, new tools, data sent out and files written. Update [docs/agents/powerbi-skills.md](../../docs/agents/powerbi-skills.md) when they change.
+5. Update the tables and counts of this section, and the tag in the `## Agent skills` section of [CLAUDE.md](../../CLAUDE.md). No test keeps them in step. The decision row stays as it is (a log is never rewritten).
+6. Review the difference of `SKILL.md` closely: it is what the agent obeys. Look for new commands, new tools, data sent out and files written. Update [docs/agents/powerbi-skills.md](../../docs/agents/powerbi-skills.md) when they change.
 
 ## Cristóbal Salcedo's "DAX for agents"
 

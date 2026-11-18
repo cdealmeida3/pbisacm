@@ -32,7 +32,7 @@ From highest to lowest:
 
 Where the skills pull the other way:
 
-- **M as PQTest runs it.** `m-reference` describes M as Power BI Desktop runs it. CI runs the queries in PQTest, and `npm run powerbi:lint` reads them. The speed rules for the queries in [docs/ARCHITECTURE.md](../ARCHITECTURE.md) §12 (D283, D284) win over an example: buffer a list that is read twice or read by position (`List.Buffer`); build a large table column by column; never `Table.TransformColumns` with functions made by a helper.
+- **Our speed rules win over M examples.** `m-reference` describes M as Power BI Desktop runs it. CI runs the queries in PQTest, and `npm run powerbi:lint` reads them. The speed rules for the queries in [docs/ARCHITECTURE.md](../ARCHITECTURE.md) §12 (D283, D284) win over an example: buffer a list that is read twice or read by position (`List.Buffer`); build a large table column by column; never `Table.TransformColumns` with functions made by a helper.
 - **TMDL is written by hand here, on purpose.** `tmdl` calls itself "a last resort" and tells the agent to prefer the Tabular Editor CLI (`te`), a modeling server or Power BI Desktop over TOM, and to run a `pbip-validator` agent. None of these is in this repository, and none is installed. Edit the `.tmdl` files directly.
 - **`expressions.tmdl` is never edited.** `npm run powerbi:generate` writes it from `powerbi/m/` (D275). Change the `.pq` file, then run the generator.
 - **The report files are edited by hand too.** `pbip` says "use `pbir` for every report mutation, never hand-edit PBIR JSON". Here there is no `pbir` command, and the `visual.json` files are written by hand and checked by `npm run powerbi:lint`.
