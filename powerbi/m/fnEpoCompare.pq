@@ -7,8 +7,9 @@
 // a difference [Field, Label, Current, Epo, Value, Leftover].
 (cis as list, systems as list, columns as list, config as record) as record =>
     let
-        retiredWords = List.Transform(config[retiredStatuses], (word) => fnNameKey(word, "")),
+        retiredWords = List.Buffer(List.Transform(config[retiredStatuses], (word) => fnNameKey(word, ""))),
         isRetired = (status as text) as logical => List.Contains(retiredWords, fnNameKey(status, "")),
+        isRetiredCi = (ci as record) as logical => List.Contains(retiredWords, ci[StatusKey]),
         same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
         byTag = fnGroupBy(List.Select(cis, (ci) => List.Contains(config[classes], ci[Class]) and ci[AssetTag] <> ""), (ci) => Text.Lower(Text.Trim(ci[AssetTag]), "en-US")),
         names = fnUserNames(cis, columns),
@@ -42,7 +43,7 @@
         pairOf = (system as record) as nullable record =>
             let
                 first = Record.FieldOrDefault(byTag, Text.Lower(Text.Trim(system[EpoId]), "en-US"), {}),
-                live = List.Select(first, (ci) => not isRetired(ci[Status])),
+                live = List.Select(first, (ci) => not isRetiredCi(ci)),
                 found = if List.Count(first) > 1 and not List.IsEmpty(live) then live else first,
                 ci = if List.IsEmpty(found) then null else found{0},
                 epoRetired = system[Status] <> "" and isRetired(system[Status]),
@@ -72,7 +73,7 @@
                 differences = status & name & people & description
             in
                 if ci = null then [Kind = if epoRetired then "none" else "without", System = system]
-                else if epoRetired and isRetired(ci[Status]) then [Kind = "retired"]
+                else if epoRetired and isRetiredCi(ci) then [Kind = "retired"]
                 else [Kind = "pair", Pair = [Ci = ci, System = system, Mapped = ci[ServiceMapped], Differences = differences,
                     Leftovers = List.Select(differences, (difference) => difference[Leftover])]],
         results = List.Buffer(List.Transform(systems, pairOf))

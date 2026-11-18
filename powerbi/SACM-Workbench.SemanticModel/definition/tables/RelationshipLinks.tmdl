@@ -7,44 +7,74 @@ table RelationshipLinks
 	/// The CI the line belongs to.
 	column CiKey
 		dataType: string
-		sourceColumn: CiKey
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiKey]
 
 	/// Parent: the other CI is above it. Child: below it.
 	column Relation
 		dataType: string
-		sourceColumn: Relation
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Relation]
 
 	column Other
 		dataType: string
-		sourceColumn: Other
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Other]
 
 	column OtherClass
 		dataType: string
-		sourceColumn: OtherClass
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [OtherClass]
 
 	column OtherStatus
 		dataType: string
-		sourceColumn: OtherStatus
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [OtherStatus]
 
 	column Type
 		dataType: string
-		sourceColumn: Type
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Type]
 
 	/// No when one end is Retired: the checks do not count it.
 	column Counts
 		dataType: string
-		sourceColumn: Counts
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Counts]
 
 	/// Yes: excluded from calculation, so it passes no criticality (D131).
 	column Excluded
 		dataType: string
-		sourceColumn: Excluded
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Excluded]
 
 	column Order
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: Order
+		isNameInferred
+		sourceColumn: [Order]
 
-	partition RelationshipLinks = m
+	partition RelationshipLinks = calculated
 		mode: import
-		source = RelationshipLinksRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "RelationshipLinks" ),
+					"CiKey", Run[RelationshipLinks.CiKey],
+					"Relation", Run[RelationshipLinks.Relation],
+					"Other", Run[RelationshipLinks.Other],
+					"OtherClass", Run[RelationshipLinks.OtherClass],
+					"OtherStatus", Run[RelationshipLinks.OtherStatus],
+					"Type", Run[RelationshipLinks.Type],
+					"Counts", Run[RelationshipLinks.Counts],
+					"Excluded", Run[RelationshipLinks.Excluded],
+					"Order", Run[RelationshipLinks.Order]
+				)

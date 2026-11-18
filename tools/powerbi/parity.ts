@@ -2,9 +2,13 @@
 // table, written by the CI job "powerbi-eval") with the answer key: the TypeScript logic of src/core/ and the recorded
 // result of tests/recorded/. Any difference fails, line by line.
 //   node tools/powerbi/parity.ts <folder with <Table>.json>
+//   node tools/powerbi/parity.ts --real-size <folder with RealSize.Summary.json> [--copies <n>] [--history <k>]
+//       at the size of the real reports (scaled.ts): the counts per check and state, the CIs evaluated per part, the
+//       notes and the rows of the tables, against src/core on the same scaled files (plan of the speed build §6.2).
 // Also checked: every table gives exactly the columns its TMDL file declares, so a refresh in Power BI Desktop does not
 // stop on a missing column.
-import { readFileSync, readdirSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
 import { readTable } from '../../src/core/reading/table.ts';
@@ -15,7 +19,8 @@ import { epoConfig, readEpoReport } from '../../src/core/sources/epo/epo-report.
 import { contractConfig, readContractReport, readSolusiFile } from '../../src/core/sources/contracts/contract-reports.ts';
 import { DIMENSIONS, ROLES } from '../../src/core/model/model.ts';
 import { loadPackFiles, loadReferences } from '../../src/hosts/cli.ts';
-import { EARLIER, RECORD_DATE, SAMPLE_FILES } from '../../tests/sample-record.ts';
+import { EARLIER, RECORD_DATE, recordReports, SAMPLE_FILES } from '../../tests/sample-record.ts';
+import { numberArgument, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { pascal } from './generate.ts';
 import { readTables } from './tmdl.ts';
 import { unitCases, unitQueryNames } from './units.ts';
@@ -189,6 +194,8 @@ export async function parityProblems(folder: string): Promise<string[]> {
 
   const tested = run.tested.filter((part) => built.has(part.split(':')[0]!)).map((part) => ({ Part: part, ReportDate: run.date, Evaluated: run.evaluated?.[part] }));
   // A check tested as a whole (Process stage) has no part.
+  // PQTest returns at most 1,000 rows: a table that fills them may hide rows (then page it, as the unit cases).
+  for (const [name, list] of outputs) if (list.length >= 1000) problems.push(`${name}: ${list.length} rows, the limit of PQTest: rows may be hidden`);
   const foundTested = rows('Tested').map((row) => ({ ...row, Part: norm(row.Part) ? `${norm(row.CheckId)}:${norm(row.Part)}` : norm(row.CheckId) }));
   problems.push(...compare('Tested', foundTested, tested, 'Part', ['ReportDate', 'Evaluated']));
 
@@ -248,7 +255,87 @@ export async function parityProblems(folder: string): Promise<string[]> {
   return problems;
 }
 
-if (process.argv[1] === import.meta.filename) {
+/** One line of RealSize.Summary (tools/powerbi/probes.ts). */
+type SummaryLine = { Kind: string; Id: string; Count: number; Cis: number; Chars: number };
+
+/** The same summary from src/core, on the scaled files of `copies` copies (the newest CI report). */
+export async function expectedSummary(copies: number, history = 0, built?: Set<string>): Promise<SummaryLine[]> {
+  const folder = mkdtempSync(join(tmpdir(), 'sacm-scaled-'));
+  try {
+    const files = scaledSampleFiles(copies, history);
+    for (const file of files) writeFileSync(join(folder, file.name), Buffer.from(file.base64, 'base64'));
+    const at = (name: string, date = RECORD_DATE) => ({ path: join(folder, `${date}_${name}`), name });
+    const out = await recordReports({ ci: at(SAMPLE_FILES.ci.name), relationship: at(SAMPLE_FILES.relationship.name), epo: at(SAMPLE_FILES.epo.name),
+      solusi: at(SAMPLE_FILES.solusi.name), solusiEarlier: at(SAMPLE_FILES.solusiEarlier.name, EARLIER), contracts: at(SAMPLE_FILES.contracts.name) });
+    const run = JSON.parse(out['run.json']!) as Run & { capabilities?: string[][] };
+    const isBuilt = (id: string): boolean => !built || built.has(id);
+    const checkIds = new Set(loadPackFiles().map((file) => (file.pack as { id: string }).id));
+    const lines: SummaryLine[] = [];
+    const groups = new Map<string, { count: number; cis: Set<string>; chars: number }>();
+    for (const fact of run.facts.filter((item) => isBuilt(item.checkId))) {
+      const id = `${fact.checkId}|${fact.state ?? 'open'}`;
+      const group = groups.get(id) ?? { count: 0, cis: new Set<string>(), chars: 0 };
+      group.count++; group.cis.add(fact.ciKey); group.chars += fact.key.length + fact.detail.length + (fact.contactId ?? '').length;
+      groups.set(id, group);
+    }
+    for (const [id, group] of groups) lines.push({ Kind: 'findings', Id: id, Count: group.count, Cis: group.cis.size, Chars: group.chars });
+    for (const part of run.tested.filter((item) => isBuilt(item.split(':')[0]!))) lines.push({ Kind: 'tested', Id: part, Count: run.evaluated?.[part] ?? -1, Cis: 0, Chars: 0 });
+    const notes = new Map<string, { count: number; chars: number }>();
+    for (const note of run.notes) {
+      const id = note.slice(0, note.indexOf(':'));
+      if (checkIds.has(id) && !isBuilt(id)) continue;
+      const entry = notes.get(id) ?? { count: 0, chars: 0 };
+      entry.count++; entry.chars += note.slice(note.indexOf(':') + 1).trim().length;
+      notes.set(id, entry);
+    }
+    for (const [id, entry] of notes) lines.push({ Kind: 'notes', Id: id, Count: entry.count, Cis: 0, Chars: entry.chars });
+    const ciTable = await tableOf(at(SAMPLE_FILES.ci.name).path);
+    const relTable = await tableOf(at(SAMPLE_FILES.relationship.name).path);
+    const cis = readCiReport(ciTable.rows).cis;
+    const relationships = readRelationshipReport(relTable.rows).relationships;
+    const references = loadReferences();
+    const graph = buildGraph(cis, relationships, references['reference/relationship-model'] as RelationshipModel);
+    const links = graph.edges.reduce((sum, edge) => sum + (edge.parent.ci ? 1 : 0) + (edge.child.ci ? 1 : 0), 0);
+    const epo = readEpoReport((await tableOf(at(SAMPLE_FILES.epo.name).path)).rows, epoConfig(references)!).systems.length;
+    const rows: Array<[string, number]> = [['Inventory', cis.length], ['Relationships', relationships.length], ['RelationshipLinks', links],
+      ['MappingBacklog', run.facts.filter((fact) => fact.checkId === 'MAPPING').length], ['CapabilitySheet', (run.capabilities ?? []).length],
+      ['Parked', (run.parked?.lines ?? []).length], ['EpoSystems', epo]];
+    for (const [id, count] of rows) lines.push({ Kind: 'rows', Id: id, Count: count, Cis: 0, Chars: 0 });
+    return lines;
+  } finally { rmSync(folder, { recursive: true, force: true }); }
+}
+
+/** RealSize.Summary of PQTest against src/core at the same size: every difference, by kind and id. */
+export async function realSizeProblems(folder: string, copies: number, history = 0): Promise<string[]> {
+  const found = outputOf(folder, 'RealSize.Summary') as unknown as SummaryLine[];
+  const built = new Set(found.filter((line) => line.Kind === 'built').map((line) => line.Id));
+  const checkIds = new Set(loadPackFiles().map((file) => (file.pack as { id: string }).id));
+  const kept = found.filter((line) => line.Kind !== 'built' && !(line.Kind === 'notes' && checkIds.has(line.Id) && !built.has(line.Id)));
+  const expected = await expectedSummary(copies, history, built);
+  const problems: string[] = [];
+  const key = (line: SummaryLine): string => `${line.Kind} ${line.Id}`;
+  const got = new Map(kept.map((line) => [key(line), line]));
+  const want = new Map(expected.map((line) => [key(line), line]));
+  for (const [id, line] of want) {
+    const other = got.get(id);
+    if (!other) { problems.push(`${id}: missing in Power Query (src/core: ${line.Count})`); continue; }
+    for (const field of ['Count', 'Cis', 'Chars'] as const) if (Number(other[field]) !== line[field]) problems.push(`${id}: ${field} is ${other[field]}, src/core gives ${line[field]}`);
+  }
+  for (const id of got.keys()) if (!want.has(id)) problems.push(`${id}: not in src/core (Power Query: ${got.get(id)!.Count})`);
+  if (!built.size) problems.push('RealSize.Summary: no check is built');
+  return problems;
+}
+
+if (process.argv[1] === import.meta.filename && process.argv.includes('--real-size')) {
+  const args = process.argv.slice(2);
+  const folder = args[args.indexOf('--real-size') + 1];
+  if (!folder) { console.error('Usage: node tools/powerbi/parity.ts --real-size <folder with RealSize.Summary.json> [--copies <n>] [--history <k>]'); process.exit(2); }
+  const copies = numberArgument(args, '--copies', REAL_SIZE_COPIES);
+  const problems = await realSizeProblems(folder, copies, numberArgument(args, '--history', 0));
+  for (const problem of problems) console.error(problem);
+  console.log(problems.length ? `Power BI parity at real size (${copies} copies): ${problems.length} differences.` : `Power BI parity at real size (${copies} copies): the counts are those of src/core.`);
+  process.exit(problems.length ? 1 : 0);
+} else if (process.argv[1] === import.meta.filename) {
   const folder = process.argv[2];
   if (!folder) { console.error('Usage: node tools/powerbi/parity.ts <folder with the PQTest output>'); process.exit(2); }
   const problems = await parityProblems(folder);

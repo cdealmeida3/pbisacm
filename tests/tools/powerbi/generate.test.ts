@@ -38,10 +38,17 @@ test('every query of expressions.tmdl has a group, and every query the generator
   assert.deepEqual(queries().map((query) => query.name), names);
 });
 
-test('every table reads from its own query <Table>Rows, and the evaluation runs every table and the unit cases', () => {
+test('every table reads from its own query <Table>Rows or is a part of Run, and the evaluation runs every table and the unit cases', () => {
   const names = new Set(readExpressions().map((expression) => expression.name));
   const tables = readTables();
   for (const table of tables) {
+    assert.ok(table.columns.length > 0, `${table.name} has no column`);
+    // A calculated table (D284) takes its rows from Run: its part, its columns in order.
+    if (table.partitionKind === 'calculated') {
+      assert.equal(table.calculated!.part, table.name);
+      assert.deepEqual(table.calculated!.columns, table.columns.map((column) => [column.name, `${table.name}.${column.name}`]));
+      continue;
+    }
     assert.equal(table.partitionM, `${table.name}Rows`, table.name);
     assert.ok(names.has(table.partitionM), `${table.partitionM} is not in expressions.tmdl`);
     assert.ok(table.columns.length > 0, `${table.name} has no column`);

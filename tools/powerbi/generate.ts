@@ -2,6 +2,7 @@
 //   - powerbi/SACM-Workbench.SemanticModel/definition/expressions.tmdl: every shared query of the model. The hand-written
 //     Power Query files of powerbi/m/ (one query per file), and the packed data: the invented samples, the check files, the
 //     reference files, the reading rules of src/core/sources/ and the recorded result of the samples (tests/recorded/).
+//   - powerbi/SACM-Workbench.SemanticModel/definition/tables/Run.tmdl: the hidden table Run, from the calculated tables.
 //   - powerbi/SACM-Workbench.Report/StaticResources/RegisteredResources/sacm-theme.json: the colours of docs/LOOK.md.
 // Same repository, same bytes (no date, no random value).
 //   node tools/powerbi/generate.ts            writes both files (npm run powerbi:generate)
@@ -24,13 +25,14 @@ import { TOPICS } from '../../src/app/view/cards.ts';
 import { MODULE_LABEL } from '../../src/app/ui/labels.ts';
 import { DEFAULT_SETTINGS } from '../../src/app/state/store.ts';
 import { EARLIER, RECORD_DATE, SAMPLE_FILES } from '../../tests/sample-record.ts';
-import { MODEL, readExpressions } from './tmdl.ts';
-import { compilePattern } from './regex.ts';
-import type { Node } from './regex.ts';
+import { MODEL, readExpressions, readTables, tmdlName } from './tmdl.ts';
+import { compilePattern, fastForm } from './regex.ts';
+import type { FastForm, Node } from './regex.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const read = (path: string): string => readFileSync(join(root, path), 'utf8');
 export const EXPRESSIONS_FILE = join(MODEL, 'expressions.tmdl');
+export const RUN_FILE = join(MODEL, 'tables', 'Run.tmdl');
 export const THEME_FILE = join(root, 'powerbi', 'SACM-Workbench.Report', 'StaticResources', 'RegisteredResources', 'sacm-theme.json');
 const M_FOLDER = join(root, 'powerbi', 'm');
 
@@ -160,6 +162,13 @@ export function compiledPatterns(): Record<string, Node> {
   return out;
 }
 
+/** The fast form of every pattern, by the same key as compiledPatterns (D285). */
+export function patternForms(): Record<string, FastForm> {
+  const out: Record<string, FastForm> = {};
+  for (const use of patternUses().sort((a, b) => patternKey(a).localeCompare(patternKey(b)))) out[patternKey(use)] = fastForm(use.source, use.flags);
+  return out;
+}
+
 /** What the Power Query readers need to read the reports as src/core/ does. */
 export function readingRules(): Record<string, unknown> {
   const needOf = (label: string): string[] => RELATIONSHIP_REPORT.needs.find((need) => need.label === label)!.any;
@@ -233,6 +242,8 @@ function packed(): Query[] {
     { name: 'ReferenceFiles', group: 'Packed', description: 'GENERATED from checks/reference/. Every reference file, by its name.', m: json(referenceFiles()) },
     { name: 'ReadingRules', group: 'Packed', description: 'GENERATED from src/core/sources/. The report types, the header forms and the words the readers use.', m: json(readingRules()) },
     { name: 'Patterns', group: 'Packed', description: 'GENERATED from the check files and the reference files (tools/powerbi/regex.ts). Every regular expression the checks test, compiled for fnRegexTest, by flags and text.', m: json(compiledPatterns()) },
+    { name: 'PatternForms', group: 'Packed', description: 'GENERATED from the check files and the reference files (tools/powerbi/regex.ts, D285). For each pattern of Patterns, the fast form that decides most texts without the walk (fnFastMatch).', m: json(patternForms()) },
+    { name: 'RunColumnTypes', group: 'Packed', description: 'GENERATED from the calculated tables (D284). The type of every column of Run that a part gives, for RunRows: the data type of the column of the calculated table.', m: runColumnTypes() },
     { name: 'ExpectedResult', group: 'Packed', description: 'GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.', m: mText(JSON.stringify(expectedResult())) },
     { name: 'WorkbenchVersion', group: 'Packed', description: 'GENERATED from package.json. The version of the Workbench.', m: mText(version) },
     { name: 'SampleDate', group: 'Packed', description: 'GENERATED from tests/sample-record.ts. The day the samples were recorded.', m: `#date(${year}, ${month}, ${day})` }
@@ -255,6 +266,52 @@ export function expressionsTmdl(): string {
     return `${description}expression ${query.name} =${body}\n\tqueryGroup: ${query.group}\n`;
   });
   return parts.join('\n');
+}
+
+/* ------------------------------------------------------------------ tables/Run.tmdl */
+
+/** The M type of a TMDL data type, as the parts give it (a date column of a part is a date). */
+const M_TYPES: Record<string, string> = { string: 'type nullable text', int64: 'Int64.Type', boolean: 'type nullable logical', dateTime: 'type nullable date', double: 'type nullable number' };
+
+/** The query RunColumnTypes: {"<Part>.<Column>", <type>} for every column a part gives, as Table.TransformColumnTypes takes it. */
+export function runColumnTypes(): string {
+  const pairs: string[] = [];
+  for (const table of readTables().filter((item) => item.calculated)) {
+    const types = new Map(table.columns.map((item) => [item.sourceColumn, item.dataType]));
+    for (const [name, source] of table.calculated!.columns) {
+      const type = M_TYPES[types.get(name) ?? 'string'];
+      if (!type) throw new Error(`${table.file}: the data type ${types.get(name)} of ${name} has no M type in generate.ts`);
+      pairs.push(`{${mText(source)}, ${type}}`);
+    }
+  }
+  return `{\n${pairs.map((pair) => `    ${pair}`).join(',\n')}\n}`;
+}
+
+/**
+ * The hidden table Run (D284): a column Part, the date of the run, and for each calculated table every column it takes
+ * from Run (<Part>.<Column>), with the data type of the calculated table's column. Generated from the calculated tables,
+ * so the two never differ. Its rows come from the query RunRows.
+ */
+export function runTmdl(): string {
+  const calculated = readTables().filter((table) => table.calculated);
+  const column = (name: string, dataType: string, extra: string[] = []): string =>
+    [`\tcolumn ${tmdlName(name)}`, `\t\tdataType: ${dataType}`, ...extra.map((line) => `\t\t${line}`), '\t\tsummarizeBy: none', `\t\tsourceColumn: ${name}`, ''].join('\n');
+  const columns = [column('Part', 'string'), column('ReportDate', 'dateTime', ['formatString: d mmm yyyy'])];
+  for (const table of calculated) {
+    const types = new Map(table.columns.map((item) => [item.sourceColumn, item.dataType]));
+    for (const [name, source] of table.calculated!.columns) columns.push(column(source, types.get(name) ?? 'string'));
+  }
+  return [
+    `/// GENERATED by npm run powerbi:generate from the calculated tables (D284). The checks on the newest CI report, computed once per refresh: the rows of ${calculated.map((table) => table.calculated!.part).join(', ')}. Hidden: the pages show the calculated tables.`,
+    'table Run',
+    '\tisHidden',
+    '',
+    ...columns,
+    '\tpartition Run = m',
+    '\t\tmode: import',
+    '\t\tsource = RunRows',
+    ''
+  ].join('\n');
 }
 
 /* ------------------------------------------------------------------ the theme */
@@ -305,6 +362,7 @@ export function staleQueries(): string[] {
     else if (found.get(query.name) !== query.m.trim()) problems.push(`${query.name}: its M is not the one of ${query.group === 'Packed' ? 'the repository' : `powerbi/m/${query.name}.pq`}`);
   }
   for (const name of found.keys()) if (!wanted.some((query) => query.name === name)) problems.push(`${name}: not in powerbi/m/ (a query made in Power BI Desktop? move it to powerbi/m/${name}.pq)`);
+  if (!existsSync(RUN_FILE) || readFileSync(RUN_FILE, 'utf8').replace(/\r\n/g, '\n') !== runTmdl()) problems.push(`${relative(root, RUN_FILE)}: not the columns of the calculated tables`);
   if (!existsSync(THEME_FILE) || readFileSync(THEME_FILE, 'utf8').replace(/\r\n/g, '\n') !== themeText()) problems.push(`${relative(root, THEME_FILE)}: not the theme of the colours of LOOK.md`);
   return problems;
 }
@@ -318,5 +376,6 @@ if (process.argv[1] === import.meta.filename) {
   }
   writeFileSync(EXPRESSIONS_FILE, expressionsTmdl());
   writeFileSync(THEME_FILE, themeText());
-  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries) and ${relative(root, THEME_FILE)}.`);
+  writeFileSync(RUN_FILE, runTmdl());
+  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${relative(root, RUN_FILE)} and ${relative(root, THEME_FILE)}.`);
 }

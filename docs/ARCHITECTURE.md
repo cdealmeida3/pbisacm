@@ -381,7 +381,7 @@ That tool designs mappings for one project at a time ("links, not data quality")
 
 ## 12. The Power BI report
 
-The Workbench is being rebuilt as a Power BI report (D268). The HTML app above stays as it is until stage 2 ends; its logic is the answer key of the report (D270). Build B1 is the foundation: the reports are read and the cards are listed. Build B2 runs the checks of the CI report: the rule checks and the CI and criticality code detectors (`BuiltDetectors`). Build B3 adds the relationship, EPO, process stage and mapping backlog detectors.
+The Workbench is being rebuilt as a Power BI report (D268). The HTML app above stays as it is until stage 2 ends; its logic is the answer key of the report (D270). Build B1 is the foundation: the reports are read and the cards are listed. Build B2 runs the checks of the CI report: the rule checks and the CI and criticality code detectors (`BuiltDetectors`). Build B3 adds the relationship, EPO, process stage and mapping backlog detectors. The speed build makes a refresh at the size of the real reports fit in the budget of D283.
 
 ```
 powerbi/
@@ -389,7 +389,8 @@ powerbi/
 ├── SACM-Workbench.SemanticModel/definition/
 │   ├── database.tmdl, model.tmdl, relationships.tmdl
 │   ├── expressions.tmdl                   GENERATED: every query of powerbi/m/, the packed samples, check and reference files
-│   └── tables/<Table>.tmdl                one file per table: its columns, its DAX measures, one query <Table>Rows
+│   └── tables/<Table>.tmdl                one file per table: its columns, its DAX measures, one query <Table>Rows, or a calculated
+│                                          table that splits Run (D284); Run.tmdl is GENERATED from those
 ├── SACM-Workbench.Report/
 │   ├── definition/                        the pages (Reports, Cards, Card, Case, Person, Mapping backlog, Self-check) and their visuals, in PBIR
 │   └── StaticResources/RegisteredResources/sacm-theme.json   GENERATED from the colours of LOOK.md
@@ -405,17 +406,41 @@ Each built module has one function: `fnDetectRule` (every operator of `checks/RE
 
 Then `fnSourceFirst` (D190, on the pairs of `fnEpoCompare`), the parked filter, and `fnFacts`: who is asked (`fnContact`, the port of `resolveContact`), Procurement, the record teams, the EPO inventory owner, where the fix is made (`fnFixedInEpo`), how the finding is listed (`fnListing`) and the CI as the message shows it.
 
-The tables `Findings` (with *What EPO already has*, `fnEpoCorrections`), `Tested`, `Notes`, `Parked`, `MappingBacklog`, `CapabilitySheet` and `RelationshipLinks` read `CheckRun`; `fnServiceNowLink` builds the link of `recordSearch` from the parameter `ServiceNowAddress` (D279). The patterns of the checks are compiled by `tools/powerbi/regex.ts` into the packed query `Patterns` and tested by `fnMatches` and `fnRegexTest` (D277); `fnSearch` and `fnReplacePattern` find and replace a match (D280). The DAX measures of `Checks` only count and choose: *Card state*, *Card number*, *Card fact*, the section lines. `SelfCheck` compares the states, the CIs and every finding key with `tests/recorded/cards.json`.
+**Computed once (D284).** Power Query computes a shared query again for each table that reads it, so only one table reads `CheckRun`: the hidden table `Run` (query `RunRows`). It makes the rows of eight parts with the functions `fnFindingsPart` (with *What EPO already has*, `fnEpoCorrections`), `fnTestedPart`, `fnNotesPart`, `fnParkedPart`, `fnMappingBacklogPart`, `fnRelationshipLinksPart`, `fnCapabilitySheetPart` and `fnSelfCheckPart`, names each column `<Part>.<Column>`, and adds `Part` and `ReportDate`. The tables the pages show are DAX calculated tables of one fixed form that split it:
+
+```
+files ─▶ ReadFiles ─▶ CheckRun ─▶ Run (hidden, RunRows) ─▶ Findings, Tested, Notes, Parked, MappingBacklog,
+                                                           RelationshipLinks, CapabilitySheet, SelfCheck (DAX)
+```
+
+`fnServiceNowLink` builds the link of `recordSearch` from the parameter `ServiceNowAddress` (D279). The patterns of the checks are compiled by `tools/powerbi/regex.ts` into the packed query `Patterns` and tested by `fnMatches` and `fnRegexTest` (D277); `PatternForms` gives each one a fast form that decides most texts without the walk (`fnFastMatch`, D285); `fnSearch` and `fnReplacePattern` find and replace a match (D280). The DAX measures of `Checks` only count and choose: *Card state*, *Card number*, *Card fact*, the section lines. `SelfCheck` compares the states, the CIs and every finding key with `tests/recorded/cards.json`.
 
 | Tool | Does |
 |---|---|
 | `tools/powerbi/generate.ts` | `npm run powerbi:generate`: writes `expressions.tmdl` from `powerbi/m/`, the samples, `checks/`, `checks/reference/`, the reading rules of `src/core/` and `tests/recorded/`, and the theme from `src/app/styles.css` (D275). `npm test` fails when they are out of date |
 | `tools/powerbi/tmdl.ts` | Reads the queries, tables, columns, measures and partitions of the TMDL files, for the other tools |
 | `tools/powerbi/lint.ts` | `npm run powerbi:lint` (D276): the model through Microsoft's TMDL library (`tmdl-check/`, .NET 8), every query through `@microsoft/powerquery-parser`, the report files against the schemas in `schemas/` (MIT, Microsoft), every name a visual or a measure uses, the generated parts, the card labels, the colours and their contrast |
-| `tools/powerbi/connector.ts` | `npm run powerbi:connector`: packs every query into a small test connector and one query file per table, for PQTest |
+| `tools/powerbi/connector.ts` | `npm run powerbi:connector`: packs every query into a small test connector and one query file per table, for PQTest. A calculated table becomes the M that does what its DAX does. `--real-size` packs the scaled samples and the probes instead; `--live k` keeps only the first k members, for `load-check.ps1` |
+| `tools/powerbi/scaled.ts` | The invented samples at the size of the real reports (D283): 170 copies, each with its own names, EPO IDs and descriptions; `--write <folder>` writes them as files, `--history k` adds earlier dates |
+| `tools/powerbi/probes.ts` | The probes of the refresh time, members of the test connector only: `Time.<Table>` for each table Power Query loads, `Time.Stage.…` and `Time.Check.<id>` for the stages of the checks, and `RealSize.Summary` (the counts that `parity.ts --real-size` compares) |
+| `tools/powerbi/time.ps1` | The job *powerbi-time* (Windows): runs each probe as its own PQTest call, with a time cap, minus the start of PQTest; writes the table of times, the growth per doubling and T1 (the sum of the tables) to the job summary; with `-Gate` fails over the budget of D283 |
+| `tools/powerbi/load-check.ps1` | When Power Query refuses the whole test connector (every query says "SacmEval.Contents wasn't recognized"), finds the query that stops it |
 | `tools/powerbi/units.ts` | The unit cases of the reading functions, of every pattern of the checks (against JavaScript), of the search and replace of the relationship patterns, of the environment, the plain text of an EPO description and the ServiceNow address: the same inputs through `src/core/` and through Power Query, in queries of 900 rows (`Units1`, `Units2`: PQTest returns at most 1,000) |
 | `tools/powerbi/regex.ts` | Compiles the regular expressions of the check and reference files into the trees `fnRegexTest` walks; refuses any form Power Query does not know (D277) |
 | `tools/powerbi/parity.ts` | `npm run powerbi:parity <folder>`: compares the PQTest result with `src/core/` and `tests/recorded/`: the columns of each table, the unit cases, the report files, every CI and every row of the other readers, the checks, every finding of the built checks with all its fields (`tests/recorded/run.json`), what was tested and how many CIs, the notes, the parked lines and the self-check |
-| `.github/workflows/powerbi.yml` | The job *powerbi-eval* on GitHub's Windows runner: downloads Microsoft's Power Query SDK tools, runs every table on the samples with PQTest, then `parity.ts` |
+| `.github/workflows/powerbi.yml` | The job *powerbi-eval* on GitHub's Windows runner: downloads Microsoft's Power Query SDK tools, runs every table on the samples with PQTest, then `parity.ts`. The job *powerbi-time*: the refresh time at real size (`time.ps1`), on every pull request and by hand with more sizes and the stages |
+
+**Speed rules for the queries (D283, D284).** A refresh at real size must stay under 2 minutes; the job *powerbi-time* fails a pull request above it.
+
+1. Every table the model loads is computed on its own: anything two tables need is computed twice. Put a new result of the checks into `Run` as a part (a function `fn<Table>Part` and a calculated table), never in a new table that reads `CheckRun`.
+2. A list or table read more than once: `List.Buffer` or `Table.Buffer`. M works a lazy list out again each time it is read.
+   This counts double for a list read by position (`list{i}` for each row) and for a sorted list: without the buffer it is made, or sorted, again for every row.
+3. A table with many rows and columns is made column by column: each column a buffered list, then one `Table.FromColumns` at the end (as `fnReadCiReport` does). Never take a table of lazy lists apart again with `Table.ToColumns`, and never `Table.TransformColumns` with functions made by a helper: both took minutes for 3,230 CIs.
+4. "Is it in there?" against more than a few dozen items: a key set (`fnKeySet`, then `Record.HasFields`), made once, or a count by value (`fnCountBy`, `fnGroupBy`).
+5. A normal form of a CI field (the name, status or identity key, the tags as keys, the squashed texts): read it from the CI record that `fnCheckRun` makes once (`NameKey`, `StatusKey`, `IdentityKey`, `TagKeys`, `Squashed`), never `fnNameKey` it again in a check.
+6. Never `List.Accumulate` a growing list over thousands of items.
+7. A new pattern: run `npm run powerbi:generate` and look at its kind in `PatternForms`. A pattern of kind `walk` with no quick "no" is slow on every CI; say why in the check file.
+8. A name defined twice in one `let` or record parses, but Power Query then refuses the whole connector; the lint finds it.
+9. Measure: start the workflow *Power BI* by hand (inputs `sizes`, `stages`, `cap`, `only`) and read the summary of the job *powerbi-time*.
 
 **What has been verified, and what not yet.** The lint and the Windows evaluation pass in the checks of the pull request. Power BI Desktop itself has not opened this project in a check (it runs only on Windows, with a person): Carlos opens it on his PC (spike S1 of the plan).

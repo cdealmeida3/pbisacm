@@ -8,7 +8,7 @@ let
             sorted = Table.Sort(candidates, {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})
         in
             if Table.IsEmpty(sorted) then null else Table.Last(sorted)[FileName],
-    withCis = Table.AddColumn(cis, "CIs", each Table.RowCount(fnReadCiReport([Read])), Int64.Type),
+    withCis = Table.AddColumn(cis, "CIs", each fnCiCount([Read]), Int64.Type),
     withRelationship = Table.AddColumn(withCis, "RelationshipFile", each pick("relationship", [ReportDate]), type nullable text),
     withEpo = Table.AddColumn(withRelationship, "EpoFile", each pick("epo", [ReportDate]), type nullable text),
     withSolusi = Table.AddColumn(withEpo, "SolusiFile", each pick("solusi", [ReportDate]), type nullable text),

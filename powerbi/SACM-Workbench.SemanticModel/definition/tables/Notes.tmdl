@@ -3,23 +3,38 @@ table Notes
 
 	column CheckId
 		dataType: string
-		sourceColumn: CheckId
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
 
 	column ReportDate
 		dataType: dateTime
+		isDataTypeInferred
 		formatString: d mmm yyyy
 		summarizeBy: none
-		sourceColumn: ReportDate
+		isNameInferred
+		sourceColumn: [ReportDate]
 
 	column Reason
 		dataType: string
-		sourceColumn: Reason
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Reason]
 
 	column Order
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: Order
+		isNameInferred
+		sourceColumn: [Order]
 
-	partition Notes = m
+	partition Notes = calculated
 		mode: import
-		source = NotesRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "Notes" ),
+					"CheckId", Run[Notes.CheckId],
+					"ReportDate", Run[Notes.ReportDate],
+					"Reason", Run[Notes.Reason],
+					"Order", Run[Notes.Order]
+				)

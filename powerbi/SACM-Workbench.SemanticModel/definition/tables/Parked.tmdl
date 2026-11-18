@@ -3,14 +3,23 @@ table Parked
 
 	column Line
 		dataType: string
+		isDataTypeInferred
 		sortByColumn: Order
-		sourceColumn: Line
+		isNameInferred
+		sourceColumn: [Line]
 
 	column Order
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: Order
+		isNameInferred
+		sourceColumn: [Order]
 
-	partition Parked = m
+	partition Parked = calculated
 		mode: import
-		source = ParkedRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "Parked" ),
+					"Line", Run[Parked.Line],
+					"Order", Run[Parked.Order]
+				)

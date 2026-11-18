@@ -24,7 +24,8 @@
         pairsByCi = fnGroupBy(pairs, (pair) => pair[Ci][Key]),
         pairByCi = Record.FromList(List.Transform(Record.FieldValues(pairsByCi), List.Last), Record.FieldNames(pairsByCi)),
         names = fnUserNames(cis, columns),
-        inactive = List.Distinct(List.Combine(List.Transform(cis, (ci) => List.Combine(List.Transform(ReadingRules[roles], (role) =>
+        // The user IDs of people marked inactive, as a key set (fnKeySet), made once.
+        inactive = fnKeySet(List.Combine(List.Transform(cis, (ci) => List.Combine(List.Transform(ReadingRules[roles], (role) =>
             let person = fnPerson(ci, role, columns) in
             if person = null then {}
             else (if person[UserId] <> "" and person[Active] = false then {Text.Lower(Text.Trim(person[UserId]), "en-US")} else {})
@@ -70,7 +71,7 @@
                             then entry[epoLabel] & " is empty in EPO; ServiceNow still shows the old person, because the sync never clears a field"
                             else entry[epoLabel] & " is empty in EPO too")
                         else if epo = own then said(finding, "EPO names the same person as " & entry[epoLabel])
-                        else if List.Contains(inactive, epo) then said(finding, "EPO names " & fnPersonWords(epo, names) & " as " & entry[epoLabel] & ", who is not active either")
+                        else if Record.HasFields(inactive, epo) then said(finding, "EPO names " & fnPersonWords(epo, names) & " as " & entry[epoLabel] & ", who is not active either")
                         else finding & [Wait = "EPO already names " & fnPersonWords(epo, names) & " as " & entry[epoLabel] & ": " & follows(pair)])),
 
         // A leftover whose old person is still active has no line of its own: the role is empty in EPO, so the owner is asked.
@@ -82,20 +83,27 @@
                 fnInScope(pack, ci) and detector[type] = "rule" and List.Contains(Record.FieldOrDefault(detector, "forEach", {}), role)
                 and (classes = null or List.Contains(classes, ci[Class])),
         candidates = List.Combine(List.Transform(pairs, (pair) => List.Transform(pair[Leftovers], (difference) => [Pair = pair, Difference = difference]))),
-        added = List.Accumulate(candidates, [Keys = List.Transform(compared, (finding) => finding[Key]), Out = {}], (state, candidate) =>
+        // Taken: a key of a finding already there, or a people line of the same CI and role of the checks compared first.
+        // Both as key sets (fnKeySet), made once.
+        keys = fnKeySet(List.Transform(compared, (finding) => finding[Key])),
+        lined = fnKeySet(List.Transform(List.Select(compared, (finding) => List.Contains(rules[checks], finding[CheckId])), (finding) => finding[CiKey] & "|" & finding[Field])),
+        packById = Record.FromList(packs, List.Transform(packs, (pack) => pack[id])),
+        leftovers = List.Transform(candidates, (candidate) =>
             let
                 pair = candidate[Pair],
                 difference = candidate[Difference],
                 entry = roleOf(difference[Field]),
                 checkId = if entry = null then null else Record.FieldOrDefault(rules[leftover], entry[role], null),
-                pack = if checkId = null then null else List.First(List.Select(packs, (candidate) => candidate[id] = checkId), null),
+                pack = if checkId = null then null else Record.FieldOrDefault(packById, checkId, null),
                 key = if pack = null then "" else pack[id] & ":" & pair[Ci][Key] & ":" & entry[role],
-                taken = List.Contains(state[Keys], key) or List.AnyTrue(List.Transform(compared, (finding) =>
-                    finding[CiKey] = pair[Ci][Key] and finding[Field] = entry[role] and List.Contains(rules[checks], finding[CheckId]))),
+                taken = Record.HasFields(keys, key) or Record.HasFields(lined, pair[Ci][Key] & "|" & entry[role]),
                 source = entry[label] & " is empty in EPO (" & entry[epoLabel] & "); ServiceNow still shows " & difference[Current] & ", because the sync never clears a field"
             in
-                if entry = null or pack = null or not inScope(pack, pair[Ci], entry[role]) or taken then state
-                else [Keys = state[Keys] & {key}, Out = state[Out] & {fnFinding(pack, pair[Ci], entry[role], source, [Source = source])}])
+                if entry = null or pack = null or not inScope(pack, pair[Ci], entry[role]) or taken then null
+                else [Key = key, Finding = fnFinding(pack, pair[Ci], entry[role], source, [Source = source])]),
+        // A key added once: the first candidate with it, in the order of the candidates (what a loop that remembers the keys
+        // it added does: it reads no other state).
+        added = [Out = List.Transform(Record.FieldValues(fnGroupBy(List.RemoveNulls(leftovers), (line) => line[Key])), (group) => group{0}[Finding])]
     in
         if rules = null then [Findings = findings, Notes = {}]
         else if why <> "" then [Findings = findings, Notes = notCompared]

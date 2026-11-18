@@ -4,7 +4,9 @@
 #   1. tools/powerbi/connector.ts packs every query of the model into a small test connector (SacmEval.mez).
 #   2. PQTest runs each table of the model and the unit cases of the reading functions, in Sample mode: no data source.
 #   3. tools/powerbi/parity.ts compares the result with the answer key (src/core/ and tests/recorded/), line by line.
-#   4. Started by hand (workflow_dispatch): the tables are timed on invented samples at the size of the real reports.
+#   4. The job "powerbi-time": the refresh time on invented samples at the size of the real reports (tools/powerbi/time.ps1,
+#      D283), and the counts at that size against src/core. On a pull request it is the gate: it fails over 120 s in all,
+#      or over 60 s for one table. Started by hand, it times the sizes and stages asked for, with no gate.
 # Only on pull requests that change the report, the check files, the samples, the readers or the answer key.
 name: Power BI
 
@@ -22,12 +24,30 @@ on:
       - package-lock.json
       - .github/workflows/powerbi.yml
   workflow_dispatch:
+    inputs:
+      sizes:
+        description: Copies of the samples to time (170 is about 3,200 CIs)
+        default: "42,85,170"
+      history:
+        description: Earlier dates of the CI and Relationship report
+        default: "0"
+      stages:
+        description: Time the stages of the checks too
+        type: boolean
+        default: true
+      cap:
+        description: Seconds before a probe is stopped
+        default: "240"
+      only:
+        description: Only the probes whose name matches this regular expression (empty for all)
+        default: ""
 
 permissions:
   contents: read
 
+# A run started by hand is never cancelled by another: each measures its own commit.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -70,41 +90,72 @@ jobs:
           $mez = ".build/powerbi/SacmEval.mez"
           $queries = Get-ChildItem .build/powerbi/queries -Filter *.pq | Sort-Object Name
           New-Item -ItemType Directory -Force .build/powerbi/results | Out-Null
+          # The name of the query is not part of the data source path (connector.ts), so one (anonymous) credential serves
+          # every query; a query the store does not know it for gets its own.
+          & $pqtest credential-template -e $mez -q $queries[0].FullName -p -ak Anonymous | & $pqtest set-credential -e $mez -q $queries[0].FullName -p | Out-Null
           foreach ($query in $queries) {
-            # The data source path is the table name, so each query gets its own (anonymous) credential.
-            & $pqtest credential-template -e $mez -q $query.FullName -p -ak Anonymous | & $pqtest set-credential -e $mez -q $query.FullName -p | Out-Null
             $out = ".build/powerbi/results/$($query.BaseName).json"
             & $pqtest run-test -e $mez -q $query.FullName -p | Out-File -Encoding utf8NoBOM $out
+            if (-not (Select-String -Path $out -Pattern '"Status": *"Passed"' -Quiet) -and (Select-String -Path $out -Pattern 'redential' -Quiet)) {
+              & $pqtest credential-template -e $mez -q $query.FullName -p -ak Anonymous | & $pqtest set-credential -e $mez -q $query.FullName -p | Out-Null
+              & $pqtest run-test -e $mez -q $query.FullName -p | Out-File -Encoding utf8NoBOM $out
+            }
             Write-Output "$($query.BaseName): $((Get-Item $out).Length) bytes"
             # A failed query: its error in the log, so the reason is seen without the artifact (invented samples only).
             if (Select-String -Path $out -Pattern '"Status": *"Failed"' -Quiet) { Get-Content $out -TotalCount 40 | Write-Output }
           }
+          # Every query failing with "SacmEval.Contents wasn't recognized": the M parses but Power Query refuses the
+          # connector. load-check.ps1 says which query stops it.
+          if (Select-String -Path ".build/powerbi/results/About.json" -Pattern "SacmEval.Contents' wasn't recognized" -Quiet) { ./tools/powerbi/load-check.ps1 }
           exit 0
       - name: Compare with the answer key
         run: node tools/powerbi/parity.ts .build/powerbi/results
-      # The refresh time at the size of the real reports (about 3,200 CIs and 5,100 relationships, invented: scaled.ts).
-      # Only when the workflow is started by hand: it says how long, it fails nothing.
-      - name: Time the tables at real size
-        if: github.event_name == 'workflow_dispatch'
-        continue-on-error: true
-        timeout-minutes: 15
-        run: |
-          node tools/powerbi/connector.ts .build/powerbi-real --real-size
-          Compress-Archive -Path .build/powerbi-real/SacmEval/SacmEval.pq -DestinationPath .build/powerbi-real/SacmEval.zip
-          Move-Item .build/powerbi-real/SacmEval.zip .build/powerbi-real/SacmEval.mez
-          $pqtest = ".build/pqsdk/tools/PQTest.exe"
-          $mez = ".build/powerbi-real/SacmEval.mez"
-          foreach ($name in @("Inventory", "Relationships", "Findings", "Tested", "Notes", "MappingBacklog", "RelationshipLinks", "CapabilitySheet")) {
-            $query = ".build/powerbi-real/queries/$name.pq"
-            & $pqtest credential-template -e $mez -q $query -p -ak Anonymous | & $pqtest set-credential -e $mez -q $query -p | Out-Null
-            $out = ".build/powerbi-real/$name.json"
-            $time = Measure-Command { & $pqtest run-test -e $mez -q $query -p | Out-File -Encoding utf8NoBOM $out }
-            $status = if (Select-String -Path $out -Pattern '"Status": *"Passed"' -Quiet) { "passed" } else { "FAILED" }
-            Write-Output ("{0}: {1:N1} s, {2}, {3} bytes" -f $name, $time.TotalSeconds, $status, (Get-Item $out).Length)
-          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: powerbi-eval
           path: .build/powerbi/results/
           retention-days: 7
+
+  # On a pull request: the gate of D283 (170 copies, the tables only, 90 s per table at most; fails over the budget).
+  # Started by hand: the sizes and stages asked for, no gate.
+  powerbi-time:
+    if: github.event.pull_request.draft != true
+    runs-on: windows-latest
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 90 || 20 }}
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      SDK_VERSION: 2.160.2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm ci
+      - name: Power Query SDK tools (cached)
+        id: sdk
+        uses: actions/cache@v4
+        with:
+          path: .build/pqsdk
+          key: pqsdk-${{ env.SDK_VERSION }}
+      - name: Download the SDK tools
+        if: steps.sdk.outputs.cache-hit != 'true'
+        run: |
+          New-Item -ItemType Directory -Force .build | Out-Null
+          Invoke-WebRequest -Uri "https://api.nuget.org/v3-flatcontainer/microsoft.powerquery.sdktools/$env:SDK_VERSION/microsoft.powerquery.sdktools.$env:SDK_VERSION.nupkg" -OutFile .build/pqsdk.zip
+          Expand-Archive .build/pqsdk.zip -DestinationPath .build/pqsdk
+      - name: Time the refresh at real size
+        env:
+          SIZES: ${{ inputs.sizes || '170' }}
+          HISTORY: ${{ inputs.history || '0' }}
+          STAGES: ${{ github.event_name == 'workflow_dispatch' && inputs.stages || false }}
+          CAP: ${{ inputs.cap || '90' }}
+          GATE: ${{ github.event_name != 'workflow_dispatch' }}
+          ONLY: ${{ inputs.only || '' }}
+        run: |
+          $stages = $env:STAGES -eq "true"
+          $gate = $env:GATE -eq "true"
+          ./tools/powerbi/time.ps1 -Sizes $env:SIZES -History ([int]$env:HISTORY) -Stages:$stages -Cap ([int]$env:CAP) -Gate:$gate -Only "$env:ONLY"

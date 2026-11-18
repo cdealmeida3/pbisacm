@@ -2,6 +2,9 @@
 // reports of the other types that go with it (fnPaired), the scope of each check, the built detectors, the source first
 // (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles.
 // Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo]; Notes are [CheckId, Note].
+// Outputs (one lazy field per built check), RunContext and Stages are read only by the probes of the refresh time.
+// Each CI gets its normal forms once (StatusKey, NameKey, IdentityKey, TagKeys, Squashed: the compared text of the six
+// fields a rule counts), so no check normalises a CI field again (ARCHITECTURE §12, the speed rules).
 (file as record) as record =>
     let
         date = file[ReportDate],
@@ -16,18 +19,29 @@
         known = if read[Lossless] or relationships = null then [] else
             let
                 ends = List.Combine(List.Transform(relationships, (item) => {item[Parent], item[Child]})),
-                hidden = List.Select(List.Transform(ends, (name) => [Key = fnNameKey(name, "?"), Chars = fnHiddenCharacters(name)]), (entry) => not List.IsEmpty(entry[Chars])),
-                grouped = fnGroupBy(hidden, (entry) => entry[Key])
+                // Most names hold no hidden character: fnHiddenCharacters says so with one native test.
+                hidden = List.Select(List.Transform(ends, (name) => [Name = name, Chars = fnHiddenCharacters(name)]), (entry) => not List.IsEmpty(entry[Chars])),
+                keyed = List.Transform(hidden, (entry) => entry & [Key = fnNameKey(entry[Name], "?")]),
+                grouped = fnGroupBy(keyed, (entry) => entry[Key])
             in
                 Record.FromList(List.Transform(Record.FieldValues(grouped), (entries) => List.Last(entries)[Chars]), Record.FieldNames(grouped)),
+        createdBy = List.Contains(found, "createdBy"),
+        squash = (row as record, field as text) as text => fnNameKey(fnCiText(row, field), ""),
         cis = List.Buffer(List.Transform(rows, (row) =>
-            let own = fnHiddenCharacters(row[Name]) in
+            let own = fnHiddenCharacters(row[Name]), tags = if row[Tags] = "" then {} else Text.Split(row[Tags], ", "), status = fnNameKey(row[Status], ""), name = fnNameKey(row[Name], "") in
             row & [
-                TagList = if row[Tags] = "" then {} else Text.Split(row[Tags], ", "),
+                TagList = tags,
+                TagKeys = List.Buffer(List.Transform(tags, (tag) => fnNameKey(tag, ""))),
+                OwnHidden = own,
                 HiddenCharacters = if not List.IsEmpty(own) then own else Record.FieldOrDefault(known, row[Key], {}),
-                CreatedBy = if List.Contains(found, "createdBy") then row[CreatedBy] else null
+                CreatedBy = if createdBy then row[CreatedBy] else null,
+                StatusKey = status, NameKey = name, IdentityKey = fnNameKey(row[Name], "?"),
+                Squashed = [
+                    description = squash(row, "description"), name = name, exception_justification = squash(row, "exception_justification"),
+                    exception_status = squash(row, "exception_status"), support_group = squash(row, "support_group"), operational_status = status
+                ]
             ])),
-        inFile = List.AnyTrue(List.Transform(cis, (ci) => not List.IsEmpty(fnHiddenCharacters(ci[Name])))),
+        inFile = List.AnyTrue(List.Transform(cis, (ci) => not List.IsEmpty(ci[OwnHidden]))),
         hiddenFrom = if read[Lossless] or inFile then "file" else if Record.FieldCount(known) > 0 then "relationships" else "",
         columns = List.Buffer(found & (if hiddenFrom <> "" then {"name.hidden"} else {})),
         questionMarks = List.Count(List.Select(cis, (ci) => Text.Contains(ci[Name], "?"))),
@@ -40,20 +54,42 @@
         graph = if relationships = null or model = null then null else fnRelationshipGraph(cis, relationships, model),
         epoConfig = let config = fnReference("reference/epo-systems-report") in
             if config <> null and Record.HasFields(config, {"columns", "statuses", "roles"}) then config else null,
+        // How many CIs of the whole report share each value (compared form), per field of a rule; the same for the live
+        // CIs per class (the operators duplicatedMoreThan and duplicatedInClass of fnDetectRule).
+        textFields = {"description", "name", "exception_justification", "exception_status", "support_group", "operational_status"},
+        countOf = (keys as list) as record =>
+            let
+                kept = List.Select(keys, (key) => key <> ""),
+                grouped = Table.Group(Table.FromColumns({kept}, {"Value"}), {"Value"}, {{"Count", Table.RowCount, Int64.Type}})
+            in
+                Record.FromList(grouped[Count], grouped[Value]),
+        live = List.Buffer(List.Select(cis, (ci) => ci[StatusKey] <> "retired")),
         // Worked out once, when a check reads it (a field of a record is worked out only when it is read).
         run = [
-            Cis = cis, Columns = columns, Date = date, Graph = graph, EpoSystems = epo,
+            Cis = cis, Columns = columns, Date = date, Graph = graph, EpoSystems = epo, CheckableKeys = checkableKeys,
+            Counts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(cis, (ci) => Record.Field(ci[Squashed], field)))), textFields),
+            ClassCounts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(live, (ci) =>
+                let key = Record.Field(ci[Squashed], field) in if key = "" then "" else ci[Class] & "|" & key))), textFields),
             Epo = if epoFile = null then null else [Systems = epo, Date = epoFile[ReportDate], Report = epoFile[FileName], PreviousDate = epoFile[PreviousDate]],
             EpoComparison = if epo = null or epoConfig = null then null else fnEpoCompare(cis, epo, columns, epoConfig)
         ],
 
         parked = fnParked(cis),
-        parkedKeys = if parked = null then {} else parked[Keys],
-        checkable = List.Buffer(List.Select(cis, (ci) => not List.Contains(parkedKeys, ci[Key]))),
-        packs = List.Select(List.Transform(Json.Document(CheckFiles), (entry) => entry[pack]), (pack) => pack[status] <> "off"),
+        parkedSet = if parked = null then [] else parked[KeySet],
+        checkable = List.Buffer(List.Select(cis, (ci) => not Record.HasFields(parkedSet, ci[Key]))),
+        checkableKeys = fnKeySet(List.Transform(checkable, (ci) => ci[Key])),
+        packs = List.Buffer(List.Select(List.Transform(Json.Document(CheckFiles), (entry) => entry[pack]), (pack) => pack[status] <> "off")),
         moduleOf = (pack as record) as text => if pack[detector][type] = "rule" then "rule" else Record.FieldOrDefault(pack[detector], "module", pack[detector][type]),
-        built = List.Select(packs, (pack) => List.Contains(BuiltDetectors, moduleOf(pack))),
-        scopeOf = (pack as record) as list => List.Buffer(List.Select(checkable, (ci) => fnInScope(pack, ci))),
+        built = List.Buffer(List.Select(packs, (pack) => List.Contains(BuiltDetectors, moduleOf(pack)))),
+        // The scope of a check (fnInScope), with its words in compared form once: the class, and the status of the CI.
+        scopeOf = (pack as record) as list =>
+            let
+                scope = pack[scope],
+                all = List.Contains(scope[classes], "*"),
+                classes = List.Buffer(scope[classes]),
+                excluded = List.Buffer(List.Transform(Record.FieldOrDefault(Record.FieldOrDefault(scope, "exclude", []), "operational_status", {}), (word) => fnNameKey(word, "")))
+            in
+                List.Buffer(List.Select(checkable, (ci) => (all or List.Contains(classes, ci[Class])) and not List.Contains(excluded, ci[StatusKey]))),
         skipped = (ref as text) as record => [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Skipped: reference data missing (" & ref & ")."}],
         noRelationships = [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Not tested: no Relationship report. Load the Relationship report with the CI report."}],
         relationshipDetectors = [
@@ -100,7 +136,10 @@
                 else if module = "criticality/none-reaches" then (if not criticality then skipped(ref) else fnDetectCriticalityNoneReaches(pack, run, inScope, reference))
                 // A module listed in BuiltDetectors that has no branch here: never a silent pass (D15).
                 else [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Not tested: the detector " & module & " is listed as built, but fnCheckRun does not run it."}],
-        outputs = List.Buffer(List.Transform(built, (pack) => let out = detect(pack) in out & [Notes = List.Transform(out[Notes], (note) => [CheckId = pack[id], Note = note])])),
+        // One field per built check, worked out only when it is read (so a check can be timed alone: tools/powerbi/probes.ts).
+        noted = (pack as record) as record => let out = detect(pack) in out & [Notes = List.Transform(out[Notes], (note) => [CheckId = pack[id], Note = note])],
+        Outputs = List.Accumulate(built, [], (record, pack) => Record.AddField(record, pack[id], () => noted(pack), true)),
+        outputs = List.Buffer(List.Transform(built, (pack) => Record.Field(Outputs, pack[id]))),
         combined = fnCombineOutputs(outputs),
 
         // The relationship graph says once what it could not match (as the first check that builds it).
@@ -112,14 +151,14 @@
             & (if graph[Ambiguous] > 0 then {[CheckId = "RELATIONSHIPS", Note = Text.From(graph[Ambiguous]) & " relationship ends name a CI that two CIs share, and neither class nor asset tag told them apart. The first was used."]} else {}),
 
         source = fnSourceFirst(combined[Findings], run, packs),
-        parkedFields = if parked = null then {} else parked[Fields],
-        kept = List.Buffer(List.Select(source[Findings], (finding) => not List.Contains(parkedFields, finding[CheckId] & ":" & finding[Field]) and not List.Contains(parkedKeys, finding[CiKey]))),
+        parkedFields = if parked = null then [] else parked[FieldSet],
+        kept = List.Buffer(List.Select(source[Findings], (finding) => not Record.HasFields(parkedFields, finding[CheckId] & ":" & finding[Field]) and not Record.HasFields(parkedSet, finding[CiKey]))),
         parkedNotes = if parked = null then {[CheckId = "PARKED", Note = "Parked classes: reference data missing (reference/parked-classes), so every class is checked."]} else {},
 
         // Where the fix is made and how findings are listed: never silent when the reference data is missing.
         synced = fnReference("reference/epo-synced-classes"),
         offeringClasses = if synced = null then {} else Record.FieldOrDefault(Record.FieldOrDefault(synced, "offerings", []), "classes", {}),
-        blind = if List.Contains(found, "createdBy") then 0 else List.Count(List.Select(cis, (ci) => List.Contains(offeringClasses, ci[Class]))),
+        blind = if createdBy then 0 else List.Count(List.Select(cis, (ci) => List.Contains(offeringClasses, ci[Class]))),
         routingNotes =
             if synced = null then {[CheckId = "Routing", Note = "reference data missing (reference/epo-synced-classes), so no finding is routed to EPO."]}
             else if blind > 0 then {[CheckId = "Routing", Note = "the report has no Created by column (sys_created_by), so " & Text.From(blind)
@@ -134,5 +173,7 @@
             Facts = List.Buffer(fnFacts(kept, run, packs)),
             Tested = combined[Tested], Evaluated = combined[Evaluated],
             Notes = graphNotes & combined[Notes] & source[Notes] & parkedNotes & routingNotes & listingNotes & hiddenNotes,
-            Parked = parked, Graph = graph, Epo = run[Epo]
+            Parked = parked, Graph = graph, Epo = run[Epo], CheckableKeys = checkableKeys,
+            // Never loaded into a table: for the probes of the refresh time (tools/powerbi/probes.ts).
+            Outputs = Outputs, RunContext = run, Stages = [Combined = combined, SourceFirst = source, Kept = kept]
         ]

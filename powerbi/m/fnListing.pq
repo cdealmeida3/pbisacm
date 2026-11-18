@@ -3,16 +3,16 @@
 // check is listed for a review only, or the detector says so), else open (to solve). Returns [State, Why].
 (ci as record, pack as nullable record, review as text, wait as text) as record =>
     let
-        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
-        notLive = Record.FieldOrDefault(ReferenceFiles, "not-live-statuses", null),
-        known = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "known-tags", []), "rules", {}),
+        rules = ListingRules,
         id = if pack = null then "" else pack[id],
-        waits = pack = null or not List.Contains(if notLive = null then {} else Record.FieldOrDefault(notLive, "exceptChecks", {}), id),
-        liveStatus = waits and List.AnyTrue(List.Transform(if notLive = null then {} else notLive[statuses], (status) => same(status, ci[Status]))),
+        waits = pack = null or not List.Contains(rules[ExceptChecks], id),
+        liveStatus = waits and List.Contains(rules[NotLiveKeys], ci[StatusKey]),
         // The first rule of the file that has a tag of the CI, and its first such tag (as finding-states.ts loops).
-        tag = List.First(List.Transform(List.Select(known, (rule) => pack <> null and List.Contains(rule[checks], id)
-            and List.AnyTrue(List.Transform(ci[TagList], (candidate) => List.AnyTrue(List.Transform(rule[tags], (word) => same(word, candidate)))))), (rule) =>
-            List.First(List.Select(ci[TagList], (candidate) => List.AnyTrue(List.Transform(rule[tags], (word) => same(word, candidate)))))), null),
+        tags = ci[TagList],
+        keys = ci[TagKeys],
+        first = (entry as record) as nullable number => List.First(List.Select(List.Positions(keys), (at) => List.Contains(entry[TagKeys], keys{at})), null),
+        rule = if pack = null then null else List.First(List.Select(rules[Known], (candidate) => List.Contains(candidate[checks], id) and first(candidate) <> null), null),
+        tag = if rule = null then null else tags{first(rule)},
         reviewWhy = if pack = null then "" else Record.FieldOrDefault(pack, "reviewWhy", "")
     in
         if wait <> "" then [State = "waiting", Why = wait]

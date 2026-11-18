@@ -60,10 +60,9 @@ fails if one is committed.
 
 ## 3. Read the real reports from SharePoint (when you are ready)
 
-**Not yet at the size of the real reports.** On invented reports as big as the real ones (3,230 CIs, 5,100
-relationships), the Windows check needs 50 seconds for the table *Inventory* alone, and the checks (*Findings*) did not
-finish in 14 minutes. The plan's target is under 2 minutes. Until a later build makes the queries faster, use the
-samples, or try SharePoint with a small report only.
+**Ready for the real reports.** On invented reports as big as the real ones (3,230 CIs, 5,100 relationships, 1,020 EPO
+systems), a refresh takes about 43 seconds on the Windows test machine (version 0.40.0, D283). The slowest table is the
+hidden table *Run*, the checks, at about 30 seconds. Your laptop may be slower or faster; the budget is 2 minutes.
 
 The model reads the reports from one folder of the team's SharePoint site. Power Automate puts the scheduled ServiceNow
 reports there (flow F1 of the plan). The real site and folder are typed in Power BI only, **never in this repository**.
@@ -123,3 +122,11 @@ The parts and the commands are in [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md
   and compares the result with the TypeScript logic of `src/core/`.
 - If you change a query in Power BI Desktop, copy the change into `powerbi/m/` and run `npm run powerbi:generate`:
   `expressions.tmdl` is generated.
+- The refresh must stay under 2 minutes at the size of the real reports (D283). The job *powerbi-time* of the workflow
+  "Power BI" measures it on invented reports of that size on every pull request, and fails above it. To see where the
+  time goes, start the workflow by hand (Actions → Power BI → Run workflow) with `sizes` (copies of the samples, for
+  example `42,85,170`; 170 is the real size), `stages` (also time each stage of the checks) and `cap` (seconds per
+  query). The job summary has one line per table and stage, the growth when the data doubles, and T1, the sum of the
+  tables. The rules that keep it fast are in [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) §12.
+- To try the real size in Power BI Desktop: `node tools/powerbi/scaled.ts --write <folder>` writes the invented reports
+  at that size; put them in a SharePoint test folder and switch `SourceMode` to SharePoint (§3).

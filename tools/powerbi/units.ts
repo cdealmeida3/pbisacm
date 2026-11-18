@@ -30,7 +30,9 @@ const FILE_NAMES = ['2026-11-17_cmdb_ci.csv', 'cmdb_ci.csv', '2026-13-01_x.csv',
 const PATTERN_TEXTS = ['', 'Member Engine', 'Member Engine - PROD', 'member engine - prod', 'Index - TEST', 'Index - DEV', 'Index-PROD', ' x', 'x ', 'a  b',
   'TBD', 'tbd', 'n/a', 'N/A', '-', '...', 'test', 'Test description', 'To be defined', '(Auto generated)', 'Created (auto generated) by Discovery', 'AST-0001', 'ast-0001', 'AST-001',
   'BS-1234', 'owned_by', 'owned_by.email', 'supportGroup', 'Support group', 'cmdb_ci_service', 'Business Service 12', '12345', 'abc_def.Ghi', 'a.b', 'é', 'Œuvre Brûlée',
-  'BIA pending', 'bia-pending', 'decommissioned', 'Retired', 'to map', 'app.example', 'x\u200by'];
+  'BIA pending', 'bia-pending', 'decommissioned', 'Retired', 'to map', 'app.example', 'x\u200by',
+  // For the fast forms (D285): a non-ASCII text in lower case, the Kelvin sign, spaces around, one letter changed.
+  'T\u00e9st', '\u212a', 'TODO', 'to do', 'To  do', 'N/A ', 'testing', 'tested', 'PROD', ' - prod', 'x - TEST', 'API - x', 'API x', 'APIx', 'Ab3', 'Ab_', 'abc_def ghi', 'tbd\u200b'];
 const ADDRESSES = ['https://contoso.service-now.com', ' HTTPS://Contoso.Service-Now.com/nav_to.do?uri=x ', 'https://contoso.service-now.com:8443/', 'http://contoso.service-now.com',
   'https://', 'contoso.service-now.com', 'https://user@contoso.com', 'https://contoso.com#top', ''];
 /** EPO descriptions: HTML as the export writes it, and the odd cases of the patterns of plainText. */

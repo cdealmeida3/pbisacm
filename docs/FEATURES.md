@@ -248,4 +248,6 @@ The Power BI version of the Workbench (D268) is in `powerbi/`. How to open it: [
 | **Mapping backlog** | One line per CI to map with its owner (D282): the CI, its class, the owner, why it is on the list, its stage and the steps of its class, its criticality lines, the state (*To solve*, *To check*, *Waiting*: the CI is in Ready, *Planned*: a tag says when) and the next step. **Lines** filters the states; the number line says how many CIs for how many owners. Below: the **capability sheet** for Enterprise Architecture (its line says how many Business Capabilities, or that it needs the Relationship report), every Business Capability with its status, the capabilities above and below, the Business Processes below, description, tags, Owned by, Managed by and hidden characters (*Export data*). |
 | **Self-check** (hidden) | How many checks give the result the HTML app records for the invented samples ("32 of 39" in B3), and for each check what differs. |
 
+A refresh at the size of the real reports takes about 43 seconds on the test machine (version 0.40.0, D283), so the report is ready for the real reports.
+
 Every page ends with the version, the data (invented samples or SharePoint) and the time of the last refresh. In Sample mode "today" is the date of the samples, 11 Nov 2026.

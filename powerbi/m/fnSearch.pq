@@ -8,7 +8,7 @@
         key = flags & "/" & pattern,
         tree = Record.FieldOrDefault(Patterns, key, null),
         ends = (at as number) as list => fnRegexWalk(tree, value, {at}),
-        index = if not fnRegexTest(tree, value) then -1
+        index = if not fnMatches(pattern, flags, value) then -1
             else List.First(List.Select(List.Numbers(0, Text.Length(value) + 1), (at) => not List.IsEmpty(ends(at))), -1)
     in
         if tree = null then error Error.Record("SACM.Pattern", "The pattern /" & pattern & "/" & flags & " is not compiled. Run npm run powerbi:generate.")

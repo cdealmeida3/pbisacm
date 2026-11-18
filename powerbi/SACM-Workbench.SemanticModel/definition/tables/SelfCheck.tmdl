@@ -14,86 +14,143 @@ table SelfCheck
 
 	column CheckId
 		dataType: string
-		sourceColumn: CheckId
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
 
 	column ExpectedState
 		dataType: string
-		sourceColumn: ExpectedState
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ExpectedState]
 
 	column ExpectedTested
 		dataType: boolean
-		sourceColumn: ExpectedTested
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ExpectedTested]
 
 	column ExpectedToSolve
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: ExpectedToSolve
+		isNameInferred
+		sourceColumn: [ExpectedToSolve]
 
 	column ExpectedToCheck
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: ExpectedToCheck
+		isNameInferred
+		sourceColumn: [ExpectedToCheck]
 
 	column ExpectedWaiting
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: ExpectedWaiting
+		isNameInferred
+		sourceColumn: [ExpectedWaiting]
 
 	column ExpectedKnown
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: ExpectedKnown
+		isNameInferred
+		sourceColumn: [ExpectedKnown]
 
 	column ExpectedCis
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: ExpectedCis
+		isNameInferred
+		sourceColumn: [ExpectedCis]
 
 	column Found
 		dataType: string
-		sourceColumn: Found
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Found]
 
 	column FoundState
 		dataType: string
-		sourceColumn: FoundState
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FoundState]
 
 	column FoundTested
 		dataType: boolean
-		sourceColumn: FoundTested
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FoundTested]
 
 	column FoundToSolve
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: FoundToSolve
+		isNameInferred
+		sourceColumn: [FoundToSolve]
 
 	column FoundToCheck
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: FoundToCheck
+		isNameInferred
+		sourceColumn: [FoundToCheck]
 
 	column FoundWaiting
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: FoundWaiting
+		isNameInferred
+		sourceColumn: [FoundWaiting]
 
 	column FoundKnown
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: FoundKnown
+		isNameInferred
+		sourceColumn: [FoundKnown]
 
 	column FoundCis
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: FoundCis
+		isNameInferred
+		sourceColumn: [FoundCis]
 
 	column Match
 		dataType: boolean
-		sourceColumn: Match
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Match]
 
 	column Why
 		dataType: string
-		sourceColumn: Why
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Why]
 
-	partition SelfCheck = m
+	partition SelfCheck = calculated
 		mode: import
-		source = SelfCheckRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "SelfCheck" ),
+					"CheckId", Run[SelfCheck.CheckId],
+					"ExpectedState", Run[SelfCheck.ExpectedState],
+					"ExpectedTested", Run[SelfCheck.ExpectedTested],
+					"ExpectedToSolve", Run[SelfCheck.ExpectedToSolve],
+					"ExpectedToCheck", Run[SelfCheck.ExpectedToCheck],
+					"ExpectedWaiting", Run[SelfCheck.ExpectedWaiting],
+					"ExpectedKnown", Run[SelfCheck.ExpectedKnown],
+					"ExpectedCis", Run[SelfCheck.ExpectedCis],
+					"Found", Run[SelfCheck.Found],
+					"FoundState", Run[SelfCheck.FoundState],
+					"FoundTested", Run[SelfCheck.FoundTested],
+					"FoundToSolve", Run[SelfCheck.FoundToSolve],
+					"FoundToCheck", Run[SelfCheck.FoundToCheck],
+					"FoundWaiting", Run[SelfCheck.FoundWaiting],
+					"FoundKnown", Run[SelfCheck.FoundKnown],
+					"FoundCis", Run[SelfCheck.FoundCis],
+					"Match", Run[SelfCheck.Match],
+					"Why", Run[SelfCheck.Why]
+				)

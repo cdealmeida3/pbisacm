@@ -7,23 +7,38 @@ table Tested
 
 	column CheckId
 		dataType: string
-		sourceColumn: CheckId
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
 
 	column Part
 		dataType: string
-		sourceColumn: Part
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Part]
 
 	column ReportDate
 		dataType: dateTime
+		isDataTypeInferred
 		formatString: d mmm yyyy
 		summarizeBy: none
-		sourceColumn: ReportDate
+		isNameInferred
+		sourceColumn: [ReportDate]
 
 	column Evaluated
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: Evaluated
+		isNameInferred
+		sourceColumn: [Evaluated]
 
-	partition Tested = m
+	partition Tested = calculated
 		mode: import
-		source = TestedRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "Tested" ),
+					"CheckId", Run[Tested.CheckId],
+					"Part", Run[Tested.Part],
+					"ReportDate", Run[Tested.ReportDate],
+					"Evaluated", Run[Tested.Evaluated]
+				)

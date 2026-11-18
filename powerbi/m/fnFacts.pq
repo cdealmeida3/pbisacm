@@ -8,11 +8,10 @@
         columns = run[Columns],
         ciByKey = Record.FromList(cis, List.Transform(cis, (ci) => ci[Key])),
         packById = Record.FromList(packs, List.Transform(packs, (pack) => pack[id])),
-        chipRules = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "tag-chips", []), "chips", {}),
+        chipRules = List.Buffer(List.Transform(Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "tag-chips", []), "chips", {}), (rule) => rule & [TagKey = fnNameKey(rule[tag], "")])),
         teams = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "record-teams", []), "teams", {}),
-        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
         chipsOf = (ci as record) as list =>
-            List.Distinct(List.Transform(List.Select(chipRules, (rule) => List.AnyTrue(List.Transform(ci[TagList], (tag) => same(tag, rule[tag])))), (rule) => rule[chip])),
+            List.Distinct(List.Transform(List.Select(chipRules, (rule) => List.Contains(ci[TagKeys], rule[TagKey])), (rule) => rule[chip])),
         nameOf = (ci as record, role as text) as text =>
             let person = fnPerson(ci, role, columns), shown = if person = null then "" else if person[Name] <> "" then person[Name] else person[Email] in
             if shown = "" then "" else shown & (if person[Active] = false then " (inactive)" else ""),
