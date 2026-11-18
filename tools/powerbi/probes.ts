@@ -58,7 +58,11 @@ export function probes(stages: boolean): Probe[] {
   // generated member read 15,000 times, as is and once named in a let: is a shared member computed once?
   for (const step of READ_CI_STEPS) stage(`ReadCi.${step}`, `ProbeAny(#"Probe.ReadCi.${step}"(fnNewest("ci"){0}[Read]))`);
   // The parts of the table Run (D284), each alone, and what EPO already says (the slowest column of Findings).
-  for (const part of ['Findings', 'Tested', 'Notes', 'Parked', 'MappingBacklog', 'RelationshipLinks', 'CapabilitySheet']) stage(`Part.${part}`, `ProbeTable(fn${part}Part(${run}))`);
+  for (const part of ['Findings', 'Tested', 'Notes', 'Parked', 'RelationshipLinks', 'CapabilitySheet']) stage(`Part.${part}`, `ProbeTable(fn${part}Part(${run}))`);
+  stage('Part.MappingBacklog', `ProbeTable(fnMappingBacklogPart(${run}, List.Buffer(fnCases(${run}))))`);
+  // Build B8 (D306): the lines of the lifecycle review on the newest run, and the part ReviewLines with the next sample.
+  stage('WithReviews', `ProbeList(fnWithReviews(${run})[Facts], {"Key"})`);
+  stage('Part.ReviewLines', `let reviewed = fnWithReviews(${run}) in ProbeTable(fnReviewLinesPart(reviewed, List.Buffer(fnCases(reviewed))))`);
   stage('Part.SelfCheck', `ProbeTable(fnSelfCheckPart(Table.Buffer(fnFindingsPart(${run})), Table.Buffer(fnTestedPart(${run}))))`);
   // The cases (fnCases, with share out) and the parts that read them (build B7): the case lines and the drafts.
   stage('Cases', `ProbeList(fnCases(${run}), {"Key", "State", "ShareTo", "ToSolve", "Askable"})`);

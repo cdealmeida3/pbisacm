@@ -82,7 +82,7 @@ export function setupLeft(steps: SetupStep[]): string {
 }
 
 /** The names of the team settings, as Settings shows them. */
-const SETTING_LABELS: Record<string, string> = {
+export const SETTING_LABELS: Record<string, string> = {
   portalLink: 'Service Portal link', signature: 'Signature of the messages', reminderDays: 'Working days before a reminder is due', maxReminders: 'Reminders before Escalate',
   epoOwnerName: 'EPO inventory owner (name)', epoOwnerEmail: 'EPO inventory owner (email)', procurementName: 'Procurement mailbox (name)',
   procurementEmail: 'Procurement mailbox (email)', procurementLeadName: 'Procurement lead (name)', procurementLeadEmail: 'Procurement lead (email)',

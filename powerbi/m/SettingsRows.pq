@@ -1,12 +1,23 @@
-// Table Settings (D291): the rows of the list SACM Settings, and the two numbers the cases use (CaseRules): a value that
-// is not a whole number in its range is not used, so the page says which value counts.
+// Table Settings (D291): the settings of the list SACM Settings, one row per setting (Key): the value of its last row,
+// as the Settings screen of the Power App adds a row for each change (build B8, D308), and for the six numbers the value
+// that counts (CaseRules): a value that is not a whole number in its range is not used, so the page says which value counts.
 let
-    rows = Table.ToRecords(fnStateList("settings")),
-    used = [reminderDays = CaseRules[ReminderDays], maxReminders = CaseRules[MaxReminders]],
-    lines = List.Transform(rows, (row) => {row[Title], row[Value],
-        if Record.HasFields(used, row[Title]) then Text.From(Record.Field(used, row[Title])) else row[Value],
-        if Record.HasFields(used, row[Title]) and Text.Trim(row[Value]) <> Text.From(Record.Field(used, row[Title])) then
-            "Not used: a whole number from " & Text.From(Record.Field(SettingRanges, row[Title])[min]) & " to " & Text.From(Record.Field(SettingRanges, row[Title])[max]) & ". The default counts."
-        else ""})
+    rows = List.Select(Table.ToRecords(fnStateList("settings")), (row) => Text.Trim(row[Title]) <> ""),
+    keys = List.Distinct(List.Transform(rows, (row) => Text.Trim(row[Title]))),
+    used = [
+        reminderDays = CaseRules[ReminderDays], maxReminders = CaseRules[MaxReminders], staleDays = CaseRules[StaleDays],
+        exceptionMonths = CaseRules[ExceptionMonths], underRetirementDays = CaseRules[UnderRetirementDays], readyDays = CaseRules[ReadyDays]
+    ],
+    lines = List.Transform(keys, (key) =>
+        let
+            row = List.Last(List.Select(rows, (candidate) => Text.Trim(candidate[Title]) = key)),
+            number = Record.HasFields(used, key),
+            counted = if number then Text.From(Record.Field(used, key)) else row[Value],
+            range = if number then Record.Field(SettingRanges, key) else null
+        in
+            {key, row[Value], counted,
+                if number and Text.Trim(row[Value]) <> counted then
+                    "Not used: a whole number from " & Text.From(range[min]) & " to " & Text.From(range[max]) & ". The default counts."
+                else ""})
 in
     #table(type table [Key = text, Value = text, Used = text, Note = text], lines)

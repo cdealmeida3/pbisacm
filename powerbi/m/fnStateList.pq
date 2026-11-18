@@ -1,8 +1,9 @@
-// One list of the team's state (D291), by its id in StateLists (journal, replies, settings, team, reviews): its columns
+// One list of the team's state (D291), by its id in StateLists (journal, replies, settings, team): its columns
 // in the order of StateLists, every value as text, whatever the mode. A date and time is yyyy-MM-ddTHH:mm:ss, a date
 // yyyy-MM-dd, a yes/no Yes or No, an empty cell "". Sample: the invented CSV file packed in StateFiles. SharePoint: the
 // list of that name on the team site (SharePoint.Tables, plan §5). A list that is not there gives no rows, so a site
-// without the lists still refreshes and every case is New.
+// without the lists still refreshes and every case is New. The rows come in the order they were added (the list's ID;
+// the samples: the order of the file), so where the last row of a key counts (a setting, D308), it is the newest.
 (id as text) as table =>
     let
         spec = Record.Field(StateLists, id),
@@ -19,9 +20,10 @@
         sharePointRows =
             let
                 lists = SharePoint.Tables(SharePointSite, [Implementation = "2.0", ViewMode = "All"]),
-                found = Table.SelectRows(lists, each [Title] = spec[list])
+                found = Table.SelectRows(lists, each [Title] = spec[list]),
+                items = if Table.IsEmpty(found) then null else found{0}[Items]
             in
-                if Table.IsEmpty(found) then {} else Table.ToRecords(found{0}[Items]),
+                if items = null then {} else Table.ToRecords(if Table.HasColumns(items, "ID") then Table.Sort(items, {{"ID", Order.Ascending}}) else items),
         rows = if StateMode = "SharePoint" then sharePointRows else if StateMode = "None" then {} else sampleRows,
         asText = (value as any) as text =>
             if value = null then ""

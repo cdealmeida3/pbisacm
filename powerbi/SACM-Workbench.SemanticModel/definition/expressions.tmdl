@@ -35,7 +35,7 @@ expression CheckFiles = "[{""path"":""checks/packs/relationships/app-instance-ma
 	queryGroup: Packed
 
 /// GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team's state, for the Self-check page.
-expression ExpectedHistory = "[{""metric"":""Report dates"",""expected"":2},{""metric"":""Findings in the newest report"",""expected"":67},{""metric"":""Findings in the report before"",""expected"":45},{""metric"":""New since the last report"",""expected"":23},{""metric"":""Solved since the last report"",""expected"":2},{""metric"":""Days to fix"",""expected"":7},{""metric"":""Open cases"",""expected"":64},{""metric"":""Reminders due"",""expected"":1},{""metric"":""To escalate"",""expected"":3},{""metric"":""Replies to read"",""expected"":1},{""metric"":""Mine"",""expected"":2},{""metric"":""Not followed up"",""expected"":2}]"
+expression ExpectedHistory = "[{""metric"":""Report dates"",""expected"":2},{""metric"":""Findings in the newest report"",""expected"":67},{""metric"":""Findings in the report before"",""expected"":45},{""metric"":""New since the last report"",""expected"":23},{""metric"":""Solved since the last report"",""expected"":2},{""metric"":""Days to fix"",""expected"":7},{""metric"":""Open cases"",""expected"":65},{""metric"":""Reminders due"",""expected"":1},{""metric"":""To escalate"",""expected"":3},{""metric"":""Replies to read"",""expected"":1},{""metric"":""Mine"",""expected"":2},{""metric"":""Not followed up"",""expected"":2}]"
 	queryGroup: Packed
 
 /// GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.
@@ -277,6 +277,35 @@ expression RunColumnTypes =
 		    {"RepliesToRead.AssignedTo", type nullable text},
 		    {"RepliesToRead.Checks", type nullable text},
 		    {"RepliesToRead.Daily", type nullable logical},
+		    {"ReviewLines.Review", type nullable text},
+		    {"ReviewLines.IsNext", type nullable logical},
+		    {"ReviewLines.IsCurrent", type nullable logical},
+		    {"ReviewLines.ReviewDate", type nullable date},
+		    {"ReviewLines.ReviewLabel", type nullable text},
+		    {"ReviewLines.Report", type nullable text},
+		    {"ReviewLines.ReportDate", type nullable date},
+		    {"ReviewLines.Group", type nullable text},
+		    {"ReviewLines.GroupLabel", type nullable text},
+		    {"ReviewLines.CiKey", type nullable text},
+		    {"ReviewLines.CiName", type nullable text},
+		    {"ReviewLines.ClassLabel", type nullable text},
+		    {"ReviewLines.ClassName", type nullable text},
+		    {"ReviewLines.EpoId", type nullable text},
+		    {"ReviewLines.Status", type nullable text},
+		    {"ReviewLines.EpoStatus", type nullable text},
+		    {"ReviewLines.EpoStatusWords", type nullable text},
+		    {"ReviewLines.Agrees", type nullable logical},
+		    {"ReviewLines.Result", type nullable text},
+		    {"ReviewLines.ResultLabel", type nullable text},
+		    {"ReviewLines.Note", type nullable text},
+		    {"ReviewLines.CheckedBy", type nullable text},
+		    {"ReviewLines.CheckedOn", type nullable date},
+		    {"ReviewLines.CaseStatus", type nullable text},
+		    {"ReviewLines.FirstMessage", type nullable text},
+		    {"ReviewLines.Reminders", type nullable text},
+		    {"ReviewLines.EscalatedOn", type nullable text},
+		    {"ReviewLines.EpoDate", type nullable date},
+		    {"ReviewLines.Order", Int64.Type},
 		    {"SelfCheck.CheckId", type nullable text},
 		    {"SelfCheck.ExpectedState", type nullable text},
 		    {"SelfCheck.ExpectedTested", type nullable logical},
@@ -324,19 +353,18 @@ expression SampleFiles =
 expression SettingRanges = Json.Document("{""reminderDays"":{""min"":1,""max"":30,""default"":3},""maxReminders"":{""min"":0,""max"":10,""default"":2},""staleDays"":{""min"":1,""max"":60,""default"":3},""exceptionMonths"":{""min"":1,""max"":36,""default"":6},""underRetirementDays"":{""min"":1,""max"":730,""default"":90},""readyDays"":{""min"":1,""max"":730,""default"":90}}")
 	queryGroup: Packed
 
-/// GENERATED from powerbi/samples/state/. The invented lists of the team's state (journal, replies, settings, team, reviews), as their bytes in base64, read when StateMode is Sample (D291).
+/// GENERATED from powerbi/samples/state/. The invented lists of the team's state (journal, replies, settings, team), as their bytes in base64, read when StateMode is Sample (D291).
 expression StateFiles =
 		#table(type table [FileName = text, Base64 = text], {
-			{"journal.csv", "VGl0bGUsQXQsQnksQnlOYW1lLFR5cGUsS2V5cyxUZXh0LFJlZixUbyxDYyxTdWJqZWN0LEtpbmQsQ2hhbm5lbCxQZXJzb24sUmVhc29uLFJldmlld09uLFJldGlyZU9uLENoZWNrSWQsQ2lLZXksQ2lOYW1lCkowMDAxLDIwMjYtMTAtMjZUMDk6MzA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiREVTQy1RVUFMSVRZOm1lbWJlcnM6ZGVzY3JpcHRpb24KUkVTUC1NSVNTSU5HOm1lbWJlcnM6bWFuYWdlZF9ieQpOQU1FLVNUQU5EQVJEOm1lbWJlcnM6YnMtc3VmZml4IiwyMDI2LTEwLTI2X1NBQ00tRUY1NkdILmVtbCxTQUNNLUVGNTZHSCxhZGFAZXhhbXBsZS5jb20sLE1lbWJlcnM6IDMgcG9pbnRzIHRvIGZpeCBbU0FDTS1FRjU2R0hdLGZpcnN0LG1haWxib3gsLCwsLCwsCkowMDAyLDIwMjYtMTAtMzBUMTA6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiREVTQy1RVUFMSVRZOm1lbWJlcnM6ZGVzY3JpcHRpb24KUkVTUC1NSVNTSU5HOm1lbWJlcnM6bWFuYWdlZF9ieQpOQU1FLVNUQU5EQVJEOm1lbWJlcnM6YnMtc3VmZml4IiwyMDI2LTEwLTMwX1NBQ00tRUY1NkdILmVtbCxTQUNNLUVGNTZHSCxhZGFAZXhhbXBsZS5jb20sLFN0aWxsIG9wZW46IE1lbWJlcnMgW1NBQ00tRUY1NkdIXSxyZW1pbmRlcixtYWlsYm94LCwsLCwsLApKMDAwMywyMDI2LTExLTAyVDExOjE1OjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxtZXNzYWdlLFRBRy1TVEFUVVMtQ09ORkxJQ1Q6bWVtYmVyIGVuZ2luZSAtIHRlc3Q6dGFncywsU0FDTS1HSDc4SUosY3lAZXhhbXBsZS5jb20sLE1lbWJlciBFbmdpbmUgLSBURVNUOiB0YWdzIHRvIGNoZWNrIFtTQUNNLUdINzhJSl0sZmlyc3Qsb3V0bG9vaywsLCwsLCwKSjAwMDQsMjAyNi0xMS0wNFQwOTowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxtZXNzYWdlLCJERVNDLVFVQUxJVFk6bWVtYmVyczpkZXNjcmlwdGlvbgpSRVNQLU1JU1NJTkc6bWVtYmVyczptYW5hZ2VkX2J5Ck5BTUUtU1RBTkRBUkQ6bWVtYmVyczpicy1zdWZmaXgiLDIwMjYtMTEtMDRfU0FDTS1FRjU2R0guZW1sLFNBQ00tRUY1NkdILGFkYUBleGFtcGxlLmNvbSwsU3RpbGwgb3BlbjogTWVtYmVycyBbU0FDTS1FRjU2R0hdLHJlbWluZGVyLG1haWxib3gsLCwsLCwsCkowMDA1LDIwMjYtMTEtMDVUMTA6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiQ1JJVC1BVVRPLUpVU1RJRklDQVRJT046bWVtYmVyIGVuZ2luZSAtIHByb2Q6YXZhaWxhYmlsaXR5CkNSSVQtTk8tSlVTVElGSUNBVElPTjppbmRleCB0b29sOmNvbmZpZGVudGlhbGl0eSIsMjAyNi0xMS0wNV9TQUNNLUFCMTJDRC5lbWwsU0FDTS1BQjEyQ0QsZGVlQGV4YW1wbGUuY29tLCxDcml0aWNhbGl0eTogMiBqdXN0aWZpY2F0aW9ucyB0byB3cml0ZSBbU0FDTS1BQjEyQ0RdLGZpcnN0LG1haWxib3gsLCwsLCwsCkowMDA2LDIwMjYtMTEtMDVUMTA6MDU6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiU1VQUE9SVC1HUk9VUC1NSVNTSU5HOm1lbWJlcnMgLSBzdGFuZGFyZDpzdXBwb3J0X2dyb3VwClNVUFBPUlRFRC1CWTptZW1iZXJzIC0gc3RhbmRhcmQ6c3VwcG9ydGVkX2J5IiwyMDI2LTExLTA1X1NBQ00tQ0QzNEVGLmVtbCxTQUNNLUNEMzRFRixjeUBleGFtcGxlLmNvbSwsTWVtYmVycyAtIFN0YW5kYXJkOiAyIHBvaW50cyB0byBmaXggW1NBQ00tQ0QzNEVGXSxmaXJzdCxtYWlsYm94LCwsLCwsLApKMDAwNywyMDI2LTExLTA2VDA4OjQwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLHN0YXR1cyxSRVNQLU1JU1NJTkc6cmVnaXN0ZXIgYSBuZXcgbWVtYmVyOm93bmVkX2J5LEZpeGVkLCwsLCwsLCwsLCwsLApKMDAwOCwyMDI2LTExLTA2VDA5OjEwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxzdGF0dXMsIlNVUFBPUlRFRC1CWTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0ZWRfYnkKU1VQUE9SVC1HUk9VUC1JTkFDVElWRTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0X2dyb3VwIixGaXggaW4gcHJvZ3Jlc3MsLCwsLCwsLCwsLCwsCkowMDA5LDIwMjYtMTEtMDZUMDk6MTE6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLHJlcXVlc3QsIlNVUFBPUlRFRC1CWTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0ZWRfYnkKU1VQUE9SVC1HUk9VUC1JTkFDVElWRTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0X2dyb3VwIixSSVRNMDAwMTIzNCwsLCwsLCwsLCwsLCwKSjAwMTAsMjAyNi0xMS0wOVQxNDowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxzdGF0dXMsUkVTUC1NSVNTSU5HOm1hbmFnZSBtZW1iZXIgcmVjb3Jkczpvd25lZF9ieSxGaXhlZCwsLCwsLCwsLCwsLCwKSjAwMTEsMjAyNi0xMS0wOVQxNDozMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsZXhjZXB0aW9uLFRBRy1NSVNTSU5HOnJlY29uY2lsZSBpbmRleDp0YWdzLFRoZSBvd25lciBrZWVwcyBpdCB1bnRpbCB0aGUgbmV4dCByZXZpZXcsLCwsLCwsLEFncmVlZCB3aXRoIHRoZSBvd25lciwyMDI3LTA1LTEwLCwsLApKMDAxMiwyMDI2LTA1LTA4VDEwOjAwOjAwLG1heEBleGFtcGxlLmNvbSxNYXggTWFuYWdlcixleGNlcHRpb24sUkVTUC1JTkFDVElWRTpyZWNvbmNpbGUgaW5kZXg6b3duZWRfYnksVGhlIG93bmVyIGxlYXZlcyBpbiBhdXR1bW4sLCwsLCwsLEFncmVlZCB3aXRoIHRoZSBvd25lciwyMDI2LTExLTEwLCwsLApKMDAxMywyMDI2LTExLTA5VDE1OjAwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxleGNlcHRpb24sLFR3byByZWNvcmRzIG9uIHB1cnBvc2UgdW50aWwgdGhlIG1vdmUsLCwsLCwsLER1cGxpY2F0ZSByZWNvcmQsMjAyNy0wMS0zMSwsTkFNRS1EVVBMSUNBVEUsbWFuYWdlIGZpbmVzLE1hbmFnZSBGaW5lcwpKMDAxNCwyMDI2LTExLTEwVDA4OjMwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLGFzc2lnbiwiTUFQUElORzpldmVudCBlbmdpbmU6bWFwcGluZwpNQVBQSU5HOmV2ZW50IGRlc2s6bWFwcGluZyIsU2FtIEV4YW1wbGUsLCwsLCwsLCwsLCwsCkowMDE1LDIwMjYtMTEtMTBUMDg6NDU6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLGhhbmRvdmVyLCJERVNDLVFVQUxJVFk6cmVjb25jaWxlIGluZGV4OmRlc2NyaXB0aW9uCkRFU0MtUVVBTElUWTpjbG9zZSB0aGUgbW9udGg6ZGVzY3JpcHRpb24iLEJhY2sgZnJvbSBob2xpZGF5OiBwbGVhc2UgdGFrZSB0aGVzZSB0d28sLEFsZXggRXhhbXBsZSwsLCwsLCwsLCwsCkowMDE2LDIwMjYtMTEtMTBUMDk6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUscmV0aXJlbWVudCxTVVBQT1JURUQtQlk6bWVtYmVyIGVuZ2luZSAtIHRlc3Q6c3VwcG9ydGVkX2J5LFRoZSBvd25lciByZXRpcmVzIGl0IGF0IHRoZSBlbmQgb2YgdGhlIHllYXIsLCwsLCwsLCwsMjAyNi0xMi0zMSwsLApKMDAxNywyMDI2LTExLTEwVDA5OjIwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxyZXZpZXdlZCxDUklULUFCT1ZFLVBBUkVOVDptZW1iZXIgZW5naW5lIC0gcHJvZDppbnRlZ3JpdHksQXNrIHRoZSBvd25lciwsLCwsLCwsLCwsLCwKSjAwMTgsMjAyNi0xMS0xMFQxMTowMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsbWVzc2FnZSxNQVBQSU5HOmV2ZW50IGdhdGV3YXkgLSBwcm9kOm1hcHBpbmcsLFNBQ00tSks5MExNLERlZSBPd25lciwsRXZlbnQgR2F0ZXdheSAtIFBST0Q6IG1hcHBpbmcgc2Vzc2lvbixmaXJzdCx0ZWFtcywsLCwsLCwKSjAwMTksMjAyNi0xMS0xMFQxMTozMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxwZXJzb24tbm90ZSwsUHJlZmVycyBhIFRlYW1zIGNoYXQgdG8gYW4gZW1haWwsLCwsLCwsY3kwMSwsLCwsLApKMDAyMCwyMDI2LTExLTExVDA4OjA1OjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLG5vdGUsUkVTUC1NSVNTSU5HOmNsb3NlIHRoZSBtb250aDptYW5hZ2VkX2J5LEFza2VkIHRoZSBQcm9jZXNzIE1hbmFnZW1lbnQgdGVhbSBpbiB0aGUgd2Vla2x5IG1lZXRpbmcsLCwsLCwsLCwsLCwsCkowMDIxLDIwMjYtMTEtMTBUMTM6MDA6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLHN0YWdlLE1BUFBJTkc6ZXZlbnQgZGVzazptYXBwaW5nLHNlc3Npb24taGVsZCwsLCwsLCwsLCwsLCwKSjAwMjIsMjAyNi0xMS0xMFQxMzowNTowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsbm8tcHJvY2VzcyxNQVBQSU5HOmV2ZW50IGRlc2s6bWFwcGluZyx5ZXMsLCwsLCwsLCwsLCwsCg=="},
+			{"journal.csv", "VGl0bGUsQXQsQnksQnlOYW1lLFR5cGUsS2V5cyxUZXh0LFJlZixUbyxDYyxTdWJqZWN0LEtpbmQsQ2hhbm5lbCxQZXJzb24sUmVhc29uLFJldmlld09uLFJldGlyZU9uLENoZWNrSWQsQ2lLZXksQ2lOYW1lLEl0ZW1zCkowMDAxLDIwMjYtMTAtMjZUMDk6MzA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiREVTQy1RVUFMSVRZOm1lbWJlcnM6ZGVzY3JpcHRpb24KUkVTUC1NSVNTSU5HOm1lbWJlcnM6bWFuYWdlZF9ieQpOQU1FLVNUQU5EQVJEOm1lbWJlcnM6YnMtc3VmZml4IiwyMDI2LTEwLTI2X1NBQ00tRUY1NkdILmVtbCxTQUNNLUVGNTZHSCxhZGFAZXhhbXBsZS5jb20sLE1lbWJlcnM6IDMgcG9pbnRzIHRvIGZpeCBbU0FDTS1FRjU2R0hdLGZpcnN0LG1haWxib3gsLCwsLCwsLApKMDAwMiwyMDI2LTEwLTMwVDEwOjAwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLG1lc3NhZ2UsIkRFU0MtUVVBTElUWTptZW1iZXJzOmRlc2NyaXB0aW9uClJFU1AtTUlTU0lORzptZW1iZXJzOm1hbmFnZWRfYnkKTkFNRS1TVEFOREFSRDptZW1iZXJzOmJzLXN1ZmZpeCIsMjAyNi0xMC0zMF9TQUNNLUVGNTZHSC5lbWwsU0FDTS1FRjU2R0gsYWRhQGV4YW1wbGUuY29tLCxTdGlsbCBvcGVuOiBNZW1iZXJzIFtTQUNNLUVGNTZHSF0scmVtaW5kZXIsbWFpbGJveCwsLCwsLCwsCkowMDAzLDIwMjYtMTEtMDJUMTE6MTU6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLG1lc3NhZ2UsVEFHLVNUQVRVUy1DT05GTElDVDptZW1iZXIgZW5naW5lIC0gdGVzdDp0YWdzLCxTQUNNLUdINzhJSixjeUBleGFtcGxlLmNvbSwsTWVtYmVyIEVuZ2luZSAtIFRFU1Q6IHRhZ3MgdG8gY2hlY2sgW1NBQ00tR0g3OElKXSxmaXJzdCxvdXRsb29rLCwsLCwsLCwKSjAwMDQsMjAyNi0xMS0wNFQwOTowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxtZXNzYWdlLCJERVNDLVFVQUxJVFk6bWVtYmVyczpkZXNjcmlwdGlvbgpSRVNQLU1JU1NJTkc6bWVtYmVyczptYW5hZ2VkX2J5Ck5BTUUtU1RBTkRBUkQ6bWVtYmVyczpicy1zdWZmaXgiLDIwMjYtMTEtMDRfU0FDTS1FRjU2R0guZW1sLFNBQ00tRUY1NkdILGFkYUBleGFtcGxlLmNvbSwsU3RpbGwgb3BlbjogTWVtYmVycyBbU0FDTS1FRjU2R0hdLHJlbWluZGVyLG1haWxib3gsLCwsLCwsLApKMDAwNSwyMDI2LTExLTA1VDEwOjAwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLG1lc3NhZ2UsIkNSSVQtQVVUTy1KVVNUSUZJQ0FUSU9OOm1lbWJlciBlbmdpbmUgLSBwcm9kOmF2YWlsYWJpbGl0eQpDUklULU5PLUpVU1RJRklDQVRJT046aW5kZXggdG9vbDpjb25maWRlbnRpYWxpdHkiLDIwMjYtMTEtMDVfU0FDTS1BQjEyQ0QuZW1sLFNBQ00tQUIxMkNELGRlZUBleGFtcGxlLmNvbSwsQ3JpdGljYWxpdHk6IDIganVzdGlmaWNhdGlvbnMgdG8gd3JpdGUgW1NBQ00tQUIxMkNEXSxmaXJzdCxtYWlsYm94LCwsLCwsLCwKSjAwMDYsMjAyNi0xMS0wNVQxMDowNTowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxtZXNzYWdlLCJTVVBQT1JULUdST1VQLU1JU1NJTkc6bWVtYmVycyAtIHN0YW5kYXJkOnN1cHBvcnRfZ3JvdXAKU1VQUE9SVEVELUJZOm1lbWJlcnMgLSBzdGFuZGFyZDpzdXBwb3J0ZWRfYnkiLDIwMjYtMTEtMDVfU0FDTS1DRDM0RUYuZW1sLFNBQ00tQ0QzNEVGLGN5QGV4YW1wbGUuY29tLCxNZW1iZXJzIC0gU3RhbmRhcmQ6IDIgcG9pbnRzIHRvIGZpeCBbU0FDTS1DRDM0RUZdLGZpcnN0LG1haWxib3gsLCwsLCwsLApKMDAwNywyMDI2LTExLTA2VDA4OjQwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLHN0YXR1cyxSRVNQLU1JU1NJTkc6cmVnaXN0ZXIgYSBuZXcgbWVtYmVyOm93bmVkX2J5LEZpeGVkLCwsLCwsLCwsLCwsLCwKSjAwMDgsMjAyNi0xMS0wNlQwOToxMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsc3RhdHVzLCJTVVBQT1JURUQtQlk6aW5kZXggdG9vbCAtIHByb2Q6c3VwcG9ydGVkX2J5ClNVUFBPUlQtR1JPVVAtSU5BQ1RJVkU6aW5kZXggdG9vbCAtIHByb2Q6c3VwcG9ydF9ncm91cCIsRml4IGluIHByb2dyZXNzLCwsLCwsLCwsLCwsLCwKSjAwMDksMjAyNi0xMS0wNlQwOToxMTowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUscmVxdWVzdCwiU1VQUE9SVEVELUJZOmluZGV4IHRvb2wgLSBwcm9kOnN1cHBvcnRlZF9ieQpTVVBQT1JULUdST1VQLUlOQUNUSVZFOmluZGV4IHRvb2wgLSBwcm9kOnN1cHBvcnRfZ3JvdXAiLFJJVE0wMDAxMjM0LCwsLCwsLCwsLCwsLCwKSjAwMTAsMjAyNi0xMS0wOVQxNDowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxzdGF0dXMsUkVTUC1NSVNTSU5HOm1hbmFnZSBtZW1iZXIgcmVjb3Jkczpvd25lZF9ieSxGaXhlZCwsLCwsLCwsLCwsLCwsCkowMDExLDIwMjYtMTEtMDlUMTQ6MzA6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLGV4Y2VwdGlvbixUQUctTUlTU0lORzpyZWNvbmNpbGUgaW5kZXg6dGFncyxUaGUgb3duZXIga2VlcHMgaXQgdW50aWwgdGhlIG5leHQgcmV2aWV3LCwsLCwsLCxBZ3JlZWQgd2l0aCB0aGUgb3duZXIsMjAyNy0wNS0xMCwsLCwsCkowMDEyLDIwMjYtMDUtMDhUMTA6MDA6MDAsbWF4QGV4YW1wbGUuY29tLE1heCBNYW5hZ2VyLGV4Y2VwdGlvbixSRVNQLUlOQUNUSVZFOnJlY29uY2lsZSBpbmRleDpvd25lZF9ieSxUaGUgb3duZXIgbGVhdmVzIGluIGF1dHVtbiwsLCwsLCwsQWdyZWVkIHdpdGggdGhlIG93bmVyLDIwMjYtMTEtMTAsLCwsLApKMDAxMywyMDI2LTExLTA5VDE1OjAwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxleGNlcHRpb24sLFR3byByZWNvcmRzIG9uIHB1cnBvc2UgdW50aWwgdGhlIG1vdmUsLCwsLCwsLER1cGxpY2F0ZSByZWNvcmQsMjAyNy0wMS0zMSwsTkFNRS1EVVBMSUNBVEUsbWFuYWdlIGZpbmVzLE1hbmFnZSBGaW5lcywKSjAwMTQsMjAyNi0xMS0xMFQwODozMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxhc3NpZ24sIk1BUFBJTkc6ZXZlbnQgZW5naW5lOm1hcHBpbmcKTUFQUElORzpldmVudCBkZXNrOm1hcHBpbmciLFNhbSBFeGFtcGxlLCwsLCwsLCwsLCwsLCwKSjAwMTUsMjAyNi0xMS0xMFQwODo0NTowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsaGFuZG92ZXIsIkRFU0MtUVVBTElUWTpyZWNvbmNpbGUgaW5kZXg6ZGVzY3JpcHRpb24KREVTQy1RVUFMSVRZOmNsb3NlIHRoZSBtb250aDpkZXNjcmlwdGlvbiIsQmFjayBmcm9tIGhvbGlkYXk6IHBsZWFzZSB0YWtlIHRoZXNlIHR3bywsQWxleCBFeGFtcGxlLCwsLCwsLCwsLCwsCkowMDE2LDIwMjYtMTEtMTBUMDk6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUscmV0aXJlbWVudCxTVVBQT1JURUQtQlk6bWVtYmVyIGVuZ2luZSAtIHRlc3Q6c3VwcG9ydGVkX2J5LFRoZSBvd25lciByZXRpcmVzIGl0IGF0IHRoZSBlbmQgb2YgdGhlIHllYXIsLCwsLCwsLCwsMjAyNi0xMi0zMSwsLCwKSjAwMTcsMjAyNi0xMS0xMFQwOToyMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUscmV2aWV3ZWQsQ1JJVC1BQk9WRS1QQVJFTlQ6bWVtYmVyIGVuZ2luZSAtIHByb2Q6aW50ZWdyaXR5LEFzayB0aGUgb3duZXIsLCwsLCwsLCwsLCwsLApKMDAxOCwyMDI2LTExLTEwVDExOjAwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxtZXNzYWdlLE1BUFBJTkc6ZXZlbnQgZ2F0ZXdheSAtIHByb2Q6bWFwcGluZywsU0FDTS1KSzkwTE0sRGVlIE93bmVyLCxFdmVudCBHYXRld2F5IC0gUFJPRDogbWFwcGluZyBzZXNzaW9uLGZpcnN0LHRlYW1zLCwsLCwsLCwKSjAwMTksMjAyNi0xMS0xMFQxMTozMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxwZXJzb24tbm90ZSwsUHJlZmVycyBhIFRlYW1zIGNoYXQgdG8gYW4gZW1haWwsLCwsLCwsY3kwMSwsLCwsLCwKSjAwMjAsMjAyNi0xMS0xMVQwODowNTowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxub3RlLFJFU1AtTUlTU0lORzpjbG9zZSB0aGUgbW9udGg6bWFuYWdlZF9ieSxBc2tlZCB0aGUgUHJvY2VzcyBNYW5hZ2VtZW50IHRlYW0gaW4gdGhlIHdlZWtseSBtZWV0aW5nLCwsLCwsLCwsLCwsLCwKSjAwMjEsMjAyNi0xMS0xMFQxMzowMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsc3RhZ2UsTUFQUElORzpldmVudCBkZXNrOm1hcHBpbmcsc2Vzc2lvbi1oZWxkLCwsLCwsLCwsLCwsLCwKSjAwMjIsMjAyNi0xMS0xMFQxMzowNTowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsbm8tcHJvY2VzcyxNQVBQSU5HOmV2ZW50IGRlc2s6bWFwcGluZyx5ZXMsLCwsLCwsLCwsLCwsLApKMDAyMywyMDI2LTExLTExVDE0OjAwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxyZXZpZXcsLFN0YXJ0ZWQgdGhlIGxpZmVjeWNsZSByZXZpZXcgb2YgMjAyNi0xMS0xMTogNyBDSXMgZHJhd24gZnJvbSAyMDI2LTExLTExX2NtZGJfY2ktc2FtcGxlLmNzdiAocmVwb3J0IG9mIDIwMjYtMTEtMTEpLDIwMjYtMTEtMTFfbGlmZWN5Y2xlLCwsLCwsLCwsLCwsLCJ7IiJyZXBvcnQiIjoiIjIwMjYtMTEtMTFfY21kYl9jaS1zYW1wbGUuY3N2IiIsIiJyZXBvcnREYXRlIiI6IiIyMDI2LTExLTExIiIsIiJpdGVtcyIiOlt7IiJjaUtleSIiOiIibWVtYmVycyIiLCIibmFtZSIiOiIiTWVtYmVycyIiLCIiY2xhc3NMYWJlbCIiOiIiQnVzaW5lc3MgU2VydmljZSIiLCIiY2xhc3NOYW1lIiI6IiJidXNpbmVzc19zZXJ2aWNlIiIsIiJzdGF0dXMiIjoiIk9wZXJhdGlvbmFsIiIsIiJlcG9JZCIiOiIiQVNULTAwMTAiIiwiImdyb3VwIiI6IiJzYW1wbGUiIn0seyIiY2lLZXkiIjoiImV2ZW50IGdhdGV3YXkgLSBwcm9kIiIsIiJuYW1lIiI6IiJFdmVudCBHYXRld2F5IC0gUFJPRCIiLCIiY2xhc3NMYWJlbCIiOiIiU2VydmljZSBJbnN0YW5jZSIiLCIiY2xhc3NOYW1lIiI6IiJzZXJ2aWNlX2luc3RhbmNlIiIsIiJzdGF0dXMiIjoiIk9wZXJhdGlvbmFsIiIsIiJlcG9JZCIiOiIiQVNULTAwMjAiIiwiImdyb3VwIiI6IiJzYW1wbGUiIn0seyIiY2lLZXkiIjoiImZpbmVzIGh1YiAtIHByb2QiIiwiIm5hbWUiIjoiIkZpbmVzICBIdWIgLSBQUk9EIiIsIiJjbGFzc0xhYmVsIiI6IiJTZXJ2aWNlIEluc3RhbmNlIiIsIiJjbGFzc05hbWUiIjoiInNlcnZpY2VfaW5zdGFuY2UiIiwiInN0YXR1cyIiOiIiT3BlcmF0aW9uYWwiIiwiImVwb0lkIiI6IiJBU1QtMDAxMiIiLCIiZ3JvdXAiIjoiInNhbXBsZSIifSx7IiJjaUtleSIiOiIiaW5kZXggdG9vbCAtIHByb2QiIiwiIm5hbWUiIjoiIkluZGV4IFRvb2wgLSBQUk9EIiIsIiJjbGFzc0xhYmVsIiI6IiJTZXJ2aWNlIEluc3RhbmNlIiIsIiJjbGFzc05hbWUiIjoiInNlcnZpY2VfaW5zdGFuY2UiIiwiInN0YXR1cyIiOiIiT3BlcmF0aW9uYWwiIiwiImVwb0lkIiI6IiJBU1QtMDAwOCIiLCIiZ3JvdXAiIjoiInNhbXBsZSIifSx7IiJjaUtleSIiOiIibWVtYmVyIGVuZ2luZSAtIHByb2QiIiwiIm5hbWUiIjoiIk1lbWJlciBFbmdpbmUgLSBQUk9EIiIsIiJjbGFzc0xhYmVsIiI6IiJTZXJ2aWNlIEluc3RhbmNlIiIsIiJjbGFzc05hbWUiIjoiInNlcnZpY2VfaW5zdGFuY2UiIiwiInN0YXR1cyIiOiIiT3BlcmF0aW9uYWwiIiwiImVwb0lkIiI6IiJBU1QtMDAwNiIiLCIiZ3JvdXAiIjoiInNhbXBsZSIifSx7IiJjaUtleSIiOiIibWVtYmVyIGVuZ2luZSAtIHRlc3QiIiwiIm5hbWUiIjoiIk1lbWJlciBFbmdpbmUgLSBURVNUIiIsIiJjbGFzc0xhYmVsIiI6IiJTZXJ2aWNlIEluc3RhbmNlIiIsIiJjbGFzc05hbWUiIjoiInNlcnZpY2VfaW5zdGFuY2UiIiwiInN0YXR1cyIiOiIiT3BlcmF0aW9uYWwiIiwiImVwb0lkIiI6IiJBU1QtMDAwNyIiLCIiZ3JvdXAiIjoiInNhbXBsZSIifSx7IiJjaUtleSIiOiIibWVtYmVycyAtIHN0YW5kYXJkIiIsIiJuYW1lIiI6IiJNZW1iZXJzIC0gU3RhbmRhcmQiIiwiImNsYXNzTGFiZWwiIjoiIlNlcnZpY2UgT2ZmZXJpbmciIiwiImNsYXNzTmFtZSIiOiIic2VydmljZV9vZmZlcmluZyIiLCIic3RhdHVzIiI6IiJPcGVyYXRpb25hbCIiLCIiZXBvSWQiIjoiIkFTVC0wMDExIiIsIiJncm91cCIiOiIic2FtcGxlIiJ9XX0iCkowMDI0LDIwMjYtMTEtMTFUMTQ6MjA6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLHJldmlldywsRVBPIGl0c2VsZiBzaG93cyBpdCBjbG9zZWQgZG93biBsYXN0IHdlZWssMjAyNi0xMS0xMV9saWZlY3ljbGUsLCwsLCwsZGlmZmVyZW50LCwsLGZpbmVzIGh1YiAtIHByb2QsRmluZXMgIEh1YiAtIFBST0QsCkowMDI1LDIwMjYtMTEtMTFUMTQ6MjU6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLHJldmlldywsLDIwMjYtMTEtMTFfbGlmZWN5Y2xlLCwsLCwsLHNhbWUsLCwsbWVtYmVycyxNZW1iZXJzLApKMDAyNiwyMDI2LTExLTExVDE0OjMwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLHJldmlldywsLDIwMjYtMTEtMTFfbGlmZWN5Y2xlLCwsLCwsLGRpZmZlcmVudCwsLCxtZW1iZXIgZW5naW5lIC0gcHJvZCxNZW1iZXIgRW5naW5lIC0gUFJPRCwKSjAwMjcsMjAyNi0xMS0xMVQxNDo0MDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxyZXZpZXcsLENoZWNrZWQgYWdhaW46IHRoZSBzYW1lIGluIEVQTywyMDI2LTExLTExX2xpZmVjeWNsZSwsLCwsLCxzYW1lLCwsLG1lbWJlciBlbmdpbmUgLSBwcm9kLE1lbWJlciBFbmdpbmUgLSBQUk9ELApKMDAyOCwyMDI2LTExLTExVDE0OjQ1OjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLHJldmlldywsLDIwMjYtMTEtMTFfbGlmZWN5Y2xlLCwsLCwsLG5vdC1pbi1lcG8sLCwsaW5kZXggdG9vbCAtIHByb2QsSW5kZXggVG9vbCAtIFBST0QsCg=="},
 			{"replies.csv", "VGl0bGUsRnJvbSxSZWNlaXZlZCxTdWJqZWN0LEJvZHkKU0FDTS1FRjU2R0gsYWRhQGV4YW1wbGUuY29tLDIwMjYtMTAtMjdUMDk6MDA6MDAsUkU6IE1lbWJlcnM6IDMgcG9pbnRzIHRvIGZpeCBbU0FDTS1FRjU2R0hdLEkgYW0gb24gaG9saWRheSB1bnRpbCAzIE5vdmVtYmVyLgpTQUNNLUFCMTJDRCxkZWVAZXhhbXBsZS5jb20sMjAyNi0xMS0wNlQxNDowMDowMCxSRTogQ3JpdGljYWxpdHk6IDIganVzdGlmaWNhdGlvbnMgdG8gd3JpdGUgW1NBQ00tQUIxMkNEXSwiSSB3aWxsIHdyaXRlIGJvdGgganVzdGlmaWNhdGlvbnMgdGhpcyB3ZWVrLgpEZWUiClNBQ00tWlowMFpaLHNvbWVvbmVAZXhhbXBsZS5jb20sMjAyNi0xMS0wOVQxNjoyMDowMCxSRTogQW4gb2xkIG1lc3NhZ2UgW1NBQ00tWlowMFpaXSxJcyB0aGlzIHN0aWxsIG5lZWRlZD8K"},
-			{"settings.csv", "VGl0bGUsVmFsdWUKcmVtaW5kZXJEYXlzLDMKbWF4UmVtaW5kZXJzLDk5CnBvcnRhbExpbmssaHR0cHM6Ly9wb3J0YWwuZXhhbXBsZS5jb20vc2FjbQpzaWduYXR1cmUsU0FDTSB0ZWFtCmVwb093bmVyTmFtZSxFdmUgSW52ZW50b3J5CmVwb093bmVyRW1haWwsZXZlLmludmVudG9yeUBleGFtcGxlLmNvbQpwcm9jdXJlbWVudE5hbWUsUHJvY3VyZW1lbnQKcHJvY3VyZW1lbnRFbWFpbCxwcm9jdXJlbWVudEBleGFtcGxlLmNvbQp0ZWFtLnByb2Nlc3MtbWFuYWdlbWVudC5uYW1lLFByb2Nlc3MgTWFuYWdlbWVudAp0ZWFtLnByb2Nlc3MtbWFuYWdlbWVudC5wZW9wbGUsUGF0IFByb2Nlc3MgPHBhdC5wcm9jZXNzQGV4YW1wbGUuY29tPjsgUXVpbm4gUHJvY2VzcyA8cXVpbm4ucHJvY2Vzc0BleGFtcGxlLmNvbT4K"},
-			{"team.csv", "VGl0bGUsRW1haWwsQWN0aXZlCkFsZXggRXhhbXBsZSxhbGV4QGV4YW1wbGUuY29tLFllcwpTYW0gRXhhbXBsZSxzYW1AZXhhbXBsZS5jb20sWWVzCk1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxObwo="},
-			{"reviews.csv", "UmV2aWV3RGF0ZSxDaUtleSxDaU5hbWUsQ2xhc3MsU3RhdHVzSW5FcG8sQW5zd2VyLE5vdGUsQnksQXQKMjAyNi0xMS0wMixldmVudCBkZXNrLEV2ZW50IERlc2ssYnVzaW5lc3NfYXBwbGljYXRpb24sS8O4cmVuZGUsc2FtZSwsU2FtIEV4YW1wbGUsMjAyNi0xMS0wMlQxMzowMDowMAoyMDI2LTExLTAyLGZpbmVzIGh1YiAtIHByb2QsRmluZXMgSHViIC0gUFJPRCxzZXJ2aWNlX2luc3RhbmNlLE5lZGxhZ3QsZGlmZmVyZW50LEVQTyBzYXlzIHJldGlyZWQ7IFNlcnZpY2VOb3cgc2F5cyBvcGVyYXRpb25hbCxTYW0gRXhhbXBsZSwyMDI2LTExLTAyVDEzOjEwOjAwCg=="}
+			{"settings.csv", "VGl0bGUsVmFsdWUKcmVtaW5kZXJEYXlzLDUKc2lnbmF0dXJlLFRoZSBvbGQgdGVhbSBsaW5lCnJlbWluZGVyRGF5cywzCm1heFJlbWluZGVycyw5OQpwb3J0YWxMaW5rLGh0dHBzOi8vcG9ydGFsLmV4YW1wbGUuY29tL3NhY20Kc2lnbmF0dXJlLFNBQ00gdGVhbQplcG9Pd25lck5hbWUsRXZlIEludmVudG9yeQplcG9Pd25lckVtYWlsLGV2ZS5pbnZlbnRvcnlAZXhhbXBsZS5jb20KcHJvY3VyZW1lbnROYW1lLFByb2N1cmVtZW50CnByb2N1cmVtZW50RW1haWwscHJvY3VyZW1lbnRAZXhhbXBsZS5jb20KdGVhbS5wcm9jZXNzLW1hbmFnZW1lbnQubmFtZSxQcm9jZXNzIE1hbmFnZW1lbnQKdGVhbS5wcm9jZXNzLW1hbmFnZW1lbnQucGVvcGxlLFBhdCBQcm9jZXNzIDxwYXQucHJvY2Vzc0BleGFtcGxlLmNvbT47IFF1aW5uIFByb2Nlc3MgPHF1aW5uLnByb2Nlc3NAZXhhbXBsZS5jb20+Cg=="},
+			{"team.csv", "VGl0bGUsRW1haWwsQWN0aXZlCkFsZXggRXhhbXBsZSxhbGV4QGV4YW1wbGUuY29tLFllcwpTYW0gRXhhbXBsZSxzYW1AZXhhbXBsZS5jb20sWWVzCk1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxObwo="}
 		})
 	queryGroup: Packed
 
-/// GENERATED from tools/powerbi/history.ts (D291). The five lists of the team's state: the name of the SharePoint list, the sample file and the columns.
-expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"",""file"":""journal.csv"",""columns"":[""Title"",""At"",""By"",""ByName"",""Type"",""Keys"",""Text"",""Ref"",""To"",""Cc"",""Subject"",""Kind"",""Channel"",""Person"",""Reason"",""ReviewOn"",""RetireOn"",""CheckId"",""CiKey"",""CiName""]},""replies"":{""list"":""SACM Replies"",""file"":""replies.csv"",""columns"":[""Title"",""From"",""Received"",""Subject"",""Body""]},""settings"":{""list"":""SACM Settings"",""file"":""settings.csv"",""columns"":[""Title"",""Value""]},""team"":{""list"":""SACM Team"",""file"":""team.csv"",""columns"":[""Title"",""Email"",""Active""]},""reviews"":{""list"":""SACM Reviews"",""file"":""reviews.csv"",""columns"":[""ReviewDate"",""CiKey"",""CiName"",""Class"",""StatusInEpo"",""Answer"",""Note"",""By"",""At""]}}")
+/// GENERATED from tools/powerbi/history.ts (D291). The four lists of the team's state: the name of the SharePoint list, the sample file and the columns.
+expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"",""file"":""journal.csv"",""columns"":[""Title"",""At"",""By"",""ByName"",""Type"",""Keys"",""Text"",""Ref"",""To"",""Cc"",""Subject"",""Kind"",""Channel"",""Person"",""Reason"",""ReviewOn"",""RetireOn"",""CheckId"",""CiKey"",""CiName"",""Items""]},""replies"":{""list"":""SACM Replies"",""file"":""replies.csv"",""columns"":[""Title"",""From"",""Received"",""Subject"",""Body""]},""settings"":{""list"":""SACM Settings"",""file"":""settings.csv"",""columns"":[""Title"",""Value""]},""team"":{""list"":""SACM Team"",""file"":""team.csv"",""columns"":[""Title"",""Email"",""Active""]}}")
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
@@ -347,21 +375,24 @@ expression WorkbenchVersion = "0.44.0"
 expression AsciiCharacters = List.Buffer(List.Transform(List.Numbers(0, 128), Character.FromNumber))
 	queryGroup: Reading
 
-/// The rules of the cases from the list SACM Settings (D158, D291): the working days before a reminder is due and how many reminders before an escalation. A value that is not a whole number in its range (SettingRanges) is not used: the default is, as the app does.
+/// The numbers of the team's settings from the list SACM Settings (D158, D291): the working days before a reminder is due, how many reminders before an escalation, the days before a report is old, the months to the review date of a decision to stop following, and the days a CI may stay Under retirement or Ready (build B8, D308). A value that is not a whole number in its range (SettingRanges) is not used: the default is, as the app does. The Settings screen of the Power App adds a row for each change and never changes one, so the last row of a setting counts (the list is read oldest first).
 expression CaseRules =
 		let
 		    rows = Table.ToRecords(fnStateList("settings")),
 		    value = (key as text) as number =>
 		        let
 		            range = Record.Field(SettingRanges, key),
-		            found = List.First(List.Select(rows, (row) => row[Title] = key), null),
+		            found = List.Last(List.Select(rows, (row) => row[Title] = key), null),
 		            raw = if found = null then "" else Text.Trim(found[Value]),
 		            digits = if Text.StartsWith(raw, "-") then Text.Middle(raw, 1) else raw,
 		            number = if digits <> "" and Text.Remove(digits, {"0".."9"}) = "" then Number.FromText(raw, "en-US") else null
 		        in
 		            if number <> null and number >= range[min] and number <= range[max] then number else range[default]
 		in
-		    [ReminderDays = value("reminderDays"), MaxReminders = value("maxReminders")]
+		    [
+		        ReminderDays = value("reminderDays"), MaxReminders = value("maxReminders"), StaleDays = value("staleDays"),
+		        ExceptionMonths = value("exceptionMonths"), UnderRetirementDays = value("underRetirementDays"), ReadyDays = value("readyDays")
+		    ]
 	queryGroup: Reading
 
 /// The day the cases are worked out for (an exception that ends, a planned retirement date): the day the samples were recorded in Sample mode, else the day of the refresh. What depends on today between two refreshes (a reminder due, a report too old) is DAX, with the measure Today.
@@ -1457,9 +1488,12 @@ expression fnHistoryRun =
 		        prefixed = (part as list) as table =>
 		            let
 		                name = part{0},
-		                rows = part{1}
+		                rows = part{1},
+		                renamed = Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})),
+		                present = Table.ColumnNames(renamed),
+		                own = List.Select(HistoryRunColumnTypes, (pair) => List.Contains(present, pair{0}))
 		            in
-		                Table.AddColumn(Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})), "Part", each name, type text),
+		                Table.AddColumn(Table.TransformColumnTypes(renamed, own), "Part", each name, type text),
 		        perDay = List.Transform(days, (day) =>
 		            let
 		                run = runOf(day),
@@ -1467,9 +1501,10 @@ expression fnHistoryRun =
 		            in
 		                Table.AddColumn(combined, "ReportDate", each day, type date)),
 		        // With no CI report in the dates, every column is still there, so a refresh of an empty part of the history works.
-		        empty = #table({"Part", "ReportDate"} & List.Transform(HistoryRunColumnTypes, (pair) => pair{0}), {}),
-		        combined = Table.Combine({empty} & perDay),
-		        typed = Table.TransformColumnTypes(combined, {{"Part", type text}, {"ReportDate", type date}} & HistoryRunColumnTypes)
+		        // Each part is typed alone, before the parts are put together (as in RunRows, D307); the empty frame types every column.
+		        types = {{"Part", type text}, {"ReportDate", type date}} & HistoryRunColumnTypes,
+		        empty = Table.TransformColumnTypes(#table(List.Transform(types, (pair) => pair{0}), {}), types),
+		        typed = Table.Combine({empty} & perDay)
 		    in
 		        Table.ReorderColumns(typed, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(typed), (column) => column <> "Part" and column <> "ReportDate"))
 	queryGroup: Reading
@@ -2472,6 +2507,111 @@ expression fnReportType =
 		        else [Kind = "", Label = "Not read", Message = "This file is not a report the Workbench knows: " & Text.Combine(parts, "; ") & "."]
 	queryGroup: Reading
 
+/// The sample a new lifecycle review would draw from the newest CI report (D306; the part "review" of reference/lifecycle): `underRetirement` CIs in the status Under retirement and `sample` CIs of the other CIs, only of the classes EPO holds, never a Retired CI. The chance is a hash (fnReviewHash) of the report date, the file and the CI key: the same report always proposes the same CIs. Each part is in the order of class, name and key; the sample by chance first. The Power App SACM audit saves this proposal in the journal when a manager presses New review, so the review keeps its CIs when later reports change. null with no CI report or no part "review". The answer key is drawSample in tools/powerbi/review.ts.
+expression fnReviewDraw =
+		(run as nullable record) as nullable record =>
+		    let
+		        reference = fnReference("reference/lifecycle"),
+		        config = if reference = null then null else Record.FieldOrDefault(reference, "review", null)
+		    in
+		        if run = null or config = null or not Value.Is(Record.FieldOrDefault(config, "classes", null), type list) then null
+		        else
+		            let
+		                retired = List.Buffer(List.Transform(config[retiredStatuses], (word) => fnNameKey(word, ""))),
+		                leaving = fnNameKey(config[underRetirementStatus], ""),
+		                classes = List.Buffer(config[classes]),
+		                start = fnReviewHash(2166136261, Date.ToText(run[Date], [Format = "yyyy-MM-dd", Culture = "en-US"]) & "|" & run[FileName] & "|"),
+		                pool = List.Buffer(List.Transform(
+		                    List.Select(run[Cis], (ci) => List.Contains(classes, ci[Class]) and not List.Contains(retired, ci[StatusKey])),
+		                    (ci) => [Ci = ci, Rank = fnReviewHash(start, ci[Key])])),
+		                byRank = (a as record, b as record) as number => let first = Value.Compare(a[Rank], b[Rank]) in if first <> 0 then first else Comparer.Ordinal(a[Ci][Key], b[Ci][Key]),
+		                item = (group as text) as function => (entry as record) as record =>
+		                    let ci = entry[Ci] in
+		                    [CiKey = ci[Key], Name = ci[Name], ClassLabel = if ci[SourceClass] <> "" then ci[SourceClass] else ci[Class], ClassName = ci[Class],
+		                        Status = ci[Status], EpoId = ci[AssetTag], Group = group],
+		                byName = (a as record, b as record) as number =>
+		                    let
+		                        label = Comparer.Ordinal(a[ClassLabel], b[ClassLabel]),
+		                        name = Comparer.Ordinal(a[Name], b[Name])
+		                    in
+		                        if label <> 0 then label else if name <> 0 then name else Comparer.Ordinal(a[CiKey], b[CiKey]),
+		                pick = (entries as list, count as number, group as text) as list =>
+		                    List.Sort(List.Transform(List.FirstN(List.Sort(entries, byRank), count), item(group)), byName),
+		                under = pick(List.Select(pool, (entry) => entry[Ci][StatusKey] = leaving), config[underRetirement], "under-retirement"),
+		                sample = pick(List.Select(pool, (entry) => entry[Ci][StatusKey] <> leaving), config[sample], "sample")
+		            in
+		                [Report = run[FileName], ReportDate = run[Date], Items = List.Buffer(sample & under)]
+	queryGroup: Reading
+
+/// The hash of the lifecycle review's draw (D306): FNV-1a of 32 bits over the characters of `text`, from the hash `start` (2166136261 for a new text), so the hash of a fixed beginning is worked out once and each CI key goes on from it. The same as fnvHash in tools/powerbi/review.ts. Every step stays below 2^53, so it is exact in Power Query's numbers: h × 16777619 mod 2^32 = ((h mod 256) × 2^24 + h × 403) mod 2^32.
+expression fnReviewHash =
+		(start as number, text as text) as number =>
+		    List.Accumulate(Text.ToList(text), start, (hash, character) =>
+		        let mixed = Number.BitwiseXor(hash, Character.ToNumber(character)) in
+		        Number.Mod(Number.Mod(mixed, 256) * 16777216 + mixed * 403, 4294967296))
+	queryGroup: Reading
+
+/// The part ReviewLines of the table Run (D306), which the DAX table ReviewLines shows: one line per CI of each lifecycle review of the journal (LifecycleReviews), with its mark and the follow-up of the case it opened, as the evidence file of the HTML app holds it (evidenceRows of src/core/audit/lifecycle-review.ts); then the CIs a new review would draw from the newest report (Review "next", fnReviewDraw), which the Power App SACM audit saves on New review. Status in EPO: the EPO systems report of the newest CI report. Agrees: not marked yet, and EPO shows the same status (the app's "Mark N same"). Case status: the status of the case a "Not the same" opened; Verified once the newest report shows the CI in another status. EpoDate: the date of that EPO report. `run` is the run with the review lines (fnWithReviews), `cases` its cases (fnCases).
+expression fnReviewLinesPart =
+		(run as nullable record, cases as list) as table =>
+		    let
+		        reference = fnReference("reference/lifecycle"),
+		        config = if reference = null then null else Record.FieldOrDefault(reference, "review", null),
+		        results = if config = null then {} else config[results],
+		        opens = if config = null then {} else config[opensCase],
+		        labelOf = (id as text) as text => let found = List.First(List.Select(results, (result) => result[id] = id), null) in if found = null then id else found[label],
+		        groupWord = [sample = "Sample by chance", #"under-retirement" = "Under retirement"],
+		        systems = if run = null or run[Epo] = null then [] else
+		            let grouped = fnGroupBy(List.Select(run[Epo][Systems], (system) => system[EpoId] <> ""), (system) => Text.Lower(Text.Trim(system[EpoId]), "en-US")) in
+		            Record.FromList(List.Transform(Record.FieldValues(grouped), List.Last), Record.FieldNames(grouped)),
+		        // The date of the EPO systems report the statuses come from: the note of "Mark N same" names it.
+		        epoDate = if run = null or run[Epo] = null then null else run[Epo][Date],
+		        epoOf = (epoId as text) as record =>
+		            let system = if epoId = "" then null else Record.FieldOrDefault(systems, Text.Lower(Text.Trim(epoId), "en-US"), null) in
+		            if system = null then [Status = "", Words = ""] else [Status = system[Status], Words = if system[Status] <> "" then system[StatusWord] & " (" & system[Status] & ")" else system[StatusWord]],
+		        casesByKey = Record.FromList(cases, List.Transform(cases, (item) => item[Key])),
+		        cis = if run = null then [] else Record.FromList(run[Cis], List.Transform(run[Cis], (ci) => ci[Key])),
+		        months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+		        longDate = (iso as text) as text => if Text.Length(iso) < 10 then iso else fnLongDate(Date.FromText(Text.Start(iso, 10), [Format = "yyyy-MM-dd", Culture = "en-US"])),
+		        dateOf = (iso as text) as nullable date => if Text.Length(iso) < 10 then null else Date.FromText(Text.Start(iso, 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		        reviews = LifecycleReviews,
+		        newest = List.Last(reviews, null),
+		        line = (review as record, item as record, next as logical) as list =>
+		            let
+		                mark = if next then null else Record.FieldOrDefault(review[Marks], item[CiKey], null),
+		                epo = epoOf(item[EpoId]),
+		                opened = mark <> null and List.Contains(opens, mark[Result]),
+		                found = if opened then Record.FieldOrDefault(casesByKey, "LIFECYCLE-REVIEW:" & item[CiKey] & ":status", null) else null,
+		                ci = Record.FieldOrDefault(cis, item[CiKey], null),
+		                status = if found <> null then found[Status]
+		                    else if opened and ci <> null and ci[StatusKey] <> fnNameKey(item[Status], "") then "Verified" else "",
+		                sent = if found = null then {} else List.Select(found[MessageEvents], (event) => event[At] >= mark[At]),
+		                dates = (kind as text) as list => List.Transform(List.Select(sent, (event) => (if event[Kind] = "" then "first" else event[Kind]) = kind), (event) => Text.Start(event[At], 10))
+		            in
+		                {
+		                    if next then "next" else review[Id], next, not next and newest <> null and review[Id] = newest[Id], dateOf(review[Date]),
+		                    if next then "The next review (not started)" else "Lifecycle review of " & longDate(review[Date]),
+		                    review[Report], dateOf(review[ReportDate]), item[Group], Record.FieldOrDefault(groupWord, item[Group], item[Group]),
+		                    item[CiKey], item[Name], item[ClassLabel], item[ClassName], item[EpoId], item[Status], epo[Status], epo[Words],
+		                    mark = null and epo[Status] <> "" and fnNameKey(epo[Status], "") = fnNameKey(item[Status], ""),
+		                    if mark = null then "" else mark[Result], if mark = null then "Not checked yet" else labelOf(mark[Result]),
+		                    if mark = null then "" else mark[Note], if mark = null then "" else mark[ByName], if mark = null then null else dateOf(mark[At]),
+		                    status, List.First(dates("first"), ""), Text.Combine(dates("reminder"), " "), Text.Combine(dates("escalation"), " "), epoDate
+		                },
+		        draw = fnReviewDraw(run),
+		        nextReview = if draw = null then null else [Id = "next", Date = "", Report = draw[Report], ReportDate = Date.ToText(draw[ReportDate], [Format = "yyyy-MM-dd", Culture = "en-US"]), Marks = []],
+		        lines = List.Combine(List.Transform(List.Reverse(reviews), (review) => List.Transform(review[Items], (item) => line(review, item, false))))
+		            & (if draw = null then {} else List.Transform(draw[Items], (item) => line(nextReview, item, true))),
+		        numbered = List.Transform(List.Positions(lines), (at) => lines{at} & {at + 1})
+		    in
+		        #table(
+		            type table [Review = text, IsNext = logical, IsCurrent = logical, ReviewDate = nullable date, ReviewLabel = text, Report = text, ReportDate = nullable date,
+		                Group = text, GroupLabel = text, CiKey = text, CiName = text, ClassLabel = text, ClassName = text, EpoId = text, Status = text,
+		                EpoStatus = text, EpoStatusWords = text, Agrees = logical, Result = text, ResultLabel = text, Note = text, CheckedBy = text, CheckedOn = nullable date,
+		                CaseStatus = text, FirstMessage = text, Reminders = text, EscalatedOn = text, EpoDate = nullable date, Order = Int64.Type],
+		            numbered)
+	queryGroup: Reading
+
 /// The part Runs of the table HistoryRun (D290), which the DAX table Runs shows: one row per CI report date, with the file, its CIs and the other reports its checks used (for each type the newest report dated on or before it, as the HTML app pairs them). `run` is a run of fnCheckRun.
 expression fnRunsPart =
 		(run as record) as table =>
@@ -2724,7 +2864,7 @@ expression fnStages =
 		            List.Transform(list, (stage) => [Id = stage[id], Label = Record.FieldOrDefault(words, stage[id], stage[label])])
 	queryGroup: Reading
 
-/// One list of the team's state (D291), by its id in StateLists (journal, replies, settings, team, reviews): its columns in the order of StateLists, every value as text, whatever the mode. A date and time is yyyy-MM-ddTHH:mm:ss, a date yyyy-MM-dd, a yes/no Yes or No, an empty cell "". Sample: the invented CSV file packed in StateFiles. SharePoint: the list of that name on the team site (SharePoint.Tables, plan §5). A list that is not there gives no rows, so a site without the lists still refreshes and every case is New.
+/// One list of the team's state (D291), by its id in StateLists (journal, replies, settings, team): its columns in the order of StateLists, every value as text, whatever the mode. A date and time is yyyy-MM-ddTHH:mm:ss, a date yyyy-MM-dd, a yes/no Yes or No, an empty cell "". Sample: the invented CSV file packed in StateFiles. SharePoint: the list of that name on the team site (SharePoint.Tables, plan §5). A list that is not there gives no rows, so a site without the lists still refreshes and every case is New. The rows come in the order they were added (the list's ID; the samples: the order of the file), so where the last row of a key counts (a setting, D308), it is the newest.
 expression fnStateList =
 		(id as text) as table =>
 		    let
@@ -2742,9 +2882,10 @@ expression fnStateList =
 		        sharePointRows =
 		            let
 		                lists = SharePoint.Tables(SharePointSite, [Implementation = "2.0", ViewMode = "All"]),
-		                found = Table.SelectRows(lists, each [Title] = spec[list])
+		                found = Table.SelectRows(lists, each [Title] = spec[list]),
+		                items = if Table.IsEmpty(found) then null else found{0}[Items]
 		            in
-		                if Table.IsEmpty(found) then {} else Table.ToRecords(found{0}[Items]),
+		                if items = null then {} else Table.ToRecords(if Table.HasColumns(items, "ID") then Table.Sort(items, {{"ID", Order.Ascending}}) else items),
 		        rows = if StateMode = "SharePoint" then sharePointRows else if StateMode = "None" then {} else sampleRows,
 		        asText = (value as any) as text =>
 		            if value = null then ""
@@ -2821,6 +2962,88 @@ expression fnWhyYou =
 expression fnWithoutHidden = (name as text) as text => List.Accumulate(ReadingRules[hiddenCharacters], name, (text, entry) => Text.Replace(text, Character.FromNumber(entry[code]), ""))
 	queryGroup: Reading
 
+/// The lines of the lifecycle review on the newest CI report (D192, D306), as withReviewFacts of src/core/audit/lifecycle-review.ts adds them: the newest mark of each CI over all reviews (LifecycleReviews) decides. A mark "Not the same" opens a line of the card Lifecycle review while the newest report still shows the CI in the status it had in the review, from the report of the review on. The line is a SACM fix line (reviewFix): service mapped, SACM copies the status of EPO; not service mapped, an incident for the sync; the owner is asked only after "EPO itself looks wrong: ask the owner". The check counts as tested (status) with every CI checked in a review; with no mark at all it is not tested and says how to start one. Only the newest report gets the lines: the history (HistoryRun) does not count them, as it does not read the journal. `run` is CheckRun (null when no CI report).
+expression fnWithReviews =
+		(run as nullable record) as nullable record =>
+		    let
+		        reference = fnReference("reference/lifecycle"),
+		        config = if reference = null then null else Record.FieldOrDefault(reference, "review", null),
+		        packs = List.Select(List.Transform(Json.Document(CheckFiles), (entry) => entry[pack]), (pack) => pack[id] = "LIFECYCLE-REVIEW" and pack[status] <> "off"),
+		        pack = List.First(packs, null),
+		        reviews = LifecycleReviews,
+		        notYet = [CheckId = "LIFECYCLE-REVIEW", Note = "No lifecycle review yet. A manager starts one on the Audit page, under Lifecycle."]
+		    in
+		        if run = null then null
+		        else if pack = null or config = null or List.IsEmpty(reviews) then run & [Notes = run[Notes] & (if pack = null then {} else {notYet})]
+		        else
+		            let
+		                // The newest mark of each CI over all reviews; a later review wins a tie.
+		                entries = List.Combine(List.Transform(reviews, (review) =>
+		                    List.RemoveNulls(List.Transform(review[Items], (item) =>
+		                        let mark = Record.FieldOrDefault(review[Marks], item[CiKey], null) in
+		                        if mark = null then null else [Item = item, Mark = mark, Review = review])))),
+		                checked = List.Count(entries),
+		                latest = List.Transform(Record.FieldValues(fnGroupBy(entries, (entry) => entry[Item][CiKey])),
+		                    (list) => List.Accumulate(list, null, (best, entry) => if best = null or best[Mark][At] <= entry[Mark][At] then entry else best)),
+		                from = List.Min(List.Transform(reviews, (review) => review[ReportDate])),
+		                date = Date.ToText(run[Date], [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		                cis = Record.FromList(run[Cis], List.Transform(run[Cis], (ci) => ci[Key])),
+		                retired = List.Transform(config[retiredStatuses], (word) => fnNameKey(word, "")),
+		                columns = run[Columns],
+		                months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+		                screenDate = (iso as text) as text => if Text.Length(iso) < 10 then iso
+		                    else Text.From(Number.FromText(Text.Middle(iso, 8, 2))) & " " & months{Number.FromText(Text.Middle(iso, 5, 2)) - 1} & " " & Text.Start(iso, 4),
+		                // A person of the CI as the app keeps it (src/app/view/people.ts): only with a name or an email; the name, else the email.
+		                known = (person as nullable record) as nullable record => if person = null or (person[Name] = "" and person[Email] = "") then null
+		                    else person & [Name = if person[Name] <> "" then person[Name] else person[Email]],
+		                reachable = (person as nullable record) as logical => person <> null and person[Email] <> "" and person[Active] <> false,
+		                shown = (person as nullable record) as text => if person = null then "" else person[Name] & (if person[Active] = false then " (inactive)" else ""),
+		                idOf = (person as record) as text => let id = Text.Lower(Text.Trim(if person[UserId] <> "" then person[UserId] else person[Email]), "en-US") in
+		                    if id <> "" then id else Text.Lower(person[Name], "en-US"),
+		                fixOf = (status as text, mapped as nullable logical) as record =>
+		                    if mapped = true then [Change = "Operational status: copy the status of EPO into ServiceNow (service mapped)", Current = status, Set = "The status EPO shows"]
+		                    else if mapped = false then [Change = "Operational status: the sync did not bring the status of EPO. Raise an incident with the ServiceNow development team", Current = status, Set = "The status EPO shows, brought by the sync"]
+		                    else [Change = "Operational status: not the same as in EPO. Service mapped: copy the status of EPO. Not service mapped: raise an incident with the ServiceNow development team", Current = status, Set = "The status EPO shows"],
+		                factOf = (entry as record) as nullable record =>
+		                    let
+		                        item = entry[Item],
+		                        mark = entry[Mark],
+		                        review = entry[Review],
+		                        ci = Record.FieldOrDefault(cis, item[CiKey], null)
+		                    in
+		                        if not List.Contains(config[opensCase], mark[Result]) or date < review[ReportDate] or ci = null or List.Contains(retired, ci[StatusKey])
+		                            or ci[StatusKey] <> fnNameKey(item[Status], "") then null
+		                        else
+		                            let
+		                                owner = known(fnPerson(ci, "owned_by", columns)),
+		                                manager = known(fnPerson(ci, "managed_by", columns)),
+		                                supporter = known(fnPerson(ci, "supported_by", columns)),
+		                                contact = if reachable(owner) then [Person = owner, Via = "owned by"] else if reachable(manager) then [Person = manager, Via = "managed by"] else null,
+		                                cc = if contact <> null and contact[Via] = "owned by" and reachable(manager) and Text.Lower(manager[Email], "en-US") <> Text.Lower(contact[Person][Email], "en-US") then {manager[Email]} else {},
+		                                finding = fnFinding(pack, ci, "status",
+		                                    "Status in ServiceNow is " & ci[Status] & "; EPO does not show the same (lifecycle review of " & screenDate(review[Date]) & ", " & mark[ByName] & ")"
+		                                        & (if mark[Note] <> "" then ": " & mark[Note] else ""),
+		                                    if pack[playbook][path] = "sacm-fix" then [Fix = fixOf(ci[Status], ci[ServiceMapped])] else null)
+		                            in
+		                                finding & [
+		                                    ClassLabel = if ci[SourceClass] <> "" then ci[SourceClass] else ci[Class], Module = pack[dimension], Route = "", State = "open", StateWhy = "",
+		                                    EpoId = ci[AssetTag], Status = ci[Status], SupportGroup = ci[SupportGroup], OwnedBy = shown(owner), ManagedBy = shown(manager), SupportedBy = shown(supporter),
+		                                    Tags = {}, Contract = null,
+		                                    ContactName = if contact = null then "" else contact[Person][Name], ContactEmail = if contact = null then "" else contact[Person][Email],
+		                                    ContactId = if contact = null then "" else idOf(contact[Person]), ContactVia = if contact = null then "" else contact[Via], Cc = cc,
+		                                    EscalateName = "", EscalateEmail = "", EscalateVia = ""
+		                                ],
+		                facts = if date < from then {} else List.RemoveNulls(List.Transform(latest, factOf)),
+		                part = "LIFECYCLE-REVIEW:status"
+		            in
+		                if date < from then run & [Notes = run[Notes] & {notYet}]
+		                else run & [
+		                    Facts = List.Buffer(List.Select(run[Facts], (fact) => fact[CheckId] <> pack[id]) & facts),
+		                    Tested = if List.Contains(run[Tested], part) then run[Tested] else run[Tested] & {part},
+		                    Evaluated = List.Select(run[Evaluated], (entry) => entry[Part] <> part) & {[Part = part, Count = checked]}
+		                ]
+	queryGroup: Reading
+
 /// The events of the list SACM Journal (D291), as the app reads its journal (DATA-MODEL §3): one record per row, oldest first (by At, then by id), every field as text ("" when empty). By is lower case; Keys is the list of the finding keys of the event, one per line of the column Keys. Read by the tables Journal, JournalKeys and Activity, and by the parts CaseLines and Exceptions of the table Run.
 expression JournalEvents =
 		let
@@ -2829,7 +3052,9 @@ expression JournalEvents =
 		        Id = row[Title], At = row[At], By = Text.Lower(row[By], "en-US"), ByName = row[ByName], Type = row[Type],
 		        Keys = List.Select(List.Transform(Text.SplitAny(row[Keys], "#(cr)#(lf)"), Text.Trim), (key) => key <> ""),
 		        Text = row[Text], Ref = row[Ref], To = row[To], Cc = row[Cc], Subject = row[Subject], Kind = row[Kind], Channel = row[Channel],
-		        Person = row[Person], Reason = row[Reason], ReviewOn = row[ReviewOn], RetireOn = row[RetireOn], CheckId = row[CheckId], CiKey = row[CiKey], CiName = row[CiName]
+		        Person = row[Person], Reason = row[Reason], ReviewOn = row[ReviewOn], RetireOn = row[RetireOn], CheckId = row[CheckId], CiKey = row[CiKey], CiName = row[CiName],
+		        // The sample of a lifecycle review, on the row that starts it (build B8, D306; LifecycleReviews).
+		        Items = row[Items]
 		    ]),
 		    order = (a as record, b as record) as number => let first = Value.Compare(a[At], b[At]) in if first <> 0 then first else Value.Compare(a[Id], b[Id])
 		in
@@ -2842,6 +3067,39 @@ expression LevelColumns =
 		    names = List.Combine(List.Transform({"target", "inherited"}, (kind) => List.Transform(ReadingRules[dimensions], (dimension) => kind & "." & dimension)))
 		in
 		    Record.FromList(List.Transform(names, fnPascal), names)
+	queryGroup: Reading
+
+/// The lifecycle reviews of the journal (D306), as the HTML app reads its reviews and their marks (src/core/audit/lifecycle-review.ts, marksOf). New review adds one row of type review with no CI: Ref is the id of the review ("2026-11-12_lifecycle", the day it was started) and Items the sample, as the Power App SACM audit saved it (JSON: report, reportDate and the items with ciKey, name, classLabel, className, status, epoId and group). A start row without Items cannot be read and is left out. Two starts with one id (two managers on one day): the first counts. A mark is a row of type review with CiKey and Reason (same, different, not-in-epo) whose Ref is the review: the last mark of a CI counts (the journal is oldest first). Gives the reviews oldest first: [Id, Date, Report, ReportDate, Items, StartedBy, Marks], Marks a record by CI key of [Result, Note, By, ByName, At]. Read by the table Run.
+expression LifecycleReviews =
+		let
+		    textOf = (source as record, field as text) as text => let value = Record.FieldOrDefault(source, field, null) in if value = null then "" else Text.From(value),
+		    starts = List.Select(JournalEvents, (event) => event[Type] = "review" and event[CiKey] = "" and event[Ref] <> "" and event[Items] <> ""),
+		    parsed = List.Transform(starts, (event) =>
+		        let
+		            body = try Json.Document(event[Items]) otherwise null,
+		            items = if body is record then Record.FieldOrDefault(body, "items", null) else null
+		        in
+		            if not (items is list) then null
+		            else [
+		                Id = event[Ref], Date = Text.Start(event[Ref], 10), Report = textOf(body, "report"), ReportDate = Text.Start(textOf(body, "reportDate"), 10),
+		                Items = List.Buffer(List.Transform(List.Select(items, (entry) => entry is record and textOf(entry, "ciKey") <> ""), (entry) => [
+		                    CiKey = textOf(entry, "ciKey"), Name = textOf(entry, "name"), ClassLabel = textOf(entry, "classLabel"), ClassName = textOf(entry, "className"),
+		                    Status = textOf(entry, "status"), EpoId = textOf(entry, "epoId"), Group = if textOf(entry, "group") = "under-retirement" then "under-retirement" else "sample"])),
+		                StartedBy = if event[ByName] <> "" then event[ByName] else event[By]
+		            ]),
+		    byId = fnGroupBy(List.RemoveNulls(parsed), (review) => review[Id]),
+		    reviews = List.Sort(List.Transform(Record.FieldValues(byId), List.First), (a, b) => Comparer.Ordinal(a[Id], b[Id])),
+		    marks = List.Select(JournalEvents, (event) => event[Type] = "review" and event[CiKey] <> "" and event[Reason] <> ""),
+		    marksOf = fnGroupBy(marks, (event) => event[Ref]),
+		    withMarks = List.Transform(reviews, (review) =>
+		        let
+		            own = fnGroupBy(Record.FieldOrDefault(marksOf, review[Id], {}), (event) => event[CiKey]),
+		            last = List.Transform(Record.FieldValues(own), (events) => let event = List.Last(events) in
+		                [Result = event[Reason], Note = event[Text], By = event[By], ByName = if event[ByName] <> "" then event[ByName] else event[By], At = event[At]])
+		        in
+		            review & [Marks = Record.FromList(last, Record.FieldNames(own))])
+		in
+		    List.Buffer(withMarks)
 	queryGroup: Reading
 
 /// The reference files that decide how a finding is listed (fnListing), with their words in compared form, made once: reference/not-live-statuses (NotLive: null when missing) and the rules of reference/known-tags.
@@ -2929,14 +3187,15 @@ expression ReportSourceFiles =
 expression RolePrefixes = Record.FromList(List.Transform(ReadingRules[roles], fnPascal), ReadingRules[roles])
 	queryGroup: Reading
 
-/// The detectors of checks/packs that are built in Power Query. A check whose detector is not in this list is grey with the note "not built" (D15), so each build can port a part. Build B2: the rule checks and the CI code detectors. Build B3: the relationship checks, the EPO checks, the stages of a Business Process and the mapping backlog. Build B4: the contract checks.
+/// The detectors of checks/packs that are built in Power Query. A check whose detector is not in this list is grey with the note "not built" (D15), so each build can port a part. Build B2: the rule checks and the CI code detectors. Build B3: the relationship checks, the EPO checks, the stages of a Business Process and the mapping backlog. Build B4: the contract checks. Build B8: the lifecycle review, whose lines come from the journal (fnWithReviews, on the newest report only).
 expression BuiltDetectors =
 		{
 		    "rule", "ci/name-standard", "ci/epo-id", "ci/status-age", "criticality/above-parents", "criticality/none-reaches",
 		    "relationships/missing", "relationships/too-many", "relationships/wrong-type", "relationships/twice",
 		    "relationships/application-instance", "relationships/offering-owner", "relationships/offering-parent",
 		    "epo/differs", "epo/not-arrived", "process/stage", "mapping/backlog",
-		    "contracts/not-in-solusi", "contracts/to-clear", "contracts/status", "contracts/upload-check", "contracts/problems"
+		    "contracts/not-in-solusi", "contracts/to-clear", "contracts/status", "contracts/upload-check", "contracts/problems",
+		    "review/lifecycle"
 		}
 	queryGroup: Checks
 
@@ -3110,6 +3369,7 @@ expression fnCheckRun =
 		                    (if reference = null or not Value.Is(Record.FieldOrDefault(reference, "rules", null), type list) then skipped(ref)
 		                    else if not (model <> null and Value.Is(Record.FieldOrDefault(model, "expectations", null), type list)) then skipped("reference/relationship-model")
 		                    else fnDetectMappingBacklog(pack, run, inScope, reference, model))
+		                else if module = "review/lifecycle" then fnDetectReviewLifecycle(pack, run, inScope, reference)
 		                else if module = "ci/name-standard" then (if reference = null then skipped(ref) else fnDetectCiNameStandard(pack, run, inScope, reference))
 		                else if module = "ci/epo-id" then (if reference = null then skipped(ref) else fnDetectCiEpoId(pack, run, inScope, reference))
 		                else if module = "ci/status-age" then (if reference = null then skipped(ref) else fnDetectCiStatusAge(pack, run, inScope, reference))
@@ -3358,7 +3618,7 @@ expression fnDetectCiNameStandard =
 		        fnCombineOutputs(perRule)
 	queryGroup: Checks
 
-/// How long a CI sits in a status (code detector ci/status-age, src/core/checks/detectors/ci-detectors.ts): more than `days` days in the status of the rule (reference/lifecycle), counted from the day the record was created or last changed to the date of the report. Every CI of the scope is tested; only a CI in the status without a date is not.
+/// How long a CI sits in a status (code detector ci/status-age, src/core/checks/detectors/ci-detectors.ts): more than `days` days in the status of the rule (reference/lifecycle), counted from the day the record was created or last changed to the date of the report. Every CI of the scope is tested; only a CI in the status without a date is not. A rule with a setting (underRetirementDays, readyDays) takes its days from the team's settings (CaseRules, D158; build B8, D308), as withTeamDays of the HTML app does. The history keeps the days of the refresh that computed each day.
 expression fnDetectCiStatusAge =
 		(pack as record, run as record, inScope as list, reference as record) as record =>
 		    let
@@ -3367,8 +3627,11 @@ expression fnDetectCiStatusAge =
 		        wanted = Record.FieldOrDefault(pack[detector], "rules", null),
 		        rules = List.Select(Record.FieldOrDefault(reference, "rules", {}), (rule) => wanted = null or List.Contains(wanted, rule[id])),
 		        fixLine = Record.FieldOrDefault(pack, "playbook", [])[path] = "sacm-fix",
-		        perRule = List.Transform(rules, (rule) =>
+		        teamDays = [underRetirementDays = CaseRules[UnderRetirementDays], readyDays = CaseRules[ReadyDays]],
+		        perRule = List.Transform(rules, (given) =>
 		            let
+		                setting = Record.FieldOrDefault(given, "setting", ""),
+		                rule = if setting <> "" and Record.HasFields(teamDays, setting) then given & [days = Record.Field(teamDays, setting)] else given,
 		                column = if rule[from] = "created" then "createdOn" else "updatedOn",
 		                word = if rule[from] = "created" then "Created (sys_created_on)" else "Updated (sys_updated_on)",
 		                sinceOf = (ci as record) as nullable date => if rule[from] = "created" then ci[CreatedOn] else ci[UpdatedOn],
@@ -4179,6 +4442,12 @@ expression fnDetectRelationshipsWrongType =
 		            Findings = List.Buffer(findings), Tested = List.Transform(parts, (part) => pack[id] & ":" & part),
 		            Evaluated = List.Transform(parts, (part) => [Part = pack[id] & ":" & part, Count = count]), Notes = {}
 		        ]
+	queryGroup: Checks
+
+/// The lifecycle review (manual detector review/lifecycle, D192): it reads no report, so on a CI report alone it finds nothing and tests nothing. Its lines come from the managers' marks in the journal, added to the newest run only (fnWithReviews, build B8, D306); the history (HistoryRun) keeps the checks of the reports alone.
+expression fnDetectReviewLifecycle =
+		(pack as record, run as record, inScope as list, reference as nullable record) as record =>
+		    [Findings = {}, Tested = {}, Evaluated = {}, Notes = {}]
 	queryGroup: Checks
 
 /// The detector of the checks of type "rule" (src/core/checks/engine.ts, runChecks and test): the condition of the check file (detector.when) is tested on each CI of the scope, once per entry of detector.forEach ("{each}" in the condition). A part the report has no column for is not tested and says so (D15). Returns [Findings, Tested, Evaluated, Notes].
@@ -5204,7 +5473,7 @@ expression ReportFilesRows =
 		    Table.TransformColumnTypes(selected, {{"FileName", type text}, {"Kind", type text}, {"TypeLabel", type text}, {"Message", type text}})
 	queryGroup: Tables
 
-/// Table ReportTypes: one row per report type (src/core/sources/report-types.ts), with its newest file. The Reports page shows one line per type; the age and "old" are DAX, so they are right on any day (D14).
+/// Table ReportTypes: one row per report type (src/core/sources/report-types.ts), with its newest file. The Reports page shows one line per type; the age and "old" are DAX, so they are right on any day (D14). The rows read from the newest file are the measure Newest rows (the Rows of that file in ReportFiles): no file is opened here (build B8, D307).
 expression ReportTypesRows =
 		let
 		    types = ReadingRules[reportTypes],
@@ -5215,56 +5484,50 @@ expression ReportTypesRows =
 		            file = if Table.IsEmpty(newest) then null else newest{0}
 		        in
 		            {
-		                reportType[kind], reportType[label], reportType[hint], position + 1, Record.FieldOrDefault(reportType, "staleAfter", ReadingRules[staleDays]),
+		                reportType[kind], reportType[label], reportType[hint], position + 1, List.Max({CaseRules[StaleDays], Record.FieldOrDefault(reportType, "staleAfter", 0)}),
 		                Table.RowCount(Table.SelectRows(ReadFiles, each [Kind] = reportType[kind])),
 		                if file = null then null else file[FileName],
-		                if file = null then null else file[ReportDate],
-		                if file = null then null else Table.RowCount(fnReadKind(reportType[kind], file[Read]))
+		                if file = null then null else file[ReportDate]
 		            }
 		in
 		    #table(
 		        type table [Kind = text, Label = text, Hint = text, Order = Int64.Type, StaleAfter = Int64.Type, Files = Int64.Type,
-		            NewestFile = nullable text, NewestDate = nullable date, NewestRows = nullable Int64.Type],
+		            NewestFile = nullable text, NewestDate = nullable date],
 		        List.Transform(List.Positions(types), row))
 	queryGroup: Tables
 
-/// Table Reviews (D291): the marks of the lifecycle review in the list SACM Reviews (the tab Lifecycle of the Audit page, read-only until build B8): per review date and CI, what EPO says and the answer of the review.
-expression ReviewsRows =
-		let
-		    rows = Table.ToRecords(fnStateList("reviews")),
-		    words = [same = "Same in EPO", different = "Not the same as in EPO", #"not-in-epo" = "Not in EPO"],
-		    lines = List.Transform(rows, (row) => {
-		        if row[ReviewDate] = "" then null else Date.FromText(Text.Start(row[ReviewDate], 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
-		        row[CiKey], row[CiName], row[Class], row[StatusInEpo], row[Answer], Record.FieldOrDefault(words, row[Answer], row[Answer]), row[Note], row[By],
-		        if row[At] = "" then null else DateTime.FromText(row[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])})
-		in
-		    #table(type table [ReviewDate = date, CiKey = text, CiName = text, Class = text, StatusInEpo = text, Answer = text, AnswerLabel = text, Note = text, By = text, At = datetime], lines)
-	queryGroup: Tables
-
-/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of twelve parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add the journal of the team, D292; from build B7 Drafts, the messages ready to send, D300). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules).
+/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of thirteen parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add the journal of the team, D292; from build B7 Drafts, the messages ready to send, D300). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules). From build B8 the run also holds the lines of the lifecycle review (fnWithReviews, the journal's marks, D306), and the part ReviewLines the reviews and the sample of the next one. The Self-check compares the checks of the reports alone (the HTML app's recorded result has no journal), so it leaves the lines of the review out.
 expression RunRows =
 		let
-		    run = CheckRun,
+		    run = fnWithReviews(CheckRun),
 		    findings = Table.Buffer(fnFindingsPart(run)),
 		    tested = Table.Buffer(fnTestedPart(run)),
 		    cases = fnCases(run),
+		    review = "LIFECYCLE-REVIEW",
 		    parts = {
 		        {"Findings", findings}, {"Tested", tested}, {"Notes", fnNotesPart(run)}, {"Parked", fnParkedPart(run)},
 		        {"MappingBacklog", fnMappingBacklogPart(run, cases)}, {"RelationshipLinks", fnRelationshipLinksPart(run)},
-		        {"CapabilitySheet", fnCapabilitySheetPart(run)}, {"SelfCheck", fnSelfCheckPart(findings, tested)},
+		        {"CapabilitySheet", fnCapabilitySheetPart(run)},
+		        {"SelfCheck", fnSelfCheckPart(Table.SelectRows(findings, each [CheckId] <> review), Table.SelectRows(tested, each [CheckId] <> review))},
 		        {"CaseLines", fnCaseLinesPart(cases)}, {"RepliesToRead", fnRepliesToReadPart(cases)}, {"Exceptions", fnExceptionsPart(run)},
-		        {"Drafts", fnDraftsPart(cases)}
+		        {"Drafts", fnDraftsPart(cases)}, {"ReviewLines", fnReviewLinesPart(run, cases)}
 		    },
 		    // Each part with its columns named <Part>.<Column> and a column Part. The type of each column is the data type of the
-		    // calculated table that shows it (RunColumnTypes, generated), so Run and the calculated tables never differ.
+		    // calculated table that shows it (RunColumnTypes, generated), so Run and the calculated tables never differ. Each part
+		    // gets the types of its own columns before the parts are put together (build B8, D307): typing the combined table
+		    // would convert every cell of every part, most of them empty (37,000 rows by 300 columns at real size). The empty
+		    // frame first gives every column its type, also the columns of a part with no rows.
 		    prefixed = List.Transform(parts, (part) =>
 		        let
 		            name = part{0},
-		            rows = part{1}
+		            rows = part{1},
+		            renamed = Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})),
+		            present = Table.ColumnNames(renamed),
+		            own = List.Select(RunColumnTypes, (pair) => List.Contains(present, pair{0}))
 		        in
-		            Table.AddColumn(Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})), "Part", each name, type text)),
-		    combined = Table.Combine(prefixed),
-		    typed = Table.TransformColumnTypes(combined, RunColumnTypes),
+		            Table.AddColumn(Table.TransformColumnTypes(renamed, own), "Part", each name, type text)),
+		    frame = Table.TransformColumnTypes(#table(List.Transform(RunColumnTypes, (pair) => pair{0}), {}), RunColumnTypes),
+		    typed = Table.Combine({frame} & prefixed),
 		    withDate = Table.AddColumn(typed, "ReportDate", each if run = null then null else run[Date], type nullable date)
 		in
 		    Table.ReorderColumns(withDate, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(withDate), (column) => column <> "Part" and column <> "ReportDate"))
@@ -5274,16 +5537,26 @@ expression RunRows =
 expression ServiceNowContractsRows = fnNewestRows("contract")
 	queryGroup: Tables
 
-/// Table Settings (D291): the rows of the list SACM Settings, and the two numbers the cases use (CaseRules): a value that is not a whole number in its range is not used, so the page says which value counts.
+/// Table Settings (D291): the settings of the list SACM Settings, one row per setting (Key): the value of its last row, as the Settings screen of the Power App adds a row for each change (build B8, D308), and for the six numbers the value that counts (CaseRules): a value that is not a whole number in its range is not used, so the page says which value counts.
 expression SettingsRows =
 		let
-		    rows = Table.ToRecords(fnStateList("settings")),
-		    used = [reminderDays = CaseRules[ReminderDays], maxReminders = CaseRules[MaxReminders]],
-		    lines = List.Transform(rows, (row) => {row[Title], row[Value],
-		        if Record.HasFields(used, row[Title]) then Text.From(Record.Field(used, row[Title])) else row[Value],
-		        if Record.HasFields(used, row[Title]) and Text.Trim(row[Value]) <> Text.From(Record.Field(used, row[Title])) then
-		            "Not used: a whole number from " & Text.From(Record.Field(SettingRanges, row[Title])[min]) & " to " & Text.From(Record.Field(SettingRanges, row[Title])[max]) & ". The default counts."
-		        else ""})
+		    rows = List.Select(Table.ToRecords(fnStateList("settings")), (row) => Text.Trim(row[Title]) <> ""),
+		    keys = List.Distinct(List.Transform(rows, (row) => Text.Trim(row[Title]))),
+		    used = [
+		        reminderDays = CaseRules[ReminderDays], maxReminders = CaseRules[MaxReminders], staleDays = CaseRules[StaleDays],
+		        exceptionMonths = CaseRules[ExceptionMonths], underRetirementDays = CaseRules[UnderRetirementDays], readyDays = CaseRules[ReadyDays]
+		    ],
+		    lines = List.Transform(keys, (key) =>
+		        let
+		            row = List.Last(List.Select(rows, (candidate) => Text.Trim(candidate[Title]) = key)),
+		            number = Record.HasFields(used, key),
+		            counted = if number then Text.From(Record.Field(used, key)) else row[Value],
+		            range = if number then Record.Field(SettingRanges, key) else null
+		        in
+		            {key, row[Value], counted,
+		                if number and Text.Trim(row[Value]) <> counted then
+		                    "Not used: a whole number from " & Text.From(range[min]) & " to " & Text.From(range[max]) & ". The default counts."
+		                else ""})
 		in
 		    #table(type table [Key = text, Value = text, Used = text, Note = text], lines)
 	queryGroup: Tables

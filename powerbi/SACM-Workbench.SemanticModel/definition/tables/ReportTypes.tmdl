@@ -32,6 +32,12 @@ table ReportTypes
 			        IF ( ISBLANK ( newest ), "Missing", IF ( [Report age] > MAX ( ReportTypes[StaleAfter] ), "Old", "Up to date" ) )
 			    )
 
+	/// How many rows the reader read from the newest file of the type: the Rows of that file in ReportFiles, so the file is read once (build B8, D307).
+	measure 'Newest rows' =
+			VAR file = SELECTEDVALUE ( ReportTypes[NewestFile] )
+			RETURN IF ( NOT ISBLANK ( file ), LOOKUPVALUE ( ReportFiles[Rows], ReportFiles[FileName], file ) )
+		formatString: #,0
+
 	/// The text colour of the state (LOOK.md: red a problem, amber a warning, green OK).
 	measure 'Report state colour' = SWITCH ( [Report state], "Missing", "#b42318", "Old", "#7d5700", "Up to date", "#067647" )
 
@@ -75,11 +81,6 @@ table ReportTypes
 		formatString: d mmm yyyy
 		summarizeBy: none
 		sourceColumn: NewestDate
-
-	column NewestRows
-		dataType: int64
-		summarizeBy: none
-		sourceColumn: NewestRows
 
 	partition ReportTypes = m
 		mode: import

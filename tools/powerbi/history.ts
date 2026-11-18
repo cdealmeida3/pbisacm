@@ -27,11 +27,13 @@ import { repliesToRead, statusWord } from '../../src/app/view/cases.ts';
 import { cardWords, describeEvent } from '../../src/app/view/activity.ts';
 import type { Episode, VerificationRecord } from '../../src/core/audit/audit.ts';
 import { loadPacks, loadReferences } from '../../src/hosts/cli.ts';
-import { DEFAULT_SETTINGS, settingNumber } from '../../src/app/state/store.ts';
+import { DEFAULT_SETTINGS, NUMBER_RANGES, settingNumber } from '../../src/app/state/store.ts';
+import type { NumberSetting } from '../../src/app/state/store.ts';
 import { EARLIER, RECORD_DATE, SAMPLE_FILES } from '../../tests/sample-record.ts';
 import { caseActions, personOf } from './actions.ts';
 import { sampleMembers, shareOutOf } from './messages.ts';
 import { mappingConfig } from '../../src/core/mapping/backlog.ts';
+import { withSampleReviews } from './review.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const utf8 = new TextDecoder('utf-8');
@@ -50,16 +52,15 @@ export const HISTORY_FILES = [
 /* ------------------------------------------------------------------ the SharePoint lists (D291) */
 
 /**
- * The five lists of the team's state, with their columns (internal names) in the order of the sample files. The sample
+ * The four lists of the team's state (the lifecycle reviews are journal rows since build B8, D306), with their columns (internal names) in the order of the sample files. The sample
  * files of powerbi/samples/state/ have exactly these columns; Power Query reads the lists in SharePoint with the same
  * names (powerbi/README.md says how to make them).
  */
 export const STATE_LISTS = {
-  journal: { list: 'SACM Journal', file: 'journal.csv', columns: ['Title', 'At', 'By', 'ByName', 'Type', 'Keys', 'Text', 'Ref', 'To', 'Cc', 'Subject', 'Kind', 'Channel', 'Person', 'Reason', 'ReviewOn', 'RetireOn', 'CheckId', 'CiKey', 'CiName'] },
+  journal: { list: 'SACM Journal', file: 'journal.csv', columns: ['Title', 'At', 'By', 'ByName', 'Type', 'Keys', 'Text', 'Ref', 'To', 'Cc', 'Subject', 'Kind', 'Channel', 'Person', 'Reason', 'ReviewOn', 'RetireOn', 'CheckId', 'CiKey', 'CiName', 'Items'] },
   replies: { list: 'SACM Replies', file: 'replies.csv', columns: ['Title', 'From', 'Received', 'Subject', 'Body'] },
   settings: { list: 'SACM Settings', file: 'settings.csv', columns: ['Title', 'Value'] },
-  team: { list: 'SACM Team', file: 'team.csv', columns: ['Title', 'Email', 'Active'] },
-  reviews: { list: 'SACM Reviews', file: 'reviews.csv', columns: ['ReviewDate', 'CiKey', 'CiName', 'Class', 'StatusInEpo', 'Answer', 'Note', 'By', 'At'] }
+  team: { list: 'SACM Team', file: 'team.csv', columns: ['Title', 'Email', 'Active'] }
 } as const;
 export type StateList = keyof typeof STATE_LISTS;
 
@@ -91,8 +92,31 @@ export const replyOf = (row: Record<string, string>): Reply =>
 
 /** The rules of the cases from the list SACM Settings: a number outside its range (D158) is not used, the default is. */
 export function rulesOf(rows: Array<Record<string, string>>): Rules {
-  const value = (key: 'reminderDays' | 'maxReminders'): number => settingNumber(key, rows.find((row) => row.Title === key)?.Value ?? '') ?? DEFAULT_SETTINGS[key];
-  return { reminderDays: value('reminderDays'), maxReminders: value('maxReminders') };
+  const numbers = teamNumbers(rows);
+  return { reminderDays: numbers.reminderDays, maxReminders: numbers.maxReminders };
+}
+
+/**
+ * The six numbers of the team settings (CaseRules): the last row of each key counts, as the Settings screen of the Power
+ * App adds a row for each change (build B8, D308); a value outside its range (D158) is not used, the default is.
+ */
+export function teamNumbers(rows: Array<Record<string, string>>): Record<NumberSetting, number> {
+  const out = {} as Record<NumberSetting, number>;
+  for (const key of Object.keys(NUMBER_RANGES) as NumberSetting[]) {
+    const last = rows.filter((row) => (row.Title ?? '').trim() === key).pop();
+    out[key] = settingNumber(key, last?.Value ?? '') ?? DEFAULT_SETTINGS[key];
+  }
+  return out;
+}
+
+/** The rows of the table Settings: one per key, the value of its last row, and the value that counts for a number. */
+export function settingsRows(rows: Array<Record<string, string>>): Array<Record<string, string>> {
+  const numbers = teamNumbers(rows) as Record<string, number>;
+  const keys = Array.from(new Set(rows.map((row) => (row.Title ?? '').trim()).filter(Boolean)));
+  return keys.map((key) => {
+    const value = rows.filter((row) => (row.Title ?? '').trim() === key).pop()!.Value ?? '';
+    return { Key: key, Value: value, Used: key in numbers ? String(numbers[key]) : value };
+  });
 }
 
 export const sampleEvents = (): CaseEvent[] => stateRows('journal').map(journalEvent);
@@ -131,7 +155,11 @@ export async function earlierRun(): Promise<Run> {
 /* ------------------------------------------------------------------ what the report must show */
 
 export interface HistoryKey {
+  /** The runs of every report date, as the history (HistoryRun) has them: the checks of the reports alone. */
   runs: Run[];
+  /** The newest run with the lines of the lifecycle review of the sample journal (fnWithReviews, build B8). */
+  reviewed: Run;
+  /** The cases, from the earlier run and the reviewed newest run, as the table Run has them. */
   cases: Case[];
   /** The newest report against the one before it. */
   record: VerificationRecord;
@@ -145,9 +173,10 @@ export async function historyKey(): Promise<HistoryKey> {
   const newest = newestRun();
   const rules = sampleRules();
   const runs = [earlier, newest];
-  const cases = buildCases(runs, sampleEvents(), sampleReplies(), RECORD_DATE, rules);
+  const reviewed = withSampleReviews(newest, sampleEvents());
+  const cases = buildCases([earlier, reviewed], sampleEvents(), sampleReplies(), RECORD_DATE, rules);
   const record = verificationRecord(newest, earlier, loadPacks(), null);
-  return { runs, cases, record, lives: episodes(runs.map(slimRun)), rules };
+  return { runs, reviewed, cases, record, lives: episodes(runs.map(slimRun)), rules };
 }
 
 /**
@@ -173,7 +202,7 @@ const packOf = (id: string) => loadPacks().find((pack) => pack.id === id);
 
 /** The lines of the part CaseLines (fnCases): one per case, as buildCases gives it on the samples. */
 export function caseLines(key: HistoryKey): Array<Record<string, string | number | boolean>> {
-  const newest = key.runs[key.runs.length - 1]!;
+  const newest = key.reviewed;
   const latest = new Set(newest.facts.map((fact) => fact.key));
   const packs = loadPacks();
   const mapping = mappingConfig(loadReferences());
@@ -222,7 +251,7 @@ export function replyLines(key: HistoryKey): Array<Record<string, string | numbe
 
 /** The lines of the part Exceptions (the tab Not followed of the Audit page), numbered in their order. */
 export function exceptionRows(key: HistoryKey): Array<Record<string, string | number | boolean>> {
-  const facts = new Map(key.runs[key.runs.length - 1]!.facts.map((fact) => [fact.key, fact]));
+  const facts = new Map(key.reviewed.facts.map((fact) => [fact.key, fact]));
   const middle = (target: string): string => { const first = target.indexOf(':'); const last = target.lastIndexOf(':'); return first < 0 ? target : last > first ? target.slice(first + 1, last) : target.slice(first + 1); };
   // The part names a finding the newest report no longer shows by the CI of its key (the app: by its last fact).
   const known = new Map(Array.from(facts).map(([id, fact]) => [id, fact]));

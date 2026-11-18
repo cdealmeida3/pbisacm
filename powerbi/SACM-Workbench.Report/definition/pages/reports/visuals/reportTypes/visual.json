@@ -92,17 +92,17 @@
             },
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "ReportTypes"
                     }
                   },
-                  "Property": "NewestRows"
+                  "Property": "Newest rows"
                 }
               },
-              "queryRef": "ReportTypes.NewestRows",
-              "nativeQueryRef": "NewestRows",
+              "queryRef": "ReportTypes.Newest rows",
+              "nativeQueryRef": "Newest rows",
               "displayName": "Rows read"
             },
             {

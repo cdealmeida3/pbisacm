@@ -36,8 +36,10 @@ import { contractChanges, contractInformation } from '../../src/core/sources/con
 import { inList } from '../../src/core/sources/contracts/contract-reports.ts';
 import type { ContractConfig, SolusiContract } from '../../src/core/sources/contracts/contract-reports.ts';
 import { daysBetween, longDate } from '../../src/core/shared/dates.ts';
-import { activityRows, caseLines, checkedOf, exceptionRows, expectedHistory, HISTORY_FILES, historyKey, historyRows, replyLines, stateRows } from './history.ts';
+import { activityRows, caseLines, checkedOf, exceptionRows, expectedHistory, HISTORY_FILES, historyKey, historyRows, replyLines, settingsRows, stateRows } from './history.ts';
 import type { HistoryKey } from './history.ts';
+import { sampleEvents } from './history.ts';
+import { reviewLines, withSampleReviews } from './review.ts';
 import { draftRows, recordedChats, recordedDrafts, REF_TOKEN, SAMPLE_SENDER, SENDER_TOKEN } from './messages.ts';
 import type { DraftRow } from './messages.ts';
 
@@ -206,7 +208,9 @@ export async function parityProblems(folder: string): Promise<string[]> {
   if (foundSelf !== cards.map((card) => card.id).sort().join(' ')) problems.push(`SelfCheck: [${foundSelf}], expected the recorded cards [${cards.map((card) => card.id).sort().join(' ')}]`);
   // 7. The built checks give the recorded result of the HTML app (tests/recorded/run.json): every finding with all its
   // fields, what was tested and how many CIs, the notes, the parked lines; the self-check says so for each of them.
-  const run = JSON.parse(readFileSync(join(import.meta.dirname, '..', '..', 'tests', 'recorded', 'run.json'), 'utf8')) as Run;
+  // From build B8 the newest run also holds the lines of the lifecycle review of the sample journal (withReviewFacts, D306).
+  const recordedRun = JSON.parse(readFileSync(join(import.meta.dirname, '..', '..', 'tests', 'recorded', 'run.json'), 'utf8')) as Run;
+  const run = withSampleReviews(recordedRun, sampleEvents());
   const built = new Set(rows('Checks').filter((row) => row.Built === true).map((row) => norm(row.CheckId)));
   const checkIds = new Set(packs.map((pack) => pack.id));
   if (!built.size) problems.push('Checks: no check is built');
@@ -349,8 +353,11 @@ export async function parityProblems(folder: string): Promise<string[]> {
   const refs = new Set(journal.filter((row) => row.Type === 'message').map((row) => row.Ref));
   problems.push(...compare('Replies', withTimes(rows('Replies'), ['Received']), stateRows('replies').map((row) => ({ Ref: row.Title, Received: row.Received, Matched: refs.has(row.Title) })), 'Ref', ['Received', 'Matched']));
   problems.push(...compare('Team', rows('Team'), stateRows('team').map((row, at) => ({ Name: row.Title, Email: row.Email!.toLowerCase(), Active: !/^(no|false|0)$/i.test(row.Active!.trim()), SampleMe: at === 0 })), 'Name', ['Email', 'Active', 'SampleMe']));
-  problems.push(...compare('Settings', rows('Settings'), stateRows('settings').map((row) => ({ Key: row.Title, Used: String(key.rules[row.Title as keyof typeof key.rules] ?? row.Value) })), 'Key', ['Used']));
-  if (rows('Reviews').length !== stateRows('reviews').length) problems.push(`Reviews: ${rows('Reviews').length} rows, expected ${stateRows('reviews').length}`);
+  problems.push(...compare('Settings', rows('Settings'), settingsRows(stateRows('settings')), 'Key', ['Value', 'Used']));
+  // The lifecycle review (build B8, D306): every review of the journal with its marks and cases, then the next sample.
+  const review = reviewLines(key.reviewed, named(SAMPLE_FILES.ci, RECORD_DATE), sampleEvents(), key.cases, systemsById(epoSystems), RECORD_DATE);
+  problems.push(...compare('ReviewLines', rows('ReviewLines').map((row) => ({ ...row, Line: `${norm(row.Review)}|${norm(row.CiKey)}` })),
+    review.map((row) => ({ ...row, Line: `${row.Review}|${row.CiKey}` })), 'Line', Object.keys(review[0] ?? {}).filter((field) => field !== 'Review' && field !== 'CiKey')));
   const expected = (await expectedHistory()).map((item, at) => ({ Metric: item.metric, Expected: item.expected, Order: at + 1 }));
   problems.push(...compare('HistoryExpected', rows('HistoryExpected'), expected, 'Metric', ['Expected', 'Order']));
 
