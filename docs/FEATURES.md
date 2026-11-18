@@ -249,6 +249,6 @@ The Power BI version of the Workbench (D268) is in `powerbi/`. How to open it: [
 | **Contract changes** | The newest Solusi contract file against the one before it (D102, D288): the line of counts (new, no longer in the file, status changes, changed fields), then each change with the contract, the field, the value before and after. **To watch**: the Concluded contracts that end in the next 30 days and in the next 90 days, with the days left counted from today, and the running contracts without a daily responsible. For information only: nobody is asked, no case is opened. |
 | **Self-check** (hidden) | How many checks give the result the HTML app records for the invented samples ("38 of 39" in B4), and for each check what differs. |
 
-A refresh at the size of the real reports takes about 43 seconds on the test machine (version 0.40.0, D283), so the report is ready for the real reports.
+A refresh at the size of the real reports takes about 64 seconds on the test machine (version 0.41.0, with the contract files, D283), so the report is ready for the real reports.
 
 Every page ends with the version, the data (invented samples or SharePoint) and the time of the last refresh. In Sample mode "today" is the date of the samples, 11 Nov 2026.

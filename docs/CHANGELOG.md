@@ -8,7 +8,7 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 - A contract is a case of its own, as in the app (D287): the Card, Case and Person pages show it with its contract owner.
 - **Card page:** the lines by kind of problem, with the contract owner. For *For Procurement* the title says that the one email to the Procurement mailbox has one table per kind of problem (the email itself comes in build B7).
 - **New page *Contract changes*** (D288): the newest Solusi file against the one before it (new contracts, contracts no longer in the file, status changes, changed fields), the Concluded contracts that end in the next 30 and 90 days, counted from today, and the running contracts without a daily responsible. For information only: nobody is asked.
-- The time limit of D283 now also reads the contract files at real size (D289). TIME_LINE
+- The time limit of D283 now also reads the contract files at real size (D289). A refresh at the size of the real reports takes about 64 seconds on the test machine, under the limit of 2 minutes.
 - The HTML app works as before: no check, number or message changed.
 
 ## 0.40.0 — The Power BI report is fast enough for the real reports (speed build)
