@@ -166,12 +166,16 @@ const kept = new Set([...DAX_KEYWORDS, ...daxCatalog.functions.map((entry) => en
 for (const table of tables) {
   for (const measure of table.measures) {
     const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
+    const names = new Set<string>();
     for (const match of dax.matchAll(/\bVAR\s+([A-Za-z_][A-Za-z0-9_]*)/gi)) {
-      if (kept.has(match[1]!.toLowerCase())) problems.push(`DAX: measure ${table.name}[${measure.name}] has the variable ${match[1]}, a word DAX keeps (a function, a keyword or a table): Desktop drops the measure`);
+      const name = match[1]!.toLowerCase();
+      if (kept.has(name)) problems.push(`DAX: measure ${table.name}[${measure.name}] has the variable ${match[1]}, a word DAX keeps (a function, a keyword or a table): Desktop drops the measure`);
+      if (names.has(name)) problems.push(`DAX: measure ${table.name}[${measure.name}] names the variable ${match[1]} twice: Desktop drops the measure`);
+      names.add(name);
     }
   }
 }
-done.push(`DAX: no variable of a measure is one of the ${kept.size} words DAX keeps`);
+done.push(`DAX: no variable of a measure is one of the ${kept.size} words DAX keeps, and none is named twice in one measure`);
 
 /* 5. Generated */
 for (const problem of staleQueries()) problems.push(`Generated: ${problem} (npm run powerbi:generate)`);

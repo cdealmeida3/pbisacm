@@ -16,6 +16,8 @@ It is **not** an automation. A manager presses a button to load a report, to sen
 
 It is also a tool for SACM's own fixes: where nobody needs to be asked, a card becomes a fix list that SACM works through in ServiceNow.
 
+**Two versions.** The first version is one HTML file that the managers open from the team folder (`app/`). Since version 0.45.0 (build B8) it is **replaced by a Power BI report** (`powerbi/`, D268): it reads the reports from a SharePoint folder by a refresh, keeps the team's actions in SharePoint lists, and has Power Apps in the report for the buttons (send, note, assign, the lifecycle review, the settings). The HTML app still works and is the answer key of the report (D270): every pull request compares the report with it. It gets no new features. Where this page says "the app", the Power BI report does the same.
+
 ## 3. Who uses it
 
 | Who | How |

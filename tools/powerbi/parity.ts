@@ -439,7 +439,9 @@ export async function expectedSummary(copies: number, history = 0, built?: Set<s
     const at = (name: string, date = RECORD_DATE) => ({ path: join(folder, `${date}_${name}`), name });
     const out = await recordReports({ ci: at(SAMPLE_FILES.ci.name), relationship: at(SAMPLE_FILES.relationship.name), epo: at(SAMPLE_FILES.epo.name),
       solusi: at(SAMPLE_FILES.solusi.name), solusiEarlier: at(SAMPLE_FILES.solusiEarlier.name, EARLIER), contracts: at(SAMPLE_FILES.contracts.name) });
-    const run = JSON.parse(out['run.json']!) as Run & { capabilities?: string[][] };
+    // With the lines of the lifecycle review of the sample journal, as the table Run has them (fnWithReviews, D306).
+    const recorded = JSON.parse(out['run.json']!) as Run & { capabilities?: string[][] };
+    const run = { ...withSampleReviews(recorded, sampleEvents()), capabilities: recorded.capabilities };
     const isBuilt = (id: string): boolean => !built || built.has(id);
     const checkIds = new Set(loadPackFiles().map((file) => (file.pack as { id: string }).id));
     const lines: SummaryLine[] = [];

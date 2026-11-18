@@ -4,13 +4,13 @@ This folder is the Power BI version of the Workbench (decision D268). It is a **
 and the report are text files, so every change can be reviewed in a pull request. Power BI Desktop opens it like a
 `.pbix`.
 
-This is **build B6**, the start of stage 2. It reads the five kinds of report, runs the checks of every CI report date
-(38 of the 39 cards work, with the same result as the HTML app; *Lifecycle review* is a manual card), keeps the history
-with an incremental refresh, reads the team's journal, replies, settings, team and lifecycle reviews from five
-SharePoint lists, and works out the cases as the app does. It can be published for the team (section 4). New in B6: the
-Power App **SACM actions** inside the report adds notes, statuses, assignments, *fixed* and the other actions of a case
-to the list *SACM Journal*, and a flow refreshes the report after each action (section 6). Sending messages comes in
-build B7, the Settings screen in build B8. Why it is built this way: decisions D268 to D299 in
+This is **build B8**, the last build of the plan: the Power BI report now replaces the HTML app. It reads the five kinds
+of report, runs the checks of every CI report date (all 39 cards, with the same result as the HTML app), keeps the
+history with an incremental refresh, reads the team's journal, replies, settings and team from four SharePoint lists,
+and works out the cases as the app does. It can be published for the team (section 4). Three Power Apps sit in the
+report (section 6): **SACM actions** (notes, statuses, assignments, *fixed* and the other actions of a case),
+**SACM messages** (sending, reminders, escalations) and, new in B8, **SACM audit** (the lifecycle review and the
+Settings screen). How it looks comes in a later design pass. Why it is built this way: decisions D268 to D309 in
 [DECISIONS.md](../docs/DECISIONS.md).
 
 ## 1. Open it on your Windows PC
@@ -31,7 +31,7 @@ The report opens on the **My day** page. Look at:
 | **My work** | *Me* is Alex Example (in Sample mode the first active member of the team; in the workspace the person signed in). The 2 cases assigned to Alex. |
 | **Activity** | The 22 events of the sample journal, newest first, in the words of the app. **Day**, **Who** and **Type** filter them. |
 | **History** | To solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. **Card** filters one card. |
-| **Audit** | The verification record of the report date chosen, what was verified (2 findings solved on 11 November), the actions of the team, the 3 decisions to stop following (2 still run, 1 ended on 10 November), and the lifecycle review marks. **More options (...)**, **Export data** gives the Excel file. |
+| **Audit** | The verification record of the report date chosen. Then the export of a period (**Period of the export**): what was verified (2 findings solved on 11 November, with the days to verify), the actions of the team, the CI reports loaded, the findings per check and those new in the period, what was open at the end, and the exceptions (the 3 decisions to stop following: 2 still run, 1 ended on 10 November). Last, the lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The app *SACM audit* sits next to it (section 6.8). **More options (...)**, **Export data** on each table gives the Excel file. |
 | **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. Below: the runs, the classes and the files that could not be read (none for the samples). |
 | **Cards** | The three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. **Topic** at the top right filters the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
 | **Card** (drill through) | Right-click a row of the Cards page, choose **Drill through**, then **Card**. Who is asked about which CI and why (to solve), the lines to check, waiting or known, the SACM fix list (with **Open in ServiceNow**), the lines by kind of problem (for *For Procurement*: one email to the Procurement mailbox, one table per kind), and a table with the columns of the SACM template: its **More options (...)**, **Export data** gives the Excel file. A contract shows as `CT…: name`. |
@@ -39,7 +39,7 @@ The report opens on the **My day** page. Look at:
 | **Person** (drill through) | Right-click the person asked, **Drill through**, **Person**: everything open with them. |
 | **Mapping backlog** | One line per CI to map with its owner: why it is on the list, the stage of its class, the steps, its criticality and the next step ("Invite the owner to a mapping session", or why it waits). **Lines** filters To solve, To check, Waiting and Planned. Below: the **capability sheet** for Enterprise Architecture (its line says how many, or why it is empty: it needs the Relationship report), every Business Capability with what is above and below it (**Export data** gives the Excel file). For the samples: 4 CIs to map. The backlog has no drill through to the Case page: right-click the CI on the *Mapping backlog* card instead. The stage is the last one the journal sets for the CI (the Power App's *Mapping stage*), else the first stage of the class: in the samples one CI is at *Session held*. |
 | **Contract changes** | The newest Solusi contract file against the one before it: new contracts, contracts no longer in the file, status changes and changed fields. Then the Concluded contracts that end in the next 30 and in the next 90 days (counted from today), and the running contracts without a daily responsible. For information only: nobody is asked. The samples have two Solusi files, an earlier one and the newest, so the page compares them; 2 Concluded contracts end in the next 90 days (none in 30) and 1 has no daily responsible. |
-| **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples: **38 of 39**, the 38 checks that are built (*Lifecycle review* is a manual card until build B8). Below: the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up), each with the app's number and *OK*. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
+| **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples: **39 of 39**. Below: the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up), each with the app's number and *OK*. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
 
 At the foot of every page: the version, "invented samples" or "SharePoint", and when the data was refreshed.
 
@@ -149,20 +149,19 @@ there sees no *My work*.
 
 ## 5. Make the team's lists in SharePoint
 
-The report reads five lists of the team's site (D291). Make them once, with these names and columns. The column names
+The report reads four lists of the team's site (D291; build B8 dropped *SACM Reviews*, D306). Make them once, with these names and columns. The column names
 must be exactly these (the internal name counts: type the name when you make the column, do not rename it later). The
-report reads them; from build B6 the Power App adds rows to *SACM Journal* (section 6), and later builds write the
-others (D272). You can also add rows by hand to try it. A list that is not there gives no rows: the report still refreshes, and every case is *New*.
+report reads them; the Power Apps add rows to *SACM Journal* and *SACM Settings* (section 6), and the flow F3 to
+*SACM Replies*; nothing changes or removes a row (D272, D296). You can also add rows by hand to try it. A list that is not there gives no rows: the report still refreshes, and every case is *New*.
 
 In the site: **New → List → Blank list**, the name, then **Add column** for each column below. *Title* is there already.
 
 | List | Columns (type) | One row is |
 |---|---|---|
-| **SACM Journal** | Title (the event id), At (Date and time), By (Single line: the email), ByName, Type, Keys (Multiple lines: one finding key per line), Text (Multiple lines), Ref, To, Cc, Subject, Kind, Channel, Person, Reason, ReviewOn (Date), RetireOn (Date), CheckId, CiKey, CiName: all Single line of text unless said | One action of a manager: a message, a reminder, an escalation, a note, fixed, not followed up, assigned, … (the events of [DATA-MODEL.md](../docs/DATA-MODEL.md) §3) |
+| **SACM Journal** | Title (the event id), At (Date and time), By (Single line: the email), ByName, Type, Keys (Multiple lines: one finding key per line), Text (Multiple lines), Ref, To, Cc, Subject, Kind, Channel, Person, Reason, ReviewOn (Date), RetireOn (Date), CheckId, CiKey, CiName, Items (Multiple lines, plain text: the sample of a lifecycle review, build B8): all Single line of text unless said | One action of a manager: a message, a reminder, an escalation, a note, fixed, not followed up, assigned, the start of a lifecycle review and its marks, a change of the settings, … (the events of [DATA-MODEL.md](../docs/DATA-MODEL.md) §3). **Items**: if you made the list before B8, add this column |
 | **SACM Replies** | Title (the reference, `SACM-…`), From, Received (Date and time), Subject, Body (Multiple lines, plain text), ConversationId (for the flows of stage 2; not read yet) | One reply that came to the shared mailbox |
-| **SACM Settings** | Title (the setting, for example `reminderDays`), Value | One setting of the team. A number outside its range is not used, its default is. You may add column validation for the ranges. In B5 the report reads `reminderDays` and `maxReminders`; from B7 the messages read their settings too (section 6.7); the other settings keep their defaults until build B8 |
+| **SACM Settings** | Title (the setting, for example `reminderDays`), Value | One setting of the team. **The last row of a setting counts** (D308): the app *SACM audit* adds a row for each change, so the list keeps the history. A number outside its range is not used, its default is. The report reads the six numbers (section 6.8) and the settings of the messages (section 6.7) |
 | **SACM Team** | Title (the name), Email, Active (Yes/No) | One manager of the team |
-| **SACM Reviews** | ReviewDate (Date), CiKey, CiName, Class, StatusInEpo, Answer, Note, By, At (Date and time) | One mark of the lifecycle review |
 
 **By** is a text column with the email, not a Person column: a Person column comes to Power BI as a number, and the
 flows of stage 2 write the email. **Body** is plain text, so the first line of a reply reads well.
@@ -180,7 +179,8 @@ the app shows, under **Done lately**, what the team did on these lines (it reads
 
 The app never changes or removes a row (D272), never writes to ServiceNow, EPO or Solusi, and sends nothing. From build
 B7 a second app, **SACM messages**, sits on the page *Messages* and sends the messages, reminders and escalations
-(section 6.6). The Settings screen and the lifecycle marks come in build B8. Why it is built this way: D294 to D304.
+(section 6.6). From B8 a third app, **SACM audit**, sits on the page *Audit*: the lifecycle review and the Settings
+screen (section 6.8). Why it is built this way: D294 to D309.
 
 The source is in `powerbi/apps/`. You make the app and the flows **once, by hand**, in the company tenant, with the steps
 below: a Power Apps visual must create its own app inside the tenant (Microsoft's rule), so the repository cannot hold a
@@ -195,6 +195,9 @@ ready app.
 | `apps/sacm-messages/App-Formulas.fx` | **Generated.** The named formulas of the app *SACM messages* (section 6.6) |
 | `apps/sacm-messages/Src/MessagesScreen.pa.yaml` | The screen of the app *SACM messages* |
 | `apps/sacm-messages/Src/App.pa.yaml` | **Generated.** Its formulas, as Power Apps keeps them |
+| `apps/sacm-audit/App-Formulas.fx` | **Generated.** The named formulas of the app *SACM audit* (section 6.8) |
+| `apps/sacm-audit/Src/AuditScreen.pa.yaml` | The screen of the app *SACM audit* |
+| `apps/sacm-audit/Src/App.pa.yaml` | **Generated.** Its formulas, as Power Apps keeps them |
 | `apps/flows.json` | The six flows below, step by step. `npm run powerbi:lint` checks that they only refresh, wait, file, or send exactly what a manager pressed Send or Test on |
 
 What the app offers (the words are those of the HTML app; a check file can give its own):
@@ -241,8 +244,10 @@ The managers may **add** rows to *SACM Journal*, but not change or delete them: 
    groups of the site, but keep yourself (and the site owners) at **Full Control**.
 4. Still in **List settings → Versioning settings**: **Create a version each time you edit an item** on. A changed row
    then keeps its old version.
-5. The other lists (*SACM Replies*, *SACM Settings*, *SACM Team*, *SACM Reviews*) stay **Read** for the managers until
-   the builds that write them (B7, B8). Keep the managers' emails in *SACM Team* correct: the app finds *Me* by it.
+5. **SACM Settings**: the same as steps 3 and 4: stop inheriting, grant `SACM managers` the level **SACM add only**,
+   versioning on. The app *SACM audit* adds a row for each change; nobody needs to edit a row.
+6. The other lists (*SACM Replies*, *SACM Team*) stay **Read** for the managers. The flow F3 adds the replies with
+   your connection. Keep the managers' emails in *SACM Team* correct: the apps find *Me* by it.
 
 The app adds the row as the manager signed in: the list shows who (*Created by*), and the column *By* holds the same
 email.
@@ -328,7 +333,9 @@ not while you edit it. Publish the report first (section 4).
 3. In the visual's filters (**Filters on this visual**): drag the measure **CaseLines → For the app**, *Show items when
    the value* **is** `1`, **Apply filter**. The app then gets only the lines of the case shown.
 4. In the visual: **Create new**. Power Apps Studio opens with a new app that is bound to the report.
-5. In Studio, **Data → Add data → SharePoint** → the team's site → tick **SACM Journal** and **SACM Team** → Connect.
+5. In Studio, **Data → Add data → SharePoint** → the team's site → tick **SACM Journal**, **SACM Team** and **SACM
+   Settings** → Connect. (*SACM Settings* from build B8: the app reads the months of a decision to stop following
+   there. An app made before B8: add the list, then paste the new `App-Formulas.fx`.)
 6. **Power Automate** (the icon on the left) → **Add flow** → **SACMRefresh**.
 7. **Tree view → App**, property **Formulas**: select all, then paste the whole file `apps/sacm-actions/App-Formulas.fx`.
 8. Open `apps/sacm-actions/Src/ActionsScreen.pa.yaml` in Notepad, select all, copy. In Studio, **Tree view**, select
@@ -362,8 +369,10 @@ What to know:
 - **Hand over my work** hands over your open lines among the lines the app gets. Use it on the page **My work**: there
   the app gets all your open work.
 - **Assign** to *Nobody (free)* makes the lines free again.
-- A case the newest report no longer shows (solved, or not followed up) is not on these pages, so the app does not get
-  it. *Follow again* for it comes with the Audit page in build B8.
+- A case the newest report no longer shows (solved, or not followed up) is not on these pages. **Follow again** for it
+  is on the page **Audit** (build B8): copy the visual there too (Ctrl+V), at the right of the table *Exceptions*, and
+  change its filter from *For the app* to **CaseLines → Status** *is* `Not followed up`. Select a line of the table, or
+  none for all, pick **Follow again**, **Save**.
 
 ### 6.5 How many refreshes (spike S5)
 
@@ -443,6 +452,54 @@ app ([DATA-MODEL.md](../docs/DATA-MODEL.md) §3, the settings).
 | `team.<id>.name`, `team.<id>.people` | A team responsible for records (D195): its name, and its people as `Name <address>; Name <address>` |
 
 The real links and addresses go into the list only, never into the repository.
+
+### 6.8 The app SACM audit: the lifecycle review and the Settings (build B8)
+
+The app **SACM audit** sits on the page **Audit**, at the right of the lifecycle reviews. It has two tabs.
+
+**Lifecycle review** (D306, the review of D192):
+
+- **New review** draws the sample from the newest CI report and adds one row to *SACM Journal* (type *review*, the
+  CIs in the column *Items*). The draw is the same for the same report: the table shows it under *The next review (not
+  started)* before you press. One review a day.
+- Tick CIs of the newest review, pick **Same in EPO**, **Not the same** or **Not in EPO**, add a note (what EPO says),
+  **Save the mark**. One journal row per CI; the last mark of a CI counts. *Not the same* opens a case on the card
+  *Lifecycle review*.
+- **Mark N same in EPO** marks at once the CIs whose status the EPO systems report shows the same, with the note "Same
+  status in the EPO systems report of …".
+- The table *Lifecycle* of the page has every review, newest first, with the evidence columns of the HTML app (group,
+  EPO status, result, note, who checked and when, the case, its first message, reminders and escalation).
+  **Export data** gives the file for the auditors.
+
+**Settings** (D308): the six numbers of the team, each with its range and default. Change a number and press **Save
+the settings**: one row per changed number goes to *SACM Settings*, and one row to the journal says what changed. A
+number outside its range cannot be saved.
+
+| Setting | Range | Default | What it does |
+|---|---|---|---|
+| Working days before a reminder is due (`reminderDays`) | 1 to 30 | 3 | When a reminder is due |
+| Reminders before Escalate (`maxReminders`) | 0 to 10 | 2 | When a case goes to the escalation |
+| Days before a report counts as old (`staleDays`) | 1 to 60 | 3 | *Old* on the Reports page |
+| Months until "Not followed up" is reviewed (`exceptionMonths`) | 1 to 36 | 6 | The review date of a decision to stop following |
+| Days before Under retirement is too long (`underRetirementDays`) | 1 to 730 | 90 | The card *Under retirement too long* |
+| Days before Ready is too long (`readyDays`) | 1 to 730 | 90 | The card *Ready too long* |
+
+Make it once, as the app of section 6.4:
+
+1. In the report (the service, **Edit**), page **Audit**: **Visualizations → Power Apps**, at the right of the table
+   *Lifecycle*. Add these fields of **ReviewLines**, each **Don't summarize**: *Review*, *IsNext*, *IsCurrent*,
+   *ReviewDate*, *Report*, *ReportDate*, *Group*, *CiKey*, *CiName*, *ClassLabel*, *ClassName*, *EpoId*, *Status*,
+   *EpoStatus*, *Agrees*, *Result*, *ResultLabel*, *EpoDate*, *Order*.
+2. **Create new**. In Studio: **Data → Add data → SharePoint** → **SACM Journal**, **SACM Team** and **SACM Settings**.
+   **Power Automate → Add flow** → **SACMRefresh**.
+3. **App → Formulas**: paste `apps/sacm-audit/App-Formulas.fx`. Paste `apps/sacm-audit/Src/AuditScreen.pa.yaml` on
+   *Screen1* (Ctrl+V), delete *Screen1*, **App → StartScreen** `AuditScreen`.
+4. **Settings → General → Data row limit** `2000`. **Save as** `SACM audit`, **Publish**, **Share** with `SACM managers`.
+   Save the report.
+
+How to try it: press **New review**. After the refresh (about a minute) the table shows the review of today. Tick one
+CI, pick *Same in EPO*, **Save the mark**. On the tab **Settings**, change the reminder days to 4 and save: after the
+refresh the page *My day* counts the reminders with 4 days.
 
 ## 7. What was assumed (questions still open)
 

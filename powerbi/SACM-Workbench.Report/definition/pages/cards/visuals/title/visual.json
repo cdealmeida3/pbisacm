@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "One line per check, in its section. Red: to solve. Blue: to check first. Green: OK. Grey: not tested, and the note says why. Right-click a line and choose Drill through to open the card.",
+                    "value": "One line per check. Red: to solve. Blue: to check. Green: OK. Grey: not tested. Right-click a line, Drill through, to open it.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10pt",

@@ -26,21 +26,34 @@ function Show-Screen([string]$Why) {
 $desktop = "C:\Program Files\Microsoft Power BI Desktop\bin\PBIDesktop.exe"
 if (-not (Test-Path $desktop)) {
   $setup = Join-Path $env:RUNNER_TEMP "PBIDesktopSetup_x64.exe"
+  $ProgressPreference = "SilentlyContinue"
+  Write-Output "$(Get-Date -Format HH:mm:ss) Downloading the installer"
   Invoke-WebRequest -Uri "https://download.microsoft.com/download/8/8/0/880BCA75-79DD-466A-927D-1ABF1F5454B0/PBIDesktopSetup_x64.exe" -OutFile $setup
-  $install = Start-Process -FilePath $setup -ArgumentList "-quiet", "-norestart", "ACCEPT_EULA=1" -Wait -PassThru
-  Write-Output "Installer: exit $($install.ExitCode)"
+  Write-Output "$(Get-Date -Format HH:mm:ss) Installer: $([math]::Round((Get-Item $setup).Length / 1MB)) MB, $((Get-Item $setup).VersionInfo.ProductVersion)"
+  $log = Join-Path $Out "install.log"
+  $install = Start-Process -FilePath $setup -ArgumentList "-q", "-norestart", "ACCEPT_EULA=1", "-log", "`"$log`"" -PassThru
+  if (-not $install.WaitForExit(15 * 60 * 1000)) {
+    Show-Screen "the installer still runs after 15 minutes"
+    if (Test-Path $log) { Get-Content $log -Tail 40 }
+    throw "The installer of Power BI Desktop did not end in 15 minutes"
+  }
+  Write-Output "$(Get-Date -Format HH:mm:ss) Installer: exit $($install.ExitCode)"
+  if ($install.ExitCode -ne 0 -and (Test-Path $log)) { Get-Content $log -Tail 40 }
 }
 if (-not (Test-Path $desktop)) { throw "Power BI Desktop is not installed" }
 Write-Output "Power BI Desktop $((Get-Item $desktop).VersionInfo.ProductVersion)"
 
 # 2. Open the project, as a double click on the .pbip does; wait for the port of its engine.
 $project = (Resolve-Path "powerbi/SACM-Workbench.pbip").Path
+Write-Output "$(Get-Date -Format HH:mm:ss) Opening $project"
 Start-Process -FilePath $desktop -ArgumentList "`"$project`""
 $workspaces = Join-Path $env:LOCALAPPDATA "Microsoft\Power BI Desktop\AnalysisServicesWorkspaces"
 $port = $null
 $deadline = (Get-Date).AddMinutes(8)
+$shown = $false
 while ((Get-Date) -lt $deadline -and -not $port) {
   Start-Sleep -Seconds 10
+  if (-not $shown -and (Get-Date) -gt $deadline.AddMinutes(-5)) { Show-Screen "no engine after 3 minutes"; $shown = $true }
   $file = Get-ChildItem $workspaces -Recurse -Filter msmdsrv.port.txt -ErrorAction SilentlyContinue | Select-Object -First 1
   if ($file) { $port = (Get-Content $file.FullName -Encoding Unicode -Raw).Trim() }
 }

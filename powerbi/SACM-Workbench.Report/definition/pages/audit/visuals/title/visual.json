@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Record: per report date and check, what was tested, found, new and verified (D250). Export: the verified findings and the actions of a period. Not followed: every decision to stop following. Lifecycle: the marks of the review (read-only until build B8).",
+                    "value": "The record per report date and check, the export of a period, what is not followed, the lifecycle review.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10pt",

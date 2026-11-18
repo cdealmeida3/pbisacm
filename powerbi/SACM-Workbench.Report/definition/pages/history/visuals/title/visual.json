@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The findings of every CI report date, kept for 24 months: the trend per card, new and solved, the days to fix, per support group and per class.",
+                    "value": "The findings of every CI report date, for 24 months: the trend, new and solved, days to fix, per group and class.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10pt",
