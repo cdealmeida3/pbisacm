@@ -83,7 +83,7 @@ test('a custom visual, too many visuals, a visual over the place of a Power App,
   assert.ok(pageProblems(page(many, { height: 720 }), catalogue).some((line) => /13 visuals/.test(line)));
   assert.ok(pageProblems(page(many), catalogue).some((line) => /not a native visual/.test(line)));
   const messages: ReportPages = { order: ['messages'], pages: [{ page: { name: 'messages', displayName: 'Messages', width: 1280, height: 720, displayOption: 'FitToPage' }, visuals: [table('wide', { x: 224, y: 84, width: 1032, height: 300 }, [200, 200])] }] };
-  assert.ok(pageProblems(messages, catalogue).some((line) => /over the place of the Power Apps visual Messages/.test(line)));
+  assert.ok(pageProblems(messages, catalogue).some((line) => /over the place of the Power Apps visual SACM messages/.test(line)));
   const card: ReportPages = { order: ['backlog', 'card'], pages: [page([]).pages[0]!, { page: { name: 'card', displayName: 'Card', width: 1280, height: 720, displayOption: 'FitToPage', pageBinding: { type: 'Drillthrough' } }, visuals: [] }] };
   assert.ok(pageProblems(card, catalogue).some((line) => /hidden from the team's tabs/.test(line)));
 });

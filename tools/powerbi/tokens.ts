@@ -73,13 +73,13 @@ export const GRID = {
  * files keep these rectangles free. The lint fails when a visual of the file is over one.
  */
 export const APP_SLOTS: Record<string, { app: string; x: number; y: number; width: number; height: number }> = {
-  mywork: { app: 'Copy actions', x: 956, y: 84, width: 300, height: 620 },
-  messages: { app: 'Messages', x: 956, y: 84, width: 300, height: 620 },
-  auditfollow: { app: 'Audit', x: 956, y: 84, width: 300, height: 620 },
-  auditreview: { app: 'Audit', x: 224, y: 480, width: 1032, height: 224 },
-  card: { app: 'Copy actions', x: 956, y: 84, width: 300, height: 300 },
-  person: { app: 'Copy actions', x: 956, y: 84, width: 300, height: 368 },
-  case: { app: 'Case', x: 956, y: 516, width: 300, height: 420 }
+  mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 },
+  messages: { app: 'SACM messages', x: 956, y: 84, width: 300, height: 620 },
+  auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 },
+  auditreview: { app: 'SACM audit', x: 956, y: 84, width: 300, height: 620 },
+  card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 300 },
+  person: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 368 },
+  case: { app: 'SACM actions', x: 956, y: 516, width: 300, height: 420 }
 };
 
 /** The space a table's column needs beside its header text (the padding of the cell and the sort arrow), in px. */

@@ -137,8 +137,8 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
       if (x < 0 || y < 0 || x + width > page.width || y + height > page.height) problems.push(`${at}: outside the page`);
       if (!RAIL_VISUAL.test(visual.name)) {
         const frame = GRID.content;
-        if (x < frame.left || x + width > frame.right || y + height > page.height - (GRID.height - frame.bottom)) {
-          problems.push(`${at}: outside the content frame (x ${frame.left} to ${frame.right}, down to ${page.height - (GRID.height - frame.bottom)})`);
+        if (x < frame.left || x + width > frame.right || y < frame.top || y + height > page.height - (GRID.height - frame.bottom)) {
+          problems.push(`${at}: outside the content frame (x ${frame.left} to ${frame.right}, y ${frame.top} down to ${page.height - (GRID.height - frame.bottom)})`);
         }
         if (slot && overlap(visual.position, slot)) problems.push(`${at}: over the place of the Power Apps visual ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} × ${slot.height})`);
       }

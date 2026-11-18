@@ -31,17 +31,23 @@ The report opens on the **My day** page. Look at:
 | **My work** | *Me* is Alex Example (in Sample mode the first active member of the team; in the workspace the person signed in). The 2 cases assigned to Alex. |
 | **Activity** | The 22 events of the sample journal, newest first, in the words of the app. **Day**, **Who** and **Type** filter them. |
 | **History** | To solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. **Card** filters one card. |
-| **Audit** | The verification record of the report date chosen. Then the export of a period (**Period of the export**): what was verified (2 findings solved on 11 November, with the days to verify), the actions of the team, the CI reports loaded, the findings per check and those new in the period, what was open at the end, and the exceptions (the 3 decisions to stop following: 2 still run, 1 ended on 10 November). Last, the lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The app *SACM audit* sits next to it (section 6.8). **More options (...)**, **Export data** on each table gives the Excel file. |
+| **Audit** | The verification record of the report date chosen (**Report date** at the top right). |
+| **Audit export** | The export of a period (**Period of the export**): what was verified (2 findings solved on 11 November, with the days to verify), the actions of the team, the CI reports loaded, the findings per check and those new in the period, and what was open at the end. **More options (...)**, **Export data** on each table gives the Excel file. |
+| **Not followed** | The exceptions (the 3 decisions to stop following: 2 still run, 1 ended on 10 November) and the cases not followed up. The app *SACM actions* sits at the right for **Follow again** (section 6.4). |
+| **Lifecycle review** | The lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The marks, then the evidence (who checked, the case, when it was asked); the app *SACM audit* sits at the right (section 6.8). |
 | **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. Below: the runs, the classes and the files that could not be read (none for the samples). |
 | **Cards** | The three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. **Topic** at the top right filters the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
-| **Card** (drill through) | Right-click a row of the Cards page, choose **Drill through**, then **Card**. Who is asked about which CI and why (to solve), the lines to check, waiting or known, the SACM fix list (with **Open in ServiceNow**), the lines by kind of problem (for *For Procurement*: one email to the Procurement mailbox, one table per kind), and a table with the columns of the SACM template: its **More options (...)**, **Export data** gives the Excel file. A contract shows as `CT…: name`. |
+| **Card** (drill through) | Right-click a row of the Cards page, choose **Drill through**, then **Card**. The counts at the top right (to solve, to check, waiting, known), then one table of every line of the card with its state and why, the SACM fix list (with **Open in ServiceNow**), the lines by kind of problem (for *For Procurement*: one email to the Procurement mailbox, one table per kind), and a table with the columns of the SACM template: its **More options (...)**, **Export data** gives the Excel file. A contract shows as `CT…: name`. |
 | **Case** (drill through) | Right-click a CI on the Card page, **Drill through**, **Case**: each problem of the CI, its state, who is asked, who is copied and who gets an escalation, the chip *changed in EPO*, and *What EPO already has* when EPO already holds the person asked for (then nobody needs to be asked). Below: **Relationships**, every CI above and below it, its class, status and type, and whether the line counts for the checks. |
 | **Person** (drill through) | Right-click the person asked, **Drill through**, **Person**: everything open with them. |
 | **Mapping backlog** | One line per CI to map with its owner: why it is on the list, the stage of its class, the steps, its criticality and the next step ("Invite the owner to a mapping session", or why it waits). **Lines** filters To solve, To check, Waiting and Planned. Below: the **capability sheet** for Enterprise Architecture (its line says how many, or why it is empty: it needs the Relationship report), every Business Capability with what is above and below it (**Export data** gives the Excel file). For the samples: 4 CIs to map. The backlog has no drill through to the Case page: right-click the CI on the *Mapping backlog* card instead. The stage is the last one the journal sets for the CI (the Power App's *Mapping stage*), else the first stage of the class: in the samples one CI is at *Session held*. |
 | **Contract changes** | The newest Solusi contract file against the one before it: new contracts, contracts no longer in the file, status changes and changed fields. Then the Concluded contracts that end in the next 30 and in the next 90 days (counted from today), and the running contracts without a daily responsible. For information only: nobody is asked. The samples have two Solusi files, an earlier one and the newest, so the page compares them; 2 Concluded contracts end in the next 90 days (none in 30) and 1 has no daily responsible. |
 | **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples: **39 of 39**. Below: the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up), each with the app's number and *OK*. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
 
-At the foot of every page: the version, "invented samples" or "SharePoint", and when the data was refreshed.
+Every page has the navy band at the left; at its foot the version, "invented samples" or "SharePoint", and when the
+data was refreshed. Under the title of every table and chart, a grey line says how many lines it shows, or why it shows
+none ("No reply to read: a reply to a message of the team shows here."): a box is never empty without a word. Every page is
+1280 × 720 and fits the window; *Case* is longer (1440) and scrolls.
 
 In Sample mode "today" is **11 November 2026**, the date of the samples, so the ages on the Reports page and the
 reminders due never change.
@@ -325,7 +331,9 @@ In F1, the step may show *Failed* for that reason; you can ignore it when the ne
 Make it in the **Power BI service** (app.powerbi.com): Desktop gives Power Apps Studio data only when the app is made,
 not while you edit it. Publish the report first (section 4).
 
-1. Open the report, **Edit**. Go to the page **Case**. **Visualizations → Power Apps**. Place it on the right.
+1. Open the report, **Edit**. Go to the page **Case**. **Visualizations → Power Apps**. Place it on the right, beside
+   *People* and *Relationships*: **Format → General → Properties → Size and position**: X `956`, Y `516`, width `300`,
+   height `420`. (Each page keeps a free place for its app; the table at the end of this section lists them all.)
 2. With the visual selected, add these fields of **CaseLines** to **Power Apps data**, in this order: *Key*, *CheckId*,
    *CiName*, *Status*, *AssignedTo*, *Person*, *Actions*, *Stages*, *StageId*, *ExceptionReason*, *RetireOn*,
    *ContactName*, *ShareTo* (from build B7: an app made in B6 gets it when you add the field and edit the app from the
@@ -347,8 +355,9 @@ not while you edit it. Publish the report first (section 4).
     number. Then **File → Save as** `SACM actions`, and **Publish**. **Share** it with the group `SACM managers`. Each manager agrees
     to the SharePoint connection the first time they open it.
 11. Back in the report: the visual shows the app. **Save** the report.
-12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **My work** (Ctrl+V). It keeps the same app. On
-    *My work* change the filter of the visual to **CaseLines → My CIs** *is not blank*, so it gets your open lines.
+12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **My work** (Ctrl+V). It keeps the same app. Set
+    its size and position as in the table below. On *My work* change the filter of the visual to **CaseLines → My CIs**
+    *is not blank*, so it gets your open lines.
 13. In Desktop, to keep the visual in the repository: download the report (**File → Download this file → A copy of
     your report**), open it, **File → Save as** the `.pbip` over your copy of `powerbi/`, and send the changed files of
     `SACM-Workbench.Report/` (the commit must not hold a `.pbix`).
@@ -370,9 +379,24 @@ What to know:
   the app gets all your open work.
 - **Assign** to *Nobody (free)* makes the lines free again.
 - A case the newest report no longer shows (solved, or not followed up) is not on these pages. **Follow again** for it
-  is on the page **Audit** (build B8), section *Not followed*: copy the visual there too (Ctrl+V), at the right of the
-  table *Cases not followed up*, and change its filter from *For the app* to **CaseLines → Status** *is* `Not followed
+  is on the page **Not followed**: copy the visual there too (Ctrl+V), at the right of the table *Cases not followed
+  up*, and change its filter from *For the app* to **CaseLines → Status** *is* `Not followed
   up`. Select lines of that table (the app then gets only those), pick **Follow again**, **Save**.
+
+**Where each app goes.** The pages keep these places free (the lint of the report refuses a visual over them). Set
+them in **Format → General → Properties → Size and position**:
+
+| Page | App | X | Y | Width | Height |
+|---|---|---|---|---|---|
+| Case | SACM actions | 956 | 516 | 300 | 420 |
+| Card | SACM actions | 956 | 84 | 300 | 300 |
+| Person | SACM actions | 956 | 84 | 300 | 368 |
+| My work | SACM actions | 956 | 84 | 300 | 620 |
+| Not followed | SACM actions (Follow again) | 956 | 84 | 300 | 620 |
+| Messages | SACM messages | 956 | 84 | 300 | 620 |
+| Lifecycle review | SACM audit | 956 | 84 | 300 | 620 |
+
+An app placed before build D1 (0.46.0) keeps its old place: move it to the place above.
 
 ### 6.5 How many refreshes (spike S5)
 
@@ -398,7 +422,7 @@ refreshes an hour. A refresh takes about a minute at the real size (D283).
 
 The page **Messages** lists every message ready to send (the table *Drafts*): first messages, reminders that are due and
 escalations, one per person across the cards (D300). The words are those of the HTML app, and the check of every pull
-request compares them with it. The app **SACM messages** sits at the right of the page:
+request compares them with it. The app **SACM messages** sits at the right of the page (X 956, Y 84, 300 × 620):
 
 - The list shows each message: what kind, who gets it, how many CIs, and who has the cases. Press one to open it.
 - **To**, **Cc** and the subject can be changed. The message is shown as it goes, with its reference and your name.
@@ -455,7 +479,7 @@ The real links and addresses go into the list only, never into the repository.
 
 ### 6.8 The app SACM audit: the lifecycle review and the Settings (build B8)
 
-The app **SACM audit** sits on the page **Audit**, at the right of the lifecycle reviews. It has two tabs.
+The app **SACM audit** sits on the page **Lifecycle review**, at the right of the tables of the reviews. It has two tabs.
 
 **Lifecycle review** (D306, the review of D192):
 
@@ -486,8 +510,8 @@ number outside its range cannot be saved.
 
 Make it once, as the app of section 6.4:
 
-1. In the report (the service, **Edit**), page **Audit**: **Visualizations → Power Apps**, at the right of the table
-   *Lifecycle*. Add these fields of **ReviewLines**, each **Don't summarize**: *Review*, *IsNext*, *IsCurrent*,
+1. In the report (the service, **Edit**), page **Lifecycle review**: **Visualizations → Power Apps**, at the right of the
+   tables (X 956, Y 84, 300 × 620). Add these fields of **ReviewLines**, each **Don't summarize**: *Review*, *IsNext*, *IsCurrent*,
    *ReviewDate*, *Report*, *ReportDate*, *Group*, *CiKey*, *CiName*, *ClassLabel*, *ClassName*, *EpoId*, *Status*,
    *EpoStatus*, *Agrees*, *Result*, *ResultLabel*, *EpoDate*, *Order*.
 2. **Create new**. In Studio: **Data → Add data → SharePoint** → **SACM Journal**, **SACM Team** and **SACM Settings**.
