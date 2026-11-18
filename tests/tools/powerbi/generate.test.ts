@@ -49,6 +49,8 @@ test('every table reads from its own query <Table>Rows or is a part of Run, and 
       assert.deepEqual(table.calculated!.columns, table.columns.map((column) => [column.name, `${table.name}.${column.name}`]));
       continue;
     }
+    // HistoryRun names RangeStart and RangeEnd itself: Power BI Desktop refuses its refresh policy otherwise (D290).
+    if (table.name === 'HistoryRun') { assert.equal(table.partitionM, 'fnHistoryRun(RangeStart, RangeEnd)'); continue; }
     assert.equal(table.partitionM, `${table.name}Rows`, table.name);
     assert.ok(names.has(table.partitionM), `${table.partitionM} is not in expressions.tmdl`);
     assert.ok(table.columns.length > 0, `${table.name} has no column`);

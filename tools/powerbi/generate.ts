@@ -330,7 +330,9 @@ const SOURCE_TEXT: Record<SourceTable, { about: string; rows: string; after: str
   Run: { about: 'The checks on the newest CI report, computed once per refresh', rows: 'RunRows', after: [] },
   HistoryRun: {
     about: 'The checks on every CI report date, kept by the incremental refresh (D290): 24 months, the last 7 days looked at, a day computed again only when its files changed',
-    rows: 'HistoryRunRows',
+    // Power BI Desktop refuses a refresh policy whose source does not name RangeStart and RangeEnd itself (a query that
+    // names them is not enough), so the partition and the policy call fnHistoryRun directly.
+    rows: 'fnHistoryRun(RangeStart, RangeEnd)',
     // Incremental refresh (Premium Per User): monthly parts for 24 months, daily parts for the last 7 days; a daily part is
     // computed again only when fnHistoryPolling gives another value (detect data changes).
     after: [
@@ -341,7 +343,7 @@ const SOURCE_TEXT: Record<SourceTable, { about: string; rows: string; after: str
       '\t\tincrementalGranularity: day',
       '\t\tincrementalPeriods: 7',
       '\t\tpollingExpression = fnHistoryPolling(RangeStart, RangeEnd)',
-      '\t\tsourceExpression = HistoryRunRows',
+      '\t\tsourceExpression = fnHistoryRun(RangeStart, RangeEnd)',
       ''
     ]
   }
@@ -350,7 +352,7 @@ const SOURCE_TEXT: Record<SourceTable, { about: string; rows: string; after: str
 /**
  * A hidden table the calculated tables split (D284, D290): a column Part, the report date, and for each calculated table
  * of that source every column it takes (<Part>.<Column>), with the data type of the calculated table's column. Generated
- * from the calculated tables, so the two never differ. Its rows come from the query RunRows or HistoryRunRows.
+ * from the calculated tables, so the two never differ. Its rows come from the query RunRows, or from fnHistoryRun(RangeStart, RangeEnd).
  */
 export function runTmdl(source: SourceTable = 'Run'): string {
   const calculated = readTables().filter((table) => table.calculated?.source === source);
