@@ -58,11 +58,17 @@ table ContractChanges
 		displayFolder: Page notes
 
 	/// Under the title of the contracts that end in 30 days.
-	measure 'Ending 30 note' = IF ( COUNTROWS ( ContractChanges ) + 0 = 0, "None ends in the next 30 days.", "Concluded, with an end date." )
+	measure 'Ending 30 note' =
+			VAR n = COUNTROWS ( FILTER ( ContractChanges, NOT ISBLANK ( [Ends in 30 days] ) ) ) + 0
+			RETURN
+			    IF ( n = 0, "No Concluded contract ends in the next 30 days.", FORMAT ( n, "#,0" ) & IF ( n = 1, " Concluded contract ends", " Concluded contracts end" ) & " in the next 30 days, the soonest first." )
 		displayFolder: Page notes
 
 	/// Under the title of the contracts that end in 90 days.
-	measure 'Ending 90 note' = IF ( COUNTROWS ( ContractChanges ) + 0 = 0, "None ends in the next 90 days.", "Concluded, with an end date." )
+	measure 'Ending 90 note' =
+			VAR n = COUNTROWS ( FILTER ( ContractChanges, NOT ISBLANK ( [Ends in 90 days] ) ) ) + 0
+			RETURN
+			    IF ( n = 0, "No Concluded contract ends in the next 90 days.", FORMAT ( n, "#,0" ) & IF ( n = 1, " Concluded contract ends", " Concluded contracts end" ) & " in the next 90 days, the soonest first." )
 		displayFolder: Page notes
 
 	/// Under the title of the running contracts with no daily responsible.
