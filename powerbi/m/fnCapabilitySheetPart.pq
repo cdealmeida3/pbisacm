@@ -1,4 +1,4 @@
-// Table CapabilitySheet (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report
+// The part CapabilitySheet of the table Run (D284), which the DAX table CapabilitySheet shows (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report
 // with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and
 // hidden characters, sorted by name. For the talks with Enterprise Architecture and Process Management: the table's
 // Export data gives the file. Empty without a Relationship report (the page says so).

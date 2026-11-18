@@ -144,7 +144,8 @@ foreach ($name in $kinds.Keys) {
   $value = $times["$name|$largest"]
   if ($kinds[$name] -eq "table" -and $null -ne $value) {
     if ($value -lt 0) { $total = [double]::PositiveInfinity } else { $total += $value }
-    if ($value -gt $TableBudget -or $value -lt 0) { $problems.Add("$name at $largest copies: over the budget of $TableBudget s for one table") }
+    # A failed or stopped probe already has its own line (above); here only a table that took too long.
+    if ($value -gt $TableBudget) { $problems.Add("$name at $largest copies: over the budget of $TableBudget s for one table") }
   }
 }
 Write-Both ""

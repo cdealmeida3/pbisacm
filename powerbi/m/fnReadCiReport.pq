@@ -10,7 +10,7 @@
         specs = List.Buffer(ReadingRules[ciColumns]),
         names = List.Buffer(List.Transform(specs, (spec) => spec[column])),
         nameSpec = List.First(List.Select(specs, (spec) => spec[column] = "Name")),
-        nameAt = fnColumnIndex(read[Headers], nameSpec[any]),
+        nameAt = fnColumnIndex(read[Headers], nameSpec[any], Record.FieldOrDefault(nameSpec, "suffix", false)),
         sourceColumns = Table.ColumnNames(read[Rows]),
         count = Table.RowCount(read[Rows]),
         rawNames = List.Buffer(if nameAt < 0 or nameAt >= List.Count(sourceColumns) then List.Repeat({""}, count) else Table.Column(read[Rows], sourceColumns{nameAt})),
@@ -64,7 +64,7 @@
             if Record.Field(sameName, base) > 1 and tag <> "" then base & "|" & Text.Lower(tag, "en-US") else base)),
         sameKey1 = fnCountBy(key1s),
         // Only a Key1 that several CIs share gets a number: the place of the CI among them, in report order.
-        sharing = List.Select(rows, (row) => Record.Field(sameKey1, key1s{row}) > 1),
+        sharing = List.Buffer(List.Select(rows, (row) => Record.Field(sameKey1, key1s{row}) > 1)),
         groups = Table.Group(Table.FromColumns({List.Transform(sharing, (row) => key1s{row}), sharing}, {"Key1", "Row"}), {"Key1"}, {{"Rows", each _[Row]}}),
         nthOf = Record.Combine({[]} & List.Transform(groups[Rows],
             (group) => Record.FromList(List.Numbers(1, List.Count(group)), List.Transform(List.Sort(group), Text.From)))),

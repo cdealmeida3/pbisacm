@@ -31,7 +31,7 @@
             let own = fnHiddenCharacters(row[Name]), tags = if row[Tags] = "" then {} else Text.Split(row[Tags], ", "), status = fnNameKey(row[Status], ""), name = fnNameKey(row[Name], "") in
             row & [
                 TagList = tags,
-                TagKeys = List.Transform(tags, (tag) => fnNameKey(tag, "")),
+                TagKeys = List.Buffer(List.Transform(tags, (tag) => fnNameKey(tag, ""))),
                 OwnHidden = own,
                 HiddenCharacters = if not List.IsEmpty(own) then own else Record.FieldOrDefault(known, row[Key], {}),
                 CreatedBy = if createdBy then row[CreatedBy] else null,

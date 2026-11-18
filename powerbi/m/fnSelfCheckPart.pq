@@ -20,8 +20,8 @@
             let
                 id = card[id],
                 isBuilt = List.Contains(built, id),
-                found = List.Transform(states, (state) => keysOf(id, state)),
-                want = List.Transform(states, (state) => strip(Record.Field(card, state))),
+                found = List.Buffer(List.Transform(states, (state) => List.Buffer(keysOf(id, state)))),
+                want = List.Buffer(List.Transform(states, (state) => List.Buffer(strip(Record.Field(card, state))))),
                 isTested = List.Contains(tested, id),
                 shown = if not List.IsEmpty(found{0}) then "open" else "review",
                 cis = List.Count(List.Distinct(List.Transform(of(id, shown), (finding) => finding[CiKey]))),

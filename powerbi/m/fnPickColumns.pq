@@ -4,7 +4,7 @@
 // Column by column (one Text.Trim per cell, no list per row).
 (sheet as record, specs as list) as record =>
     let
-        positions = List.Transform(specs, (spec) => fnColumnIndex(sheet[Headers], spec[any], Record.FieldOrDefault(spec, "suffix", false))),
+        positions = List.Buffer(List.Transform(specs, (spec) => fnColumnIndex(sheet[Headers], spec[any], Record.FieldOrDefault(spec, "suffix", false)))),
         names = List.Transform(specs, (spec) => spec[column]),
         rows = sheet[Rows],
         sourceColumns = Table.ColumnNames(rows),

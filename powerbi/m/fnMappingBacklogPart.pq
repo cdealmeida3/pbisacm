@@ -1,4 +1,4 @@
-// Table MappingBacklog (src/app/view/backlog.ts, D200 to D204): one line per CI to map, from the findings of the
+// The part MappingBacklog of the table Run (D284), which the DAX table MappingBacklog shows (src/app/view/backlog.ts, D200 to D204): one line per CI to map, from the findings of the
 // mapping backlog: its owner (Owned by, else who is asked), why it is on the list, its stage and the steps of its class
 // (reference/mapping-backlog), the criticality lines of the same CI, and whether it can be marked "The process does not
 // exist". Until the team's journal is read (build B5) every case is at the first stage of its class. Order: to solve
@@ -13,7 +13,7 @@
         packs = List.Buffer(List.Transform(Json.Document(CheckFiles), (file) => file[pack])),
         labelOf = (id as text) as text => let pack = List.First(List.Select(packs, (candidate) => candidate[id] = id), null) in
             if pack = null then id else Record.FieldOrDefault(pack, "cardLabel", id),
-        mappingChecks = List.Transform(List.Select(packs, (pack) => Record.FieldOrDefault(pack[detector], "module", "") = "mapping/backlog"), (pack) => pack[id]),
+        mappingChecks = List.Buffer(List.Transform(List.Select(packs, (pack) => Record.FieldOrDefault(pack[detector], "module", "") = "mapping/backlog"), (pack) => pack[id])),
         critical = Record.FieldOrDefault(config, "criticality", {}),
         // The criticality lines by CI, grouped once (not looked for again for each line).
         criticalByCi = fnGroupBy(List.Select(facts, (fact) => List.Contains(critical, fact[CheckId])), (fact) => fact[CiKey]),

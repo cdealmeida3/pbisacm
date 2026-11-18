@@ -197,7 +197,7 @@ expression fnCanonicalClass =
 		        if List.IsEmpty(found) then Text.Combine(List.Select(Text.SplitAny(text, " #(tab)#(cr)#(lf)"), each _ <> ""), "_") else found{0}
 	queryGroup: Reading
 
-/// Table CapabilitySheet (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and hidden characters, sorted by name. For the talks with Enterprise Architecture and Process Management: the table's Export data gives the file. Empty without a Relationship report (the page says so). `run` is CheckRun (null when no CI report is loaded).
+/// The part CapabilitySheet of the table Run (D284), which the DAX table CapabilitySheet shows (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and hidden characters, sorted by name. For the talks with Enterprise Architecture and Process Management: the table's Export data gives the file. Empty without a Relationship report (the page says so). `run` is CheckRun (null when no CI report is loaded).
 expression fnCapabilitySheetPart =
 		(run as nullable record) as table =>
 		    let
@@ -562,7 +562,7 @@ expression fnLevelWords = (value as number) as text => Record.FieldOrDefault(Rea
 expression fnLongDate = (value as date) as text => Date.ToText(value, [Format = "d MMMM yyyy", Culture = "en-US"])
 	queryGroup: Reading
 
-/// Table MappingBacklog (src/app/view/backlog.ts, D200 to D204): one line per CI to map, from the findings of the mapping backlog: its owner (Owned by, else who is asked), why it is on the list, its stage and the steps of its class (reference/mapping-backlog), the criticality lines of the same CI, and whether it can be marked "The process does not exist". Until the team's journal is read (build B5) every case is at the first stage of its class. Order: to solve first, then by name (by stage too from build B5, when a case can be past its first stage). `run` is CheckRun (null when no CI report is loaded).
+/// The part MappingBacklog of the table Run (D284), which the DAX table MappingBacklog shows (src/app/view/backlog.ts, D200 to D204): one line per CI to map, from the findings of the mapping backlog: its owner (Owned by, else who is asked), why it is on the list, its stage and the steps of its class (reference/mapping-backlog), the criticality lines of the same CI, and whether it can be marked "The process does not exist". Until the team's journal is read (build B5) every case is at the first stage of its class. Order: to solve first, then by name (by stage too from build B5, when a case can be past its first stage). `run` is CheckRun (null when no CI report is loaded).
 expression fnMappingBacklogPart =
 		(run as nullable record) as table =>
 		    let
@@ -573,7 +573,7 @@ expression fnMappingBacklogPart =
 		        packs = List.Buffer(List.Transform(Json.Document(CheckFiles), (file) => file[pack])),
 		        labelOf = (id as text) as text => let pack = List.First(List.Select(packs, (candidate) => candidate[id] = id), null) in
 		            if pack = null then id else Record.FieldOrDefault(pack, "cardLabel", id),
-		        mappingChecks = List.Transform(List.Select(packs, (pack) => Record.FieldOrDefault(pack[detector], "module", "") = "mapping/backlog"), (pack) => pack[id]),
+		        mappingChecks = List.Buffer(List.Transform(List.Select(packs, (pack) => Record.FieldOrDefault(pack[detector], "module", "") = "mapping/backlog"), (pack) => pack[id])),
 		        critical = Record.FieldOrDefault(config, "criticality", {}),
 		        // The criticality lines by CI, grouped once (not looked for again for each line).
 		        criticalByCi = fnGroupBy(List.Select(facts, (fact) => List.Contains(critical, fact[CheckId])), (fact) => fact[CiKey]),
@@ -794,7 +794,7 @@ expression fnPersonWords =
 expression fnPickColumns =
 		(sheet as record, specs as list) as record =>
 		    let
-		        positions = List.Transform(specs, (spec) => fnColumnIndex(sheet[Headers], spec[any], Record.FieldOrDefault(spec, "suffix", false))),
+		        positions = List.Buffer(List.Transform(specs, (spec) => fnColumnIndex(sheet[Headers], spec[any], Record.FieldOrDefault(spec, "suffix", false)))),
 		        names = List.Transform(specs, (spec) => spec[column]),
 		        rows = sheet[Rows],
 		        sourceColumns = Table.ColumnNames(rows),
@@ -914,7 +914,7 @@ expression fnReadCiReport =
 		        specs = List.Buffer(ReadingRules[ciColumns]),
 		        names = List.Buffer(List.Transform(specs, (spec) => spec[column])),
 		        nameSpec = List.First(List.Select(specs, (spec) => spec[column] = "Name")),
-		        nameAt = fnColumnIndex(read[Headers], nameSpec[any]),
+		        nameAt = fnColumnIndex(read[Headers], nameSpec[any], Record.FieldOrDefault(nameSpec, "suffix", false)),
 		        sourceColumns = Table.ColumnNames(read[Rows]),
 		        count = Table.RowCount(read[Rows]),
 		        rawNames = List.Buffer(if nameAt < 0 or nameAt >= List.Count(sourceColumns) then List.Repeat({""}, count) else Table.Column(read[Rows], sourceColumns{nameAt})),
@@ -968,7 +968,7 @@ expression fnReadCiReport =
 		            if Record.Field(sameName, base) > 1 and tag <> "" then base & "|" & Text.Lower(tag, "en-US") else base)),
 		        sameKey1 = fnCountBy(key1s),
 		        // Only a Key1 that several CIs share gets a number: the place of the CI among them, in report order.
-		        sharing = List.Select(rows, (row) => Record.Field(sameKey1, key1s{row}) > 1),
+		        sharing = List.Buffer(List.Select(rows, (row) => Record.Field(sameKey1, key1s{row}) > 1)),
 		        groups = Table.Group(Table.FromColumns({List.Transform(sharing, (row) => key1s{row}), sharing}, {"Key1", "Row"}), {"Key1"}, {{"Rows", each _[Row]}}),
 		        nthOf = Record.Combine({[]} & List.Transform(groups[Rows],
 		            (group) => Record.FromList(List.Numbers(1, List.Count(group)), List.Transform(List.Sort(group), Text.From)))),
@@ -1294,8 +1294,8 @@ expression fnSelfCheckPart =
 		            let
 		                id = card[id],
 		                isBuilt = List.Contains(built, id),
-		                found = List.Transform(states, (state) => keysOf(id, state)),
-		                want = List.Transform(states, (state) => strip(Record.Field(card, state))),
+		                found = List.Buffer(List.Transform(states, (state) => List.Buffer(keysOf(id, state)))),
+		                want = List.Buffer(List.Transform(states, (state) => List.Buffer(strip(Record.Field(card, state))))),
 		                isTested = List.Contains(tested, id),
 		                shown = if not List.IsEmpty(found{0}) then "open" else "review",
 		                cis = List.Count(List.Distinct(List.Transform(of(id, shown), (finding) => finding[CiKey]))),
@@ -1576,7 +1576,7 @@ expression fnCheckRun =
 		            let own = fnHiddenCharacters(row[Name]), tags = if row[Tags] = "" then {} else Text.Split(row[Tags], ", "), status = fnNameKey(row[Status], ""), name = fnNameKey(row[Name], "") in
 		            row & [
 		                TagList = tags,
-		                TagKeys = List.Transform(tags, (tag) => fnNameKey(tag, "")),
+		                TagKeys = List.Buffer(List.Transform(tags, (tag) => fnNameKey(tag, ""))),
 		                OwnHidden = own,
 		                HiddenCharacters = if not List.IsEmpty(own) then own else Record.FieldOrDefault(known, row[Key], {}),
 		                CreatedBy = if createdBy then row[CreatedBy] else null,
