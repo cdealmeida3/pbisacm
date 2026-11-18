@@ -20,17 +20,24 @@
                     let fact = members{0}[Fact], openOnes = List.Select(members, (item) => not item[Closed]) in
                     [Key = fact[CheckId] & "|" & fact[Route] & "|" & contactOf(fact), Open = openOnes, Size = List.Count(List.Distinct(List.Transform(openOnes, (item) => item[CiKey])))]),
                 free = List.Select(keyed, (group) => not List.IsEmpty(group[Open]) and List.AllTrue(List.Transform(group[Open], (item) => item[AssignedTo] = ""))),
-                ordered = List.Sort(free, (a, b) => let bySize = Value.Compare(b[Size], a[Size]) in if bySize <> 0 then bySize else compare(a[Key], b[Key])),
-                // Each group to the member with the least so far: [Load = CIs per member, Pairs = {key, name} of the cases].
-                given = List.Accumulate(ordered, [Load = List.Repeat({0}, List.Count(members)), Pairs = {}], (done, group) =>
-                    let
-                        least = List.Min(done[Load]),
-                        best = List.PositionOf(done[Load], least),
-                        name = members{best}
-                    in
-                        [Load = List.ReplaceRange(done[Load], best, 1, {done[Load]{best} + group[Size]}), Pairs = done[Pairs] & List.Transform(group[Open], (item) => {item[Key], name})])
+                ordered = List.Buffer(List.Sort(free, (a, b) => let bySize = Value.Compare(b[Size], a[Size]) in if bySize <> 0 then bySize else compare(a[Key], b[Key]))),
+                count = List.Count(ordered),
+                // Each group to the member with the least so far: one step per group, carrying the CIs of each member
+                // (Load) and giving the name (no list grows step by step, which is slow in M).
+                names = if count = 0 then {} else List.Buffer(List.Skip(List.Generate(
+                    () => [At = -1, Load = List.Repeat({0}, List.Count(members)), Name = ""],
+                    (step) => step[At] < count,
+                    (step) =>
+                        let
+                            at = step[At] + 1,
+                            load = step[Load],
+                            best = List.PositionOf(load, List.Min(load))
+                        in
+                            if at >= count then [At = at, Load = load, Name = ""]
+                            else [At = at, Load = List.Buffer(List.ReplaceRange(load, best, 1, {load{best} + ordered{at}[Size]})), Name = members{best}],
+                    (step) => step[Name])))
             in
-                given[Pairs],
+                List.Combine(List.Transform(List.Positions(ordered), (at) => List.Transform(ordered{at}[Open], (item) => {item[Key], names{at}}))),
         pairs = if List.Count(members) < 2 then {} else List.Combine(List.Transform(Record.FieldValues(byCard), card))
     in
         Record.FromList(List.Transform(pairs, (pair) => pair{1}), List.Transform(pairs, (pair) => pair{0}))

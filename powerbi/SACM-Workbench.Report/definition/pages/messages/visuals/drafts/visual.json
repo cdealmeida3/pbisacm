@@ -1,0 +1,196 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "drafts",
+  "position": {
+    "x": 24,
+    "y": 124,
+    "z": 2000,
+    "height": 544,
+    "width": 760,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "DraftId"
+                }
+              },
+              "queryRef": "Drafts.DraftId",
+              "nativeQueryRef": "DraftId",
+              "displayName": "Draft"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "KindLabel"
+                }
+              },
+              "queryRef": "Drafts.KindLabel",
+              "nativeQueryRef": "KindLabel",
+              "displayName": "Kind"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "ToName"
+                }
+              },
+              "queryRef": "Drafts.ToName",
+              "nativeQueryRef": "ToName",
+              "displayName": "To"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "CiCount"
+                }
+              },
+              "queryRef": "Drafts.CiCount",
+              "nativeQueryRef": "CiCount",
+              "displayName": "CIs"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "Draft who"
+                }
+              },
+              "queryRef": "Drafts.Draft who",
+              "nativeQueryRef": "Draft who",
+              "displayName": "Who has it"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "Subject"
+                }
+              },
+              "queryRef": "Drafts.Subject",
+              "nativeQueryRef": "Subject",
+              "displayName": "Subject"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Drafts"
+                  }
+                },
+                "Property": "DraftId"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Messages ready to send'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Messages ready to send'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

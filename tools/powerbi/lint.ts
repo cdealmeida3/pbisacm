@@ -260,10 +260,10 @@ if (process.argv.includes('--no-dotnet')) {
       if (!validate(file.json)) for (const error of (validate.errors ?? []).slice(0, 5)) problems.push(`App: ${where}: ${error.instancePath || '/'} ${error.message}`);
     }
     problems.push(...callProblems(read.formulas.filter((formula) => formula.file !== schema!.file)));
-    done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the app only adds journal rows and runs only the refresh flow`);
+    done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the apps only add journal rows and run only the flows of flows.json`);
   }
 }
-done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait or file');
+done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait, file, or send what a manager pressed');
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);

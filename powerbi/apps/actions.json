@@ -1,5 +1,5 @@
 {
-  "note": "The actions of the Power App SACM actions (build B6, D294). One entry per action: what it is called, the journal event it adds to the list SACM Journal (type and fixed text; DATA-MODEL §3) and what the manager types or picks (asks). scope 'line': the model gives the action to each case it applies to (the column Actions of CaseLines, fnCaseActions); the app offers it when every selected line has it. scope 'mine': on the open lines assigned to the manager. scope 'person': when every selected line is about one person. The app only adds rows, never changes or removes one (D272). The words of the buttons are those of the HTML app; a check file can give its own (playbook askAfterReview, askWhenUnsure, markWord).",
+  "note": "The actions of the Power App SACM actions (build B6, D294). One entry per action: what it is called, the journal event it adds to the list SACM Journal (type and fixed text; DATA-MODEL §3) and what the manager types or picks (asks). scope 'line': the model gives the action to each case it applies to (the column Actions of CaseLines, fnCaseActions); the app offers it when every selected line has it. scope 'mine': on the open lines assigned to the manager. scope 'person': when every selected line is about one person. scope 'card': share out (D24, build B7): the free groups of a card go to the active members of SACM Team, each line to the member of its column ShareTo, worked out at the refresh. The app only adds rows, never changes or removes one (D272). The words of the buttons are those of the HTML app; a check file can give its own (playbook askAfterReview, askWhenUnsure, markWord).",
   "actions": [
     { "id": "note", "label": "Note", "type": "note", "scope": "line", "asks": ["text"] },
     { "id": "status", "label": "Status", "type": "status", "scope": "line", "asks": ["status"] },
@@ -16,6 +16,7 @@
     { "id": "no-process", "label": "The process does not exist", "type": "no-process", "scope": "line", "text": "yes", "asks": [] },
     { "id": "no-process-undo", "label": "Undo: the process does not exist", "type": "no-process", "scope": "line", "text": "no", "asks": [] },
     { "id": "handover", "label": "Hand over my work", "type": "handover", "scope": "mine", "asks": ["member", "text"] },
-    { "id": "person-note", "label": "Note about the person", "type": "person-note", "scope": "person", "asks": ["text"] }
+    { "id": "person-note", "label": "Note about the person", "type": "person-note", "scope": "person", "asks": ["text"] },
+    { "id": "share-out", "label": "Share out", "type": "assign", "scope": "card", "asks": [] }
   ]
 }

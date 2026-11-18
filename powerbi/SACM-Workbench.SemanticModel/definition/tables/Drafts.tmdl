@@ -17,6 +17,22 @@ table Drafts
 	measure 'Escalations ready' = CALCULATE ( COUNTROWS ( Drafts ), Drafts[Kind] = "escalation" ) + 0
 		formatString: #,0
 
+	/// The line at the top of the page Messages: how many messages are ready, of each kind.
+	measure 'Messages line' =
+			VAR n = [Messages ready]
+			VAR first = [Emails ready]
+			VAR reminders = [Reminders ready]
+			VAR escalations = [Escalations ready]
+			RETURN
+				IF (
+					n = 0,
+					"No message is ready to send. After the next report, or when a reminder is due, it is listed here.",
+					n & IF ( n = 1, " message", " messages" ) & " ready to send: "
+						& first & IF ( first = 1, " first message, ", " first messages, " )
+						& reminders & IF ( reminders = 1, " reminder and ", " reminders and " )
+						& escalations & IF ( escalations = 1, " escalation.", " escalations." )
+				)
+
 	/// On a line of the page Messages: Mine when the cases of the draft are assigned to me, Free when nobody has them.
 	measure 'Draft who' =
 			VAR me = [Me]

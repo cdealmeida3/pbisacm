@@ -25,8 +25,11 @@ export interface AppAction {
   label: string;
   /** The type of the journal event it adds (DATA-MODEL §3). */
   type: string;
-  /** line: the model gives it to each case it applies to; mine: the open lines assigned to the manager; person: one person. */
-  scope: 'line' | 'mine' | 'person';
+  /**
+   * line: the model gives it to each case it applies to; mine: the open lines assigned to the manager; person: one person;
+   * card: share out, each line to the member of its column ShareTo (D24).
+   */
+  scope: 'line' | 'mine' | 'person' | 'card';
   /** The fixed text of the event, when the manager types none. */
   text?: string;
   asks: Ask[];
