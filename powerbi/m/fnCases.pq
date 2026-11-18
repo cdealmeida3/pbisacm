@@ -81,7 +81,15 @@
                 // A case that waits for its planned retirement date gets no reminder until then.
                 due = not (state = "waiting" and factState = "open"),
                 assignment = List.Last(List.Select(timeline, (event) => event[Type] = "assign" or event[Type] = "handover"), null),
-                sentOn = if lastMessage = null then null else dateOf(lastMessage[At])
+                sentOn = if lastMessage = null then null else dateOf(lastMessage[At]),
+                closed = status = "Verified" or status = "Not followed up",
+                // What the Power App offers on the case (build B6, D294).
+                actions = fnCaseActions([
+                    Key = key, CheckId = fact[CheckId], InLatest = inLatest, State = state, FactState = if factState = null then "" else factState, Closed = closed,
+                    Status = status, Timeline = timeline, Stopped = exception <> null, RetireOn = retireOn,
+                    Class = Record.FieldOrDefault(fact, "Class", ""), Mapping = Record.FieldOrDefault(fact, "Mapping", {})
+                ]),
+                contactId = Record.FieldOrDefault(fact, "ContactId", "")
             in
                 [
                     Key = key, CheckId = fact[CheckId], CiKey = fact[CiKey], CiName = fact[CiName], ClassLabel = fact[ClassLabel], Field = fact[Field],
@@ -103,7 +111,10 @@
                     FixedOn = if status = "Fixed" and manual <> null then dateOf(manual[At]) else null, Events = List.Count(timeline),
                     // The last time a manager acted on the case (a status, an exception, a message): a reply before it is read.
                     Acted = List.Max(List.Transform(List.Select(timeline, (event) => List.Contains({"status", "exception", "message"}, event[Type])), (event) => event[At]), ""),
-                    Closed = status = "Verified" or status = "Not followed up"
+                    Closed = closed,
+                    // Who the case is about: the user ID of the person asked, else the email in lower case (as the HTML app knows a person contacted).
+                    Person = if not inLatest then "" else if contactId <> "" then contactId else Text.Lower(fact[ContactEmail], "en-US"),
+                    Actions = actions[Actions], ActionWords = actions[ActionWords], Stages = actions[Stages], StageId = actions[StageId]
                 ]
     in
         List.Buffer(List.Transform(subjects, line))

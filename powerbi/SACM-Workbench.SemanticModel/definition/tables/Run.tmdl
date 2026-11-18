@@ -233,6 +233,31 @@ table Run
 		summarizeBy: none
 		sourceColumn: CaseLines.Events
 
+	column 'CaseLines.Person'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CaseLines.Person
+
+	column 'CaseLines.Actions'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CaseLines.Actions
+
+	column 'CaseLines.ActionWords'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CaseLines.ActionWords
+
+	column 'CaseLines.Stages'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CaseLines.Stages
+
+	column 'CaseLines.StageId'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CaseLines.StageId
+
 	column 'Exceptions.Target'
 		dataType: string
 		summarizeBy: none

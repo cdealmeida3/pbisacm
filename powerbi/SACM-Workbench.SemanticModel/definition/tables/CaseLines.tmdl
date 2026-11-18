@@ -85,6 +85,12 @@ table CaseLines
 			VAR fixedText = IF ( fixedBy <> "", "Marked fixed by " & fixedBy & " on " & FORMAT ( fixedOn, "d mmm" ) )
 			RETURN assigned & IF ( assigned <> "" && fixedText <> "", " · " ) & fixedText
 
+	/// For the Power App visual (build B6): 1 on a line whose case is on the page (the drill through of the Card, Case and Person pages and the rows selected filter Findings), blank otherwise. Put it in the visual-level filter of the Power Apps visual as "is 1" (powerbi/README.md §6).
+	measure 'For the app' =
+			VAR shown = CALCULATE ( COUNTROWS ( Findings ), TREATAS ( VALUES ( CaseLines[Key] ), Findings[Key] ) )
+			RETURN IF ( shown > 0, 1 )
+		formatString: 0
+
 	/// The first report date that showed the finding of a case.
 	measure 'Case first seen' = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( History ), TREATAS ( VALUES ( CaseLines[Key] ), History[Key] ) )
 		formatString: d mmm yyyy
@@ -311,6 +317,41 @@ table CaseLines
 		isNameInferred
 		sourceColumn: [Events]
 
+	/// Who the case is about: the user ID of the person asked, else the email in lower case ("" for a case the newest report no longer shows). The Power App writes it on a note about the person.
+	column Person
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Person]
+
+	/// What the Power App offers on the case (build B6, D294): "id=Label|id=Label", in the order of powerbi/apps/actions.json. The app offers an action when every selected line has it.
+	column Actions
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Actions]
+
+	/// The labels of Actions, as the Case page shows them: "Note · Status · Assign".
+	column ActionWords
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ActionWords]
+
+	/// For a case of the mapping backlog: the stages of its class, "id=Label|id=Label" (the Power App offers them); "" otherwise.
+	column Stages
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Stages]
+
+	/// For a case of the mapping backlog: the id of its stage (the last one a manager set, else the first of its class).
+	column StageId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [StageId]
+
 	partition CaseLines = calculated
 		mode: import
 		source =
@@ -348,5 +389,10 @@ table CaseLines
 					"VerifiedOn", Run[CaseLines.VerifiedOn],
 					"FixedBy", Run[CaseLines.FixedBy],
 					"FixedOn", Run[CaseLines.FixedOn],
-					"Events", Run[CaseLines.Events]
+					"Events", Run[CaseLines.Events],
+					"Person", Run[CaseLines.Person],
+					"Actions", Run[CaseLines.Actions],
+					"ActionWords", Run[CaseLines.ActionWords],
+					"Stages", Run[CaseLines.Stages],
+					"StageId", Run[CaseLines.StageId]
 				)

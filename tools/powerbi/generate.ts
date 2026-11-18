@@ -31,6 +31,7 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES, tmdlName } from './t
 import type { SourceTable } from './tmdl.ts';
 import { expectedHistory, HISTORY_FILES, STATE_LISTS } from './history.ts';
 import { compilePattern, fastForm } from './regex.ts';
+import { ACTIONS_FILE } from './actions.ts';
 import type { FastForm, Node } from './regex.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -276,6 +277,8 @@ function packed(): Query[] {
     { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The five lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
     { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.',
       m: json(Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }]))) },
+    { name: 'AppActions', group: 'Packed', description: 'GENERATED from powerbi/apps/actions.json (D294). The actions of the Power App SACM actions: id, label, the journal event, its scope and what the manager types; fnCaseActions gives each case the actions of scope line that apply.',
+      m: json(JSON.parse(readFileSync(ACTIONS_FILE, 'utf8'))) },
     { name: 'ExpectedHistory', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team\'s state, for the Self-check page.', m: mText(JSON.stringify(EXPECTED_HISTORY)) },
     { name: 'ExpectedResult', group: 'Packed', description: 'GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.', m: mText(JSON.stringify(expectedResult())) },
     { name: 'WorkbenchVersion', group: 'Packed', description: 'GENERATED from package.json. The version of the Workbench.', m: mText(version) },
