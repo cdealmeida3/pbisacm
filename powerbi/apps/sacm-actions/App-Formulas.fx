@@ -38,6 +38,9 @@ ExceptionMonths = 6;
 
 Lines = PowerBIIntegration.Data;
 LineCount = CountRows(Lines);
+// The Power Apps visual gives the app 1,000 rows at most (Microsoft's limit). At 1,000 the app cannot tell whether there
+// are more, so it acts on none: Save is off until fewer lines are selected or filtered.
+TooManyLines = LineCount >= 1000;
 Me = LookUp('SACM Team', Lower(Email) = Lower(User().Email));
 MeName = Coalesce(Me.Title, User().FullName);
 // The managers a line can be given to: the active members of the list SACM Team (a menu shows the column Value).

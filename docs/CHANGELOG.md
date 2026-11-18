@@ -2,6 +2,18 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.43.0 — The Power BI report, the actions (B6)
+
+- **The Power App *SACM actions*** (D294) sits in the report, on the pages Card, Case, Person and My work. A manager picks the lines (or the page gives them), picks what to do and presses **Save**: Note, Status, Request number, Assign, Stop following, Follow again, Fixed and Undo, Ask the owner and Back to SACM, Retirement date, Stage, The process does not exist, Hand over my work, Note about the person. It offers only what every line allows, with the words of the HTML app. The model decides which actions a line has, and the check of every pull request compares it with the HTML app.
+- **Save adds one row** to the list *SACM Journal* and never changes or removes one (D296). The guide gives the managers a permission level that can add rows but not edit or delete them.
+- **The report refreshes after each action** (D295): the flow *SACMRefresh*, one at a time, then two minutes of rest. *Refresh now* in the app and on the pages My day and Reports does the same. The flow that files the reports refreshes too. Until the refresh, the app shows what the team did on the lines.
+- **How many refreshes** (spike S5, D299): the guide says what Microsoft allows and how to test ten refreshes in a row.
+- **The Mapping backlog shows the stage the team set** (D298), else the first stage of the class.
+- **The set-up guide** in [powerbi/README.md](../powerbi/README.md) §6: the checks of the tenant, the lists' permissions, the three flows and the app, step by step. The app and the flows are made once by hand in the company tenant.
+- The check of every pull request parses the app's formulas with Microsoft's Power Fx library and checks that the app only adds journal rows and the flows send nothing.
+- *Share out* and sending messages come in build B7; the Settings screen and the lifecycle marks in B8 (D297).
+- The HTML app works as before: no check, number or message changed.
+
 ## 0.42.1 — The Power BI report opens again
 
 - Power BI Desktop refused to open the project of 0.42.0: "RefreshPolicy source expression of table 'HistoryRun' has an invalid value". The history table now names RangeStart and RangeEnd in its refresh policy, as Desktop requires, and the check of every pull request looks for it. Nothing else changes.

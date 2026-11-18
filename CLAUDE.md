@@ -62,7 +62,7 @@ The developer runs `npm install` once; the team never installs anything.
 | `npm run browser` | The browser checks (`tests/browser/`, Playwright not in `package.json`, invented data) |
 | `node src/hosts/cli.ts <reports>` | The checks on report files |
 | `npm run powerbi:generate` | Writes `expressions.tmdl` and the theme of the Power BI report again after a change in `powerbi/m/`, `checks/`, `samples/` or `tests/recorded/` |
-| `npm run powerbi:lint` | The Power BI project: model (needs .NET 8), queries, report files, names, colours. The workflow *Power BI* runs the queries on Windows and compares them with `src/core/` |
+| `npm run powerbi:lint` | The Power BI project: model (needs .NET 8), queries, report files, names, colours, the Power App source and its flows. The workflow *Power BI* runs the queries on Windows and compares them with `src/core/` |
 
 ## Working rules
 

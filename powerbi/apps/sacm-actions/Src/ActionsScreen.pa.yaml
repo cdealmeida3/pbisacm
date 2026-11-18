@@ -4,7 +4,8 @@
 # What it does: the manager picks an action the selected lines all have, types or picks what it asks, and presses Save.
 # Save adds ONE row to the list SACM Journal (never changes or removes a row, D272), then asks flow F5 (SACMRefresh) to
 # refresh the report. Below: what the team did lately on these lines, read from the list at once (before the refresh).
-# Nothing is sent from this app (messages come with build B7).
+# Nothing is sent from this app (messages come with build B7). The visual gives the app 1,000 lines at most (Microsoft's
+# limit), so Save is off at 1,000: the app may not have them all.
 Screens:
   ActionsScreen:
     Properties:
@@ -14,7 +15,7 @@ Screens:
           Control: Label
           Properties:
             Text: |-
-              ="SACM actions: " & LineCount & If(LineCount = 1, " line", " lines") & If(IsBlank(MeName), "", " · " & MeName)
+              ="SACM actions: " & LineCount & If(LineCount = 1, " line", " lines") & If(IsBlank(MeName), "", " · " & MeName) & If(TooManyLines, " · Too many lines: the report gives the app 1,000 at most. Select or filter fewer lines.", "")
             FontWeight: =FontWeight.Semibold
             Size: =14
             X: =16
@@ -141,7 +142,7 @@ Screens:
             Visible: =LineCount > 0
             DisplayMode: |-
               =If(
-                  !IsBlank(ActionPick.Selected.Id) &&
+                  !TooManyLines && !IsBlank(ActionPick.Selected.Id) &&
                   Switch(
                       ActionPick.Selected.Id,
                       "note", !IsBlank(Trim(NoteText.Text)),
