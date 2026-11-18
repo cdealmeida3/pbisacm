@@ -1,0 +1,38 @@
+{
+  "note": "The Power Automate flows of build B6 (D295), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power App calls a flow by it), the trigger, the concurrency of the trigger (1: one run at a time; the others wait) and the steps in order. A flow only reads, files or refreshes: none sends a message and none runs on a timer (D2, D269). npm run powerbi:lint checks these rules and that the app calls only flows of this file. The workspace and the semantic model are picked in the step, so they are not written here.",
+  "flows": [
+    {
+      "id": "F5",
+      "name": "SACMRefresh",
+      "purpose": "Refresh the report after a manager saved an action in the Power App, or pressed Refresh now in it.",
+      "trigger": "Power Apps (V2)",
+      "concurrency": 1,
+      "steps": [
+        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "SACM Workbench", "Dataset": "SACM-Workbench" } },
+        { "action": "Delay", "connector": "Schedule", "fields": { "Count": "2", "Unit": "Minute" }, "runAfter": ["Succeeded", "Failed"] }
+      ]
+    },
+    {
+      "id": "F6",
+      "name": "SACM refresh now",
+      "purpose": "The button Refresh now on the pages My day and Reports (the Power Automate visual).",
+      "trigger": "Power BI button clicked",
+      "concurrency": 1,
+      "steps": [
+        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "SACM Workbench", "Dataset": "SACM-Workbench" } },
+        { "action": "Delay", "connector": "Schedule", "fields": { "Count": "2", "Unit": "Minute" }, "runAfter": ["Succeeded", "Failed"] }
+      ]
+    },
+    {
+      "id": "F1",
+      "name": "SACM - File reports",
+      "purpose": "File each report the shared mailbox gets in the reports folder of the team site, then refresh the report.",
+      "trigger": "When a new email arrives in a shared mailbox (V2)",
+      "concurrency": 1,
+      "steps": [
+        { "action": "Create file", "connector": "SharePoint", "fields": { "Folder Path": "the folder of ReportsFolder", "File Name": "the date of today, an underscore and the name of the attachment" }, "forEach": "Attachments" },
+        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "SACM Workbench", "Dataset": "SACM-Workbench" } }
+      ]
+    }
+  ]
+}

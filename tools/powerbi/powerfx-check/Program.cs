@@ -1,4 +1,4 @@
-// Reads the Power App source (build B6): each .pa.yaml file as JSON (YamlDotNet), so tools/powerbi/app-lint.ts can check it
+// Reads the Power App source (build B6): each .pa.yaml file (and the schema of pa.yaml) as JSON (YamlDotNet), so tools/powerbi/app-lint.ts can check it
 // against Microsoft's schema, and every Power Fx formula parsed with Microsoft's Power Fx library, as Power Apps Studio
 // parses it. A formula is a value of a Properties map that starts with "="; the property Formulas of the App, and a .fx
 // file, hold named formulas ("Name = expression;"). Prints one JSON document; exits 2 on a file it cannot read.
@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.PowerFx;
 using Microsoft.PowerFx.Syntax;
-using YamlDotNet.Serialization;
+using YamlDotNet.RepresentationModel;
 
 if (args.Length == 0) { Console.Error.WriteLine("usage: PowerFxCheck <file.pa.yaml | file.fx> ..."); return 2; }
 var engine = new Engine(new PowerFxConfig());
@@ -39,12 +39,22 @@ void Named(string file, string where, string text)
     }
 }
 
-JsonNode? ToJson(object? value) => value switch
+// A YAML node as JSON. A plain (unquoted) scalar true, false, null or a whole number is typed as YAML 1.2 reads it; every
+// other scalar, and every quoted one, is text (a formula is always text).
+JsonNode? ToJson(YamlNode node) => node switch
 {
-    null => null,
-    IDictionary<object, object> map => new JsonObject(map.Select(pair => new KeyValuePair<string, JsonNode?>(pair.Key.ToString()!, ToJson(pair.Value)))),
-    IList<object> list => new JsonArray(list.Select(ToJson).ToArray()),
-    _ => JsonValue.Create(value.ToString())
+    YamlMappingNode map => new JsonObject(map.Children.Select(pair => new KeyValuePair<string, JsonNode?>(((YamlScalarNode)pair.Key).Value ?? "", ToJson(pair.Value)))),
+    YamlSequenceNode list => new JsonArray(list.Children.Select(ToJson).ToArray()),
+    YamlScalarNode scalar when scalar.Style == YamlDotNet.Core.ScalarStyle.Plain => scalar.Value switch
+    {
+        null or "" or "null" or "~" => null,
+        "true" => JsonValue.Create(true),
+        "false" => JsonValue.Create(false),
+        var text when long.TryParse(text, out var number) => JsonValue.Create(number),
+        var text => JsonValue.Create(text)
+    },
+    YamlScalarNode scalar => JsonValue.Create(scalar.Value ?? ""),
+    _ => null
 };
 
 void Walk(string file, JsonNode? node, string path, bool inProperties)
@@ -71,7 +81,12 @@ foreach (var file in args)
     catch (Exception error) { Console.Error.WriteLine($"{file}: {error.Message}"); return 2; }
     if (file.EndsWith(".fx", StringComparison.OrdinalIgnoreCase)) { Named(file, "", text); continue; }
     JsonNode? json;
-    try { json = ToJson(new DeserializerBuilder().Build().Deserialize<object>(text)); }
+    try
+    {
+        var stream = new YamlStream();
+        stream.Load(new StringReader(text));
+        json = stream.Documents.Count == 0 ? null : ToJson(stream.Documents[0].RootNode);
+    }
     catch (Exception error)
     {
         files.Add(new JsonObject { ["file"] = file, ["error"] = error.Message });
@@ -113,7 +128,7 @@ static IEnumerable<(string? name, string body)> SplitNamed(string text)
     }
 }
 
-/// Every function call of a formula: its name, the data source it names first, the function of its second argument and
+/// Every function call of a formula: its name and namespace (SACMRefresh of SACMRefresh.Run()), the data source it names first, the function of its second argument and
 /// the field names of the records it is given (Patch('SACM Journal', Defaults('SACM Journal'), { Title: … })).
 sealed class Calls(JsonArray calls) : IdentityTexlVisitor
 {
@@ -126,6 +141,7 @@ sealed class Calls(JsonArray calls) : IdentityTexlVisitor
         calls.Add(new JsonObject
         {
             ["name"] = node.Head.Name.Value,
+            ["namespace"] = node.Head.Namespace.ToDottedSyntax() is var ns && ns.Length > 0 ? ns : null,
             ["source"] = args.Count > 0 && args[0] is FirstNameNode first ? first.Ident.Name.Value : null,
             ["second"] = args.Count > 1 && args[1] is CallNode second ? second.Head.Name.Value : null,
             ["fields"] = fields

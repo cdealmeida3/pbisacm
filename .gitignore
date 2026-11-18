@@ -30,3 +30,6 @@ dist/
 # The build of the TMDL check (tools/powerbi/tmdl-check/)
 tools/powerbi/tmdl-check/bin/
 tools/powerbi/tmdl-check/obj/
+# The build of the Power Fx check (tools/powerbi/powerfx-check/)
+tools/powerbi/powerfx-check/bin/
+tools/powerbi/powerfx-check/obj/

@@ -14,7 +14,10 @@
 //      no query of powerbi/m is a probe.
 //   7. Colours: every colour of the theme and the measures is a colour of LOOK.md, and each state colour reads on its
 //      fill and on the page with a contrast of 4.5:1 or more.
-// --no-dotnet skips step 1 and says so (for a computer without .NET); the CI never uses it.
+//   9. App (build B6): the Power App source of powerbi/apps/sacm-actions/ is valid against Microsoft's schema of pa.yaml
+//      (a copy in tools/powerbi/schemas/pa-yaml/), every Power Fx formula parses with Microsoft's Power Fx library
+//      (tools/powerbi/powerfx-check/, needs `dotnet`), and the app and its flows keep the rules of tools/powerbi/app-rules.ts.
+// --no-dotnet skips step 1 and the parsing of step 9, and says so (for a computer without .NET); the CI never uses it.
 import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -25,6 +28,9 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
 import { EXPECTED_HISTORY, lightColours, staleQueries, THEME_FILE } from './generate.ts';
 import { connectorSource } from './connector.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
+import { APP_FOLDER } from './actions.ts';
+import { callProblems, catalogueProblems, flowProblems } from './app-rules.ts';
+import type { Formula } from './app-rules.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const REPORT = join(root, 'powerbi', 'SACM-Workbench.Report');
@@ -231,6 +237,33 @@ const found = tables.find((table) => table.name === 'HistoryExpected')?.measures
 for (const item of EXPECTED_HISTORY) if (!found.includes(`"${item.metric}"`)) problems.push(`Run: the measure HistoryExpected[History found] has no branch for the metric "${item.metric}" of ExpectedHistory`);
 for (const expression of expressions) if (/^(?:Time|RealSize|Probe)/.test(expression.name)) problems.push(`Run: the query ${expression.name} has the name of a probe of tools/powerbi/probes.ts`);
 done.push(`Run: ${calculatedTables.length} calculated tables take their part of Run or HistoryRun, both hidden`);
+
+/* 9. App */
+problems.push(...catalogueProblems(undefined, expressions.find((expression) => expression.name === 'fnCaseActions')?.m ?? ''), ...flowProblems());
+const appFiles = filesUnder(APP_FOLDER, /(\.pa\.yaml|App-Formulas\.fx)$/);
+if (process.argv.includes('--no-dotnet')) {
+  done.push('App: catalogue and flows checked; the app source NOT PARSED (--no-dotnet). The CI parses it.');
+} else {
+  const schemaFile = join(SCHEMAS, 'pa-yaml', 'v3.0', 'pa.schema.yaml');
+  const run = spawnSync('dotnet', ['run', '--project', join(import.meta.dirname, 'powerfx-check'), '-c', 'Release', '--', schemaFile, ...appFiles], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  if (run.error || run.status !== 0) problems.push(`App: the Power Fx check did not run (${run.error?.message ?? (run.stderr || run.stdout).trim()})`);
+  else {
+    const read = JSON.parse(run.stdout) as { files: Array<{ file: string; json?: unknown; error?: string }>; formulas: Formula[] };
+    const [schema, ...sources] = read.files;
+    // Microsoft's schema has one pattern JavaScript cannot read (CodeComponent-ComponentName); a pattern that does not
+    // compile matches everything, so the rest of the schema still counts.
+    const appAjv = new Ajv({ strict: false, allErrors: true, code: { regExp: ((pattern: string, flags: string) => { try { return new RegExp(pattern, flags); } catch { return /(?:)/; } }) as never } });
+    const validate = appAjv.compile(schema!.json as AnySchema);
+    for (const file of sources) {
+      const where = relative(root, file.file);
+      if (file.error) { problems.push(`App: ${where} is not YAML: ${file.error}`); continue; }
+      if (!validate(file.json)) for (const error of (validate.errors ?? []).slice(0, 5)) problems.push(`App: ${where}: ${error.instancePath || '/'} ${error.message}`);
+    }
+    problems.push(...callProblems(read.formulas.filter((formula) => formula.file !== schema!.file)));
+    done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the app only adds journal rows and runs only the refresh flow`);
+  }
+}
+done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait or file');
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);
