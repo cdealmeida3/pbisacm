@@ -4,7 +4,9 @@
 // (tools/powerbi/desktop-check/, with Microsoft's client libraries). This file has the two ends, in TypeScript:
 //   node tools/powerbi/desktop.ts queries <out.json> [drill.json] the DAX query of every visual (queriesOf), and one per
 //                                                                value of a drill-through page (drill.json: the runner's)
-//   node tools/powerbi/desktop.ts judge <results.json>           what Desktop would show wrong (judge); exit 1 on a problem
+//   node tools/powerbi/desktop.ts pages <out.json>               the pages in their order, for the pictures (pictures.ps1)
+//   node tools/powerbi/desktop.ts judge <results.json> [pictures.json]
+//                                                                what Desktop would show wrong (judge); exit 1 on a problem
 // 0.44.0 showed why the lint is not enough: visuals that said "Select or drag fields" (a measure Desktop dropped), a
 // card that said "(Blank)", blank rows at the top of tables and lines that exist only because a measure gave text for
 // nothing. Only invented data: the job runs in Sample mode.
@@ -170,12 +172,28 @@ export function drillColumns(): string[] {
   return [...columns];
 }
 
+/** One page for the picture step (pictures.ps1, D318): its folder name, its tab, whether the team sees its tab. */
+export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number }
+
+/** Every page in the order of pages.json: the picture step opens each from its tab (a drill-through page shows its empty state). */
+export function pageList(): PageEntry[] {
+  const order = readJson<{ pageOrder: string[] }>(join(PAGES, 'pages.json')).pageOrder;
+  return order.map((name) => {
+    const page = readJson<{ displayName: string; visibility?: string; width: number; height: number; pageBinding?: { type?: string } }>(join(PAGES, name, 'page.json'));
+    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height };
+  });
+}
+
 /* ------------------------------------------------------------------ the judge */
 
 /** What the runner gives back for one query. */
 export interface QueryResult { query: VisualQuery; error?: string; rows?: Array<Array<string | null>> }
 /** What the runner gives back: the model's own errors (TOM), the open and refresh, and each query. */
 export interface Results { opened: boolean; openError?: string; refreshError?: string; modelErrors: string[]; results: QueryResult[] }
+/** What the picture step gives back (pictures.ps1): per page the seconds it took to draw and the words of a broken visual it shows. */
+export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] }> }
+/** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
+export const DRAW_SECONDS = 3;
 
 const blank = (value: string | null | undefined): boolean => value === null || value === undefined || value === '';
 const where = (query: VisualQuery): string => `${query.page} › ${query.visual}${query.drill ? (query.drill.value ? ` (drilled to ${query.drill.value})` : ' (opened from its tab)') : ''}`;
@@ -188,9 +206,10 @@ const where = (query: VisualQuery): string => `${query.page} › ${query.visual}
  *   - a table, matrix or chart has a line whose columns are all blank (the blank row of a relationship).
  * `notes`: what is worth a look but not wrong (an empty table).
  */
-export function judge(results: Results): { problems: string[]; notes: string[] } {
+export function judge(results: Results, pictures?: Pictures): { problems: string[]; notes: string[] } {
   const problems: string[] = [];
   const notes: string[] = [];
+  if (pictures) problems.push(...judgePictures(pictures, notes));
   if (!results.opened) { problems.push(`Desktop did not open the project: ${results.openError ?? 'no reason given'}`); return { problems, notes }; }
   if (results.refreshError) problems.push(`The refresh failed: ${results.refreshError}`);
   for (const error of results.modelErrors) problems.push(`Model: ${error}`);
@@ -211,6 +230,23 @@ export function judge(results: Results): { problems: string[]; notes: string[] }
   return { problems, notes };
 }
 
+/**
+ * What the pictures show wrong (D318): a page that has no tab, a page that shows the words of a broken visual or
+ * "(Blank)", a page that takes more than DRAW_SECONDS to draw. A picture step that could not run is a problem too: the
+ * check would pass without looking.
+ */
+export function judgePictures(pictures: Pictures, notes: string[] = []): string[] {
+  const problems: string[] = [];
+  if (!pictures.taken) return [`The pictures of the pages were not taken: ${pictures.why ?? 'no reason given'}`];
+  for (const page of pictures.pages) {
+    if (!page.found) { problems.push(`${page.displayName}: the picture step found no tab for the page`); continue; }
+    for (const words of page.broken) problems.push(`${page.displayName}: the page shows "${words}" (picture ${page.file})`);
+    if (page.seconds !== null && page.seconds > DRAW_SECONDS) problems.push(`${page.displayName}: the page took ${page.seconds} s to draw, more than ${DRAW_SECONDS} s (picture ${page.file})`);
+    else notes.push(`${page.displayName}: drawn in ${page.seconds} s (picture ${page.file})`);
+  }
+  return problems;
+}
+
 /* ------------------------------------------------------------------ the command line */
 
 if (import.meta.main) {
@@ -220,21 +256,27 @@ if (import.meta.main) {
     const queries = queriesOf(drills);
     writeFileSync(file, JSON.stringify({ drillColumns: drillColumns(), queries }, null, 1));
     console.log(`${queries.length} queries of ${new Set(queries.map((query) => `${query.pageName}/${query.visual}`)).size} visuals written to ${file}`);
+  } else if (command === 'pages' && file) {
+    const pages = pageList();
+    writeFileSync(file, JSON.stringify(pages, null, 1));
+    console.log(`${pages.length} pages written to ${file}`);
   } else if (command === 'judge' && file) {
     const results = readJson<Results>(file);
+    const pictures = extra && existsSync(extra) ? readJson<Pictures>(extra) : undefined;
     // What each visual shows, short, so the log can be read like the pages.
     for (const { query, error, rows } of results.results) {
       if (query.drill?.value) continue;
       const shown = error ? `ERROR ${error.split('\n')[0]}` : `${rows!.length} line${rows!.length === 1 ? '' : 's'}${rows!.length ? ': ' + rows!.slice(0, 3).map((row) => row.map((value) => value ?? '·').join(' | ')).join(' ¶ ') : ''}`;
       console.log(`${query.page} › ${query.visual} [${query.type}] ${shown.slice(0, 300)}`);
     }
-    const { problems, notes } = judge(results);
+    const { problems, notes } = judge(results, pictures);
+    if (extra && !pictures) problems.push(`no pictures: ${extra} is missing`);
     for (const note of notes) console.log(`Note: ${note}`);
     for (const problem of problems) console.log(`PROBLEM: ${problem}`);
     console.log(problems.length ? `Desktop check: ${problems.length} problem${problems.length === 1 ? '' : 's'}.` : 'Desktop check: no problem.');
     process.exit(problems.length ? 1 : 0);
   } else {
-    console.error('Usage: node tools/powerbi/desktop.ts queries <out.json> [drill-values.json] | judge <results.json>');
+    console.error('Usage: node tools/powerbi/desktop.ts queries <out.json> [drill-values.json] | pages <out.json> | judge <results.json> [pictures.json]');
     process.exit(2);
   }
 }

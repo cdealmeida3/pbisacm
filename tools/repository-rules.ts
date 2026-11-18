@@ -8,7 +8,8 @@
 //      and every file that names the tool names that version. An update that forgets one place fails.
 //   4. No file of Power BI Desktop that holds data or one person's settings (plan §3.1): no .pbix, and no cache.abf,
 //      localSettings.json or editorSettings.json in a .pbi folder. Desktop writes them next to the project on a computer
-//      that opens it, and .gitignore keeps them out, so in a git folder only the committed files count.
+//      that opens it, and .gitignore keeps them out, so in a git folder only the committed files count. And no folder
+//      pictures/ at the root: the Desktop check commits its pictures there to a branch for review (D318), never to main.
 //   node tools/repository-rules.ts     checks the repository (also run by npm test)
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -205,6 +206,7 @@ export function powerBiFileProblems(root: string): string[] {
     const name = parts.at(-1) ?? '';
     if (name.endsWith('.pbix')) problems.push(`${path}: a .pbix holds the data and cannot be compared; the report is the project in powerbi/ (plan §3.1). Delete it.`);
     else if (parts.at(-2) === '.pbi' && PBI_LOCAL_FILES.has(name)) problems.push(`${path}: Power BI Desktop writes this file for one computer (its data or settings). Delete it; .gitignore keeps it out.`);
+    else if (parts[0] === 'pictures') problems.push(`${path}: a picture of the Desktop check, committed to a branch for review (workflow Power BI, "pictures", D318). Remove the folder pictures/ before the merge.`);
   }
   return problems.sort();
 }
