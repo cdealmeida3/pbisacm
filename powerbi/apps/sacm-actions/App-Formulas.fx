@@ -43,8 +43,10 @@ LineCount = CountRows(Lines);
 TooManyLines = LineCount >= 1000;
 Me = LookUp('SACM Team', Lower(Email) = Lower(User().Email));
 MeName = Coalesce(Me.Title, User().FullName);
-// The managers a line can be given to: the active members of the list SACM Team (a menu shows the column Value).
-TeamNames = ForAll(Sort(Filter('SACM Team', Active = true), Title), { Value: Title });
+// The managers a line can be given to: the active members of the list SACM Team (a menu shows the column Value), and
+// Nobody, which makes the lines free again (an assign event with no name, as in the HTML app).
+Nobody = "Nobody (free)";
+TeamNames = Table({ Value: Nobody }, ForAll(Sort(Filter('SACM Team', Active = true), Title), { Value: Title }));
 
 // My open work: the lines assigned to me that can still be assigned (open, to solve or to check).
 MyOpenLines = Filter(Lines As line, line.AssignedTo = MeName && (StartsWith(line.Actions, "assign=") || ("|assign=") in line.Actions));
@@ -86,11 +88,11 @@ FollowAgainReason = If(
     "Other",
     First(Lines).ExceptionReason);
 
-// What the team did lately on these lines, before the next refresh shows it: the journal of the last 60 days (the date
-// test runs in SharePoint, so it is delegated), then the events that name one of the keys. Newest first.
+// What the team did lately on these lines, before the next refresh shows it: the journal of the last 60 days, newest
+// first (the date test and the sort run in SharePoint, so they are delegated), then the events that name one of the
+// keys. The second filter runs in the app on the newest rows only, as many as the data row limit of the app (set it to
+// 2,000, README §6.4).
 SelectedKeys = ForAll(Lines, Key);
-RecentEvents = Sort(
-    Filter(
-        Filter('SACM Journal', At >= DateAdd(Today(), -60, TimeUnit.Days)) As event,
-        CountRows(Filter(Split(event.Keys, Char(10)) As key, Trim(key.Value) in SelectedKeys.Value)) > 0),
-    At, SortOrder.Descending);
+RecentEvents = Filter(
+    Sort(Filter('SACM Journal', At >= DateAdd(Today(), -60, TimeUnit.Days)), At, SortOrder.Descending) As event,
+    CountRows(Filter(Split(event.Keys, Char(10)) As key, Trim(key.Value) in SelectedKeys.Value)) > 0);

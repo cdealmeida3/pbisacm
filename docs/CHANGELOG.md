@@ -7,10 +7,10 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 - **The Power App *SACM actions*** (D294) sits in the report, on the pages Card, Case, Person and My work. A manager picks the lines (or the page gives them), picks what to do and presses **Save**: Note, Status, Request number, Assign, Stop following, Follow again, Fixed and Undo, Ask the owner and Back to SACM, Retirement date, Stage, The process does not exist, Hand over my work, Note about the person. It offers only what every line allows, with the words of the HTML app. The model decides which actions a line has, and the check of every pull request compares it with the HTML app.
 - **Save adds one row** to the list *SACM Journal* and never changes or removes one (D296). The guide gives the managers a permission level that can add rows but not edit or delete them.
 - **The report refreshes after each action** (D295): the flow *SACMRefresh*, one at a time, then two minutes of rest. *Refresh now* in the app and on the pages My day and Reports does the same. The flow that files the reports refreshes too. Until the refresh, the app shows what the team did on the lines.
-- **How many refreshes** (spike S5, D299): the guide says what Microsoft allows and how to test ten refreshes in a row.
+- **How many refreshes** (D299): the guide says what Microsoft allows, and how to test ten refreshes in a row.
 - **The Mapping backlog shows the stage the team set** (D298), else the first stage of the class.
 - **The set-up guide** in [powerbi/README.md](../powerbi/README.md) §6: the checks of the tenant, the lists' permissions, the three flows and the app, step by step. The app and the flows are made once by hand in the company tenant.
-- The check of every pull request parses the app's formulas with Microsoft's Power Fx library and checks that the app only adds journal rows and the flows send nothing.
+- Every change is checked: the app's formulas must be valid, the app may only add journal rows, and the flows may send nothing.
 - *Share out* and sending messages come in build B7; the Settings screen and the lifecycle marks in B8 (D297).
 - The HTML app works as before: no check, number or message changed.
 

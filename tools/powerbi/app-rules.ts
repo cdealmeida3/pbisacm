@@ -13,12 +13,13 @@ import { join } from 'node:path';
 import { ASKS, appActions } from './actions.ts';
 import type { AppAction } from './actions.ts';
 import { STATE_LISTS } from './history.ts';
+import type { EventType } from '../../src/core/cases/cases.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 export const FLOWS_FILE = join(root, 'powerbi', 'apps', 'flows.json');
 
 /** The journal types of DATA-MODEL §3 (EventType of src/core/cases/cases.ts) that the model reads. */
-export const JOURNAL_TYPES = ['note', 'status', 'assign', 'request', 'message', 'report', 'handover', 'person-note', 'exception', 'settings', 'review', 'reviewed', 'retirement', 'stage', 'no-process'];
+export const JOURNAL_TYPES: EventType[] = ['note', 'status', 'assign', 'request', 'message', 'report', 'handover', 'person-note', 'exception', 'settings', 'review', 'reviewed', 'retirement', 'stage', 'no-process'];
 const LISTS = Object.values(STATE_LISTS).map((list) => list.list as string);
 const JOURNAL = STATE_LISTS.journal.list as string;
 const JOURNAL_COLUMNS = new Set<string>(STATE_LISTS.journal.columns);
@@ -65,7 +66,7 @@ export function catalogueProblems(actions: AppAction[] = appActions(), fnCaseAct
     if (ids.has(action.id)) problems.push(`Actions: the id ${action.id} is there twice`);
     ids.add(action.id);
     if (!/^[a-z][a-z-]*$/.test(action.id)) problems.push(`Actions: the id "${action.id}" is not lower-case words with "-"`);
-    if (!JOURNAL_TYPES.includes(action.type)) problems.push(`Actions: ${action.id} adds the type ${action.type}, which the journal does not know (DATA-MODEL §3)`);
+    if (!(JOURNAL_TYPES as string[]).includes(action.type)) problems.push(`Actions: ${action.id} adds the type ${action.type}, which the journal does not know (DATA-MODEL §3)`);
     if (action.type === 'message' || action.type === 'report' || action.type === 'settings' || action.type === 'review') problems.push(`Actions: ${action.id} adds a ${action.type} event: not an action of build B6`);
     if (!['line', 'mine', 'person'].includes(action.scope)) problems.push(`Actions: ${action.id} has the scope ${action.scope}`);
     for (const ask of action.asks) if (!(ASKS as readonly string[]).includes(ask)) problems.push(`Actions: ${action.id} asks for ${ask}, which the app does not know`);

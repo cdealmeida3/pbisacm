@@ -253,10 +253,9 @@ these: the app calls *SACMRefresh* by its name.
 **F5 SACMRefresh** (the app calls it after each Save, and from its **Refresh now** button):
 
 1. **Create → Instant cloud flow.** Name `SACMRefresh`, trigger **When Power Apps calls a flow (V2)**. No inputs.
-2. On the trigger: **... → Settings → Concurrency control**: on, **Degree of Parallelism** `1`. Runs then wait for each
-   other: two refreshes never overlap.
-3. **New step → Power BI → Refresh a dataset.** Workspace *SACM Workbench*, Dataset *SACM-Workbench* (the names of
-   section 4).
+2. On the trigger: **... → Settings → Concurrency control**: on, **Degree of Parallelism** `1`. Runs of the flow then
+   wait for each other, so a Save made during a refresh gets a refresh of its own after it.
+3. **New step → Power BI → Refresh a dataset.** Workspace: yours of section 4 (for example *SACM Workbench*), Dataset *SACM-Workbench*.
 4. **New step → Schedule → Delay**: Count `2`, Unit `Minute`. On the Delay: **... → Configure run after**: tick **is
    successful** and **has failed**. *Refresh a dataset* only starts the refresh (about a minute at the real size, D283);
    the delay keeps the next run waiting until it is done.
@@ -275,10 +274,15 @@ these: the app calls *SACMRefresh* by its name.
    as in F5.
 
 **F1 SACM - File reports** (made for the HTML app, [SETUP.md](../docs/SETUP.md) §2.3): at the end, after the *Apply to each* that saves the
-attachments, add **Refresh a dataset** (Workspace *SACM Workbench*, Dataset *SACM-Workbench*). The report then refreshes
+attachments, add **Refresh a dataset** (the workspace of section 4, Dataset *SACM-Workbench*). The report then refreshes
 when a new report arrives, with no button (D271). Set its concurrency to `1` too.
 
 None of the flows sends anything or runs on a timer. The scheduled refresh of section 4 stays as a safety net.
+
+Two flows may ask for a refresh at the same moment (for example F1 after a new report and F5 after a Save). Power BI
+runs one refresh of a model at a time and refuses the other: that run of the flow then shows *Failed* at the step
+*Refresh a dataset*. Nothing is lost: the rows are in the list, and the refresh that runs, or the next one, shows them.
+In F1, the step may show *Failed* for that reason; you can ignore it when the next refresh worked.
 
 ### 6.4 The app
 
@@ -300,7 +304,8 @@ not while you edit it. Publish the report first (section 4).
    to `ActionsScreen`.
 9. The app check (the warning triangle) should show no error. A formula that Studio reads differently from the
    repository: copy the change back into `formulas.fx` or the YAML, and tell the project thread.
-10. **File → Save as** `SACM actions`, then **Publish**. **Share** it with the group `SACM managers`. Each manager agrees
+10. **Settings → General → Data row limit**: `2000`. *Done lately* reads the newest rows of the journal up to that
+    number. Then **File → Save as** `SACM actions`, and **Publish**. **Share** it with the group `SACM managers`. Each manager agrees
     to the SharePoint connection the first time they open it.
 11. Back in the report: the visual shows the app. **Save** the report.
 12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **My work** (Ctrl+V). It keeps the same app. On
@@ -320,6 +325,13 @@ What to know:
   change.
 - The visual works in **Edge** and **Chrome**, not in Firefox.
 - **Selecting rows** in a table of the page (Ctrl+click) filters the visual too: the app then acts only on those lines.
+- **Until the refresh**, the menu offers what the lines allowed at the last refresh. To avoid a second row by mistake,
+  Save is off for 3 minutes for the same action on the same lines (not for a note).
+- **Hand over my work** hands over your open lines among the lines the app gets. Use it on the page **My work**: there
+  the app gets all your open work.
+- **Assign** to *Nobody (free)* makes the lines free again.
+- A case the newest report no longer shows (solved, or not followed up) is not on these pages, so the app does not get
+  it. *Follow again* for it comes with the Audit page in build B8.
 
 ### 6.5 How many refreshes (spike S5)
 

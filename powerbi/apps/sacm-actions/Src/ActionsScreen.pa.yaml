@@ -57,7 +57,7 @@ Screens:
           Control: Classic/TextInput
           Properties:
             Default: =""
-            HintText: ="Request number, for example RITM0012345"
+            HintText: ="The request number (RITM…)"
             AccessibleLabel: ="Request number"
             Visible: |-
               =",request," in "," & ActionPick.Selected.Asks & ","
@@ -141,23 +141,7 @@ Screens:
             Text: ="Save"
             Visible: =LineCount > 0
             DisplayMode: |-
-              =If(
-                  !TooManyLines && !IsBlank(ActionPick.Selected.Id) &&
-                  Switch(
-                      ActionPick.Selected.Id,
-                      "note", !IsBlank(Trim(NoteText.Text)),
-                      "person-note", !IsBlank(Trim(NoteText.Text)),
-                      "request", !IsBlank(Trim(RequestText.Text)),
-                      "assign", !IsBlank(MemberPick.Selected.Value),
-                      "handover", !IsBlank(MemberPick.Selected.Value) && MemberPick.Selected.Value <> MeName,
-                      "status", !IsBlank(StatusPick.Selected.Status),
-                      "stage", !IsBlank(StagePick.Selected.Id),
-                      "stop", ReviewDate.SelectedDate > Today() && (ReasonPick.Selected.Value <> "Other" || !IsBlank(Trim(NoteText.Text))),
-                      true
-                  ),
-                  DisplayMode.Edit,
-                  DisplayMode.Disabled
-              )
+              =If(IsBlank(SaveWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
               =Set(varError, "");
               With(
@@ -179,7 +163,7 @@ Screens:
                                       action.Id,
                                       "status", StatusPick.Selected.Status,
                                       "request", Trim(RequestText.Text),
-                                      "assign", MemberPick.Selected.Value,
+                                      "assign", If(MemberPick.Selected.Value = Nobody, "", MemberPick.Selected.Value),
                                       "stage", StagePick.Selected.Id,
                                       If(",text," in "," & action.Asks & ",", Trim(NoteText.Text), action.Text)
                                   ),
@@ -197,6 +181,7 @@ Screens:
                   If(
                       IsBlank(varSaved),
                       Notify("Not saved: " & varError, NotificationType.Error),
+                      Set(varJustSaved, { Id: action.Id, Keys: KeysFor.lines, At: Now() });
                       Notify("Saved: " & action.Value & ". The report shows it after the next refresh, in about a minute.", NotificationType.Success);
                       IfError(SACMRefresh.Run(), Notify("Saved. The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning));
                       Reset(NoteText);
@@ -206,6 +191,38 @@ Screens:
             X: =16
             Y: =256
             Width: =120
+            Height: =36
+      - SaveWhy:
+          Control: Label
+          Properties:
+            # Why Save is off: what the action still asks for. Empty when Save is on (LOOK rule 7: a grey button says why).
+            Text: |-
+              =If(
+                  LineCount = 0 || IsBlank(ActionPick.Selected.Id), "",
+                  TooManyLines, "Too many lines: select fewer than 1,000.",
+                  !(ActionPick.Selected.Id in ["note", "person-note"]) && varJustSaved.Id = ActionPick.Selected.Id && varJustSaved.Keys = KeysFor.lines && Now() < DateAdd(varJustSaved.At, 3, TimeUnit.Minutes),
+                  "Saved just now. The menu shows what these lines allow after the refresh, in about a minute.",
+                  Switch(
+                      ActionPick.Selected.Id,
+                      "note", If(IsBlank(Trim(NoteText.Text)), "Type the note.", ""),
+                      "person-note", If(IsBlank(Trim(NoteText.Text)), "Type the note.", ""),
+                      "request", If(IsBlank(Trim(RequestText.Text)), "Type the request number.", ""),
+                      "assign", If(IsBlank(MemberPick.Selected.Value), "Pick the team member.", ""),
+                      "handover", If(IsBlank(MemberPick.Selected.Value) || MemberPick.Selected.Value = MeName || MemberPick.Selected.Value = Nobody, "Pick the colleague who takes your work.", ""),
+                      "retirement", If(RetireDate.SelectedDate = First(Lines).RetireOn, "Pick another date, or empty the date to take it away.", ""),
+                      "status", If(IsBlank(StatusPick.Selected.Status), "Pick the status.", ""),
+                      "stage", If(IsBlank(StagePick.Selected.Id), "Pick the stage. The lines must all be of the same class.", ""),
+                      "stop", If(
+                          ReviewDate.SelectedDate <= Today(), "Pick a review date after today.",
+                          ReasonPick.Selected.Value = "Other" && IsBlank(Trim(NoteText.Text)), "With the reason Other, type a note.",
+                          ""),
+                      ""
+                  )
+              )
+            Visible: =LineCount > 0
+            X: =292
+            Y: =256
+            Width: =Parent.Width - 308
             Height: =36
       - RefreshButton:
           Control: Classic/Button
