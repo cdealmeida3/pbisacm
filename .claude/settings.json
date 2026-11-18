@@ -1,0 +1,12 @@
+{
+  "env": {
+    "DISABLE_TELEMETRY": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npx -y modern-web-guidance@1.0.1 search:*)",
+      "Bash(npx -y modern-web-guidance@1.0.1 retrieve:*)",
+      "Bash(npx -y modern-web-guidance@1.0.1 list)"
+    ]
+  }
+}

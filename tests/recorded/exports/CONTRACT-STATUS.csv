@@ -1,0 +1,4 @@
+﻿"Problem","Contract number","Name","Vendor","What we found","What is asked","Status"
+"","CT000002","Example Consulting - framework agreement","Example Consulting Ltd","ServiceNow shows Expired and has no status tag. Solusi says S - Concluded","","New"
+"","CT000004","Example Hosting - hosting agreement","Example Hosting Ltd","ServiceNow shows Expired with the tag T - Terminated. Solusi says E - Ended","","New"
+"","CT000005","Example Network - connectivity","Example Network","ServiceNow shows S - Concluded, like Solusi, but carries the tag E - Ended","","New"

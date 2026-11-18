@@ -1,0 +1,61 @@
+{
+  "id": "CRIT-AUTO-JUSTIFICATION",
+  "status": "live",
+  "title": "Criticality exception with only the automatic justification",
+  "cardLabel": "Automatic justification only",
+  "cardHint": "A CI kept a lower value after its parent was raised; its only justification is the automatic text. The owner says why.",
+  "cardText": "When the inherited value rises, ServiceNow keeps the lower target with the text \"Inherited value increased (Auto generated)\". That text gives no reason. The owner is asked which justification applies, or if the value should follow the parent. SACM then selects the justification, or raises the target.",
+  "family": "criticality",
+  "dimension": "correctness",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "forEach": [
+      "confidentiality",
+      "integrity",
+      "availability",
+      "authenticity"
+    ],
+    "when": {
+      "all": [
+        {
+          "op": "lessThanField",
+          "field": "target.{each}",
+          "value": "inherited.{each}"
+        },
+        {
+          "op": "onlyMatches",
+          "field": "exception_justification",
+          "value": "\\(Auto generated\\)"
+        }
+      ]
+    }
+  },
+  "playbook": {
+    "path": "email",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "message": {
+      "subject": "Lower criticality without a reason",
+      "intro": "The parent of these CIs was raised, and the CIs kept a lower value. The only justification is the automatic text, which gives no reason.",
+      "ask": "Which justification applies, or should the value follow the parent? {Reply}, and we select the justification in ServiceNow, or raise the target.",
+      "why": "If it is lower, we should know why: an exception needs a reason."
+    }
+  }
+}

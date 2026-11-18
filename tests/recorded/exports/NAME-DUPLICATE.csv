@@ -1,0 +1,4 @@
+﻿"Name","EPO ID","Class","Change","Current value","Value to set","Note","Status","Marked fixed by","Marked fixed on"
+"Fines  Hub - PROD","AST-0012","Service Instance","Two spaces in a row in the name","Fines  Hub - PROD","Fines Hub - PROD","","New","",""
+"Manage Fines","AST-0013","Business Capability","Two records for one thing: retire one","Manage Fines","Retire the record that is not used (two real CIs: ask the owner)","","New","",""
+"Manage Fines","AST-0014","Business Capability","Two records for one thing: retire one","Manage Fines","Retire the record that is not used (two real CIs: ask the owner)","","New","",""

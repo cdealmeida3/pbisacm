@@ -1,0 +1,10 @@
+{
+  "note": "A short word shown next to a CI that carries a tag.",
+  "chips": [
+    {
+      "tag": "Descoped",
+      "chip": "to map",
+      "why": "Descoped from service mapping earlier; now to be mapped. It does not mean deleted."
+    }
+  ]
+}

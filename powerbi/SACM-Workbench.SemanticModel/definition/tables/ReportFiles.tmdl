@@ -1,0 +1,54 @@
+/// Every report file: its type by its columns, its report date and how many rows its reader read.
+table ReportFiles
+
+	/// Report files of a known type.
+	measure 'Files read' = CALCULATE ( COUNTROWS ( ReportFiles ), ReportFiles[IsRead] = TRUE () ) + 0
+		formatString: 0
+
+	/// Report files of no known type.
+	measure 'Files not read' = CALCULATE ( COUNTROWS ( ReportFiles ), ReportFiles[IsRead] = FALSE () ) + 0
+		formatString: 0
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column Kind
+		dataType: string
+		sourceColumn: Kind
+
+	column TypeLabel
+		dataType: string
+		sourceColumn: TypeLabel
+
+	column Format
+		dataType: string
+		sourceColumn: Format
+
+	column Rows
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Rows
+
+	column Columns
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Columns
+
+	column IsRead
+		dataType: boolean
+		sourceColumn: IsRead
+
+	column Message
+		dataType: string
+		sourceColumn: Message
+
+	partition ReportFiles = m
+		mode: import
+		source = ReportFilesRows

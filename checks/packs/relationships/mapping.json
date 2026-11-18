@@ -1,0 +1,50 @@
+{
+  "id": "MAPPING",
+  "status": "proposed",
+  "title": "CI to map with its owner",
+  "cardLabel": "Mapping backlog",
+  "cardHint": "One case per CI to map: SACM invites the owner to a mapping session and moves the case through its stages.",
+  "cardText": "Everything that must be mapped, one case per CI: a Service Instance without a Business Application, a Business Service or Business Application without a Business Process, a Business Application without a Service Instance, a Business Process with nothing below (in Ready only once it has CIA values), and a Business Application tagged To be deleted that is still Operational. SACM invites the owner to a mapping session (no list of questions), maps the CI with the owner in the Service Mapping Workspace and makes the changes in ServiceNow. Set the stage on the case as it moves on. When the owner says the Business Process does not exist, mark it: Tell Process Management writes one message to the team. A case is solved when a later report no longer shows the problem. CIs tagged To Be Mapped, Descoped or Process is missing or unknown are planned (known); CIs in Ready wait.",
+  "family": "relationships",
+  "dimension": "compliance",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "mapping/backlog",
+    "ref": "reference/mapping-backlog"
+  },
+  "playbook": {
+    "path": "mapping",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "message": {
+      "subject": "Mapping session",
+      "intro": "SACM maps every CI of the CMDB to the CIs above and below it. These CIs of yours are not fully mapped yet.",
+      "ask": "Could we plan a 30-minute mapping session with you? {Reply} with a time that suits you. There is nothing to prepare: we go through it together.",
+      "why": "Without these relationships, criticality cannot flow to the CIs that support your service, and incidents cannot be linked to it.",
+      "byProblem": {
+        "no-process": {
+          "subject": "No Business Process",
+          "intro": "In a mapping session, the owners of these CIs told us that the Business Process they belong to does not exist yet.",
+          "ask": "Could you identify the Business Process of each CI, or have it created? {Reply} with the process, and SACM links the CI to it in ServiceNow."
+        }
+      }
+    }
+  }
+}

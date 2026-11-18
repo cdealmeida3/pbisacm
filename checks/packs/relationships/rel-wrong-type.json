@@ -1,0 +1,40 @@
+{
+  "id": "REL-WRONG-TYPE",
+  "status": "live",
+  "title": "Relationship type is not allowed between these classes",
+  "cardLabel": "Wrong relationship type",
+  "cardHint": "The relationship has a type the model does not allow between these classes. SACM corrects it in ServiceNow.",
+  "cardText": "SACM corrects these in ServiceNow: use the fix list. A Platform above the Service Instance that uses it is only listed for a review: confirm with the criticality owner before changing production, because criticality flows down.",
+  "family": "relationships",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/wrong-type",
+    "ref": "reference/relationship-model"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "name": "SACM Workbench",
+  "dataColors": [
+    "#0c1c49",
+    "#b42318",
+    "#175cd3",
+    "#107569",
+    "#067647",
+    "#5925dc",
+    "#7d5700",
+    "#475467"
+  ],
+  "foreground": "#2b2623",
+  "foregroundNeutralSecondary": "#655a52",
+  "foregroundNeutralTertiary": "#655a52",
+  "background": "#ffffff",
+  "backgroundLight": "#f6f0e8",
+  "backgroundNeutral": "#e8dfd3",
+  "tableAccent": "#0c1c49",
+  "hyperlink": "#0c1c49",
+  "visualHyperlink": "#0c1c49",
+  "good": "#067647",
+  "neutral": "#7d5700",
+  "bad": "#b42318",
+  "maximum": "#b42318",
+  "center": "#7d5700",
+  "minimum": "#067647",
+  "null": "#475467",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI",
+      "fontSize": 16,
+      "color": "#2b2623"
+    },
+    "header": {
+      "fontFace": "Segoe UI",
+      "fontSize": 15,
+      "color": "#2b2623"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 13,
+      "color": "#655a52"
+    },
+    "callout": {
+      "fontFace": "Segoe UI",
+      "fontSize": 22,
+      "color": "#2b2623"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#ffffff"
+              }
+            }
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#e8dfd3"
+              }
+            },
+            "radius": 10
+          }
+        ],
+        "title": [
+          {
+            "fontColor": {
+              "solid": {
+                "color": "#2b2623"
+              }
+            },
+            "fontFamily": "Segoe UI",
+            "fontSize": 12
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#faf6f1"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "outspace": [
+          {
+            "color": {
+              "solid": {
+                "color": "#faf6f1"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

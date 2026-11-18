@@ -1,0 +1,304 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "relationships",
+  "position": {
+    "x": 24,
+    "y": 680,
+    "z": 5500,
+    "height": 280,
+    "width": 1232,
+    "tabOrder": 5500
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "Order"
+                }
+              },
+              "queryRef": "RelationshipLinks.Order",
+              "nativeQueryRef": "Order",
+              "displayName": "No."
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "Relation"
+                }
+              },
+              "queryRef": "RelationshipLinks.Relation",
+              "nativeQueryRef": "Relation",
+              "displayName": "The other CI is its"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "Other"
+                }
+              },
+              "queryRef": "RelationshipLinks.Other",
+              "nativeQueryRef": "Other",
+              "displayName": "CI"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "OtherClass"
+                }
+              },
+              "queryRef": "RelationshipLinks.OtherClass",
+              "nativeQueryRef": "OtherClass",
+              "displayName": "Class"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "OtherStatus"
+                }
+              },
+              "queryRef": "RelationshipLinks.OtherStatus",
+              "nativeQueryRef": "OtherStatus",
+              "displayName": "Operational status"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "Type"
+                }
+              },
+              "queryRef": "RelationshipLinks.Type",
+              "nativeQueryRef": "Type",
+              "displayName": "Type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "Counts"
+                }
+              },
+              "queryRef": "RelationshipLinks.Counts",
+              "nativeQueryRef": "Counts",
+              "displayName": "Counts for the checks"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RelationshipLinks"
+                    }
+                  },
+                  "Property": "Excluded"
+                }
+              },
+              "queryRef": "RelationshipLinks.Excluded",
+              "nativeQueryRef": "Excluded",
+              "displayName": "Excluded from calculation"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "RelationshipLinks"
+                  }
+                },
+                "Property": "Relation"
+              }
+            },
+            "direction": "Descending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "RelationshipLinks"
+                  }
+                },
+                "Property": "Other"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The relationships of the CI: the CIs above and below it'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Relationships'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "onTheCase",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "RelationshipLinks"
+              }
+            },
+            "Property": "On the case"
+          }
+        },
+        "type": "Advanced",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "r",
+              "Entity": "RelationshipLinks",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Comparison": {
+                  "ComparisonKind": 0,
+                  "Left": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "r"
+                        }
+                      },
+                      "Property": "On the case"
+                    }
+                  },
+                  "Right": {
+                    "Literal": {
+                      "Value": "1L"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

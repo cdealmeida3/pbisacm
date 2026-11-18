@@ -1,0 +1,53 @@
+{
+  "id": "READY-TOO-LONG",
+  "status": "proposed",
+  "title": "CI is in status Ready for too long",
+  "cardLabel": "Ready too long",
+  "cardHint": "The CI has been in status Ready for months. Its other problems wait while it is not live, so the owner is asked.",
+  "cardText": "The CI was created more than the number of days in Settings ago (90 at first) and is still in status Ready. A CI in Ready is not live, so its other problems wait. That is right for a new CI, not for one that sits in Ready for months: clarify it with the owner when there is time. Business Processes and Business Applications are not on this card.",
+  "family": "lifecycle",
+  "dimension": "compliance",
+  "severity": "medium",
+  "priority": "later",
+  "scope": {
+    "classes": [
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "ci/status-age",
+    "ref": "reference/lifecycle",
+    "rules": [
+      "ready"
+    ]
+  },
+  "playbook": {
+    "path": "email",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "message": {
+      "subject": "In status Ready for a long time",
+      "intro": "They are still in status Ready, long after they were created.",
+      "ask": "Is it in use? Then the status must be Operational. Is it not needed any more? Then it must be retired. Please make the change, or {reply}.",
+      "askByClass": {
+        "service_instance": "Is this system in use? Then its status must be Operational. Is it not needed any more? Then it must be retired. Please make the change in EPO, or {reply}."
+      },
+      "why": "A CI in Ready is treated as not live: its owner, criticality and relationships are not followed up."
+    }
+  }
+}

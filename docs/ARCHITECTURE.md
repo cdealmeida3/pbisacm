@@ -1,0 +1,421 @@
+# Architecture
+
+How the Workbench is built: its parts, its layers, every module, which module may use which, how data flows, and how it stays safe. Why the app exists is in [CONTEXT.md](CONTEXT.md); the screens are in [FEATURES.md](FEATURES.md); the SACM rules are in [DOMAIN-RULES.md](DOMAIN-RULES.md); the files of the team folder, field by field, are in [DATA-MODEL.md](DATA-MODEL.md); how to add a check, a report type or a screen is in [HOW-TO.md](HOW-TO.md). Every decision has its number in [DECISIONS.md](DECISIONS.md).
+
+## 1. In one picture
+
+A web app for SACM managers. It reads the reports the team already gets, finds the data quality problems, shows them in one shared queue, knows who to ask, prepares the message, shows the replies and keeps the history for the whole team.
+
+**Nothing happens on its own.** A report is read when a manager presses *Load*. A message goes out when a manager presses *Send*. Replies are shown when a manager presses *Get replies*.
+
+```mermaid
+flowchart LR
+  A[Load report] --> B[Checks produce findings]
+  B --> C[Case queue]
+  C --> D[Manager reviews and sends a message]
+  D --> E[Stakeholder answers or raises a request]
+  E --> F[Manager gets replies, notes, sets status]
+  F --> G[Next report verifies the fix]
+  G --> A
+```
+
+## 2. Principles
+
+| # | Principle | Consequence |
+|---|---|---|
+| P1 | **The manager decides, the tool prepares** | No scheduled sending, no status a person would not expect. The only automatic conclusion is "the problem is gone from the report". |
+| P2 | **ServiceNow is the only place where CMDB data changes** | The tool never writes to the CMDB, EPO or Solusi. |
+| P3 | **A check is a module** | Detection, audience and message text are data in `checks/`. A new rule is normally a new check file. |
+| P4 | **One shared memory** | Everything a manager does is recorded with name and time, and every colleague sees it. |
+| P5 | **Fix where the data is born** | Values that come from EPO, the vendor import or Solusi are corrected at the source. |
+| P6 | **Closed means verified** | A case is *Verified* only when a later report contains the CI, could test the check and no longer shows the problem. |
+| P7 | **Only what we already have** | Microsoft 365, the shared mailbox, Teams, ServiceNow. No servers, no new licences. |
+| P8 | **Company data stays in the tenant** | The app makes no network connection. This repository holds code and invented samples only. |
+| P9 | **The process is the specification** | Roles, approval rules and criticality rules come from the SACM process documentation ([PROCESS-BASELINE.md](PROCESS-BASELINE.md)). |
+| P10 | **Same input, same bytes** | Every file the app writes depends only on what it read, never on "now" or "me". Two computers that do the same thing write the same file, so OneDrive keeps one. |
+
+The Power BI report (§12) keeps P1 to P6, P9 and P10. For P7 and P8 it uses what the company already has (Power BI Premium Per User, SharePoint, Power Automate, D268) and connects only to the team's SharePoint site in the tenant; reports load by a refresh, sending stays a button (D269).
+
+## 3. The parts
+
+```mermaid
+flowchart LR
+  SN[(ServiceNow)] -- scheduled report by email --> MB[Shared SACM mailbox]
+  subgraph Folder[Workbench folder in the team's channel, synced to each manager's computer]
+    REP[reports/]
+    OUT[outbox/]
+    SENT[sent/]
+    RPL[replies/]
+    DATA[data/ runs, journals, settings]
+  end
+  MB -- F1 files the attachment --> REP
+  APP[[SACM Workbench<br/>one HTML file in the browser]]
+  REP -- Load report --> APP
+  APP <--> DATA
+  APP -- Send --> OUT
+  OUT -- F2 sends exactly this message --> MB
+  MB -- email --> ST[Stakeholders]
+  ST -- reply --> MB
+  MB -- F3 files the reply --> RPL
+  RPL -- Get replies --> APP
+  OUT -. F2 moves the file .-> SENT
+  ST -- raises request --> PORTAL[Service Portal<br/>requests + approvals] --> SN
+```
+
+| Part | What it is | Technology |
+|---|---|---|
+| **App** | The whole user interface and all logic. Opened from the synced folder. | One HTML file (`app/SACM-Workbench.html`), built with React, Vite and Tailwind; the logic is plain TypeScript. Edge or Chrome. |
+| **Team folder** | Shared memory and the exchange point with the mailbox. Its files: [DATA-MODEL.md](DATA-MODEL.md). | A folder in the channel's library, synced with OneDrive. |
+| **Three small flows** | The bridge to the shared mailbox. They hold no logic and take no decisions. Steps: [SETUP.md](SETUP.md). | Power Automate, standard connectors. |
+| **ServiceNow** | Source of the reports; the only place where data changes. | Scheduled reports; requests in the Service Portal. |
+
+| Flow | Trigger | Does |
+|---|---|---|
+| F1 File reports | An email with a report arrives in the shared mailbox | Saves the attachment in `reports/` |
+| F2 Send from outbox | A manager pressed *Send*: a file appears in `outbox/` | Sends that message, unchanged, from the shared mailbox; moves the file to `sent/` |
+| F3 File replies | An email with one of our references in its subject arrives | Saves sender, time, subject and text in `replies/` |
+
+Without the flows the app still works: reports can be picked as files, messages can be opened as a draft in Outlook, and the manager writes the answer as a note.
+
+The app has three modes: the **team folder** (the shared memory), **report files only** (in memory, nothing is saved) and **invented data** (the demo, in memory). The two in-memory modes use the same code with an in-memory folder (`MemoryWorkspace`).
+
+## 4. Layers
+
+```
+checks/            the rules, as data: one file per check (packs/<subject>/) and the reference data (reference/)
+src/core/          the logic: pure TypeScript, no browser, no Node, no library
+src/app/           the browser part
+  platform/          folder access, file reading, what Vite packs into the page
+  state/             the state and the actions a manager takes (no screen, no library)
+  view/              what the screens show (pure)
+  ui/                parts several screens share
+  screens/<screen>/  one folder per screen
+  shell/             the top bar and the start screen: the only part that imports the screens
+src/hosts/cli.ts   the command line, for development and tests
+```
+
+Each layer may use only the layers above it in this list, and the logic uses nothing but itself. Five design rules are checked by `tests/architecture.test.ts` on every `npm test`:
+
+1. **The logic never uses the screens, the browser or Node.** `src/core/` imports only `src/core/`, and uses no browser or Node object.
+2. **The centre does not know the features.** `model/`, `shared/`, the engine and finding states of `checks/`, and `cases/` import no report type, no team, audit or review module. They reach the checks of a report type only through the one list of detectors (`src/core/checks/detectors/index.ts`).
+3. **What the screens show is pure.** `src/app/view/` imports the logic and other view files only.
+4. **A screen does not import another screen.** Shared parts live in `src/app/ui/`; only `src/app/shell/` imports the screens.
+5. **The actions import no screen and no library.** `src/app/state/` uses React only in `use-store.ts`, and gets the check packs and samples through `content.ts`, so the actions run under `node:test` with the in-memory folder.
+
+None of these rules has an exception today; the test fails on a new one.
+
+## 5. Module map
+
+Every module of `src/`, by folder. Tests use the same folders under `tests/` (`tests/core/…`, `tests/app/state/`, `tests/app/view/`, `tests/tools/`).
+
+### `src/core/model/`
+
+| Module | Holds |
+|---|---|
+| `model.ts` | The shared types: CI, person, check pack, rule condition, message texts, finding, fix line, run result; the three modules; the finding states; the contract key (`contract:`) and the Procurement contact |
+
+### `src/core/shared/`
+
+| Module | Holds |
+|---|---|
+| `dates.ts` | Dates as ISO text, Excel date numbers, business days; the one way a date is written: `screenDate` ("12 Nov 2026"), `longDate` ("12 November 2026"), `datesInText` |
+| `names.ts` | Names, the CI identity key (`nameKey`, `identityKey`) and the characters nobody can see |
+| `text.ts` | Base64 to text without platform helpers, `plural`, and the words for report columns in notes (`columnWord`, `missingColumns`) |
+
+### `src/core/reading/`
+
+| Module | Holds |
+|---|---|
+| `csv.ts` | The CSV reader (quoting; comma, semicolon or tab found from the header line) |
+| `xlsx.ts` | The `.xlsx` reader, no library: the zip directory and the sheet XML; the host passes the one unzip step |
+| `headers.ts` | How a column header is compared (lower case, `_`, no `ci.` prefix) |
+| `table.ts` | A file as a table; `ReportType`; knowing the type of a report from its columns (`recogniseAmong`) |
+
+### `src/core/sources/`
+
+One folder per report type: its definition (a `ReportType`), its reader and its comparison with the CI report.
+
+| Module | Holds |
+|---|---|
+| `report-types.ts` | `REPORT_TYPES`, the one list of report types (the order of the tiles); `recogniseReport`; `unhandledKind`, the last branch of every "one branch per type" in the hosts |
+| `ci/ci-report.ts` | The CI report (`cmdb_ci` export or CMDB Health result) read into CIs |
+| `relationships/relationship-report.ts` | The Relationship report (`cmdb_rel_ci`), and matching its ends to CIs |
+| `epo/epo-report.ts` | The EPO systems report, and its comparison with the Service Instances |
+| `contracts/contract-reports.ts` | The Solusi contract file and the ServiceNow contract report, and their comparison |
+| `contracts/contract-changes.ts` | The page Contract changes: two Solusi files compared |
+
+### `src/core/checks/`
+
+| Module | Holds |
+|---|---|
+| `engine.ts` | `runChecks`: runs every check pack on one CI report. Pure: same input, same findings, same keys. The rule operators. `compareRuns` for the command line |
+| `check-files.ts` | The validator of the check files (fields, rule words, detectors, classes, requests, references) |
+| `parked.ts` | Parked classes (reference/parked-classes, D179): which CIs and parts of checks give no line yet, and the grey lines of the first screen |
+| `finding-states.ts` | To solve, to review, waiting or known, from the reference data; the chips next to a CI |
+| `detectors/index.ts` | The one list of code detectors, by family, `EngineInputs`, the named inputs of the engine, and `afterChecks`, the step a report type runs on the findings once every check ran |
+| `detectors/output.ts` | What a detector gives back |
+| `detectors/ci-detectors.ts` | Checks that need only the CI report: name rules, EPO ID, days in a status |
+| `detectors/relationship-detectors.ts` | The relationship checks, on the relationship model |
+| `detectors/criticality-detectors.ts` | The criticality checks that need the parents of a CI: above the parents, no criticality reaches the CI (relationships excluded from calculation pass nothing) |
+| `detectors/epo-detectors.ts` | The EPO checks |
+| `detectors/process-detectors.ts` | The stages of a Business Process in Ready (D197): waits for the BIA (a note), to map (a note: it is on the mapping backlog), or mapped (make it Operational) |
+| `detectors/mapping-detectors.ts` | The mapping backlog (D200): one line per CI to map, with every reason (rules of the relationship model, and the tag rule of reference/mapping-backlog) |
+| `detectors/source-first.ts` | The source first (D190): after the checks ran, the people lines of a CI from EPO are compared with the EPO systems report; a line waits, says what EPO holds, or a leftover gets its line |
+| `detectors/contract-detectors.ts` | The contract checks: Not in Solusi, To clear by hand, Contract status, Upload check, and the problems of the contract data (For Procurement, Contracts to fix in ServiceNow) |
+
+### `src/core/cases/`
+
+| Module | Holds |
+|---|---|
+| `cases.ts` | `buildRun` (a run from a result: who is asked, by which route), `buildCases` (cases from runs, journals and replies), `groupCases` (shared cases), the statuses, the scores |
+| `contact.ts` | Who to ask about a finding, and who to escalate to: the manager, else the department head; for a Managed by person, the owner of the CI |
+| `record-teams.ts` | Teams that are the contact for the record of a class (reference/record-teams, D195): Process Management for a Business Process; the addresses of a team from the settings |
+| `fix-place.ts` | Where a fix is made: in EPO (Business Service, Service Instance, an offering the EPO integration created) or in ServiceNow (D122, D123) |
+| `record-search.ts` | Where the record of a line of a SACM list is found in ServiceNow: the address of the team's ServiceNow, and the link to the CI, the relationship rows or the contract (D244) |
+| `inventory.ts` | The inventory a run keeps for the lifecycle review |
+| `replies.ts` | A reply file read; the reference in a subject; an email body as text |
+
+### `src/core/mapping/`
+
+| Module | Holds |
+|---|---|
+| `mapping/backlog.ts` | The mapping backlog as a manager works it (D201, D203): the stages of each class, the stage of a case, the mark "The process does not exist" and when Process Management was told |
+| `mapping/capability-sheet.ts` | The capability sheet (D205): every Business Capability with what is above and below it, worked out when the report is loaded |
+
+### `src/core/messages/`, `team/`, `memory/`, `audit/`
+
+| Module | Holds |
+|---|---|
+| `messages/messages.ts` | The email and Teams texts in the style of the SACM templates; `REQUESTS`; parts of at most 25 CIs; a reminder with new points as one email; escalation drafts |
+| `team/team.ts` | The team list, sharing out a card, My work, Since your last visit, the double-contact warning |
+| `team/conflict-copies.ts` | Tidying the copies OneDrive makes when two computers write the same file |
+| `memory/memory.ts` | Keeping the shared memory small: what is active, what is archived, `state.json` |
+| `memory/finder.ts` | The newest report of each type among the files of the folder; run file names |
+| `audit/audit.ts` | The verification record of a load, the audit export of a period, *Not followed up* |
+| `audit/lifecycle-review.ts` | The lifecycle review: drawing the sample, the answers, the cases it opens |
+
+### `src/app/platform/`
+
+| Module | Holds |
+|---|---|
+| `workspace.ts` | The team folder: `FolderWorkspace` (the browser's folder access) and `MemoryWorkspace` (in memory), behind one `Workspace` interface |
+| `files.ts` | Reading a picked file in the browser (`DecompressionStream` for `.xlsx`) |
+| `bundle.ts` | What Vite packs into the page: the check packs, the reference data, the invented samples |
+
+### `src/app/state/`
+
+| Module | Holds |
+|---|---|
+| `store.ts` | The state object the screens read; `rebuild` (runs, cases and groups worked out again); `changed`, `update`, `toast` |
+| `use-store.ts` | The one link to React: re-render when the state changes |
+| `content.ts` | The check packs, reference data and samples the actions use (set once at start in `main.tsx`) |
+| `folder.ts` | Opening the folder, *Refresh*, and the upkeep of the shared memory (`maintain`) |
+| `folder-files.ts` | Reading runs, the archive, journals, replies and `state.json` |
+| `conflicts.ts` | Tidying the conflict copies found in the folder |
+| `loading.ts` | Loading reports (*Load*, *Choose reports*, files, the demo), *Remove* a load |
+| `journal.ts` | Writing an event to the journal of the manager |
+| `messages.ts` | Handing a message to `outbox/`, recording a sent message (and making the group mine), *Get replies*, reading a colleague's sent message |
+| `team.ts` | The team list, Since your last visit, the double-contact warning |
+| `settings.ts` | Who is working (kept in the browser) and the team settings |
+| `audit.ts` | *Not followed up*, and the history the audit export reads |
+| `review.ts` | Starting a lifecycle review and recording the answers |
+
+### `src/app/view/`
+
+| Module | Holds |
+|---|---|
+| `cards.ts` | One card per check: its kind (`cardKind`: owners, fix list, review list, one mailbox, mapping backlog), its light (red, green, grey, review, marked) and its counts; its subject (`topicOf`), the order of the cards (`orderCards`) new and solved since the report before (`sinceReport`), the words of a section header (`sectionText`) and the one number and fact of a card (`cardLine`) |
+| `myday.ts` | My day (D216): the rows of the four boxes (replies to read, reminders due, to escalate, new since the last report) |
+| `groups.ts` | The cases of a card by owner (or by kind for contracts), the group "nobody" by reason; search, sort, the Teams link; the next step of a group (`nextStep`) |
+| `cases.ts` | What a case shows: closed or to solve, what was done, what SACM still has to do; the replies to read |
+| `people.ts` | The people of a CI as shown, and the run as the app saves it (`AppRun`, `people`) |
+| `person.ts` | The page of a person contacted |
+| `fix-list.ts` | The SACM fix list: its lines, who marked them, its groups, one record per CI with all its changes (D242) |
+| `exports.ts` | The CSV exports, also the mapping backlog and the capability sheet |
+| `tiles.ts` | The Reports strip: one tile per report type, and the one Reports line above them (`reportsLine`) |
+| `activity.ts` | Events in words, for timelines and the Activity page (what was done and who did it, apart) |
+| `setup.ts` | Settings: the set-up list (`setupSteps`) and the lines a change writes to Activity (`settingsLines`) |
+| `contracts.ts` | What the contract cards show besides their cases |
+| `backlog.ts` | What the page Mapping backlog shows: one line per CI to map, its stage, the criticality lines of the CI, the lines to tell Process Management and their message |
+
+### `src/app/ui/`, `src/app/screens/`, `src/app/shell/`
+
+| Module | Holds |
+|---|---|
+| `ui/basics.tsx` | The base parts of the look ([LOOK.md](LOOK.md)): buttons, the icon button, icons, the logo, the state badge, the status chip, the filter chip, windows, fields, the pages of a long list |
+| `ui/parts.tsx` | The other parts of the look: tabs, segmented control, counter, notice, empty state, fold sign, the fold of a list (*Waiting 1*), menu button and its lines, filter chip, count badge, tick box, initials, date field, table, long text, and the one tooltip of the page (`TipLayer`) |
+| `ui/icons.ts` | The Workspace icons (73), one meaning each |
+| `ui/fonts/` | The font Nunito Sans (three weights), packed into the page by the build |
+| `ui/ConfirmDialog.tsx` | The app's own question before an action on many things |
+| `ui/people.tsx` | The person link, the Assign menu (*Take*, *Assign to*), the double-contact warning |
+| `ui/servicenow.tsx` | SACM's hand work in ServiceNow: **Copy** the value to set (D243) and **ServiceNow**, the record in a new tab (D244); fix list and case panel |
+| `ui/ComposeDialog.tsx` | The email window: the drafts as tabs, one footer (*Send from mailbox*, *Outlook*, *More*) |
+| `ui/TeamsDialog.tsx` | *Teams chat* |
+| `ui/ExceptionDialog.tsx` | *Not followed up* |
+| `ui/PageHead.tsx` | The head of a page |
+| `ui/download.ts` | Saving a file to Downloads |
+| `ui/labels.ts` | Words several screens show |
+| `ui/stages.tsx` | The stages of a mapping case: the dots, and the buttons that set it (page Backlog, case panel) |
+| `screens/myday/MyDay.tsx` | My day (D216): the page head with the Reports line, the four boxes, or one line of counters when folded; the outbox list |
+| `screens/overview/Overview.tsx` | All cards: the filter row (Search, subject, Filter menu, Cards or Lines), three sections of cards in their order, and the plain list of cards beside an open card |
+| `screens/card/CardView.tsx` | An open card: only picks the screen of its kind |
+| `screens/card/CardHead.tsx` | The head every card shares (title, what to do, *Details*, numbers, D223), the one toolbar of every card (Search, Filter, the actions, D224), and the one sentence of a card with nothing to do |
+| `screens/card/OwnerCard.tsx` | The kind Owners: owner groups, and the part SACM checks first |
+| `screens/card/FixListCard.tsx` | The kind SACM fix list: lines by group and page, a tick box per line, *Mark N fixed*, *Fixed*, *Undo* (D233) |
+| `screens/card/ReviewListCard.tsx` | The kind Review list: lines to look at |
+| `screens/card/MailboxCard.tsx` | The kind One mailbox: one message, its step in the toolbar (D231), a table per kind of problem |
+| `screens/card/GroupCard.tsx` | The parts the card screens share: one owner group (its head, D226), *Share out*, the notes, the quiet lists under a card (D230) |
+| `screens/card/CiTable.tsx` | The one table part of a card: the CIs of a group, the plain lines of a folded list, a line that opens its case, *Missing* or "–" (D229) |
+| `screens/case/CasePanel.tsx` | The case panel: one CI, its problems as boxes, people and timeline, and the bar at the bottom (D232) |
+| `screens/reports/Reports.tsx` | The Reports line with its tiles (*Show*), the message of the load, and *Choose reports* |
+| `screens/audit/Audit.tsx` | The Audit page |
+| `screens/contracts/Contracts.tsx` | The page Contract changes |
+| `screens/backlog/Backlog.tsx` | The page Mapping backlog (D200): the lines, filters by state and stage, *Invite*, *Tell Process Management*, *Export*, *Capability sheet*. The shell also shows it for the card *Mapping backlog* |
+| `screens/team/Pages.tsx` | My work (replies to read, then the table of what is assigned), Activity (a table), a person's page |
+| `screens/team/HandOver.tsx` | *Hand over* |
+| `screens/settings/Settings.tsx` | Settings: four parts (Set-up, Me, Team, Mailboxes), "Not saved yet" and the question before closing |
+| `screens/settings/TeamEditor.tsx` | Settings → Team |
+| `screens/settings/TeamPeopleEditor.tsx` | Settings → Mailboxes: the name and the people of a team of reference/record-teams (Process Management) |
+| `shell/App.tsx` | The header (one row: pages, *Load*, the menu *More*, Settings, theme, initials), the start screen, which screen is shown |
+| `shell/Notes.tsx` | The strips above the screens |
+| `main.tsx` | Start: hands the packed content to the state and shows the shell |
+| `index.html`, `styles.css` | The page (with its Content-Security-Policy and the tab icon) and the styles: the named colours light and dark, the font, the corners (Tailwind, with its own colours switched off) |
+
+### `src/hosts/`, `tools/`, `tests/`
+
+| Module | Holds |
+|---|---|
+| `src/hosts/cli.ts` | `node src/hosts/cli.ts <reports>`: the checks on files, a summary, `findings.json` |
+| `tools/build-app.mjs` | `npm run build`: validates the check files, builds the one HTML file, fails if anything is not inline |
+| `tools/checks-doc.ts` | `npm run docs`: writes [CHECKS.md](CHECKS.md) from the check files |
+| `tools/placeholders.ts` | `npm run placeholders`: lists the stand-ins of `tools/placeholders.json` and fails on a stale entry or an unlisted placeholder; `npm run docs` writes [PLACEHOLDERS.md](PLACEHOLDERS.md) with it |
+| `tools/record-samples.ts` | `npm run record`: writes the recorded result of the invented samples (`tests/recorded/`) |
+| `tools/privacy-guard.ts` | `npm run privacy`: fails on a link, a host or an email address that is not invented |
+| `tools/repository-rules.ts` | `npm run rules`: fails when a copied skill file differs from `.claude/skills/upstream.json` (listed by source), a pinned skill tool has two versions, a `GLOSSARY.md` or `docs/adr/` exists, or a `.pbix` or a Power BI cache or personal settings file is committed |
+| `tools/powerbi/` | The tools of the Power BI report (§12): `generate.ts`, `tmdl.ts`, `lint.ts` with `tmdl-check/` and `schemas/`, `connector.ts`, `units.ts`, `parity.ts` |
+| `tools/fingerprint.ts` | Counts and checksums of real files, to prove a change gives the same result (output never committed) |
+| `tests/architecture.test.ts` | The design rules of §4 |
+| `tests/sample-record.ts` | The recorded result: findings, cases, cards, groups, messages, exports of the invented samples |
+| `tests/docs.test.ts` | Every relative link of the documents resolves, and this page names every module |
+| `tests/browser/` | `npm run browser`: pilot (two managers at once), EPO, contracts, criticality, relationships, lifecycle, tags and Settings, numbers, times and words, messages and follow-up, each card as its kind, the first screen, Settings and Audit, and the look (four sizes, light and dark), in a headless browser on invented data |
+
+## 6. How data flows
+
+### Loading a report
+
+1. The app reads the file into a table (`reading/`) and knows its type from its columns, never from its name (`recogniseReport`).
+2. A Relationship report, an EPO systems report or a contract file is read by its reader and saved as a load in its folder of `data/runs/`. Its checks run when a CI report is loaded, with the newest load of each type made with it or before it.
+3. A CI report is read into CIs. `runChecks(cis, columns, packs, references, { date, relationships, epo, contracts })` gives the findings, what was tested, how many CIs each check saw, and the notes on what could not be tested. A check that cannot be evaluated always gives a note, never a silent pass.
+4. `buildRun` adds to each finding who to ask, by which route, who is copied, who an escalation goes to, the CI as the message table shows it, and its state (to solve, to review, waiting, known). The run is saved in `data/runs/`.
+5. The load is written to the journal of the manager (event `report`), and the upkeep runs (§6.3).
+
+### Working out the cases
+
+Cases are never stored. Each time the folder is read, `rebuild` (`src/app/state/store.ts`) works them out from what is stored:
+
+- **runs**: the last 10 CI runs, plus the summary of older ones in `data/state.json`;
+- **events**: the journals of every manager, from the month of the oldest active run on;
+- **replies**: the files in `replies/`, matched to a message by the reference in their subject.
+
+`withReviewFacts` first adds the findings opened by the lifecycle review. `buildCases` gives one case per finding: its status, messages, replies, notes, who has it, whether a reminder is due. `groupCases` makes the shared cases (one check, one contact, one route). The view (`src/app/view/`) turns them into cards and owner groups.
+
+### Keeping the memory small
+
+When a report is loaded, the app moves runs beyond the last 10 to `data/archive/yyyy-mm/`, moves handled replies to `replies/archive/yyyy-mm/`, and writes `data/state.json` (`compact`, `src/core/memory/memory.ts`). What the app reads stays about the same size however long the team uses it. Nothing is deleted. Details: [DATA-MODEL.md](DATA-MODEL.md) §4.
+
+### Sending a message
+
+A draft is made from the cases of a group (`src/core/messages/messages.ts`). Nothing is sent until a manager presses a button: *Send* writes the message to `outbox/` and an event `message` to the journal; flow F2 sends it unchanged. *Open in Outlook*, *Copy message* and *Teams chat* record the same event with their channel. After every *Send* and every *Refresh* the app reads `outbox/` and `sent/` again (`readOutbox`): a message still in the outbox after one hour makes its cases queued, and the days to a reminder count from the day its file reached `sent/`.
+
+## 7. How some parts work
+
+- **Report files without a library.** `.xlsx` is read in the logic (zip directory, shared strings, sheet XML); only the unzip step comes from the host: `DecompressionStream` in the browser, `node:zlib` on the command line.
+- **Hidden characters.** Zero-width characters are removed for matching (`nameKey`); the CI identity writes them as "?", as the CSV export does, so a CI keeps its key whether the report came as `.csv` or `.xlsx`.
+- **Identity.** A CI is known by its name, with the asset tag added only when two CIs share a name. A person is known by user ID, else email. A contract is known by `contract:<number>`.
+- **Same bytes on two computers** (P10). Run files and `state.json` hold no "who" or "when": who loaded a report is in the journal. Lists are sorted. Lifecycle samples are drawn with a seed made from the date and the report. So two managers who do the same thing before OneDrive has synced write the same file.
+- **Conflict copies.** When OneDrive still keeps two copies, the app tidies them each time it reads the folder: same runs are one, journal copies are joined, team lists are joined, a settings copy is shown for a check. The copies move to `data/archive/yyyy-mm/conflicts/`, never deleted (`src/core/team/conflict-copies.ts`).
+- **No timer.** Every read follows a button press or the opening of the app. The double-contact warning reads the colleagues' journals again on *Email*, *Teams* and *Send*.
+- **Older team folders.** Files written by older versions lack fields; every reader has a default for them ([DATA-MODEL.md](DATA-MODEL.md) §5). A folder of version 0.5 or older is moved to the monthly layout the first time it is opened.
+
+## 8. Security and privacy
+
+- **No network.** A Content-Security-Policy in the page blocks every connection. The build fails if anything is not inline. Data moves only through the synced folder.
+- **Access** is access to the channel folder.
+- **Identity.** Each manager enters name and email once; every event carries them. This is a record among colleagues, not a security control. Nothing is written without a name and an email.
+- **Untrusted text** (report values, email replies) is always shown as text, never as HTML.
+- **Audit trail.** Runs, journals, outbox and sent files, and reply files are all kept: who asked whom, when, with which message, what was answered, and which report showed the fix.
+- **This repository** holds no links, addresses or real report files; its samples are invented (D266). The privacy guard (`tools/privacy-guard.ts`) runs with `npm test` and on every pull request.
+
+## 9. The safety net
+
+| Command | Checks |
+|---|---|
+| `npm run typecheck` | The types of the app, the logic, the tests and the command line |
+| `npm test` | Every test; the recorded result of the invented samples (byte for byte); the design rules; the privacy guard; the copied skills unchanged and no glossary or ADR file; the check files; the stand-ins of `tools/placeholders.json`; that [CHECKS.md](CHECKS.md) and [PLACEHOLDERS.md](PLACEHOLDERS.md) are up to date; that the documents' links resolve |
+| `npm run build` | The check files again, then the one HTML file |
+| `npm run verify` | All of the above, and the built file matches the source |
+| `npm run browser` | The browser checks on the built file |
+| `npm run powerbi:lint` | The Power BI project (§12): the model, the queries, the report files, the names and the colours (needs .NET 8) |
+
+The same runs on every pull request (`.github/workflows/check.yml`): one job for the checks and, beside it, three jobs for the browser checks; the browser jobs run only when `app/`, `src/`, `checks/`, `samples/`, `tests/browser/`, the build or the workflow changed (D257). It does not run again on `main` after the merge, and a new push to a pull request stops the run before it (D261). A draft pull request runs nothing until it is marked ready, and the browser jobs use the runner's own Google Chrome (D262). The jobs run on GitHub's own Linux runner, never on a self-hosted one: the repository is public (D286). The checks job reads the private words of the secret `PRIVACY_TERMS_LIST` (HOW-TO §10).
+
+**What has been verified, and what not yet.**
+
+- In a headless browser: the demo, the team folder (the browser's private file system stands in for the folder picker), report files only, two managers at once, EPO and contracts, on desktop, phone and dark mode. The headless browser crashes when it reads a stored folder handle back from its storage, so a second visit is tested by picking the folder again.
+- On the real (masked) reports of November 2026, on the developer's computer only, never committed: every check and the app. For reference, the counts of 11 Nov 2026: EPO 596 live pairs, 11 service mapped CIs (14 lines) and 26 not mapped CIs (30 lines) that differ, 33 descriptions; contracts 461 pairs, 146 to delete (35 still linked), 31 to clear, 24 status tags, 177 contracts (257 lines) for Procurement.
+- With the real team folder: choosing the folder and saving notes works. Not verified yet: two people on a OneDrive-synced folder (sync delay, copy names), and the three flows.
+
+## 10. Relation to the Service Mapping Workspace
+
+That tool designs mappings for one project at a time ("links, not data quality"). The Workbench watches the whole CMDB and drives the follow-up. They share the report layouts, the class catalogue and the relationship model (`checks/reference/relationship-model.json`, rule ids kept); see [DATA-SOURCES.md](DATA-SOURCES.md).
+
+## 11. Risks
+
+| Risk | Mitigation |
+|---|---|
+| Folder sync is slow or paused on a manager's computer | The app reads only when asked and says what it found; *Refresh* reads again. Messages show *waiting to be sent* until the flow has moved them. |
+| A browser without folder access (Firefox, Safari) | Edge or Chrome are needed for the team folder; the demo works everywhere. |
+| Two managers write to the same person about the same CIs | The double-contact warning; the case shows who sent what and when. |
+| Rules do not match SACM's real definitions | Rules are data; a check stays *proposed* until SACM confirms it. |
+| Stakeholders feel spammed | One message per person and kind of problem; reminders only when a manager decides. |
+
+## 12. The Power BI report
+
+The Workbench is being rebuilt as a Power BI report (D268). The HTML app above stays as it is until stage 2 ends; its logic is the answer key of the report (D270). Build B1 is the foundation: the reports are read and the cards are listed. Build B2 runs the checks of the CI report: the rule checks and the CI and criticality code detectors (`BuiltDetectors`). Build B3 adds the relationship, EPO, process stage and mapping backlog detectors.
+
+```
+powerbi/
+├── SACM-Workbench.pbip                    the file to double-click in Power BI Desktop
+├── SACM-Workbench.SemanticModel/definition/
+│   ├── database.tmdl, model.tmdl, relationships.tmdl
+│   ├── expressions.tmdl                   GENERATED: every query of powerbi/m/, the packed samples, check and reference files
+│   └── tables/<Table>.tmdl                one file per table: its columns, its DAX measures, one query <Table>Rows
+├── SACM-Workbench.Report/
+│   ├── definition/                        the pages (Reports, Cards, Card, Case, Person, Mapping backlog, Self-check) and their visuals, in PBIR
+│   └── StaticResources/RegisteredResources/sacm-theme.json   GENERATED from the colours of LOOK.md
+├── m/<Query>.pq                           the Power Query queries, one per file (hand-written)
+└── README.md                              how to open, refresh, make a .pbix, switch to SharePoint (for Carlos)
+```
+
+**How data flows.** `SourceMode` (D271) picks the files: `SampleFiles` (the invented samples, base64 in the model) or `fnSharePointFiles` (one folder of the SharePoint site). `ReadFiles` reads each file once (`fnReadTable`: CSV with its separator and encoding, or every sheet of an `.xlsx`) and finds its kind by its columns (`fnReportType`, the port of `recogniseAmong`). The newest file of each kind (`fnNewest`) goes through its reader (`fnReadCiReport`, `fnReadRelationshipReport`, `fnReadEpoReport`, `fnReadSolusiFile`, `fnReadContractReport`, ports of `src/core/sources/`) into the tables `Inventory`, `Relationships`, `EpoSystems`, `SolusiContracts` and `ServiceNowContracts`. `Checks` lists every check file that is not off; `Notes` gives the grey note of each check whose detector is not built (`BuiltDetectors`), so no card is a silent pass. `SelfCheck` compares the result with the expected result packed from `tests/recorded/cards.json`. Ages and "old" are DAX measures, so they are right on any day.
+
+**How the checks run (B2, B3).** `CheckRun` runs `fnCheckRun` on the newest CI report (D278), the port of `runChecks` and `buildRun`. It reads the CIs with their tags and hidden characters, pairs the Relationship and EPO reports dated on or before it (`fnPaired`), builds the relationship graph once (`fnRelationshipGraph`), parks the classes of `parked-classes` (`fnParked`), and gives each check in use its scope.
+
+Each built module has one function: `fnDetectRule` (every operator of `checks/README.md`), `fnDetectCiNameStandard`, `fnDetectCiEpoId`, `fnDetectCiStatusAge`, `fnDetectCriticalityAboveParents`, `fnDetectCriticalityNoneReaches`, the seven `fnDetectRelationships…` (on the graph: its edges, the partners up and down, the environment of each CI by `fnEnvironment`), `fnDetectEpoDiffers` and `fnDetectEpoNotArrived` (on `fnEpoCompare`, worked out once per run, D281), `fnDetectProcessStage` and `fnDetectMappingBacklog`; each returns `[Findings, Tested, Evaluated, Notes]` and a part it cannot test gives a note (D15).
+
+Then `fnSourceFirst` (D190, on the pairs of `fnEpoCompare`), the parked filter, and `fnFacts`: who is asked (`fnContact`, the port of `resolveContact`), Procurement, the record teams, the EPO inventory owner, where the fix is made (`fnFixedInEpo`), how the finding is listed (`fnListing`) and the CI as the message shows it.
+
+The tables `Findings` (with *What EPO already has*, `fnEpoCorrections`), `Tested`, `Notes`, `Parked`, `MappingBacklog`, `CapabilitySheet` and `RelationshipLinks` read `CheckRun`; `fnServiceNowLink` builds the link of `recordSearch` from the parameter `ServiceNowAddress` (D279). The patterns of the checks are compiled by `tools/powerbi/regex.ts` into the packed query `Patterns` and tested by `fnMatches` and `fnRegexTest` (D277); `fnSearch` and `fnReplacePattern` find and replace a match (D280). The DAX measures of `Checks` only count and choose: *Card state*, *Card number*, *Card fact*, the section lines. `SelfCheck` compares the states, the CIs and every finding key with `tests/recorded/cards.json`.
+
+| Tool | Does |
+|---|---|
+| `tools/powerbi/generate.ts` | `npm run powerbi:generate`: writes `expressions.tmdl` from `powerbi/m/`, the samples, `checks/`, `checks/reference/`, the reading rules of `src/core/` and `tests/recorded/`, and the theme from `src/app/styles.css` (D275). `npm test` fails when they are out of date |
+| `tools/powerbi/tmdl.ts` | Reads the queries, tables, columns, measures and partitions of the TMDL files, for the other tools |
+| `tools/powerbi/lint.ts` | `npm run powerbi:lint` (D276): the model through Microsoft's TMDL library (`tmdl-check/`, .NET 8), every query through `@microsoft/powerquery-parser`, the report files against the schemas in `schemas/` (MIT, Microsoft), every name a visual or a measure uses, the generated parts, the card labels, the colours and their contrast |
+| `tools/powerbi/connector.ts` | `npm run powerbi:connector`: packs every query into a small test connector and one query file per table, for PQTest |
+| `tools/powerbi/units.ts` | The unit cases of the reading functions, of every pattern of the checks (against JavaScript), of the search and replace of the relationship patterns, of the environment, the plain text of an EPO description and the ServiceNow address: the same inputs through `src/core/` and through Power Query, in queries of 900 rows (`Units1`, `Units2`: PQTest returns at most 1,000) |
+| `tools/powerbi/regex.ts` | Compiles the regular expressions of the check and reference files into the trees `fnRegexTest` walks; refuses any form Power Query does not know (D277) |
+| `tools/powerbi/parity.ts` | `npm run powerbi:parity <folder>`: compares the PQTest result with `src/core/` and `tests/recorded/`: the columns of each table, the unit cases, the report files, every CI and every row of the other readers, the checks, every finding of the built checks with all its fields (`tests/recorded/run.json`), what was tested and how many CIs, the notes, the parked lines and the self-check |
+| `.github/workflows/powerbi.yml` | The job *powerbi-eval* on GitHub's Windows runner: downloads Microsoft's Power Query SDK tools, runs every table on the samples with PQTest, then `parity.ts` |
+
+**What has been verified, and what not yet.** The lint and the Windows evaluation pass in the checks of the pull request. Power BI Desktop itself has not opened this project in a check (it runs only on Windows, with a person): Carlos opens it on his PC (spike S1 of the plan).

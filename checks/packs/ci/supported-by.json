@@ -1,0 +1,58 @@
+{
+  "id": "SUPPORTED-BY",
+  "status": "live",
+  "title": "Supported by is empty or an inactive user",
+  "cardLabel": "Supported by",
+  "cardHint": "Supported by is empty, or names a person who is no longer active. The owner or manager names the person.",
+  "cardText": "Supported by is important, but it comes after Owned by and Managed by. On a Service Instance the owner fills it in EPO (Secondary Responsible). On a Service Offering the owner or manager replies, or raises the request to modify the offering. Only these two classes are checked.",
+  "family": "responsibility",
+  "dimension": "completeness",
+  "severity": "medium",
+  "priority": "later",
+  "scope": {
+    "classes": [
+      "service_offering",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "forEach": [
+      "supported_by"
+    ],
+    "when": {
+      "any": [
+        {
+          "op": "isEmpty"
+        },
+        {
+          "op": "refInactive"
+        }
+      ]
+    }
+  },
+  "playbook": {
+    "path": "service-request",
+    "audience": [
+      "managed_by",
+      "owned_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "routeBy": "epo",
+    "message": {
+      "subject": "Supported by to fill",
+      "intro": "The role Supported by is empty, or names a person who is no longer active.",
+      "ask": "Could you tell us who it should be? Please {reply}, and we will update ServiceNow for you.",
+      "why": "The support person is the second contact for incidents on these CIs.",
+      "askByClass": {
+        "service_offering": "Could you tell us who it should be? You can {reply}, or raise the request {request:modify-service-offering}."
+      }
+    }
+  }
+}

@@ -1,0 +1,96 @@
+/// The contracts of the newest ServiceNow contract report.
+table ServiceNowContracts
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column Number
+		dataType: string
+		sourceColumn: Number
+
+	column VendorContract
+		dataType: string
+		sourceColumn: VendorContract
+
+	column State
+		dataType: string
+		sourceColumn: State
+
+	column Name
+		dataType: string
+		sourceColumn: Name
+
+	column Vendor
+		dataType: string
+		sourceColumn: Vendor
+
+	column Category
+		dataType: string
+		sourceColumn: Category
+
+	column Start
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: Start
+
+	column End
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: End
+
+	column Owner
+		dataType: string
+		sourceColumn: Owner
+
+	column OwnerActive
+		dataType: boolean
+		sourceColumn: OwnerActive
+
+	column OwnerUserId
+		dataType: string
+		sourceColumn: OwnerUserId
+
+	column OwnerEmail
+		dataType: string
+		sourceColumn: OwnerEmail
+
+	column DailyResponsible
+		dataType: string
+		sourceColumn: DailyResponsible
+
+	column ProcurementPartner
+		dataType: string
+		sourceColumn: ProcurementPartner
+
+	column ProcurementPartnerActive
+		dataType: boolean
+		sourceColumn: ProcurementPartnerActive
+
+	column ProcurementPartnerUserId
+		dataType: string
+		sourceColumn: ProcurementPartnerUserId
+
+	column ProcurementPartnerEmail
+		dataType: string
+		sourceColumn: ProcurementPartnerEmail
+
+	column Tags
+		dataType: string
+		sourceColumn: Tags
+
+	column Criticality
+		dataType: boolean
+		sourceColumn: Criticality
+
+	partition ServiceNowContracts = m
+		mode: import
+		source = ServiceNowContractsRows

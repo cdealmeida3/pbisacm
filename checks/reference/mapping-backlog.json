@@ -1,0 +1,53 @@
+{
+  "note": "The mapping backlog (D200): one case per CI that must be mapped, SACM's work with the owner in a mapping session. 'rules' are the rules of reference/relationship-model that make a CI a mapping case; they are not on Relationship missing. A Business Process in 'readyStatus' is a case only when it has CIA values (a Target value): before that it waits for the BIA. 'tagged': a CI of 'classes' with a tag that matches one of 'tags' (a regular expression, ignoring case) and in 'status' is a case too: its future is decided in the session. 'stages': the steps of a case, in order; 'classStages': the steps each class goes through (D201). 'processMissing': the classes whose case can be marked 'The process does not exist' when one of 'rules' is the reason; 'team' is the team of reference/record-teams that is told (D203). 'criticality': the checks whose lines of the same CI are shown in the case (D204).",
+  "rules": [
+    "si-business-application",
+    "bs-business-process",
+    "ba-business-process",
+    "ba-service-instance",
+    "bp-application-or-service"
+  ],
+  "readyStatus": "Ready",
+  "tagged": {
+    "id": "tagged-to-delete",
+    "classes": [
+      "business_application"
+    ],
+    "tags": [
+      "to be deleted"
+    ],
+    "status": "Operational",
+    "say": "Tagged To be deleted and still Operational: decide in the session whether it is retired, or was never a Business Application"
+  },
+  "stages": [
+    { "id": "to-plan", "label": "To plan" },
+    { "id": "session-held", "label": "Session held" },
+    { "id": "classified", "label": "Classified" },
+    { "id": "application-linked", "label": "Application linked" },
+    { "id": "process-linked", "label": "Process linked" }
+  ],
+  "classStages": {
+    "service_instance": ["to-plan", "session-held", "classified", "application-linked", "process-linked"],
+    "business_application": ["to-plan", "session-held", "process-linked"],
+    "business_service": ["to-plan", "session-held", "process-linked"],
+    "business_process": ["to-plan", "session-held", "application-linked"]
+  },
+  "stageWords": {
+    "business_process": { "application-linked": "Applications linked" }
+  },
+  "processMissing": {
+    "classes": [
+      "business_service",
+      "business_application"
+    ],
+    "rules": [
+      "bs-business-process",
+      "ba-business-process"
+    ],
+    "team": "process-management"
+  },
+  "criticality": [
+    "CRIT-ABOVE-PARENT",
+    "CRIT-NONE-REACHES"
+  ]
+}

@@ -1,0 +1,4 @@
+﻿"Problem","Contract number","Name","Vendor","What we found","What is asked","Status"
+"End date","CT000006","Example Tools - support agreement","Example Tools Ltd","End date: Solusi has 15 December 2026, ServiceNow has 31 December 2026","","New"
+"Not in ServiceNow yet","CT000007","Example Cloud - new platform","Example Cloud Ltd","In the Solusi contract file (N - In negotiation, starts 1 December 2026), not in ServiceNow yet","","New"
+"Vendor","CT000005","Example Network - connectivity","Example Network","Vendor: Solusi has Example Network Ltd, ServiceNow has Example Network","","New"

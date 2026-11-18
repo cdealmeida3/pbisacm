@@ -1,0 +1,21 @@
+{
+  "note": "Every stand-in that stays in the repository on purpose (D110, D266), and real values kept on purpose that look like one. A thread that needs the real value of a stand-in asks the user first. node tools/placeholders.ts finds them; npm run docs writes docs/PLACEHOLDERS.md from this file.",
+  "entries": [
+    { "id": "person.sample-people", "group": "people", "invented": ["Ada Example", "Alex Example", "Sam Example", "Max Manager", "Test Manager", "Hana Head", "Lee Lead", "Dee Owner", "Olga Owner", "Ann Owner", "Pia Owner", "Cy Keeper", "Ian Inactive", "Dana Daily", "Pat Partner", "Demo User", "Lena", "Nia", "Oskar"], "use": "stays-invented", "label": "Invented people of the samples and tests (the main ones; Demo User is the name of the demo; Lena, Nia and Oskar are the team members of the team tests)" },
+    { "id": "epo.report-words", "group": "documents", "invented": ["Kørende", "Nedlagt", "Konstruktion", "Udgående", "AJOUR_TMS"], "use": "kept", "label": "The four status words and the date column of the real EPO systems report. Real, kept on purpose: the app needs them to read the real report (D286)" },
+    { "id": "doc.format-example", "group": "examples", "invented": ["Jane Doe"], "use": "stays-invented", "label": "A format example of a person's name in a comment" },
+    { "id": "test.private-word", "group": "examples", "invented": ["Acme"], "use": "stays-invented", "label": "The private word of the privacy guard test" },
+    { "id": "department.sample", "group": "samples", "invented": ["D-100", "D-200", "D-300"], "use": "stays-invented", "label": "Invented departments of the EPO sample" },
+    { "id": "powerbi.reports-folder", "group": "addresses", "invented": ["Shared Documents/Workbench/Reports"], "use": "stays-invented", "label": "Default of the Power BI parameter ReportsFolder: the folder of the report files in the SharePoint site. The real folder is typed in Power BI Desktop or in the workspace, never here (powerbi/README.md)" }
+  ],
+  "shapes": [
+    { "id": "person.sample-user-ids", "group": "people", "pattern": "\\b(?:ada|ann|bo|cy|dee|iin|pia)0\\d\\b", "use": "stays-invented", "label": "Invented ServiceNow user IDs of the samples and tests" },
+    { "id": "email.example", "group": "addresses", "pattern": "[A-Za-z0-9._%+-]+@example\\.(?:com|org|net)\\b", "use": "stays-invented", "label": "Invented email addresses" },
+    { "id": "vendor.sample", "group": "samples", "pattern": "\\bExample [A-Z][a-z]+(?: Ltd)?\\b", "use": "stays-invented", "label": "Invented vendors and contract names of the contract samples" },
+    { "id": "host.servicenow", "group": "addresses", "pattern": "\\bcontoso(?:\\.service-now)?\\.com\\b", "use": "stays-invented", "label": "Invented ServiceNow host, also the default of the Power BI parameter ServiceNowAddress. The real address is typed in Power BI Desktop or in the workspace, never here (powerbi/README.md)" },
+    { "id": "host.sharepoint", "group": "addresses", "pattern": "\\bcontoso\\.sharepoint\\.com(?:/sites/sacm)?\\b", "use": "stays-invented", "label": "Invented SharePoint site, the default of the Power BI parameter SharePointSite. The real site is typed in Power BI Desktop or in the workspace, never here (powerbi/README.md)" },
+    { "id": "ci.asset-tag", "group": "samples", "pattern": "\\bAST-\\d{4}\\b", "use": "stays-invented", "label": "Invented asset tags of the sample CIs" },
+    { "id": "column.criticality-scope", "group": "samples", "pattern": "\\bx_demo_[a-z_]+", "use": "stays-invented", "label": "Invented scope prefix of the criticality columns of the samples. The reader matches the columns by their ending, so the real prefix needs no change" },
+    { "id": "doc.section-number", "group": "documents", "pattern": "\\b(?:[Pp]rocedure|[Ii]nstruction)(?:,? (?:section|appendix))?,? \\d+\\.\\d+\\b", "use": "kept", "label": "Section numbers of the team's procedure and instruction. Real, kept on purpose (D267)" }
+  ]
+}

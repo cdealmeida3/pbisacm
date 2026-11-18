@@ -1,0 +1,25 @@
+/// Why a check could not be evaluated, or only in part, on the newest report. A card with a note and nothing tested is grey (D15).
+table Notes
+
+	column CheckId
+		dataType: string
+		sourceColumn: CheckId
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column Reason
+		dataType: string
+		sourceColumn: Reason
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition Notes = m
+		mode: import
+		source = NotesRows

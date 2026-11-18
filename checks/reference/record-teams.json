@@ -1,0 +1,11 @@
+{
+  "note": "Teams that are the contact for the record of a class (D195). A line of one of the 'checks' on a CI of one of the 'classes' goes to the team, never to the people of the CI: one message to every person of the team (Settings, Requests and mailboxes), nobody copied. Process Management is responsible for the record of a Business Process; its mapping is SACM's work with the process owner (Relationship missing), and SACM does not chase the BIA (the criticality cards).",
+  "teams": [
+    {
+      "id": "process-management",
+      "name": "Process Management",
+      "classes": ["business_process"],
+      "checks": ["RESP-MISSING", "RESP-INACTIVE", "RESP-SAME-PERSON", "DESC-QUALITY", "NAME-DUPLICATE", "TAG-MISSING", "TAG-STATUS-CONFLICT", "UNDER-RETIREMENT-LONG"]
+    }
+  ]
+}

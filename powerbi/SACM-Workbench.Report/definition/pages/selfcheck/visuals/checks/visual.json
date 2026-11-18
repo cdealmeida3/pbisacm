@@ -1,0 +1,226 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "checks",
+  "position": {
+    "x": 24,
+    "y": 144,
+    "z": 3000,
+    "height": 524,
+    "width": 1232,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "CheckId"
+                }
+              },
+              "queryRef": "SelfCheck.CheckId",
+              "nativeQueryRef": "CheckId",
+              "displayName": "Check"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "ExpectedState"
+                }
+              },
+              "queryRef": "SelfCheck.ExpectedState",
+              "nativeQueryRef": "ExpectedState",
+              "displayName": "Expected state"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "ExpectedToSolve"
+                }
+              },
+              "queryRef": "SelfCheck.ExpectedToSolve",
+              "nativeQueryRef": "ExpectedToSolve",
+              "displayName": "To solve"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "ExpectedToCheck"
+                }
+              },
+              "queryRef": "SelfCheck.ExpectedToCheck",
+              "nativeQueryRef": "ExpectedToCheck",
+              "displayName": "To check"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "ExpectedWaiting"
+                }
+              },
+              "queryRef": "SelfCheck.ExpectedWaiting",
+              "nativeQueryRef": "ExpectedWaiting",
+              "displayName": "Waiting"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "ExpectedKnown"
+                }
+              },
+              "queryRef": "SelfCheck.ExpectedKnown",
+              "nativeQueryRef": "ExpectedKnown",
+              "displayName": "Known"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "Found"
+                }
+              },
+              "queryRef": "SelfCheck.Found",
+              "nativeQueryRef": "Found",
+              "displayName": "In Power BI"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "Why"
+                }
+              },
+              "queryRef": "SelfCheck.Why",
+              "nativeQueryRef": "Why",
+              "displayName": "Why"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "SelfCheck"
+                  }
+                },
+                "Property": "CheckId"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Per check'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Per check'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

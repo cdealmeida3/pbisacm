@@ -1,0 +1,42 @@
+{
+  "id": "NAME-HIDDEN-CHAR",
+  "status": "live",
+  "title": "CI name holds a hidden character",
+  "cardLabel": "Hidden character in name",
+  "cardHint": "The name holds a character nobody can see, so searching and matching fail. SACM removes it in ServiceNow.",
+  "cardText": "The name holds a character nobody can see, most often a zero-width space. ServiceNow does not show it, but it is in the record, so searching for the name or matching it with another report fails. A CSV export shows it as \"?\". SACM removes it in ServiceNow; nobody needs to be asked.",
+  "family": "name",
+  "dimension": "correctness",
+  "severity": "low",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "op": "hasHiddenCharacters",
+      "field": "name"
+    }
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

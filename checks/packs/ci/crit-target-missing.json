@@ -1,0 +1,35 @@
+{
+  "id": "CRIT-TARGET-MISSING",
+  "status": "live",
+  "title": "Business Process without target criticality (BIA missing)",
+  "cardLabel": "BIA missing",
+  "cardHint": "An Operational Business Process has no CIA values and no tag BIA N/A or BIA is pending. SACM checks the status or the tag.",
+  "cardText": "Criticality starts on the Business Process: its CIA values come from the BIA, and the process becomes Operational after its mapping. A process in Ready without CIA values is not listed: it may wait there. An Operational (or Under retirement) process without CIA values is wrong, unless the tag BIA N/A or BIA is pending says why: SACM checks the status, or adds the tag. Nobody is written to: SACM does not chase the BIA.",
+  "family": "criticality",
+  "dimension": "completeness",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "business_process"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired",
+        "ready"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "op": "levelsMissing",
+      "field": "target"
+    }
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

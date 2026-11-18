@@ -1,0 +1,89 @@
+{
+  "id": "DESC-QUALITY",
+  "status": "proposed",
+  "title": "Description is missing or of poor quality",
+  "cardLabel": "Description",
+  "cardHint": "The description is empty, too short, the same as the name, or a placeholder. The owner writes what the CI is and what it is for.",
+  "cardText": "The description is empty, too short, the same as the name, or a placeholder. The owner writes what the CI is and what it is for. On a Business Service or a Service Instance the owner corrects it in EPO. A Business Application is not asked: SACM copies the description of its Service Instance (card Application ≠ Instance).",
+  "family": "description",
+  "dimension": "completeness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "any": [
+        {
+          "field": "description",
+          "op": "isEmpty"
+        },
+        {
+          "field": "description",
+          "op": "shorterThan",
+          "value": 30
+        },
+        {
+          "field": "description",
+          "op": "equalsField",
+          "value": "name"
+        },
+        {
+          "field": "description",
+          "op": "matchesAny",
+          "value": [
+            "^tbd$",
+            "^n/?a$",
+            "^test(ing)?$",
+            "^to ?do$",
+            "^[-.?x]+$",
+            "^none$",
+            "^unknown$"
+          ]
+        },
+        {
+          "field": "description",
+          "op": "duplicatedMoreThan",
+          "value": 10
+        }
+      ]
+    }
+  },
+  "playbook": {
+    "path": "self-fix",
+    "audience": [
+      "managed_by",
+      "owned_by",
+      "managerOf(owned_by)"
+    ],
+    "message": {
+      "subject": "No useful description",
+      "intro": "The description is empty, or does not say what the CI is.",
+      "ask": "Could you reply with one or two sentences per CI: what it is, and what it is used for? We will update ServiceNow for you. You can also raise the request {form:modify-service-offering}.",
+      "why": "The service desk and change approvers read it to understand the CI.",
+      "epoWhat": "description",
+      "askByClass": {
+        "service_offering": "Could you reply with one or two sentences per offering: what it is, and what it is used for? We will update ServiceNow for you. You can also raise the request {request:modify-service-offering}."
+      },
+      "askByTeam": {
+        "process-management": "Could you reply with one or two sentences per process: what the process is and what it does? We will update ServiceNow."
+      }
+    },
+    "routeBy": "epo"
+  }
+}

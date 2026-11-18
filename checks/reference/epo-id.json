@@ -1,0 +1,8 @@
+{
+  "note": "The EPO ID is the asset tag. 'required': a missing EPO ID is to solve (the known cases of section 3.1 of the instruction are marked Not followed up once, by a manager). 'unique': two live CIs must not share an EPO ID. Service Offerings are ServiceNow records and are not checked (D128). Business Application, Business Process and Business Capability have no EPO ID: not checked.",
+  "required": [
+    "business_service",
+    "service_instance"
+  ],
+  "unique": true
+}

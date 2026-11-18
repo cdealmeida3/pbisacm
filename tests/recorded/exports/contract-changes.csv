@@ -1,0 +1,6 @@
+﻿"Change","Contract number","Name","Vendor","Field","Before","After"
+"New contract","CT000006","Example Tools - support agreement","Example Tools Ltd","","","S - Concluded, starts 1 June 2024, ends 15 December 2026"
+"No longer in the file","CT000008","Example Courier - delivery agreement","Example Courier Ltd","","E - Ended, starts 1 January 2020, ends 31 October 2026",""
+"Status change","CT000004","Example Hosting - hosting agreement","Example Hosting Ltd","Status","S - Concluded","E - Ended"
+"Changed field","CT000001","Example Software - licence agreement","Example Software Ltd","Contract owner","Ian Inactive","Olga Owner"
+"Changed field","CT000005","Example Network - connectivity","Example Network Ltd","End date","31 January 2026","31 January 2027"

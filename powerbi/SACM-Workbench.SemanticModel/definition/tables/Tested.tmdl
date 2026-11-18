@@ -1,0 +1,29 @@
+/// Each part of a check the newest CI report could test, and the CIs it evaluated (D15). A card with no row here is grey, never green.
+table Tested
+
+	/// How many CIs the newest report tested for a check: the biggest number over its parts.
+	measure 'Tested CIs' = MAX ( Tested[Evaluated] ) + 0
+		formatString: #,0
+
+	column CheckId
+		dataType: string
+		sourceColumn: CheckId
+
+	column Part
+		dataType: string
+		sourceColumn: Part
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column Evaluated
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Evaluated
+
+	partition Tested = m
+		mode: import
+		source = TestedRows

@@ -1,0 +1,36 @@
+{
+  "id": "CRIT-NONE-REACHES",
+  "status": "live",
+  "reviewOnly": true,
+  "reviewWhy": "SACM checks the mapping: no criticality reaches these CIs",
+  "title": "No criticality reaches the CI",
+  "cardLabel": "No criticality reaches the CI",
+  "cardHint": "No target and nothing inherited: no parent passes a criticality to the CI. Often a parent relationship is missing.",
+  "cardText": "The owner is not asked for a target: criticality flows down from the Business Process. These CIs have no target and nothing inherited, so no parent passes a criticality to them. Often a parent relationship is missing, or the only parent is over a relationship excluded from calculation. SACM checks the mapping. A CI with Inherited set and Target empty waits two weeks: ServiceNow then copies Inherited to Target. A target without Inherited is fine.",
+  "family": "criticality",
+  "dimension": "completeness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_application",
+      "business_service",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "criticality/none-reaches",
+    "ref": "reference/criticality"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

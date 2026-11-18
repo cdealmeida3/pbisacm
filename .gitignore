@@ -1,0 +1,32 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+findings.json
+
+# Build
+node_modules/
+dist/
+
+# Browser check screenshots
+.build/
+
+# Power BI (plan §3.1): the binary file, the data cache and the per-user settings of Power BI Desktop never go in
+*.pbix
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+# The build of the TMDL check (tools/powerbi/tmdl-check/)
+tools/powerbi/tmdl-check/bin/
+tools/powerbi/tmdl-check/obj/

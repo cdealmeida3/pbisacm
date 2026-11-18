@@ -1,0 +1,37 @@
+/// One row per CI report, with the other reports its checks use.
+table Runs
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column CIs
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: CIs
+
+	column RelationshipFile
+		dataType: string
+		sourceColumn: RelationshipFile
+
+	column EpoFile
+		dataType: string
+		sourceColumn: EpoFile
+
+	column SolusiFile
+		dataType: string
+		sourceColumn: SolusiFile
+
+	column ContractFile
+		dataType: string
+		sourceColumn: ContractFile
+
+	partition Runs = m
+		mode: import
+		source = RunsRows

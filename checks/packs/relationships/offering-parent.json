@@ -1,0 +1,32 @@
+{
+  "id": "OFFERING-PARENT",
+  "status": "live",
+  "title": "Parent field and Business Service relationship of an offering do not match",
+  "cardLabel": "Offering parent",
+  "cardHint": "The Parent field of a Service Offering and its Business Service relationship do not name the same service. SACM fixes it.",
+  "cardText": "The Parent field of a Service Offering and its Business Service relationship must name the same, single Business Service. SACM fixes it, nobody is asked: use the fix list. When the Parent field names a service and no relationship exists, add the relationship to that service.",
+  "family": "relationships",
+  "dimension": "correctness",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "service_offering"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/offering-parent",
+    "ref": "reference/relationship-model"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

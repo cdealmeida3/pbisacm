@@ -1,0 +1,50 @@
+{
+  "id": "LIFECYCLE-REVIEW",
+  "status": "proposed",
+  "title": "Status in ServiceNow is not the same as in EPO (lifecycle review)",
+  "cardLabel": "Lifecycle review",
+  "cardHint": "A manager found that the status of a sampled CI is not the same as in EPO. SACM looks at the source first.",
+  "cardText": "From the lifecycle review (Audit, Lifecycle): a manager compared the status of a sampled CI with EPO and marked it Not the same. A service mapped CI: SACM copies the status of EPO into ServiceNow. A CI that is not service mapped should follow EPO by itself: raise an incident with the ServiceNow development team. Only when EPO itself looks wrong, press \"EPO itself looks wrong: ask the owner\" on the line. A line stays to solve until a later report shows another status for the CI.",
+  "family": "lifecycle",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "manual",
+    "module": "review/lifecycle",
+    "ref": "reference/lifecycle"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "message": {
+      "subject": "Status differs from EPO",
+      "intro": "In our lifecycle review, their status in ServiceNow was not the same as in EPO, and the status in EPO looks wrong to us.",
+      "ask": "Which status is right? Please correct it in EPO, or {reply}.",
+      "why": "The status decides whether a CI is followed up, and whether incidents and changes can use it."
+    },
+    "askWhenUnsure": "EPO itself looks wrong: ask the owner"
+  }
+}

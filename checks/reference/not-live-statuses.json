@@ -1,0 +1,25 @@
+{
+  "note": "Operational statuses of a CI that is not live yet. A CI is created in Ready and becomes Operational after sign-off; criticality comes after the BIA (Operational Activities Instruction 2.14). Findings on these CIs are listed under Waiting: not to solve, no message. They move to to solve at the first report that shows the CI live.",
+  "statuses": [
+    "Ready"
+  ],
+  "exceptChecks": [
+    "NAME-HIDDEN-CHAR",
+    "REL-WRONG-TYPE",
+    "REL-RETIRED",
+    "REL-TWICE",
+    "APP-INSTANCE-MATCH",
+    "OFFERING-PARENT",
+    "OFFERING-OWNER",
+    "NAME-FORMAT",
+    "READY-TOO-LONG",
+    "READY-TOO-LONG-BC",
+    "LIFECYCLE-REVIEW",
+    "EPO-DIFF",
+    "EPO-NOT-ARRIVED",
+    "TAG-MISSING",
+    "PROCESS-STAGE",
+    "MAPPING"
+  ],
+  "exceptNote": "Checks that SACM fixes itself, with no question to anybody, do not wait: they stay to solve on a CI that is not live yet. Ready too long is about the status Ready itself, and the lifecycle review compares the status with EPO: they do not wait either. The EPO checks compare ServiceNow with EPO, which has its own status for a system in construction: they do not wait either. The mapping backlog decides itself (D200): a CI in Ready waits, except a Business Process with CIA values, which is the one to map now."
+}

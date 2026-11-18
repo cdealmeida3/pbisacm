@@ -1,0 +1,48 @@
+{
+  "note": "The naming rules of the SACM instruction, as data. Patterns are regular expressions; upper and lower case count. 'when': only names that match it are tested. The check packs name the rules they apply (detector.rules). Decision of 11 Nov 2026, to confirm: the instruction writes \"API-\", but the API offerings in ServiceNow are written \"API - \" with spaces, so the rule follows the data.",
+  "rules": [
+    {
+      "id": "ba-suffix",
+      "classes": [
+        "business_application"
+      ],
+      "pattern": "_BA$",
+      "say": "The name does not end with _BA"
+    },
+    {
+      "id": "bs-suffix",
+      "classes": [
+        "business_service"
+      ],
+      "pattern": "_BS$",
+      "say": "The name does not end with _BS"
+    },
+    {
+      "id": "si-suffix",
+      "classes": [
+        "service_instance"
+      ],
+      "pattern": " - (PROD|TEST)$",
+      "say": "The name does not end with \" - PROD\" or \" - TEST\""
+    },
+    {
+      "id": "api-prefix",
+      "classes": [
+        "service_offering"
+      ],
+      "when": "^API\\b",
+      "pattern": "^API - ",
+      "say": "The name of an API offering does not start with \"API - \"",
+      "set": "Start the name with \"API - \" (API, space, hyphen, space)"
+    },
+    {
+      "id": "outer-space",
+      "classes": [
+        "*"
+      ],
+      "noOuterSpaces": true,
+      "say": "The name has a space at its start or its end",
+      "set": "Remove the space"
+    }
+  ]
+}

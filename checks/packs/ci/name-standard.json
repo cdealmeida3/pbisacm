@@ -1,0 +1,48 @@
+{
+  "id": "NAME-STANDARD",
+  "status": "proposed",
+  "title": "CI name does not follow the naming standard",
+  "cardLabel": "Name not standard",
+  "cardHint": "The name does not end as the instruction asks for its class, for example _BS. The owner corrects it in EPO.",
+  "cardText": "The instruction gives each class an ending: a Business Service ends with _BS, a Service Instance with \" - PROD\" or \" - TEST\". The owner is asked to correct the name in EPO. The name of a Business Application is on Application ≠ Instance: SACM copies it from its Service Instance.",
+  "family": "name",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_service",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "ci/name-standard",
+    "ref": "reference/name-rules",
+    "rules": [
+      "bs-suffix",
+      "si-suffix"
+    ]
+  },
+  "playbook": {
+    "path": "service-request",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "routeBy": "epo",
+    "message": {
+      "subject": "Name not standard",
+      "intro": "Their name does not follow the SACM naming standard.",
+      "ask": "Please correct the name. {Reply} if you need help, or if the name is right as it is.",
+      "why": "A standard name lets everybody find the CI and see what it is.",
+      "epoWhat": "name"
+    }
+  }
+}

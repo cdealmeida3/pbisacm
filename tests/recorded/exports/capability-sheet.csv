@@ -1,0 +1,5 @@
+﻿"Name","Operational status","Capabilities above","Capabilities below","Business Processes below","Description","Tags","Owned by","Managed by","Hidden characters"
+"Manage Events","Ready","","","","Capability to plan and run library events","","","",""
+"Manage Fines","Operational","","","","Capability to take and refund member fines","","","",""
+"Manage Fines","Operational","","","","Capability to move fines between member records","","","",""
+"Manage Member Records","Operational","","","Close the Month, Reconcile Index, Register a New Member","Capability to register and maintain library members","","","Cy Keeper",""

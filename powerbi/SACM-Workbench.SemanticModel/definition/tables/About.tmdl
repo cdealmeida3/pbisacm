@@ -1,0 +1,37 @@
+/// One row: the version, where the data comes from, the day the samples were recorded.
+table About
+
+	/// The day the report counts from: the day the samples were recorded in Sample mode, else today.
+	measure Today = IF ( SELECTEDVALUE ( About[SourceMode] ) = "Sample", MAX ( About[SampleDate] ), TODAY () )
+		formatString: d mmm yyyy
+
+	/// The line at the foot of every page.
+	measure 'About line' = "SACM Workbench " & SELECTEDVALUE ( About[Version] ) & " · " & SELECTEDVALUE ( About[Data] ) & " · refreshed " & FORMAT ( MAX ( About[RefreshedAt] ), "d mmm yyyy hh:nn" )
+
+	column Version
+		dataType: string
+		sourceColumn: Version
+
+	column SourceMode
+		dataType: string
+		sourceColumn: SourceMode
+
+	column Data
+		dataType: string
+		sourceColumn: Data
+
+	column SampleDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: SampleDate
+
+	column RefreshedAt
+		dataType: dateTime
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		sourceColumn: RefreshedAt
+
+	partition About = m
+		mode: import
+		source = AboutRows

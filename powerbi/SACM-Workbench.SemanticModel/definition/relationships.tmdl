@@ -1,0 +1,40 @@
+relationship Inventory_Classes
+	fromColumn: Inventory.Class
+	toColumn: Classes.Id
+
+relationship Notes_Checks
+	fromColumn: Notes.CheckId
+	toColumn: Checks.CheckId
+
+relationship SelfCheck_Checks
+	fromColumn: SelfCheck.CheckId
+	toColumn: Checks.CheckId
+
+relationship ReportFiles_ReportTypes
+	fromColumn: ReportFiles.Kind
+	toColumn: ReportTypes.Kind
+
+relationship ReportFiles_Date
+	fromColumn: ReportFiles.ReportDate
+	toColumn: Date.Date
+
+
+relationship Findings_Checks
+	fromColumn: Findings.CheckId
+	toColumn: Checks.CheckId
+
+relationship Tested_Checks
+	fromColumn: Tested.CheckId
+	toColumn: Checks.CheckId
+
+relationship Findings_Inventory
+	fromColumn: Findings.CiKey
+	toColumn: Inventory.Key
+
+relationship RelationshipLinks_Inventory
+	fromColumn: RelationshipLinks.CiKey
+	toColumn: Inventory.Key
+
+relationship MappingBacklog_Inventory
+	fromColumn: MappingBacklog.CiKey
+	toColumn: Inventory.Key

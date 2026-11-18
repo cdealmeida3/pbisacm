@@ -1,0 +1,37 @@
+{
+  "note": "Tags of the team that explain a finding. A finding of a listed check on a CI with one of the tags is listed under Known: not to solve, no message. Remove the tag in ServiceNow and the finding is to solve at the next report. Tags are compared ignoring case and spaces.",
+  "rules": [
+    {
+      "checks": [
+        "CRIT-TARGET-MISSING",
+        "CRIT-NONE-REACHES"
+      ],
+      "tags": [
+        "BIA is pending",
+        "BIA N/A"
+      ],
+      "why": "The BIA that gives the values is pending, or does not apply."
+    },
+    {
+      "checks": [
+        "RESP-SAME-PERSON"
+      ],
+      "tags": [
+        "Owned by is interim managed by"
+      ],
+      "why": "The manager holds the owner role for a while, on purpose."
+    },
+    {
+      "checks": [
+        "REL-MISSING",
+        "MAPPING"
+      ],
+      "tags": [
+        "To Be Mapped",
+        "Descoped",
+        "Process is missing or unknown"
+      ],
+      "why": "Mapping is planned (To Be Mapped, Descoped), or the process is not known yet."
+    }
+  ]
+}

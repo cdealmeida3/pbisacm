@@ -1,0 +1,42 @@
+{
+  "name": "sacm-data-quality-workbench",
+  "private": true,
+  "version": "0.39.0",
+  "type": "module",
+  "description": "SACM Data Quality Workbench. Tests need nothing installed; the app build needs npm install once.",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "node --no-warnings --test \"tests/**/*.test.ts\"",
+    "check": "node src/hosts/cli.ts samples/cmdb_ci-sample.csv",
+    "build": "node --no-warnings tools/build-app.mjs",
+    "typecheck": "tsc -p . && tsc -p tsconfig.node.json",
+    "record": "node --no-warnings tools/record-samples.ts",
+    "privacy": "node --no-warnings tools/privacy-guard.ts",
+    "rules": "node --no-warnings tools/repository-rules.ts",
+    "placeholders": "node --no-warnings tools/placeholders.ts",
+    "docs": "node --no-warnings tools/checks-doc.ts && node --no-warnings tools/placeholders.ts --doc",
+    "browser": "node tests/browser/run.mjs",
+    "powerbi:generate": "node --no-warnings tools/powerbi/generate.ts",
+    "powerbi:lint": "node --no-warnings tools/powerbi/lint.ts",
+    "powerbi:connector": "node --no-warnings tools/powerbi/connector.ts",
+    "powerbi:parity": "node --no-warnings tools/powerbi/parity.ts",
+    "verify": "npm run typecheck && npm test && npm run build && git diff --exit-code -- app/SACM-Workbench.html"
+  },
+  "devDependencies": {
+    "@microsoft/powerquery-parser": "5.0.0",
+    "@tailwindcss/vite": "4.3.5",
+    "@types/node": "22.20.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "ajv": "8.20.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tailwindcss": "4.3.5",
+    "typescript": "5.9.3",
+    "vite": "7.3.8",
+    "vite-plugin-singlefile": "2.3.4"
+  }
+}

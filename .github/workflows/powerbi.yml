@@ -1,0 +1,110 @@
+# The Power BI report's Power Query, run for real on the invented samples (plan §9.2, the job "powerbi-eval"). Microsoft's
+# Power Query test tool (PQTest, in the NuGet package Microsoft.PowerQuery.SdkTools) runs only on Windows, so this job
+# uses GitHub's own Windows runner, never a self-hosted one (D286).
+#   1. tools/powerbi/connector.ts packs every query of the model into a small test connector (SacmEval.mez).
+#   2. PQTest runs each table of the model and the unit cases of the reading functions, in Sample mode: no data source.
+#   3. tools/powerbi/parity.ts compares the result with the answer key (src/core/ and tests/recorded/), line by line.
+#   4. Started by hand (workflow_dispatch): the tables are timed on invented samples at the size of the real reports.
+# Only on pull requests that change the report, the check files, the samples, the readers or the answer key.
+name: Power BI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - powerbi/**
+      - checks/**
+      - samples/**
+      - src/core/**
+      - tests/recorded/**
+      - tests/sample-record.ts
+      - tools/powerbi/**
+      - package-lock.json
+      - .github/workflows/powerbi.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  powerbi-eval:
+    if: github.event.pull_request.draft != true
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      SDK_VERSION: 2.160.2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm ci
+      - name: Power Query SDK tools (cached)
+        id: sdk
+        uses: actions/cache@v4
+        with:
+          path: .build/pqsdk
+          key: pqsdk-${{ env.SDK_VERSION }}
+      - name: Download the SDK tools
+        if: steps.sdk.outputs.cache-hit != 'true'
+        run: |
+          New-Item -ItemType Directory -Force .build | Out-Null
+          Invoke-WebRequest -Uri "https://api.nuget.org/v3-flatcontainer/microsoft.powerquery.sdktools/$env:SDK_VERSION/microsoft.powerquery.sdktools.$env:SDK_VERSION.nupkg" -OutFile .build/pqsdk.zip
+          Expand-Archive .build/pqsdk.zip -DestinationPath .build/pqsdk
+      - name: Build the test connector
+        run: |
+          node tools/powerbi/connector.ts .build/powerbi
+          Compress-Archive -Path .build/powerbi/SacmEval/SacmEval.pq -DestinationPath .build/powerbi/SacmEval.zip
+          Move-Item .build/powerbi/SacmEval.zip .build/powerbi/SacmEval.mez
+      - name: Run the queries
+        run: |
+          $pqtest = ".build/pqsdk/tools/PQTest.exe"
+          $mez = ".build/powerbi/SacmEval.mez"
+          $queries = Get-ChildItem .build/powerbi/queries -Filter *.pq | Sort-Object Name
+          New-Item -ItemType Directory -Force .build/powerbi/results | Out-Null
+          foreach ($query in $queries) {
+            # The data source path is the table name, so each query gets its own (anonymous) credential.
+            & $pqtest credential-template -e $mez -q $query.FullName -p -ak Anonymous | & $pqtest set-credential -e $mez -q $query.FullName -p | Out-Null
+            $out = ".build/powerbi/results/$($query.BaseName).json"
+            & $pqtest run-test -e $mez -q $query.FullName -p | Out-File -Encoding utf8NoBOM $out
+            Write-Output "$($query.BaseName): $((Get-Item $out).Length) bytes"
+            # A failed query: its error in the log, so the reason is seen without the artifact (invented samples only).
+            if (Select-String -Path $out -Pattern '"Status": *"Failed"' -Quiet) { Get-Content $out -TotalCount 40 | Write-Output }
+          }
+          exit 0
+      - name: Compare with the answer key
+        run: node tools/powerbi/parity.ts .build/powerbi/results
+      # The refresh time at the size of the real reports (about 3,200 CIs and 5,100 relationships, invented: scaled.ts).
+      # Only when the workflow is started by hand: it says how long, it fails nothing.
+      - name: Time the tables at real size
+        if: github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        timeout-minutes: 15
+        run: |
+          node tools/powerbi/connector.ts .build/powerbi-real --real-size
+          Compress-Archive -Path .build/powerbi-real/SacmEval/SacmEval.pq -DestinationPath .build/powerbi-real/SacmEval.zip
+          Move-Item .build/powerbi-real/SacmEval.zip .build/powerbi-real/SacmEval.mez
+          $pqtest = ".build/pqsdk/tools/PQTest.exe"
+          $mez = ".build/powerbi-real/SacmEval.mez"
+          foreach ($name in @("Inventory", "Relationships", "Findings", "Tested", "Notes", "MappingBacklog", "RelationshipLinks", "CapabilitySheet")) {
+            $query = ".build/powerbi-real/queries/$name.pq"
+            & $pqtest credential-template -e $mez -q $query -p -ak Anonymous | & $pqtest set-credential -e $mez -q $query -p | Out-Null
+            $out = ".build/powerbi-real/$name.json"
+            $time = Measure-Command { & $pqtest run-test -e $mez -q $query -p | Out-File -Encoding utf8NoBOM $out }
+            $status = if (Select-String -Path $out -Pattern '"Status": *"Passed"' -Quiet) { "passed" } else { "FAILED" }
+            Write-Output ("{0}: {1:N1} s, {2}, {3} bytes" -f $name, $time.TotalSeconds, $status, (Get-Item $out).Length)
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: powerbi-eval
+          path: .build/powerbi/results/
+          retention-days: 7

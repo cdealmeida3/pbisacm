@@ -1,0 +1,66 @@
+{
+  "ending": [
+    {
+      "days": 30,
+      "contracts": []
+    },
+    {
+      "days": 90,
+      "contracts": [
+        {
+          "number": "CT000006",
+          "status": "S - Concluded",
+          "name": "Example Tools - support agreement",
+          "vendor": "Example Tools Ltd",
+          "vendorNumber": "V0006",
+          "category": "Software",
+          "start": "2024-06-01",
+          "end": "2026-12-15",
+          "duration": "Fixed-term",
+          "owner": "Olga Owner",
+          "dailyResponsible": "Dana Daily",
+          "procurementPartner": "Pat Partner",
+          "epoId": "",
+          "sheet": "active",
+          "terminated": ""
+        },
+        {
+          "number": "CT000005",
+          "status": "S - Concluded",
+          "name": "Example Network - connectivity",
+          "vendor": "Example Network Ltd",
+          "vendorNumber": "V0005",
+          "category": "Connectivity agreement",
+          "start": "2024-02-01",
+          "end": "2027-01-31",
+          "duration": "Fixed-term",
+          "owner": "Olga Owner",
+          "dailyResponsible": "Dana Daily",
+          "procurementPartner": "Pat Partner",
+          "epoId": "9999",
+          "sheet": "active",
+          "terminated": ""
+        }
+      ]
+    }
+  ],
+  "noDailyResponsible": [
+    {
+      "number": "CT000002",
+      "status": "S - Concluded",
+      "name": "Example Consulting - framework agreement",
+      "vendor": "Example Consulting Ltd",
+      "vendorNumber": "",
+      "category": "Consultants",
+      "start": "2022-05-01",
+      "end": "",
+      "duration": "Open-ended",
+      "owner": "Olga Owner",
+      "dailyResponsible": "",
+      "procurementPartner": "Pat Partner",
+      "epoId": "",
+      "sheet": "active",
+      "terminated": ""
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "RESP-SAME-PERSON",
+  "status": "proposed",
+  "title": "Owned by and Managed by are the same person",
+  "cardLabel": "Owner = Manager",
+  "cardHint": "Owned by and Managed by name the same person. They should be two different people.",
+  "family": "responsibility",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "op": "samePersonAs",
+      "field": "owned_by",
+      "value": "managed_by"
+    }
+  },
+  "playbook": {
+    "path": "service-request",
+    "audience": [
+      "managed_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "routeBy": "epo",
+    "message": {
+      "subject": "Same person as owner and manager",
+      "intro": "The same person is Owned by and Managed by.",
+      "ask": "Could you name a second person for Managed by? You can reply, or raise the request {request:managed-by-update}.",
+      "why": "The two roles approve changes together. One person in both means there is no second check.",
+      "epoAsk": "Could you name a second person as Primary Responsible (Managed by) in EPO?",
+      "askByTeam": {
+        "process-management": "Could you name a second person for Managed by? Please {reply} with the name for each process, and we will update ServiceNow."
+      }
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "note": "Lifecycle rules (Operational Activities Instruction 2.13). 'rules': a CI sits in a status for more than 'days' days, counted from the day the record was created or last changed, to the date of the report. 'days' is the value proposed; the team sets its own number in Settings ('setting'). 'fix': the line of the fix list when SACM changes the status itself (Business Capabilities in Ready). 'review': the sample of the lifecycle review, drawn only from the classes EPO holds (Business Service, Service Offering, Service Instance), so every CI of the sample can be compared with EPO; drawn once on a button press and saved in data/reviews/ of the team folder.",
+  "rules": [
+    {
+      "id": "under-retirement",
+      "status": "Under retirement",
+      "from": "updated",
+      "days": 90,
+      "setting": "underRetirementDays",
+      "say": "Status {status}, and the record did not change since {date} ({age} days)"
+    },
+    {
+      "id": "ready",
+      "status": "Ready",
+      "from": "created",
+      "days": 90,
+      "setting": "readyDays",
+      "say": "Status {status} since it was created on {date} ({age} days)",
+      "fix": {
+        "change": "Operational status: make it Operational",
+        "set": "Operational"
+      }
+    }
+  ],
+  "review": {
+    "sample": 50,
+    "classes": [
+      "business_service",
+      "service_offering",
+      "service_instance"
+    ],
+    "underRetirement": 20,
+    "underRetirementStatus": "Under retirement",
+    "retiredStatuses": [
+      "Retired"
+    ],
+    "results": [
+      {
+        "id": "same",
+        "label": "Same in EPO"
+      },
+      {
+        "id": "different",
+        "label": "Not the same"
+      },
+      {
+        "id": "not-in-epo",
+        "label": "Not in EPO"
+      }
+    ],
+    "opensCase": [
+      "different"
+    ]
+  },
+  "processStages": {
+    "note": "The stages of a Business Process in Ready (D197). Waits for the BIA: no CIA value (Target) yet, no line, only a note. To map: CIA values and nothing live linked below of the classes in below: no line here, the process is a case of the Mapping backlog (D200), and a note says how many. Mapped: CIA values and something linked below: SACM makes it Operational.",
+    "status": "Ready",
+    "below": [
+      "business_application",
+      "business_service"
+    ],
+    "waits": {
+      "one": "1 Business Process in Ready waits for the BIA (no CIA values yet): nothing to do.",
+      "many": "{n} Business Processes in Ready wait for the BIA (no CIA values yet): nothing to do."
+    },
+    "toMap": {
+      "one": "1 Business Process in Ready is to map (CIA values set, nothing linked below): it is on the Mapping backlog.",
+      "many": "{n} Business Processes in Ready are to map (CIA values set, nothing linked below): they are on the Mapping backlog."
+    },
+    "mapped": {
+      "say": "Mapped: the CIA values are set and {below} linked below. Make it Operational",
+      "change": "Operational status: make it Operational",
+      "current": "Ready, mapped",
+      "set": "Operational"
+    }
+  }
+}

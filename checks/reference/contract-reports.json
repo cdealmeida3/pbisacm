@@ -1,0 +1,247 @@
+{
+  "note": "The two contract files (piece 5C, procedure 2.8): the Solusi contract file (Excel, every Monday; row 1 field names, row 2 labels) and the ServiceNow contract report (ast_contract). They are matched by the Solusi contract number, which ServiceNow keeps in Vendor contract. Procurement owns the data: a wrong value is corrected in Solusi, because the next import writes over ServiceNow. The problems of the contract data ('problems') are split over two cards: For Procurement raises the problems of Solusi itself, Contracts to fix in ServiceNow the ones SACM corrects in ServiceNow ('change' and 'set' are the words of its fix list). An inactive contract owner or Procurement partner: when the loaded reports know an active account with the same name, the upload picked the wrong account and SACM sets the active one ('ownerInactive', 'partnerInactive'); when they know none, the person left and Procurement names a new person in Solusi ('ownerLeft', 'partnerLeft').",
+  "solusi": {
+    "columns": {
+      "number": [
+        "contract_no"
+      ],
+      "status": [
+        "contract_status"
+      ],
+      "name": [
+        "contract_name"
+      ],
+      "vendor": [
+        "partner_name"
+      ],
+      "vendorNumber": [
+        "partner_no"
+      ],
+      "category": [
+        "contract_category"
+      ],
+      "start": [
+        "contract_start"
+      ],
+      "end": [
+        "contract_end"
+      ],
+      "duration": [
+        "map_duration_type"
+      ],
+      "owner": [
+        "clm_contract_owner"
+      ],
+      "dailyResponsible": [
+        "clm_contract_daily_responsible"
+      ],
+      "procurementPartner": [
+        "clm_contract_supporter"
+      ],
+      "epoId": [
+        "clm_contract_epo_id"
+      ],
+      "terminated": [
+        "termination_date"
+      ]
+    },
+    "labelRow": [
+      "contract no.",
+      "contract no",
+      "contract"
+    ],
+    "terminatedSheet": "The tab with a termination date column holds the contracts terminated in the last 7 days."
+  },
+  "servicenow": {
+    "columns": {
+      "number": [
+        "number"
+      ],
+      "vendorContract": [
+        "vendor_contract"
+      ],
+      "state": [
+        "state"
+      ],
+      "name": [
+        "short_description"
+      ],
+      "vendor": [
+        "vendor"
+      ],
+      "category": [
+        "u_contract_category"
+      ],
+      "start": [
+        "starts"
+      ],
+      "end": [
+        "ends"
+      ],
+      "owner": [
+        "business_owner"
+      ],
+      "ownerActive": [
+        "business_owner.active"
+      ],
+      "ownerUserId": [
+        "business_owner.user_name"
+      ],
+      "ownerEmail": [
+        "business_owner.email"
+      ],
+      "dailyResponsible": [
+        "u_point_of_contact"
+      ],
+      "procurementPartner": [
+        "contract_administrator"
+      ],
+      "procurementPartnerActive": [
+        "contract_administrator.active"
+      ],
+      "procurementPartnerUserId": [
+        "contract_administrator.user_name"
+      ],
+      "procurementPartnerEmail": [
+        "contract_administrator.email"
+      ],
+      "tags": [
+        "sys_tags"
+      ],
+      "criticality": [
+        "u_inherited_confidentiality",
+        "u_inherited_integrity",
+        "u_inherited_availability",
+        "u_inherited_authenticity"
+      ]
+    }
+  },
+  "fields": [
+    {
+      "field": "name",
+      "label": "Name",
+      "kind": "text"
+    },
+    {
+      "field": "vendor",
+      "label": "Vendor",
+      "kind": "text"
+    },
+    {
+      "field": "category",
+      "label": "Category",
+      "kind": "text"
+    },
+    {
+      "field": "start",
+      "label": "Start date",
+      "kind": "date"
+    },
+    {
+      "field": "end",
+      "label": "End date",
+      "kind": "date"
+    },
+    {
+      "field": "owner",
+      "label": "Contract owner",
+      "kind": "person"
+    },
+    {
+      "field": "dailyResponsible",
+      "label": "Daily responsible",
+      "kind": "person"
+    },
+    {
+      "field": "procurementPartner",
+      "label": "Procurement partner",
+      "kind": "person"
+    }
+  ],
+  "autoStates": [
+    "Expired"
+  ],
+  "draftStates": [
+    "Draft"
+  ],
+  "statusTag": "\\b[ESTN]\\s*-\\s*(Ended|Terminated|Concluded|In negotiation)\\b",
+  "runningStatuses": [
+    "S - Concluded",
+    "N - In negotiation"
+  ],
+  "targetTag": "target\\s*bc\\s*=\\s*[1-4]",
+  "concludedStatuses": [
+    "S - Concluded"
+  ],
+  "fixedTermWords": [
+    "Fixed-term"
+  ],
+  "epo": {
+    "classes": [
+      "service_instance"
+    ],
+    "retiredStatuses": [
+      "Retired"
+    ],
+    "minDigits": 3
+  },
+  "endsWithinDays": [
+    30,
+    90
+  ],
+  "problems": [
+    {
+      "id": "ownerInactive",
+      "label": "Contract owner: an inactive account was picked",
+      "change": "Contract owner: set the active account with the same name",
+      "set": "the active account"
+    },
+    {
+      "id": "partnerInactive",
+      "label": "Procurement partner: an inactive account was picked",
+      "change": "Procurement partner: set the active account with the same name",
+      "set": "the active account"
+    },
+    {
+      "id": "noOwner",
+      "label": "No contract owner"
+    },
+    {
+      "id": "ownerLeft",
+      "label": "Contract owner left"
+    },
+    {
+      "id": "partnerLeft",
+      "label": "Procurement partner left"
+    },
+    {
+      "id": "personName",
+      "label": "A name ServiceNow does not show the same",
+      "change": "set the person Solusi names"
+    },
+    {
+      "id": "endPassed",
+      "label": "Concluded, but the end date has passed",
+      "change": "End date: correct it, or set the status Ended",
+      "set": "the right end date, or Ended"
+    },
+    {
+      "id": "noEnd",
+      "label": "Fixed-term, but no end date",
+      "change": "End date: add it, or correct the duration type",
+      "set": "the end date"
+    },
+    {
+      "id": "noVendorNumber",
+      "label": "No vendor number"
+    },
+    {
+      "id": "epoRetired",
+      "label": "The EPO ID names a Retired system"
+    },
+    {
+      "id": "epoUnknown",
+      "label": "The EPO ID is not a known EPO ID"
+    }
+  ]
+}

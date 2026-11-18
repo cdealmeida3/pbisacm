@@ -1,0 +1,39 @@
+{
+  "note": "Parked classes (decision D179): CIs that are not checked yet. A parked CI stays in the report, so relationships to it count, but no check tests it, it has no line on any card and it is not counted as tested. The first screen, the load message and the verification record show one grey line per rule instead, so nothing is hidden silently. 'statuses': only CIs in these statuses are parked (empty: every status); a Retired CI is never counted. 'one', 'many' ({n} is the number) and 'none' are the words of the line; 'none' empty: no line. 'fields': parts of checks (check:field) that are parked with the rule on every CI. A capability that is Operational or Under retirement is checked as before; its own rules wait for the round with Enterprise Architecture (OPEN-QUESTIONS).",
+  "rules": [
+    {
+      "id": "capability-ready",
+      "classes": [
+        "business_capability"
+      ],
+      "statuses": [
+        "Ready"
+      ],
+      "one": "1 Business Capability in Ready is not checked yet",
+      "many": "{n} Business Capabilities in Ready are not checked yet",
+      "none": "",
+      "fields": [
+        "REL-MISSING:bp-business-capability"
+      ]
+    },
+    {
+      "id": "api-application",
+      "classes": [
+        "api",
+        "application"
+      ],
+      "one": "1 API or Application CI is not checked yet: the class is not used yet",
+      "many": "{n} API or Application CIs are not checked yet: the classes are not used yet",
+      "none": "No API or Application CIs in this report"
+    },
+    {
+      "id": "technology-management-service",
+      "classes": [
+        "technology_management_service"
+      ],
+      "one": "1 Technology Management Service is not checked yet: the class is not used yet",
+      "many": "{n} Technology Management Services are not checked yet: the class is not used yet",
+      "none": "No Technology Management Service in this report"
+    }
+  ]
+}

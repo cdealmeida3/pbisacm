@@ -1,0 +1,324 @@
+/// The CIs of the newest CI report, with every column the checks read.
+table Inventory
+
+	/// CIs in the newest CI report.
+	measure CIs = COUNTROWS ( Inventory ) + 0
+		formatString: #,0
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column Key
+		dataType: string
+		sourceColumn: Key
+
+	column Class
+		dataType: string
+		sourceColumn: Class
+
+	column Name
+		dataType: string
+		sourceColumn: Name
+
+	column SourceClass
+		dataType: string
+		sourceColumn: SourceClass
+
+	column AssetTag
+		dataType: string
+		sourceColumn: AssetTag
+
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	column Description
+		dataType: string
+		sourceColumn: Description
+
+	column SupportGroup
+		dataType: string
+		sourceColumn: SupportGroup
+
+	column Tags
+		dataType: string
+		sourceColumn: Tags
+
+	column DiscoverySource
+		dataType: string
+		sourceColumn: DiscoverySource
+
+	column ExceptionStatus
+		dataType: string
+		sourceColumn: ExceptionStatus
+
+	column ExceptionJustification
+		dataType: string
+		sourceColumn: ExceptionJustification
+
+	column ServiceMapped
+		dataType: boolean
+		sourceColumn: ServiceMapped
+
+	column Platform
+		dataType: boolean
+		sourceColumn: Platform
+
+	column Environment
+		dataType: string
+		sourceColumn: Environment
+
+	column ParentService
+		dataType: string
+		sourceColumn: ParentService
+
+	column SupportGroupActive
+		dataType: boolean
+		sourceColumn: SupportGroupActive
+
+	column CreatedOn
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: CreatedOn
+
+	column CreatedBy
+		dataType: string
+		sourceColumn: CreatedBy
+
+	column UpdatedOn
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: UpdatedOn
+
+	column OwnedBy
+		dataType: string
+		sourceColumn: OwnedBy
+
+	column OwnedByEmail
+		dataType: string
+		sourceColumn: OwnedByEmail
+
+	column OwnedByUserId
+		dataType: string
+		sourceColumn: OwnedByUserId
+
+	column OwnedByActive
+		dataType: boolean
+		sourceColumn: OwnedByActive
+
+	column OwnedByManager
+		dataType: string
+		sourceColumn: OwnedByManager
+
+	column OwnedByManagerEmail
+		dataType: string
+		sourceColumn: OwnedByManagerEmail
+
+	column OwnedByManagerActive
+		dataType: boolean
+		sourceColumn: OwnedByManagerActive
+
+	column OwnedByManagerUserId
+		dataType: string
+		sourceColumn: OwnedByManagerUserId
+
+	column OwnedByDepartmentHead
+		dataType: string
+		sourceColumn: OwnedByDepartmentHead
+
+	column OwnedByDepartmentHeadEmail
+		dataType: string
+		sourceColumn: OwnedByDepartmentHeadEmail
+
+	column OwnedByDepartmentHeadUserId
+		dataType: string
+		sourceColumn: OwnedByDepartmentHeadUserId
+
+	column ManagedBy
+		dataType: string
+		sourceColumn: ManagedBy
+
+	column ManagedByEmail
+		dataType: string
+		sourceColumn: ManagedByEmail
+
+	column ManagedByUserId
+		dataType: string
+		sourceColumn: ManagedByUserId
+
+	column ManagedByActive
+		dataType: boolean
+		sourceColumn: ManagedByActive
+
+	column ManagedByManager
+		dataType: string
+		sourceColumn: ManagedByManager
+
+	column ManagedByManagerEmail
+		dataType: string
+		sourceColumn: ManagedByManagerEmail
+
+	column ManagedByManagerActive
+		dataType: boolean
+		sourceColumn: ManagedByManagerActive
+
+	column ManagedByManagerUserId
+		dataType: string
+		sourceColumn: ManagedByManagerUserId
+
+	column ManagedByDepartmentHead
+		dataType: string
+		sourceColumn: ManagedByDepartmentHead
+
+	column ManagedByDepartmentHeadEmail
+		dataType: string
+		sourceColumn: ManagedByDepartmentHeadEmail
+
+	column ManagedByDepartmentHeadUserId
+		dataType: string
+		sourceColumn: ManagedByDepartmentHeadUserId
+
+	column SupportedBy
+		dataType: string
+		sourceColumn: SupportedBy
+
+	column SupportedByEmail
+		dataType: string
+		sourceColumn: SupportedByEmail
+
+	column SupportedByUserId
+		dataType: string
+		sourceColumn: SupportedByUserId
+
+	column SupportedByActive
+		dataType: boolean
+		sourceColumn: SupportedByActive
+
+	column SupportedByManager
+		dataType: string
+		sourceColumn: SupportedByManager
+
+	column SupportedByManagerEmail
+		dataType: string
+		sourceColumn: SupportedByManagerEmail
+
+	column SupportedByManagerActive
+		dataType: boolean
+		sourceColumn: SupportedByManagerActive
+
+	column SupportedByManagerUserId
+		dataType: string
+		sourceColumn: SupportedByManagerUserId
+
+	column SupportedByDepartmentHead
+		dataType: string
+		sourceColumn: SupportedByDepartmentHead
+
+	column SupportedByDepartmentHeadEmail
+		dataType: string
+		sourceColumn: SupportedByDepartmentHeadEmail
+
+	column SupportedByDepartmentHeadUserId
+		dataType: string
+		sourceColumn: SupportedByDepartmentHeadUserId
+
+	column AssignedTo
+		dataType: string
+		sourceColumn: AssignedTo
+
+	column AssignedToEmail
+		dataType: string
+		sourceColumn: AssignedToEmail
+
+	column AssignedToUserId
+		dataType: string
+		sourceColumn: AssignedToUserId
+
+	column AssignedToActive
+		dataType: boolean
+		sourceColumn: AssignedToActive
+
+	column AssignedToManager
+		dataType: string
+		sourceColumn: AssignedToManager
+
+	column AssignedToManagerEmail
+		dataType: string
+		sourceColumn: AssignedToManagerEmail
+
+	column AssignedToManagerActive
+		dataType: boolean
+		sourceColumn: AssignedToManagerActive
+
+	column AssignedToManagerUserId
+		dataType: string
+		sourceColumn: AssignedToManagerUserId
+
+	column AssignedToDepartmentHead
+		dataType: string
+		sourceColumn: AssignedToDepartmentHead
+
+	column AssignedToDepartmentHeadEmail
+		dataType: string
+		sourceColumn: AssignedToDepartmentHeadEmail
+
+	column AssignedToDepartmentHeadUserId
+		dataType: string
+		sourceColumn: AssignedToDepartmentHeadUserId
+
+	column TargetConfidentiality
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: TargetConfidentiality
+
+	column TargetIntegrity
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: TargetIntegrity
+
+	column TargetAvailability
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: TargetAvailability
+
+	column TargetAuthenticity
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: TargetAuthenticity
+
+	column InheritedConfidentiality
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: InheritedConfidentiality
+
+	column InheritedIntegrity
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: InheritedIntegrity
+
+	column InheritedAvailability
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: InheritedAvailability
+
+	column InheritedAuthenticity
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: InheritedAuthenticity
+
+	column NameSpaces
+		dataType: boolean
+		sourceColumn: NameSpaces
+
+	partition Inventory = m
+		mode: import
+		source = InventoryRows

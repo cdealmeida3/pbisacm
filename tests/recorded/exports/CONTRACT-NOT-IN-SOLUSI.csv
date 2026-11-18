@@ -1,0 +1,5 @@
+﻿"Problem","Contract number","Name","Vendor","What we found","What is asked","Status"
+"","CNTR0001100","Example Draft - typed in by hand","","In ServiceNow with no Solusi contract number (status Draft): it does not come from Solusi","","New"
+"","CT000090","Example Archive - old storage agreement","Example Archive Ltd","In ServiceNow (status Expired), not in the Solusi contract file of 11 November 2026","","New"
+"","CT000091","Example Print - printer lease","Example Print Ltd","In ServiceNow (status T - Terminated), not in the Solusi contract file of 11 November 2026. Still linked: it carries a criticality from a CI; it is tagged Target BC = 3","","New"
+"","CT000092","Example Legacy - maintenance","Example Legacy Ltd","In ServiceNow (status S - Concluded), not in the Solusi contract file of 11 November 2026. Still linked: it is S - Concluded and ends 31 December 2099","","New"

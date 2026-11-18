@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@source "./";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * The look of the app (docs/LOOK.md): one list of named colours, sizes and corners, light and dark. A screen uses only
+ * these names (bg-surface, text-muted, ring-line, bg-red-soft and so on); the colours of Tailwind are switched off, so a
+ * raw colour such as text-slate-500 draws nothing, and tests/app/ui/look.test.ts fails on it.
+ */
+@font-face { font-family: "Nunito Sans"; font-weight: 400; font-style: normal; font-display: block; src: url("./ui/fonts/nunito-sans-latin-400.woff2") format("woff2"); }
+@font-face { font-family: "Nunito Sans"; font-weight: 600; font-style: normal; font-display: block; src: url("./ui/fonts/nunito-sans-latin-600.woff2") format("woff2"); }
+@font-face { font-family: "Nunito Sans"; font-weight: 700; font-style: normal; font-display: block; src: url("./ui/fonts/nunito-sans-latin-700.woff2") format("woff2"); }
+
+:root {
+  /* Neutrals: the page, the surfaces, the lines and the text. */
+  --wb-page: #faf6f1; --wb-surface: #ffffff; --wb-surface-2: #f6f0e8; --wb-line: #e8dfd3; --wb-line-strong: #cfc3b4;
+  --wb-ink: #2b2623; --wb-muted: #655a52;
+  /* Navy: buttons and what is selected. Coral and pale pink: decoration only, never a button and never a state. */
+  --wb-accent: #0c1c49; --wb-accent-hover: #1b2f6e; --wb-accent-soft: #e6e9f4; --wb-on-accent: #ffffff;
+  --wb-deco: #fd472c; --wb-pink: #f5ddd2;
+  /* One meaning per colour (rule 4): the text colour, the soft background and the line of each. */
+  --wb-red: #b42318; --wb-red-soft: #fef3f2; --wb-red-line: #fecdca;
+  --wb-blue: #175cd3; --wb-blue-soft: #eff8ff; --wb-blue-line: #b2ddff;
+  --wb-teal: #107569; --wb-teal-soft: #f0fdf9; --wb-teal-line: #99f6e0;
+  --wb-green: #067647; --wb-green-soft: #ecfdf3; --wb-green-line: #abefc6;
+  --wb-violet: #5925dc; --wb-violet-soft: #f4f3ff; --wb-violet-line: #d9d6fe;
+  --wb-amber: #7d5700; --wb-amber-soft: #fffaeb; --wb-amber-line: #fedf89;
+  --wb-grey: #475467; --wb-grey-soft: #f2f4f7; --wb-grey-line: #d0d5dd;
+  /* Tooltips and toasts, the shade behind a window, the shadows. */
+  --wb-tip: #1f2d3a; --wb-tip-ink: #ffffff; --wb-scrim: rgb(15 23 32 / 38%);
+  --wb-shadow-1: 0 1px 3px rgb(80 50 20 / 8%); --wb-shadow-2: 0 10px 40px rgb(16 32 48 / 22%);
+  color-scheme: light;
+}
+:root.dark {
+  --wb-page: #1a1614; --wb-surface: #241f1c; --wb-surface-2: #2f2824; --wb-line: #40372f; --wb-line-strong: #5e5247;
+  --wb-ink: #f1ebe5; --wb-muted: #bdb1a7;
+  --wb-accent: #f0f1f4; --wb-accent-hover: #ffffff; --wb-accent-soft: #1c2a5e; --wb-on-accent: #0c1c49;
+  --wb-deco: #fd472c; --wb-pink: #2a1f2a;
+  --wb-red: #fda29b; --wb-red-soft: #3b1613; --wb-red-line: #7a271a;
+  --wb-blue: #93b4ff; --wb-blue-soft: #112457; --wb-blue-line: #1849a9;
+  --wb-teal: #5fe9d0; --wb-teal-soft: #0c332e; --wb-teal-line: #125d56;
+  --wb-green: #75e0a7; --wb-green-soft: #0a3120; --wb-green-line: #085d3a;
+  --wb-violet: #bdb4fe; --wb-violet-soft: #2a2060; --wb-violet-line: #4a1fb8;
+  --wb-amber: #fec84b; --wb-amber-soft: #3a2806; --wb-amber-line: #7a2e0e;
+  --wb-grey: #cdd5df; --wb-grey-soft: #2b323b; --wb-grey-line: #4b5563;
+  --wb-tip: #e8edf2; --wb-tip-ink: #11171d; --wb-scrim: rgb(0 0 0 / 55%);
+  --wb-shadow-1: 0 1px 2px rgb(0 0 0 / 40%); --wb-shadow-2: 0 10px 40px rgb(0 0 0 / 60%);
+  color-scheme: dark;
+}
+
+@theme {
+  --color-*: initial;
+  --font-sans: "Nunito Sans", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  /* Corners of look D: 8 chips and fields, 10 buttons and boxes, 16 panels and windows; round for badges. */
+  --radius-sm: 6px; --radius-md: 8px; --radius-lg: 10px; --radius-xl: 16px; --radius-2xl: 16px;
+  /* Text of look D (D211, version 0.30): 15 px for text, 13 px for second text; 16, 18 and 22 px for titles. */
+  --text-xs: 13px; --text-xs--line-height: 18px; --text-sm: 15px; --text-sm--line-height: 22px;
+  --text-base: 16px; --text-base--line-height: 24px; --text-lg: 18px; --text-lg--line-height: 26px;
+}
+@theme inline {
+  --color-transparent: transparent; --color-current: currentColor;
+  --color-page: var(--wb-page); --color-surface: var(--wb-surface); --color-surface-2: var(--wb-surface-2);
+  --color-line: var(--wb-line); --color-line-strong: var(--wb-line-strong); --color-ink: var(--wb-ink); --color-muted: var(--wb-muted);
+  --color-accent: var(--wb-accent); --color-accent-hover: var(--wb-accent-hover); --color-accent-soft: var(--wb-accent-soft); --color-on-accent: var(--wb-on-accent);
+  --color-deco: var(--wb-deco); --color-pink: var(--wb-pink);
+  --color-red: var(--wb-red); --color-red-soft: var(--wb-red-soft); --color-red-line: var(--wb-red-line);
+  --color-blue: var(--wb-blue); --color-blue-soft: var(--wb-blue-soft); --color-blue-line: var(--wb-blue-line);
+  --color-teal: var(--wb-teal); --color-teal-soft: var(--wb-teal-soft); --color-teal-line: var(--wb-teal-line);
+  --color-green: var(--wb-green); --color-green-soft: var(--wb-green-soft); --color-green-line: var(--wb-green-line);
+  --color-violet: var(--wb-violet); --color-violet-soft: var(--wb-violet-soft); --color-violet-line: var(--wb-violet-line);
+  --color-amber: var(--wb-amber); --color-amber-soft: var(--wb-amber-soft); --color-amber-line: var(--wb-amber-line);
+  --color-grey: var(--wb-grey); --color-grey-soft: var(--wb-grey-soft); --color-grey-line: var(--wb-grey-line);
+  --color-tip: var(--wb-tip); --color-tip-ink: var(--wb-tip-ink);
+  --shadow-sm: var(--wb-shadow-1); --shadow: var(--wb-shadow-1); --shadow-md: var(--wb-shadow-1);
+  --shadow-lg: var(--wb-shadow-2); --shadow-xl: var(--wb-shadow-2); --shadow-2xl: var(--wb-shadow-2);
+}
+
+body { @apply bg-page text-sm text-ink antialiased; }
+dialog::backdrop { background: var(--wb-scrim); backdrop-filter: blur(2px); }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--wb-accent); }
+:focus-visible { outline: 2px solid var(--wb-accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

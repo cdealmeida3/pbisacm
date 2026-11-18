@@ -1,0 +1,4 @@
+# The recorded result of the invented samples is compared byte for byte: never change its line endings.
+tests/recorded/** -text
+# The samples are read byte for byte (the Power BI model packs them, plan §3.1): never change their line endings.
+samples/** -text

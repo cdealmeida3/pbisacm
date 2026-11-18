@@ -1,0 +1,7 @@
+﻿"Name","EPO ID","Class","Change","Current value","Value to set","Note","Status","Marked fixed by","Marked fixed on"
+"Index Tool","AST-0005","Business Application","Set Description (as on Index Tool - PROD)","Index Tool","Production instance of the index tool","","New","",""
+"Index Tool","AST-0005","Business Application","Set Managed by (as on Index Tool - PROD)","(empty)","Cy Keeper","","New","",""
+"Index Tool","AST-0005","Business Application","Set Name (as on Index Tool - PROD)","Index Tool","Index Tool_BA","","New","",""
+"Member Engine","AST-0004","Business Application","Set Managed by (as on Member Engine - PROD)","Cy Keeper","Bo Leaver","","New","",""
+"Member Engine","AST-0004","Business Application","Set Name (as on Member Engine - PROD)","Member Engine","Member Engine_BA","","New","",""
+"Member Engine","AST-0004","Business Application","Set Owned by (as on Member Engine - PROD)","(empty)","Dee Owner","","New","",""

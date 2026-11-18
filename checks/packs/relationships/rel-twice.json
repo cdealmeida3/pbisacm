@@ -1,0 +1,40 @@
+{
+  "id": "REL-TWICE",
+  "status": "live",
+  "title": "More than one relationship between two CIs",
+  "cardLabel": "Relationship entered twice",
+  "cardHint": "Two CIs are linked more than once. Only one relationship is allowed: SACM keeps the right one and removes the others.",
+  "cardText": "Between two CIs only one relationship is allowed. This lists the same relationship entered more than once, and two CIs linked by relationships of different types or in both directions. SACM keeps the right one and removes the others: use the fix list.",
+  "family": "relationships",
+  "dimension": "correctness",
+  "severity": "low",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/twice",
+    "ref": "reference/relationship-model"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

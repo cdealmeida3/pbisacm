@@ -1,0 +1,223 @@
+/// One row per check file that is not off: what the card shows, from the check files.
+table Checks
+
+	/// The state of one card (src/app/view/cards.ts, cardSummaries): Not tested when the newest report tested no part of the check (grey, never green: D15), To solve when a finding is to solve, To check when a finding is to check first, else OK. Build B5 adds All marked as fixed from the team's journal.
+	measure 'Card state' =
+			VAR tested = CALCULATE ( COUNTROWS ( Tested ) ) > 0
+			RETURN
+			    IF (
+			        HASONEVALUE ( Checks[CheckId] ),
+			        IF ( NOT tested, "Not tested", IF ( [To solve] > 0, "To solve", IF ( [To check] > 0, "To check", "OK" ) ) )
+			    )
+
+	/// The one number of a card and its word (D220): CIs on an owners card, lines on a SACM fix list or a review list, contracts on a contract card. OK says Nothing to do.
+	measure 'Card number' =
+			VAR state = [Card state]
+			VAR kind = SELECTEDVALUE ( Checks[Kind] )
+			VAR contracts = SELECTEDVALUE ( Checks[Counts] ) = "contracts"
+			VAR shown = IF ( state = "To check", "review", "open" )
+			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), Findings[State] = shown ) + 0
+			VAR lines = CALCULATE ( COUNTROWS ( Findings ), Findings[State] = shown ) + 0
+			VAR byLine = kind = "fix" || ( kind = "review" && state = "To check" )
+			VAR count = IF ( byLine, lines, cis )
+			VAR word =
+			    IF ( byLine, IF ( count = 1, "line", "lines" ), IF ( contracts, IF ( count = 1, "contract", "contracts" ), IF ( count = 1, "CI", "CIs" ) ) )
+			RETURN
+			    IF ( state = "OK", "Nothing to do", IF ( state = "To solve" || state = "To check" || ( state = "Not tested" && cis > 0 ), FORMAT ( IF ( state = "Not tested", cis, count ), "#,0" ) & " " & IF ( state = "Not tested", IF ( contracts, IF ( cis = 1, "contract", "contracts" ), IF ( cis = 1, "CI", "CIs" ) ), word ) ) )
+
+	/// The one fact of a card besides its number (D220). Build B2 knows Partly tested: the check was tested, and a note says what it could not test. Build B5 adds new, reminders, answers and the rest.
+	measure 'Card fact' =
+			VAR tested = CALCULATE ( COUNTROWS ( Tested ) ) > 0
+			VAR notes = CALCULATE ( COUNTROWS ( Notes ) ) + 0
+			RETURN IF ( HASONEVALUE ( Checks[CheckId] ) && tested && notes > 0, "Partly tested" )
+
+	/// What the card says when it is not tested or only partly tested: its notes, in the order of the run.
+	measure 'Card note' = IF ( HASONEVALUE ( Checks[CheckId] ), CONCATENATEX ( Notes, Notes[Reason], " ", Notes[Order], ASC ) )
+
+	/// The text colour of the state (LOOK.md, one meaning per colour).
+	measure 'Card colour' = SWITCH ( [Card state], "To solve", "#b42318", "To check", "#175cd3", "OK", "#067647", "#475467" )
+
+	/// The soft background of the state.
+	measure 'Card fill' = SWITCH ( [Card state], "To solve", "#fef3f2", "To check", "#eff8ff", "OK", "#ecfdf3", "#f2f4f7" )
+
+	/// The order of the cards inside a section (D172): To solve first, then To check, OK, Not tested last.
+	measure 'Card rank' = SWITCH ( [Card state], "To solve", 1, "To check", 2, "OK", 3, 4 )
+		formatString: 0
+
+	/// "When there is time" on a card that is not daily work (priority later, D182): it is never in the count to solve.
+	measure 'Card time' = IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", "When there is time" )
+
+	/// The order of the cards (D172, src/app/view/cards.ts orderCards): by section, daily work before the cards for when there is time, then To solve, To check, OK, Not tested, the biggest first, then the order of the check files.
+	measure 'Card order' =
+			VAR state = [Card state]
+			VAR size = IF ( state = "To solve", [To solve], IF ( state = "To check", [To check], 0 ) )
+			RETURN
+			    SELECTEDVALUE ( Checks[SectionOrder] ) * 1000000000
+			        + IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", 100000000, 0 )
+			        + [Card rank] * 10000000 + ( 99999 - MIN ( size, 99999 ) ) * 100 + SELECTEDVALUE ( Checks[FileOrder] )
+		formatString: 0
+
+	/// Checks that are not off.
+	measure 'Checks in use' = COUNTROWS ( Checks ) + 0
+		formatString: 0
+
+	/// What the card page says to do: the hint of the check file.
+	measure 'Card hint' = SELECTEDVALUE ( Checks[CardHint] )
+
+	/// The name of the check on its card page.
+	measure 'Card title' = SELECTEDVALUE ( Checks[CardLabel] ) & IF ( HASONEVALUE ( Checks[CheckId] ), " · " & [Card state] )
+
+	/// The line of the section Completeness (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
+	measure Completeness =
+			VAR checks = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "completeness" )
+			VAR toSolve = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To solve" && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
+			VAR toCheck = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
+			VAR later = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To solve" && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
+			VAR notTested = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
+			VAR solveText = IF ( toSolve > 0, toSolve & " to solve" )
+			VAR checkText = IF ( toCheck > 0, toCheck & " to check" )
+			VAR laterText = IF ( later > 0, later & " when there is time" )
+			VAR greyText = IF ( notTested > 0, notTested & " not tested" )
+			VAR both = solveText & IF ( solveText <> "" && checkText <> "", " · " ) & checkText
+			VAR three = both & IF ( both <> "" && laterText <> "", " · " ) & laterText
+			VAR words = three & IF ( three <> "" && greyText <> "", " · " ) & greyText
+			RETURN "Completeness: " & IF ( words = "", "All OK", words )
+
+	/// The line of the section Correctness (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
+	measure Correctness =
+			VAR checks = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "correctness" )
+			VAR toSolve = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To solve" && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
+			VAR toCheck = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
+			VAR later = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To solve" && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
+			VAR notTested = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
+			VAR solveText = IF ( toSolve > 0, toSolve & " to solve" )
+			VAR checkText = IF ( toCheck > 0, toCheck & " to check" )
+			VAR laterText = IF ( later > 0, later & " when there is time" )
+			VAR greyText = IF ( notTested > 0, notTested & " not tested" )
+			VAR both = solveText & IF ( solveText <> "" && checkText <> "", " · " ) & checkText
+			VAR three = both & IF ( both <> "" && laterText <> "", " · " ) & laterText
+			VAR words = three & IF ( three <> "" && greyText <> "", " · " ) & greyText
+			RETURN "Correctness: " & IF ( words = "", "All OK", words )
+
+	/// The line of the section Compliance (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
+	measure Compliance =
+			VAR checks = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "compliance" )
+			VAR toSolve = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To solve" && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
+			VAR toCheck = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
+			VAR later = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To solve" && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
+			VAR notTested = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
+			VAR solveText = IF ( toSolve > 0, toSolve & " to solve" )
+			VAR checkText = IF ( toCheck > 0, toCheck & " to check" )
+			VAR laterText = IF ( later > 0, later & " when there is time" )
+			VAR greyText = IF ( notTested > 0, notTested & " not tested" )
+			VAR both = solveText & IF ( solveText <> "" && checkText <> "", " · " ) & checkText
+			VAR three = both & IF ( both <> "" && laterText <> "", " · " ) & laterText
+			VAR words = three & IF ( three <> "" && greyText <> "", " · " ) & greyText
+			RETURN "Compliance: " & IF ( words = "", "All OK", words )
+
+	column CheckId
+		dataType: string
+		sourceColumn: CheckId
+
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	column Title
+		dataType: string
+		sourceColumn: Title
+
+	column CardLabel
+		dataType: string
+		sortByColumn: SortKey
+		sourceColumn: CardLabel
+
+	column CardHint
+		dataType: string
+		sourceColumn: CardHint
+
+	column CardText
+		dataType: string
+		sourceColumn: CardText
+
+	column Family
+		dataType: string
+		sourceColumn: Family
+
+	column Dimension
+		dataType: string
+		sourceColumn: Dimension
+
+	column Section
+		dataType: string
+		sortByColumn: SectionOrder
+		sourceColumn: Section
+
+	column SectionOrder
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SectionOrder
+
+	column Severity
+		dataType: string
+		sourceColumn: Severity
+
+	column Topic
+		dataType: string
+		sortByColumn: TopicOrder
+		sourceColumn: Topic
+
+	column TopicOrder
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: TopicOrder
+
+	column Priority
+		dataType: string
+		sourceColumn: Priority
+
+	column ReviewOnly
+		dataType: boolean
+		sourceColumn: ReviewOnly
+
+	column DetectorType
+		dataType: string
+		sourceColumn: DetectorType
+
+	column Module
+		dataType: string
+		sourceColumn: Module
+
+	column Path
+		dataType: string
+		sourceColumn: Path
+
+	column Counts
+		dataType: string
+		sourceColumn: Counts
+
+	column FileOrder
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: FileOrder
+
+	column SortKey
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: SortKey
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column Built
+		dataType: boolean
+		sourceColumn: Built
+
+	column Kind
+		dataType: string
+		sourceColumn: Kind
+
+	partition Checks = m
+		mode: import
+		source = ChecksRows

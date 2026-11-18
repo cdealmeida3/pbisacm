@@ -1,0 +1,28 @@
+{
+  "id": "CONTRACT-STATUS",
+  "status": "proposed",
+  "title": "The status tag of a contract does not say what Solusi says",
+  "cardLabel": "Contract status",
+  "cardHint": "The real status from Solusi is kept as a tag, because ServiceNow sets Expired by itself. The list shows the tag to set.",
+  "cardText": "ServiceNow sets \"Expired\" by itself from the end date, so the real status from Solusi is kept as a tag, for example \"S - Concluded\" (procedure 2.8, known challenge 4). This list shows the tag to add, change or remove. Contracts terminated in the last 7 days are checked the same way.",
+  "family": "contracts",
+  "subject": "contract",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "contract"
+    ]
+  },
+  "detector": {
+    "type": "code",
+    "module": "contracts/status",
+    "ref": "reference/contract-reports"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

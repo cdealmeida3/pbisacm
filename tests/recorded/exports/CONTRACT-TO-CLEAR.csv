@@ -1,0 +1,3 @@
+﻿"Problem","Contract number","Name","Vendor","What we found","What is asked","Status"
+"","CT000002","Example Consulting - framework agreement","Example Consulting Ltd","End date is empty in the Solusi contract file of 11 November 2026, ServiceNow still has 31 December 2025; ServiceNow shows the contract as Expired only because of it","","New"
+"","CT000002","Example Consulting - framework agreement","Example Consulting Ltd","Daily responsible is empty in the Solusi contract file of 11 November 2026, ServiceNow still has Dana Daily","","New"

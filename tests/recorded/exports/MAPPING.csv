@@ -1,0 +1,5 @@
+﻿"Name","EPO ID","Class","Owned by","Managed by","Operational status","Support group","Tags","What we found"
+"Event Desk","AST-0017","Business Application","Dee Owner","Cy Keeper","Operational","Finance Team","BIA is pending","Business Application without a Business Process above; Business Application without a Service Instance"
+"Event Engine","AST-0016","Business Application","Dee Owner","Cy Keeper","Operational","Core Team","","Business Application without a Business Process above; Business Application without a Service Instance"
+"Event Gateway - PROD","AST-0020","Service Instance","Dee Owner","Cy Keeper","Operational","Core Team","","Service Instance without a Business Application"
+"Fines  Hub - PROD","AST-0012","Service Instance","Dee Owner","Cy Keeper","Operational","","To be deleted","Service Instance without a Business Application"

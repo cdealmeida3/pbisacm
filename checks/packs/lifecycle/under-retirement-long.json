@@ -1,0 +1,59 @@
+{
+  "id": "UNDER-RETIREMENT-LONG",
+  "status": "proposed",
+  "title": "CI is Under retirement for too long",
+  "cardLabel": "Under retirement too long",
+  "cardHint": "The CI has been Under retirement for months without a change. The owner says if and when it is retired.",
+  "cardText": "The CI is in status Under retirement and its record did not change for more than the number of days in Settings (90 at first). The owner is asked if it is still going to be retired, and when. Write the date the owner gives on the case (Planned retirement date): the CI then waits until that date. Clarify it when there is time. Business Applications are not on this card: they follow their Service Instance.",
+  "family": "lifecycle",
+  "dimension": "compliance",
+  "severity": "medium",
+  "priority": "later",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "ci/status-age",
+    "ref": "reference/lifecycle",
+    "rules": [
+      "under-retirement"
+    ]
+  },
+  "playbook": {
+    "path": "email",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "retirementDate": true,
+    "message": {
+      "subject": "Under retirement for a long time",
+      "intro": "They are in status Under retirement, and nothing changed on them for a long time.",
+      "ask": "Is this CI still going to be retired, and when? Please {reply}. If it is no longer in use, please retire it.",
+      "askByClass": {
+        "service_instance": "Is this system still going to be retired, and when? Please {reply}. If it is no longer in use, please retire it in EPO."
+      },
+      "why": "A CI that stays Under retirement keeps its relationships and its criticality, and nobody knows if it is still used.",
+      "askByTeam": {
+        "process-management": "Is this process still going to be retired, and when? Please {reply}. If it is no longer in use, we will retire it in ServiceNow."
+      }
+    }
+  }
+}

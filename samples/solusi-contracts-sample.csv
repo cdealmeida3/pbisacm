@@ -1,0 +1,9 @@
+CONTRACT_NO,CONTRACT_STATUS,PARTNER_NAME,CONTRACT_NAME,CONTRACT_TYPE,PARTNER_NO,CONTRACT_CATEGORY,CONTRACT_START,CONTRACT_END,MAP_DURATION_TYPE,CLM_CONTRACT_OWNER,CLM_CONTRACT_DAILY_RESPONSIBLE,CLM_CONTRACT_SUPPORTER,VENDOR_ACCOUNT_NO,CLM_CONTRACT_EPO_ID
+Contract No.,Status,Company name,Name,Contract type,Company no.,Category,Contract start,Contract end,Duration type,Contract Owner,Daily responsible,Procurement Partner,Vendor account no,EPO ID
+CT000001,S - Concluded,Example Software Ltd,Example Software - licence agreement,Main agreement,V0001,Software,2023-01-01,2099-12-31,Open-ended,Olga Owner,Dana Daily,Pat Partner,10001,AST-0006
+CT000002,S - Concluded,Example Consulting Ltd,Example Consulting - framework agreement,Main agreement,,Consultants,2022-05-01,,Open-ended,Olga Owner,,Pat Partner,10002,
+CT000003,S - Concluded,Example Data Ltd,Example Data - data feed,Main agreement,V0003,Data feed,2021-03-01,2025-12-31,Fixed-term,Ian Inactive,Dana Daily,Pat Partner,10003,AST-0009
+CT000004,E - Ended,Example Hosting Ltd,Example Hosting - hosting agreement,Main agreement,V0004,Outsourcing,2019-01-01,2025-06-30,Fixed-term,Olga Owner,Dana Daily,Pat Partner,10004,
+CT000005,S - Concluded,Example Network Ltd,Example Network - connectivity,Main agreement,V0005,Connectivity agreement,2024-02-01,2027-01-31,Fixed-term,Olga Owner,Dana Daily,Pat Partner,,9999
+CT000006,S - Concluded,Example Tools Ltd,Example Tools - support agreement,Main agreement,V0006,Software,2024-06-01,2026-12-15,Fixed-term,Olga Owner,Dana Daily,Pat Partner,10006,
+CT000007,N - In negotiation,Example Cloud Ltd,Example Cloud - new platform,Main agreement,V0007,Software,2026-12-01,,Fixed-term,Olga Owner,Dana Daily,Pat Partner,10007,

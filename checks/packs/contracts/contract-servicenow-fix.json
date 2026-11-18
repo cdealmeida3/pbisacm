@@ -1,0 +1,35 @@
+{
+  "id": "CONTRACT-SN-FIX",
+  "status": "live",
+  "title": "A contract value SACM corrects in ServiceNow",
+  "cardLabel": "Contracts to fix in ServiceNow",
+  "cardHint": "Contract fields that are wrong in ServiceNow, such as an inactive account with the name of an active person. SACM corrects them itself.",
+  "cardText": "SACM corrects these contracts itself in ServiceNow; no email is needed: a contract owner or Procurement partner for whom the upload picked an inactive account while an active account with the same name exists (the line names the account to set), a person ServiceNow shows differently from Solusi, a fixed-term contract without an end date, and a Concluded contract whose end date has passed. A person who really left is on the card \"For Procurement\". Mark as fixed when it is done. A line is Verified when a later report no longer shows it.",
+  "family": "contracts",
+  "subject": "contract",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "contract"
+    ]
+  },
+  "detector": {
+    "type": "code",
+    "module": "contracts/problems",
+    "ref": "reference/contract-reports",
+    "rules": [
+      "ownerInactive",
+      "partnerInactive",
+      "personName",
+      "endPassed",
+      "noEnd"
+    ]
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

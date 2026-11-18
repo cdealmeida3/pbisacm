@@ -1,0 +1,138 @@
+===== APP-INSTANCE-MATCH
+Hi, this is the SACM team. Reference: SACM-CHAT-APP-INSTANCE-MATCH
+
+===== CONTRACT-PROCUREMENT
+Hi, this is the SACM team. These contracts need a correction in Solusi.
+- CT000002: Example Consulting - framework agreement
+- CT000003: Example Data - data feed
+- CT000005: Example Network - connectivity
+Please correct them in Solusi.
+Reference: SACM-CHAT-CONTRACT-PROCUREMENT
+
+===== CONTRACT-NOT-IN-SOLUSI
+Hi, this is the SACM team. Reference: SACM-CHAT-CONTRACT-NOT-IN-SOLUSI
+
+===== CONTRACT-SN-FIX
+Hi, this is the SACM team. Reference: SACM-CHAT-CONTRACT-SN-FIX
+
+===== CONTRACT-STATUS
+Hi, this is the SACM team. Reference: SACM-CHAT-CONTRACT-STATUS
+
+===== CONTRACT-TO-CLEAR
+Hi, this is the SACM team. Reference: SACM-CHAT-CONTRACT-TO-CLEAR
+
+===== CONTRACT-UPLOAD
+Hi, this is the SACM team. Reference: SACM-CHAT-CONTRACT-UPLOAD
+
+===== CRIT-AUTO-JUSTIFICATION
+Hi, this is the SACM team. The parent of these CIs was raised, and the CIs kept a lower value. The only justification is the automatic text, which gives no reason.
+- Member Engine - PROD
+Which justification applies, or should the value follow the parent? Answer in this chat, and we select the justification in ServiceNow, or raise the target.
+Reference: SACM-CHAT-CRIT-AUTO-JUSTIFICATION
+
+===== CRIT-NO-JUSTIFICATION
+Hi, this is the SACM team. A target value is lower than the inherited value, and the request gives no justification for it.
+- Index Tool
+Could you tell us why the value is lower than the one inherited from the parent? Answer in this chat with the reason, and we select the justification in ServiceNow. If the value should follow the parent, tell us and we raise the target.
+Reference: SACM-CHAT-CRIT-NO-JUSTIFICATION
+
+===== DESC-QUALITY
+Hi, this is the SACM team. The description is empty, or does not say what the CI is.
+- Close the Month
+- Members
+- Members - Standard
+- Reconcile Index
+For Service Offerings: Could you reply with one or two sentences per offering: what it is, and what it is used for? We will update ServiceNow for you. You can also raise the request "Add or modify a Service (CI)", action "Modify service offering", in the Service Portal (https://portal.example.com/sacm). For the other CIs: Could you reply with one or two sentences per CI: what it is, and what it is used for? We will update ServiceNow for you. You can also raise the request "Add or modify a Service (CI)" in the Service Portal (https://portal.example.com/sacm).
+Reference: SACM-CHAT-DESC-QUALITY
+
+===== EPO-DIFF
+Hi, this is the SACM team. Reference: SACM-CHAT-EPO-DIFF
+
+===== MAPPING
+Hi, this is the SACM team. SACM maps every CI of the CMDB to the CIs above and below it. These CIs of yours are not fully mapped yet.
+- Event Desk
+- Event Engine
+- Event Gateway - PROD
+- Fines  Hub - PROD
+Could we plan a 30-minute mapping session with you? Answer in this chat with a time that suits you. There is nothing to prepare: we go through it together.
+Reference: SACM-CHAT-MAPPING
+
+===== NAME-DUPLICATE
+Hi, this is the SACM team. Another live CI of the same class has the same name. They are two different CIs.
+- Fines  Hub - PROD
+- Manage Fines
+These CIs come from EPO. Please correct the name in EPO. ServiceNow receives the change from EPO.
+Reference: SACM-CHAT-NAME-DUPLICATE
+
+===== NAME-STANDARD
+Hi, this is the SACM team. Their name does not follow the SACM naming standard.
+- Members
+These CIs come from EPO. Please correct the name in EPO. ServiceNow receives the change from EPO.
+Reference: SACM-CHAT-NAME-STANDARD
+
+===== REL-MISSING
+Hi, this is the SACM team. A relationship the CMDB model asks for is missing on these CIs.
+- Manage Fines
+Which Business Processes or Business Capabilities carry out this capability? Answer in this chat, and we add the relationships "Service Mapping" in the Service Portal (https://portal.example.com/sacm).
+Reference: SACM-CHAT-REL-MISSING
+
+===== REL-TWICE
+Hi, this is the SACM team. Reference: SACM-CHAT-REL-TWICE
+
+===== REL-WRONG-TYPE
+Hi, this is the SACM team. Reference: SACM-CHAT-REL-WRONG-TYPE
+
+===== RESP-INACTIVE
+Hi, this is the SACM team. Their Owned by is no longer an active user.
+- Reconcile Index
+Could you tell us who took over? Please answer in this chat with the name of the person for each process, and we will update ServiceNow.
+Reference: SACM-CHAT-RESP-INACTIVE
+
+===== RESP-MISSING
+Hi, this is the SACM team. The role Owned by or Managed by is empty.
+- Close the Month
+- Event Gateway - PROD
+- Manage Fines
+- Manage Member Records
+- Members
+Could you tell us who it should be? You can answer in this chat, or raise the request "Owned by - update" or "Managed by – update" in the Service Portal (https://portal.example.com/sacm).
+Reference: SACM-CHAT-RESP-MISSING
+
+===== RESP-SAME-PERSON
+Hi, this is the SACM team. The same person is Owned by and Managed by.
+- Register a New Member
+Could you name a second person for Managed by? Please answer in this chat with the name for each process, and we will update ServiceNow.
+Reference: SACM-CHAT-RESP-SAME-PERSON
+
+===== SUPPORT-GROUP-INACTIVE
+Hi, this is the SACM team. Their Support group is no longer active.
+- Index Tool - PROD
+Please raise the request "Support group update" in the Service Portal (https://portal.example.com/sacm) and name an active group.
+Reference: SACM-CHAT-SUPPORT-GROUP-INACTIVE
+
+===== SUPPORT-GROUP-MISSING
+Hi, this is the SACM team. These CIs have no Support group.
+- Fines  Hub - PROD
+- Members - Standard
+For Service Offerings: Please raise the request "Add or modify a Service (CI)", action "Modify service offering", in the Service Portal (https://portal.example.com/sacm). If the group does not exist yet, there is a request to create it. For the other CIs: Please raise the request "Support group update" in the Service Portal (https://portal.example.com/sacm). If the group does not exist yet, there is a request to create it.
+Reference: SACM-CHAT-SUPPORT-GROUP-MISSING
+
+===== SUPPORTED-BY
+Hi, this is the SACM team. The role Supported by is empty, or names a person who is no longer active.
+- Index Tool - PROD
+- Member Engine - TEST
+- Members - Standard
+These CIs come from EPO. In EPO, Supported by is called Secondary Responsible. Please correct it in EPO. ServiceNow receives the change from EPO.
+Reference: SACM-CHAT-SUPPORTED-BY
+
+===== TAG-MISSING
+Hi, this is the SACM team. A mandatory tag is missing on these CIs.
+- Reconcile Index
+Is each process customer facing or internal? Please answer in this chat, and we will set the tag in ServiceNow.
+Reference: SACM-CHAT-TAG-MISSING
+
+===== TAG-STATUS-CONFLICT
+Hi, this is the SACM team. These CIs are tagged To be deleted, but they are still Operational.
+- Fines  Hub - PROD
+These CIs come from EPO. When will they be retired? Please reply with the planned retirement date of each CI, and retire them in EPO on that date. It is fine to keep a CI for some years, for example to keep its data: we only need the date. ServiceNow receives the change from EPO.
+Reference: SACM-CHAT-TAG-STATUS-CONFLICT

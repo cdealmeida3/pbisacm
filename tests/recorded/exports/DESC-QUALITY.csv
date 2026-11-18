@@ -1,0 +1,5 @@
+﻿"Name","EPO ID","Class","Owned by","Managed by","Operational status","Support group","Tags","What we found"
+"Close the Month","AST-0021","Business Process","Dee Owner","","Operational","Finance Team","Internal BP","Description has only 15 characters"
+"Members","AST-0010","Business Service","Ada Example","","Operational","","","Description has only 3 characters"
+"Members - Standard","AST-0011","Service Offering","Ada Example","Cy Keeper","Operational","","","Description has only 3 characters"
+"Reconcile Index","AST-0003","Business Process","Bo Leaver (inactive)","Cy Keeper","Operational","","","Description has only 3 characters"

@@ -1,0 +1,27 @@
+{
+  "id": "EPO-DIFF",
+  "status": "live",
+  "title": "A service mapped CI differs from EPO",
+  "cardLabel": "EPO ≠ ServiceNow",
+  "cardHint": "Service mapped CIs whose status, name, people or description differ from EPO. SACM copies the EPO value into ServiceNow.",
+  "cardText": "Service mapped CIs whose status, name, people or description in ServiceNow are not the same as in EPO (procedure 2.7). The description is compared by letters and digits only: empty in ServiceNow, cut short, or another start. The sync to these CIs is cut, so SACM copies the EPO value into ServiceNow by hand: use the fix list. When the Service Instance changes, change its Business Application too (the card \"Application ≠ Instance\" shows it at the next report). Never remove the relationships.",
+  "family": "epo-report",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "service_instance"
+    ]
+  },
+  "detector": {
+    "type": "code",
+    "module": "epo/differs",
+    "ref": "reference/epo-systems-report"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

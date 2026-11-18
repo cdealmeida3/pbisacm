@@ -1,0 +1,44 @@
+{
+  "id": "CRIT-ABOVE-PARENT",
+  "status": "live",
+  "title": "Target criticality is higher than every parent passes on",
+  "cardLabel": "Above parent",
+  "cardHint": "The target criticality is higher than every parent passes on. Often a parent relationship is missing: SACM checks the mapping first.",
+  "cardText": "A target value higher than every value the parents pass on is unusual: often a parent relationship is missing. SACM checks the mapping first, so these CIs start under Check the mapping first. Parents over a relationship excluded from calculation do not count. When the mapping of a CI is complete, press \"Mapping is complete: ask the owner\" on its line: the CI moves to Asked of the owner, and the owner is asked to confirm the value or lower it with the criticality request.",
+  "family": "criticality",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "criticality/above-parents",
+    "ref": "reference/criticality"
+  },
+  "playbook": {
+    "path": "service-request",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "askAfterReview": "Mapping done: ask owner",
+    "message": {
+      "subject": "Criticality above the parent CIs",
+      "intro": "A target value is higher than every value the parent CIs pass on. We checked the mapping: no parent relationship is missing.",
+      "ask": "Could you confirm that the value is right? If it is too high, please lower it with the request {request:criticality}.",
+      "why": "Criticality flows down from the parents. A CI rated higher than all of its parents is unusual."
+    }
+  }
+}

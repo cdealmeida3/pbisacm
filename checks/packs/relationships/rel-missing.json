@@ -1,0 +1,58 @@
+{
+  "id": "REL-MISSING",
+  "status": "live",
+  "title": "Mandatory relationship is missing (unmapped CI)",
+  "cardLabel": "Relationship missing",
+  "cardHint": "A CI lacks a relationship the model asks for, such as a Business Service without a Service Offering.",
+  "cardText": "A CI without a relationship the model asks for. On a Business Service and on an offering from EPO the change goes into EPO. A Business Capability needs at least one Business Process or Business Capability below it. One rule is only listed for a review (offering without a Service Instance): it is not agreed yet. What SACM maps with the owner (a Service Instance without a Business Application, a Business Application without a Service Instance or a Business Process, a Business Service without a Business Process, a Business Process with nothing below) is on the Mapping backlog.",
+  "family": "relationships",
+  "dimension": "compliance",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/missing",
+    "ref": "reference/relationship-model",
+    "rules": [
+      "bc-below",
+      "bp-business-capability",
+      "bs-offering",
+      "bso-business-service",
+      "bso-service-instance"
+    ]
+  },
+  "playbook": {
+    "path": "self-fix",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "routeBy": "epo",
+    "message": {
+      "subject": "Relationship missing",
+      "intro": "A relationship the CMDB model asks for is missing on these CIs.",
+      "ask": "Could you tell us which CI is missing? {Reply} with its name (or EPO ID), and we add the relationship {request:service-mapping}.",
+      "several": "As there are several CIs, a 30-minute mapping session may be quicker. Reply with a time that suits you.",
+      "why": "Without these relationships, criticality cannot flow to the CIs that support your service, and incidents cannot be linked to it.",
+      "epoAsk": "Please add the missing relationship in EPO. If you are not sure which one, reply with the Business Process your system delivers and the systems it depends on (EPO IDs or names).",
+      "askByClass": {
+        "business_capability": "Which Business Processes or Business Capabilities carry out this capability? {Reply}, and we add the relationships {request:service-mapping}."
+      }
+    }
+  }
+}

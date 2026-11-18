@@ -1,0 +1,47 @@
+{
+  "id": "SUPPORT-GROUP-INACTIVE",
+  "status": "live",
+  "title": "Support group of the CI is not active",
+  "cardLabel": "Support group inactive",
+  "cardHint": "The Support group is no longer active, so incidents on the CI reach nobody.",
+  "cardText": "The Service Offering or Service Instance has a Support group, but the group is no longer active, so incidents on the CI reach nobody (procedure 2.5). A CI with no Support group at all is on the card Support group.",
+  "family": "support",
+  "dimension": "correctness",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "service_offering",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "op": "groupInactive",
+      "field": "support_group"
+    }
+  },
+  "playbook": {
+    "path": "service-request",
+    "audience": [
+      "managed_by",
+      "owned_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "message": {
+      "subject": "Inactive Support group",
+      "intro": "Their Support group is no longer active.",
+      "ask": "Please raise the request {request:support-group-update} and name an active group.",
+      "askByClass": {
+        "service_offering": "Please raise the request {request:modify-service-offering} and name an active group."
+      },
+      "why": "Without an active Support group, incidents on these CIs are not assigned to a team."
+    }
+  }
+}

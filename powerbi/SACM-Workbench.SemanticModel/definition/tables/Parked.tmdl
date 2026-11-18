@@ -1,0 +1,16 @@
+/// The grey lines of the Cards page for the classes that are not checked yet (reference/parked-classes, D179).
+table Parked
+
+	column Line
+		dataType: string
+		sortByColumn: Order
+		sourceColumn: Line
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition Parked = m
+		mode: import
+		source = ParkedRows

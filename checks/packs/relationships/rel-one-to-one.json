@@ -1,0 +1,48 @@
+{
+  "id": "REL-ONE-TO-ONE",
+  "status": "live",
+  "title": "CI has more than the one allowed partner",
+  "cardLabel": "Too many partners",
+  "cardHint": "A CI has more partners than the model allows, such as an offering with two Business Services. SACM fixes the mapping.",
+  "cardText": "An offering has exactly one Business Service; a Service Instance exactly one Business Application; a Business Application one Service Instance per environment. SACM fixes the mapping in ServiceNow: use the fix list. When SACM cannot tell which one is right, open the CI and press \"Cannot tell which one is right: ask the owner\": the owner is asked.",
+  "family": "relationships",
+  "dimension": "compliance",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "business_application",
+      "service_offering",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/too-many",
+    "ref": "reference/relationship-model",
+    "rules": [
+      "bso-business-service",
+      "ba-service-instance",
+      "si-business-application"
+    ]
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "askWhenUnsure": "Cannot tell which one is right: ask the owner",
+    "message": {
+      "subject": "Too many related CIs",
+      "intro": "These CIs are related to more CIs than the CMDB model allows. The table shows which.",
+      "ask": "Which one is right? {Reply}, and SACM removes the other relationships in ServiceNow.",
+      "why": "With two parents, criticality and ownership are not clear."
+    }
+  }
+}

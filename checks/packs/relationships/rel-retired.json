@@ -1,0 +1,39 @@
+{
+  "id": "REL-RETIRED",
+  "status": "off",
+  "title": "Relationship to a Retired CI",
+  "cardLabel": "Relationship to a Retired CI",
+  "cardHint": "One end of the relationship is Retired, the other is not (procedure 2.12). SACM removes it in ServiceNow: use the fix list, grouped by the live CI.",
+  "family": "relationships",
+  "dimension": "correctness",
+  "severity": "low",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/retired-end",
+    "ref": "reference/relationship-model"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

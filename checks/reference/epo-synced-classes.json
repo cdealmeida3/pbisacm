@@ -1,0 +1,24 @@
+{
+  "note": "Where a fix is made (decisions D122 and D123). On a CI of 'classes' the fix is made in EPO, by the person the check asks, and ServiceNow receives it from EPO. A Service Offering is a ServiceNow record: it comes from EPO only when the EPO integration created it, that is when its Created by is not a person's user ID ('personUserId'); then it is fixed in EPO, on its Business Service. An offering made by a person, and every other class, is fixed in ServiceNow with the request the message names. Without the Created by column, every offering counts as made by a person. The service mapped flag plays no part here: only the card EPO ≠ ServiceNow reads it. On an offering the integration created, only Owned by follows its Business Service in EPO; Managed by, Supported by and the Support group are changed in ServiceNow with the request \"Add or modify a Service (CI)\", action \"Modify service offering\" ('inServiceNow': the fields, and the checks whose finding is about one of them; decision D187).",
+  "classes": [
+    "business_service",
+    "service_instance"
+  ],
+  "offerings": {
+    "classes": [
+      "service_offering"
+    ],
+    "personUserId": "^[A-Za-z0-9]{3}$",
+    "inServiceNow": {
+      "fields": [
+        "managed_by",
+        "supported_by"
+      ],
+      "checks": [
+        "RESP-SAME-PERSON",
+        "SUPPORT-GROUP-MISSING",
+        "SUPPORT-GROUP-INACTIVE"
+      ]
+    }
+  }
+}

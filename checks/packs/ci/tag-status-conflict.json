@@ -1,0 +1,64 @@
+{
+  "id": "TAG-STATUS-CONFLICT",
+  "status": "proposed",
+  "title": "Tagged To be deleted, but still Operational",
+  "cardLabel": "Deleted but operational",
+  "cardHint": "The CI is tagged To be deleted and is still Operational. The owner gives the planned retirement date.",
+  "cardText": "The CI is tagged To be deleted and is still Operational. Some are kept on purpose, for example to keep their data for some years. The owner is asked for the planned retirement date. Write it on the case (Planned retirement date): the CI then waits until that date. Business Applications are not on this card: they are decided in the mapping of their system.",
+  "family": "tags",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "all": [
+        {
+          "op": "tagMatchesAny",
+          "field": "tags",
+          "value": [
+            "to be deleted"
+          ]
+        },
+        {
+          "op": "equals",
+          "field": "operational_status",
+          "value": "Operational"
+        }
+      ]
+    }
+  },
+  "playbook": {
+    "path": "self-fix",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "routeBy": "epo",
+    "retirementDate": true,
+    "message": {
+      "subject": "Tagged for deletion but still Operational",
+      "intro": "These CIs are tagged To be deleted, but they are still Operational.",
+      "ask": "When will they be retired? Please reply with the planned retirement date of each CI. It is fine to keep a CI for some years, for example to keep its data: we only need the date.",
+      "why": "A CI tagged To be deleted needs a planned date: on that date it is retired, so it no longer receives incidents or changes.",
+      "epoAsk": "When will they be retired? Please reply with the planned retirement date of each CI, and retire them in EPO on that date. It is fine to keep a CI for some years, for example to keep its data: we only need the date."
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "OFFERING-OWNER",
+  "status": "live",
+  "title": "Service Offering owner differs from its Business Service owner",
+  "cardLabel": "Offering owner ≠ Service owner",
+  "cardHint": "A Service Offering made by a person has another owner than its Business Service. SACM copies the service owner.",
+  "cardText": "A Service Offering made by a person has the owner of its Business Service (procedure 2.6). Offerings from EPO take their owner from EPO and are not raised. SACM copies the owner of the Business Service onto the offering in ServiceNow: use the fix list. Nobody is asked.",
+  "family": "relationships",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "service_offering"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/offering-owner",
+    "ref": "reference/relationship-model"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

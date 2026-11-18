@@ -1,0 +1,5 @@
+﻿"Problem","Contract number","Name","Vendor","What we found","What is asked","Status"
+"Contract owner left","CT000003","Example Data - data feed","Example Data Ltd","Contract owner Ian Inactive is no longer active in ServiceNow, and no active account with that name is known","Please name a new contract owner in Solusi, or tell us if the person is still with the company.","New"
+"No vendor number","CT000002","Example Consulting - framework agreement","Example Consulting Ltd","No vendor number for Example Consulting Ltd, so the vendor stays empty in ServiceNow","Please add the vendor number in Solusi.","New"
+"The EPO ID names a Retired system","CT000003","Example Data - data feed","Example Data Ltd","EPO ID AST-0009 (Old Receipt Printer): the system is Retired","Please check if the contract still covers a system in use, and correct the EPO ID in Solusi.","New"
+"The EPO ID is not a known EPO ID","CT000005","Example Network - connectivity","Example Network","EPO ID 9999: not the EPO ID of a system in ServiceNow","Please check the number, and correct the EPO ID in Solusi.","New"

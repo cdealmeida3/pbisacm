@@ -1,0 +1,46 @@
+{
+  "id": "SUPPORT-GROUP-MISSING",
+  "status": "live",
+  "title": "Service Offering or Service Instance has no support group",
+  "cardLabel": "Support group",
+  "cardHint": "A Service Offering or Service Instance has no Support group, so incidents on it reach nobody.",
+  "family": "support",
+  "dimension": "completeness",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "service_offering",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "op": "isEmpty",
+      "field": "support_group"
+    }
+  },
+  "playbook": {
+    "path": "service-request",
+    "audience": [
+      "managed_by",
+      "owned_by",
+      "supported_by",
+      "managerOf(owned_by)"
+    ],
+    "message": {
+      "subject": "No Support group",
+      "intro": "These CIs have no Support group.",
+      "ask": "Please raise the request {request:support-group-update}. If the group does not exist yet, there is a request to create it.",
+      "askByClass": {
+        "service_offering": "Please raise the request {request:modify-service-offering}. If the group does not exist yet, there is a request to create it."
+      },
+      "why": "Without an active Support group, incidents on these CIs are not assigned to a team."
+    }
+  }
+}

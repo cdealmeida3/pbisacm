@@ -1,0 +1,29 @@
+/// One row per day (the date table).
+table Date
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		formatString: d mmm yyyy
+		isKey
+		summarizeBy: none
+		sourceColumn: Date
+
+	column Year
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Year
+
+	column Month
+		dataType: string
+		sortByColumn: MonthOrder
+		sourceColumn: Month
+
+	column MonthOrder
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: MonthOrder
+
+	partition Date = m
+		mode: import
+		source = DateRows

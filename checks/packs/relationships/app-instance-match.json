@@ -1,0 +1,32 @@
+{
+  "id": "APP-INSTANCE-MATCH",
+  "status": "live",
+  "title": "Business Application differs from its Service Instance",
+  "cardLabel": "Application ≠ Instance",
+  "cardHint": "A Business Application is a copy of its Service Instance: owners, status, description and name. SACM copies what differs.",
+  "cardText": "A Business Application has the same Owned by, Managed by, Operational status and description as its Service Instance, and its name is the instance name without \" - PROD\" or \" - TEST\", plus \"_BA\" (procedure 2.9). With several instances: the production one whose name it carries. Nobody is asked about the owners, status, description or name of an application: SACM copies the value of the instance in ServiceNow. Use the fix list. When the instance itself is wrong, its own card asks its owner, in EPO.",
+  "family": "relationships",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_application"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "relationships/application-instance",
+    "ref": "reference/relationship-model"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

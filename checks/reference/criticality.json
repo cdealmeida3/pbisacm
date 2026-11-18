@@ -1,0 +1,4 @@
+{
+  "note": "Criticality (CIA-A) flows down from the Business Process (BIA). Each parent passes its values to its children's Inherited fields; the highest value per dimension wins. A relationship 'Excluded for calculation' in the Relationship report passes nothing (D131). ServiceNow copies Inherited to Target after two weeks, unless an exception applies: a CI with Inherited set and Target empty waits 'waitDays' days after the last change of its record (D132).",
+  "waitDays": 14
+}

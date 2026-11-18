@@ -1,0 +1,82 @@
+/// The contracts of the newest Solusi contract file.
+table SolusiContracts
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column Number
+		dataType: string
+		sourceColumn: Number
+
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	column Name
+		dataType: string
+		sourceColumn: Name
+
+	column Vendor
+		dataType: string
+		sourceColumn: Vendor
+
+	column VendorNumber
+		dataType: string
+		sourceColumn: VendorNumber
+
+	column Category
+		dataType: string
+		sourceColumn: Category
+
+	column Start
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: Start
+
+	column End
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: End
+
+	column Duration
+		dataType: string
+		sourceColumn: Duration
+
+	column Owner
+		dataType: string
+		sourceColumn: Owner
+
+	column DailyResponsible
+		dataType: string
+		sourceColumn: DailyResponsible
+
+	column ProcurementPartner
+		dataType: string
+		sourceColumn: ProcurementPartner
+
+	column EpoId
+		dataType: string
+		sourceColumn: EpoId
+
+	column Sheet
+		dataType: string
+		sourceColumn: Sheet
+
+	column Terminated
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: Terminated
+
+	partition SolusiContracts = m
+		mode: import
+		source = SolusiContractsRows

@@ -1,0 +1,267 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "lines",
+  "position": {
+    "x": 24,
+    "y": 100,
+    "z": 2000,
+    "height": 330,
+    "width": 1232,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "MappingBacklog.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "CI"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "ClassLabel"
+                }
+              },
+              "queryRef": "MappingBacklog.ClassLabel",
+              "nativeQueryRef": "ClassLabel",
+              "displayName": "Class"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "Owner"
+                }
+              },
+              "queryRef": "MappingBacklog.Owner",
+              "nativeQueryRef": "Owner",
+              "displayName": "Owner"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "Reasons"
+                }
+              },
+              "queryRef": "MappingBacklog.Reasons",
+              "nativeQueryRef": "Reasons",
+              "displayName": "Why it is on the list"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "Stage"
+                }
+              },
+              "queryRef": "MappingBacklog.Stage",
+              "nativeQueryRef": "Stage",
+              "displayName": "Stage"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "Steps"
+                }
+              },
+              "queryRef": "MappingBacklog.Steps",
+              "nativeQueryRef": "Steps",
+              "displayName": "Steps of its class"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "Criticality"
+                }
+              },
+              "queryRef": "MappingBacklog.Criticality",
+              "nativeQueryRef": "Criticality",
+              "displayName": "Criticality lines"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "StateLabel"
+                }
+              },
+              "queryRef": "MappingBacklog.StateLabel",
+              "nativeQueryRef": "StateLabel",
+              "displayName": "State"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MappingBacklog"
+                    }
+                  },
+                  "Property": "NextStep"
+                }
+              },
+              "queryRef": "MappingBacklog.NextStep",
+              "nativeQueryRef": "NextStep",
+              "displayName": "Next step"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "MappingBacklog"
+                  }
+                },
+                "Property": "StateLabel"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "MappingBacklog"
+                  }
+                },
+                "Property": "CiName"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The CIs to map, with their owner, why, their stage and the next step'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'CIs to map'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

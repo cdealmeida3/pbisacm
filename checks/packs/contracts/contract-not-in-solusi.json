@@ -1,0 +1,29 @@
+{
+  "id": "CONTRACT-NOT-IN-SOLUSI",
+  "status": "live",
+  "title": "A contract in ServiceNow is not in Solusi",
+  "cardLabel": "Not in Solusi",
+  "cardHint": "Contracts in ServiceNow that the Solusi contract file does not hold. SACM deletes them in ServiceNow; the app deletes nothing.",
+  "cardText": "Contracts that ServiceNow holds and the Solusi contract file does not (procedure 2.8). What is not in Solusi does not exist, or should not exist, in ServiceNow: every line is to delete. SACM deletes them in ServiceNow; the app deletes nothing. A note \"Still linked\" on a line only says what links the contract to the CMDB. If Procurement asks to keep a contract, open it and choose Not followed up, with the reason.",
+  "family": "contracts",
+  "subject": "contract",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "contract"
+    ]
+  },
+  "detector": {
+    "type": "code",
+    "module": "contracts/not-in-solusi",
+    "ref": "reference/contract-reports"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "markWord": "deleted",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

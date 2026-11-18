@@ -1,0 +1,50 @@
+/// The relationships of each CI of the newest CI report, from both ends, as the checks match them: for the Case page.
+table RelationshipLinks
+
+	/// 1 for the relationships of the CI of the case (the CIs the Findings filter leaves), so the Case page shows only them.
+	measure 'On the case' = IF ( SELECTEDVALUE ( RelationshipLinks[CiKey] ) IN VALUES ( Findings[CiKey] ), 1 )
+
+	/// The CI the line belongs to.
+	column CiKey
+		dataType: string
+		sourceColumn: CiKey
+
+	/// Parent: the other CI is above it. Child: below it.
+	column Relation
+		dataType: string
+		sourceColumn: Relation
+
+	column Other
+		dataType: string
+		sourceColumn: Other
+
+	column OtherClass
+		dataType: string
+		sourceColumn: OtherClass
+
+	column OtherStatus
+		dataType: string
+		sourceColumn: OtherStatus
+
+	column Type
+		dataType: string
+		sourceColumn: Type
+
+	/// No when one end is Retired: the checks do not count it.
+	column Counts
+		dataType: string
+		sourceColumn: Counts
+
+	/// Yes: excluded from calculation, so it passes no criticality (D131).
+	column Excluded
+		dataType: string
+		sourceColumn: Excluded
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition RelationshipLinks = m
+		mode: import
+		source = RelationshipLinksRows

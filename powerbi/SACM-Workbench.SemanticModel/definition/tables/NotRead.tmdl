@@ -1,0 +1,20 @@
+/// The files of no known type, with what each type is missing.
+table NotRead
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column Message
+		dataType: string
+		sourceColumn: Message
+
+	partition NotRead = m
+		mode: import
+		source = NotReadRows

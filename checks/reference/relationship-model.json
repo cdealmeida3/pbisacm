@@ -1,0 +1,427 @@
+{
+  "note": "The relationship model of the Service Mapping Workspace (dictionary and mandatory relationships), as data. Relationships are written parent -> child: the parent is the upstream CI. Only the classes the reports hold today; more can be added. Rule ids are the ones of the Workspace, so both projects can be compared. A Service Instance with Platform ticked (u_platform) is the class 'platform'. A relationship counts only when neither end is Retired.",
+  "retiredStatuses": [
+    "Retired"
+  ],
+  "environments": {
+    "note": "The environment of a Service Instance: its Environment field, else a trailing word of its name ('- TEST'), else production. Synonyms count as one.",
+    "suffix": "\\b(prod|production|prd|preprod|pre-prod|pre-production|non-prod|nonprod|non-production|acc|acceptance|uat|test|tst|dev|development|dr|disaster recovery)\\)?\\s*$",
+    "aliases": [
+      {
+        "pattern": "^(prod|production|prd)$",
+        "name": "PROD"
+      },
+      {
+        "pattern": "^(preprod|pre-prod|pre-production)$",
+        "name": "PREPROD"
+      },
+      {
+        "pattern": "^(acc|acceptance)$",
+        "name": "ACC"
+      },
+      {
+        "pattern": "^(test|tst)$",
+        "name": "TEST"
+      },
+      {
+        "pattern": "^(dev|development)$",
+        "name": "DEV"
+      },
+      {
+        "pattern": "^(dr|disaster recovery)$",
+        "name": "DR"
+      },
+      {
+        "pattern": "^(non-prod|nonprod|non-production)$",
+        "name": "NONPROD"
+      }
+    ]
+  },
+  "applicationCopy": {
+    "descriptions": "poor",
+    "descriptionMin": 30,
+    "descriptionStart": 40,
+    "instanceSuffix": "\\s+-\\s+(PROD|TEST)$",
+    "applicationSuffix": "_BA"
+  },
+  "dictionary": [
+    {
+      "parents": [
+        "business_capability"
+      ],
+      "children": [
+        "business_capability"
+      ],
+      "status": "allowed",
+      "types": [
+        "Provided by::Provides"
+      ],
+      "note": "Capability hierarchy."
+    },
+    {
+      "parents": [
+        "business_capability"
+      ],
+      "children": [
+        "business_process"
+      ],
+      "status": "allowed",
+      "types": [
+        "Provided by::Provides"
+      ],
+      "note": "The process carries out the capability."
+    },
+    {
+      "parents": [
+        "business_capability"
+      ],
+      "children": [
+        "business_application"
+      ],
+      "status": "unconfirmed",
+      "types": [
+        "Provided by::Provides"
+      ],
+      "note": "Type not agreed yet: not checked."
+    },
+    {
+      "parents": [
+        "business_process"
+      ],
+      "children": [
+        "business_application"
+      ],
+      "status": "allowed",
+      "types": [
+        "Provided by::Provides"
+      ],
+      "note": "A process can use several applications, and the other way round."
+    },
+    {
+      "parents": [
+        "business_process"
+      ],
+      "children": [
+        "business_service"
+      ],
+      "status": "allowed",
+      "types": [
+        "Provided by::Provides"
+      ],
+      "note": "The process is delivered through the Business Service."
+    },
+    {
+      "parents": [
+        "business_process"
+      ],
+      "children": [
+        "service_instance",
+        "platform",
+        "application",
+        "api"
+      ],
+      "status": "blocked",
+      "note": "Go through the Business Service and the Business Application.",
+      "advice": "Link the process to a Business Service or a Business Application instead."
+    },
+    {
+      "parents": [
+        "business_application"
+      ],
+      "children": [
+        "service_instance",
+        "platform"
+      ],
+      "status": "allowed",
+      "types": [
+        "Consumes::Consumed by"
+      ],
+      "note": "One Service Instance or Platform per environment."
+    },
+    {
+      "parents": [
+        "business_application"
+      ],
+      "children": [
+        "business_service",
+        "service_offering"
+      ],
+      "status": "blocked",
+      "note": "A Business Application's only children are Service Instances.",
+      "advice": "Link it through the Service Instance."
+    },
+    {
+      "parents": [
+        "business_service",
+        "service_offering"
+      ],
+      "children": [
+        "business_application"
+      ],
+      "status": "blocked",
+      "note": "Services and offerings reach a Business Application through the Service Instance.",
+      "advice": "Link it through the Service Instance."
+    },
+    {
+      "parents": [
+        "business_service"
+      ],
+      "children": [
+        "service_offering"
+      ],
+      "status": "allowed",
+      "types": [
+        "Provided by::Provides",
+        "Provides::Provided by"
+      ],
+      "note": "A Business Service has at least one offering; each offering has exactly one Business Service."
+    },
+    {
+      "parents": [
+        "business_service"
+      ],
+      "children": [
+        "business_service"
+      ],
+      "status": "blocked",
+      "note": "A Business Service is never the parent of another Business Service."
+    },
+    {
+      "parents": [
+        "service_offering"
+      ],
+      "children": [
+        "service_instance",
+        "platform"
+      ],
+      "status": "allowed",
+      "types": [
+        "Depends on::Used by"
+      ],
+      "note": "The offering depends on the Service Instances that deliver it."
+    },
+    {
+      "parents": [
+        "service_instance"
+      ],
+      "children": [
+        "platform"
+      ],
+      "status": "allowed",
+      "types": [
+        "Depends on::Used by"
+      ],
+      "note": "The Service Instance uses the Platform's data or technology: the Service Instance is the parent."
+    },
+    {
+      "parents": [
+        "platform"
+      ],
+      "children": [
+        "platform"
+      ],
+      "status": "allowed",
+      "types": [
+        "Depends on::Used by"
+      ],
+      "note": "A Platform that depends on another Platform."
+    },
+    {
+      "parents": [
+        "service_instance"
+      ],
+      "children": [
+        "service_instance"
+      ],
+      "status": "allowed",
+      "types": [
+        "Depends on::Used by"
+      ],
+      "note": "A runtime dependency between Service Instances."
+    },
+    {
+      "parents": [
+        "platform"
+      ],
+      "children": [
+        "service_instance"
+      ],
+      "status": "direction",
+      "review": true,
+      "note": "A Platform is the child of the Service Instance that uses it. Confirm with the criticality owner before changing production, because criticality flows down.",
+      "advice": "Swap the direction: the Service Instance is the parent of the Platform."
+    },
+    {
+      "parents": [
+        "service_instance",
+        "platform"
+      ],
+      "children": [
+        "application",
+        "api"
+      ],
+      "status": "allowed",
+      "types": [
+        "Depends on::Used by"
+      ],
+      "note": "The Service Instance depends on its Application CIs and APIs."
+    }
+  ],
+  "expectations": [
+    {
+      "id": "bc-below",
+      "classes": [
+        "business_capability"
+      ],
+      "direction": "child",
+      "related": [
+        "business_process",
+        "business_capability"
+      ],
+      "min": 1,
+      "title": "Business Capability with nothing below",
+      "todo": "Add at least one Business Process or Business Capability as child, with Provided by::Provides."
+    },
+    {
+      "id": "bp-business-capability",
+      "classes": [
+        "business_process"
+      ],
+      "direction": "parent",
+      "related": [
+        "business_capability"
+      ],
+      "min": 1,
+      "title": "Business Process without a Business Capability above",
+      "todo": "Add its Business Capability as parent, with Provided by::Provides."
+    },
+    {
+      "id": "bp-application-or-service",
+      "classes": [
+        "business_process"
+      ],
+      "direction": "child",
+      "related": [
+        "business_application",
+        "business_service"
+      ],
+      "min": 1,
+      "title": "Business Process without a Business Application or Business Service below",
+      "todo": "Add one as child, with Provided by::Provides."
+    },
+    {
+      "id": "ba-business-process",
+      "classes": [
+        "business_application"
+      ],
+      "direction": "parent",
+      "related": [
+        "business_process"
+      ],
+      "min": 1,
+      "title": "Business Application without a Business Process above",
+      "todo": "Add a Business Process as parent, with Provided by::Provides."
+    },
+    {
+      "id": "ba-service-instance",
+      "classes": [
+        "business_application"
+      ],
+      "direction": "child",
+      "related": [
+        "service_instance",
+        "platform"
+      ],
+      "min": 1,
+      "max": 1,
+      "maxPerEnvironment": true,
+      "title": "Business Application without a Service Instance",
+      "tooManyTitle": "Business Application with more than one Service Instance in one environment",
+      "todo": "Add its Service Instance or Platform as child, with Consumes::Consumed by.",
+      "tooManyTodo": "Keep one per environment: which one is right?"
+    },
+    {
+      "id": "bs-offering",
+      "classes": [
+        "business_service"
+      ],
+      "direction": "child",
+      "related": [
+        "service_offering"
+      ],
+      "min": 1,
+      "title": "Business Service without a Service Offering",
+      "todo": "Add its Service Offering as child, with Provided by::Provides."
+    },
+    {
+      "id": "bso-business-service",
+      "parentField": true,
+      "classes": [
+        "service_offering"
+      ],
+      "direction": "parent",
+      "related": [
+        "business_service"
+      ],
+      "min": 1,
+      "max": 1,
+      "title": "Service Offering without a Business Service",
+      "tooManyTitle": "Service Offering with more than one Business Service",
+      "todo": "Add its Business Service as parent.",
+      "tooManyTodo": "An offering has exactly one Business Service: which one is right?"
+    },
+    {
+      "id": "si-business-application",
+      "classes": [
+        "service_instance",
+        "platform"
+      ],
+      "direction": "parent",
+      "related": [
+        "business_application"
+      ],
+      "min": 1,
+      "max": 1,
+      "inServiceNow": true,
+      "title": "Service Instance without a Business Application",
+      "tooManyTitle": "Service Instance with more than one Business Application",
+      "todo": "SACM maps it in ServiceNow with the owner: add its Business Application as parent, with Consumes::Consumed by.",
+      "tooManyTodo": "A Service Instance has exactly one Business Application: which one is right?"
+    },
+    {
+      "id": "bso-service-instance",
+      "review": true,
+      "classes": [
+        "service_offering"
+      ],
+      "direction": "child",
+      "related": [
+        "service_instance",
+        "platform"
+      ],
+      "min": 1,
+      "title": "Service Offering without a Service Instance",
+      "todo": "Review: the Workspace documents disagree on this rule.",
+      "reviewWhy": "Review only: the rule is not agreed."
+    },
+    {
+      "id": "bs-business-process",
+      "review": true,
+      "classes": [
+        "business_service"
+      ],
+      "direction": "parent",
+      "related": [
+        "business_process"
+      ],
+      "min": 1,
+      "title": "Business Service without a Business Process above",
+      "todo": "Review: the instruction says a Business Service should relate to a Business Process.",
+      "reviewWhy": "Review only: the instruction says \"should\"."
+    }
+  ],
+  "notRaised": [
+    "A Service Instance that no offering uses.",
+    "A Service Instance with nothing below it."
+  ]
+}

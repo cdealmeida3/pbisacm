@@ -1,0 +1,52 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Parameters
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Packed
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup Reading
+
+	annotation PBI_QueryGroupOrder = 2
+
+queryGroup Checks
+
+	annotation PBI_QueryGroupOrder = 3
+
+queryGroup Tables
+
+	annotation PBI_QueryGroupOrder = 4
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+ref table About
+ref table ReportTypes
+ref table ReportFiles
+ref table NotRead
+ref table Runs
+ref table Inventory
+ref table Relationships
+ref table EpoSystems
+ref table SolusiContracts
+ref table ServiceNowContracts
+ref table Checks
+ref table Findings
+ref table Tested
+ref table Notes
+ref table Parked
+ref table MappingBacklog
+ref table CapabilitySheet
+ref table RelationshipLinks
+ref table SelfCheck
+ref table Classes
+ref table Date
+

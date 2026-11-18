@@ -1,0 +1,54 @@
+{
+  "id": "TAG-MISSING",
+  "status": "proposed",
+  "title": "Mandatory tag is missing",
+  "cardLabel": "Tag missing",
+  "cardHint": "A tag the class must carry is missing (a process: customer facing or internal). SACM sets it, and asks Process Management when it cannot tell.",
+  "family": "tags",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "op": "missingTags",
+      "ref": "reference/mandatory-tags",
+      "field": "tags"
+    }
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "managed_by",
+      "owned_by",
+      "managerOf(owned_by)"
+    ],
+    "askWhenUnsure": "Cannot tell which type: ask Process Management",
+    "message": {
+      "subject": "Missing tag",
+      "intro": "A mandatory tag is missing on these CIs.",
+      "ask": "Could you tell us the right value for each CI? We will update ServiceNow for you.",
+      "why": "The mandatory tags say what kind of CI it is. Reports and rules depend on them.",
+      "askByTeam": {
+        "process-management": "Is each process customer facing or internal? Please {reply}, and we will set the tag in ServiceNow."
+      }
+    }
+  }
+}

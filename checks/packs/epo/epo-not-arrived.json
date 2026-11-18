@@ -1,0 +1,29 @@
+{
+  "id": "EPO-NOT-ARRIVED",
+  "reviewOnly": true,
+  "reviewWhy": "ServiceNow should follow EPO by itself: listed for a review of the sync",
+  "status": "live",
+  "title": "EPO change not in ServiceNow (not service mapped)",
+  "cardLabel": "EPO update not arrived",
+  "cardHint": "CIs that should follow EPO by themselves but differ from it: the sync did not bring the change. A list to look at.",
+  "cardText": "CIs that are not service mapped: ServiceNow must follow EPO by itself, so a difference means the sync did not bring the change. Status, name, the three people and the description are compared (the description by letters and digits only). Check a few of them in EPO and in ServiceNow. A change made in EPO less than two days before the report waits: the sync may still bring it. After two days, raise one incident for the pattern with the ServiceNow development team, and keep its number on the cases.",
+  "family": "epo-report",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "service_instance"
+    ]
+  },
+  "detector": {
+    "type": "code",
+    "module": "epo/not-arrived",
+    "ref": "reference/epo-systems-report"
+  },
+  "playbook": {
+    "path": "source-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

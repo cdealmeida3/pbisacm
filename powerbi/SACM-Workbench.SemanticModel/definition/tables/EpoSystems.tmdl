@@ -1,0 +1,58 @@
+/// The systems of the newest EPO systems report.
+table EpoSystems
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column EpoId
+		dataType: string
+		sourceColumn: EpoId
+
+	column Name
+		dataType: string
+		sourceColumn: Name
+
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	column StatusWord
+		dataType: string
+		sourceColumn: StatusWord
+
+	column Department
+		dataType: string
+		sourceColumn: Department
+
+	column Owner
+		dataType: string
+		sourceColumn: Owner
+
+	column Responsible1
+		dataType: string
+		sourceColumn: Responsible1
+
+	column Responsible2
+		dataType: string
+		sourceColumn: Responsible2
+
+	column Changed
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: Changed
+
+	column Description
+		dataType: string
+		sourceColumn: Description
+
+	partition EpoSystems = m
+		mode: import
+		source = EpoSystemsRows

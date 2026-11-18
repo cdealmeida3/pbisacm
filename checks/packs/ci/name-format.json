@@ -1,0 +1,44 @@
+{
+  "id": "NAME-FORMAT",
+  "status": "proposed",
+  "title": "CI name has a wrong dash or a space at its start or end",
+  "cardLabel": "Name to tidy",
+  "cardHint": "Small faults in a name, such as a space at the start or the end. SACM corrects them itself; nobody is asked.",
+  "cardText": "Small faults in a name that SACM corrects itself, nobody is asked: an API offering that does not start with \"API - \" (for example another dash), and a space at the start or the end of a name.",
+  "family": "name",
+  "dimension": "compliance",
+  "severity": "low",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "ci/name-standard",
+    "ref": "reference/name-rules",
+    "rules": [
+      "api-prefix",
+      "outer-space"
+    ]
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

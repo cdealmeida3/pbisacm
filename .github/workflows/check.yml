@@ -1,0 +1,137 @@
+# The check of every pull request (piece A1, the safety net; D257, D261). It runs on GitHub's own Linux runner, never on
+# a self-hosted one: the repository is public, and a pull request from a fork must not run code on a developer's
+# computer (D286). Every step runs in bash.
+# Pull requests only: main changes only by a merged pull request that already passed, so a second run after the
+# merge spent minutes and found nothing (D261). A new push to a pull request stops the run of the push before it.
+# A draft pull request runs nothing; marking it ready runs the check (D262). Every job has a time limit, so a stuck
+# browser check cannot spend hours, and the browser jobs use the Google Chrome the runner already has (D262).
+#   changes: decides whether the browser checks can find something: only when the app, its source, the check files, the
+#            samples, the browser checks, the build or this workflow changed. The Run workflow button runs everything.
+#   checks:  types (app, logic, tests, command line), tests (with the recorded result of the samples, the design rules,
+#            the privacy guard with the private words of the secret PRIVACY_TERMS_LIST, and the repository rules), the
+#            Power BI lint, build, and "the built file matches the source".
+#   browser: the twelve browser checks on the built file, with invented data, in three jobs side by side, beside the
+#            checks job. A skipped browser job counts as passed.
+name: Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash -e {0}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm ci
+      - name: Types
+        run: npm run typecheck
+      # The private words (names and words that must never be in the repository) are the Actions secret
+      # PRIVACY_TERMS_LIST, one per line; the privacy guard of npm test reads them and prints only file and line
+      # (docs/HOW-TO.md §10). A pull request from a fork gets no secret: the words are checked at the next run with it.
+      - name: Tests
+        env:
+          PRIVACY_TERMS_LIST: ${{ secrets.PRIVACY_TERMS_LIST }}
+        run: |
+          if [ -z "$PRIVACY_TERMS_LIST" ]; then echo "::notice::Private words not checked: no secret PRIVACY_TERMS_LIST."; fi
+          npm test
+      # The Power BI project: its model through Microsoft's TMDL library (.NET 8), its Power Query syntax, its report
+      # files against Microsoft's schemas, references and colours (tools/powerbi/lint.ts, plan §9.1). The real Power
+      # Query runs in the workflow "Power BI" on Windows.
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Power BI lint
+        run: npm run powerbi:lint
+      - name: Build
+        run: npm run build
+      - name: The built file matches the source
+        run: |
+          if ! git diff --quiet -- app/SACM-Workbench.html; then
+            echo "::error file=app/SACM-Workbench.html::app/SACM-Workbench.html is not the build of this source. Run npm run build and commit the result."
+            git diff --stat -- app/SACM-Workbench.html
+            exit 1
+          fi
+      - name: No other file changed by the build
+        run: git diff --exit-code --stat
+
+  changes:
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      browser: ${{ steps.diff.outputs.browser }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Did the app or its browser checks change?
+        id: diff
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then base="$PR_BASE"; else base=""; fi
+          if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            echo "browser=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git diff --name-only "$base"...HEAD -- app src checks samples tests/browser tools/build-app.mjs \
+               package.json package-lock.json vite.config.ts tsconfig.json .github/workflows | grep -q .; then
+            echo "browser=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "browser=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No change to the app or its browser checks: the browser checks are skipped."
+          fi
+
+  browser:
+    needs: changes
+    if: needs.changes.outputs.browser == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - group: 1
+            checks: "look"
+          - group: 2
+            checks: "contracts pilot lifecycle numbers criticality"
+          - group: 3
+            checks: "epo cards followup firstscreen settings relationships"
+    name: browser (${{ matrix.group }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      # Only the Playwright package: the browser is the runner's own Google Chrome (D262), not a download each run.
+      - name: Playwright (for the checks only, not part of the app)
+        run: npm install --no-save --no-package-lock playwright@1.63.0
+      - name: Browser checks
+        run: npm run browser -- ${{ matrix.checks }}
+        env:
+          CHROMIUM_PATH: /usr/bin/google-chrome
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-screenshots-${{ matrix.group }}
+          path: .build/browser/
+          retention-days: 7

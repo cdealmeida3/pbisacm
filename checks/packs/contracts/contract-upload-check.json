@@ -1,0 +1,28 @@
+{
+  "id": "CONTRACT-UPLOAD",
+  "status": "live",
+  "family": "contracts",
+  "subject": "contract",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "contract"
+    ]
+  },
+  "title": "A field differs between Solusi and ServiceNow after the upload",
+  "cardLabel": "Upload check",
+  "cardHint": "Solusi and ServiceNow differ. First check that the Solusi file was uploaded; if it was, SACM sets the Solusi value itself.",
+  "cardText": "First question: was this Solusi contract file uploaded to ServiceNow? If not, upload it, load a new ServiceNow contract report and look again. If it was, SACM sets the value of Solusi in ServiceNow itself and marks the line as fixed; no incident is raised. A person's name that differs is on Contracts to fix in ServiceNow.",
+  "detector": {
+    "type": "code",
+    "module": "contracts/upload-check",
+    "ref": "reference/contract-reports"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

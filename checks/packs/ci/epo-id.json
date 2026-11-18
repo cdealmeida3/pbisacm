@@ -1,0 +1,43 @@
+{
+  "id": "EPO-ID",
+  "status": "proposed",
+  "title": "EPO ID missing or used twice",
+  "cardLabel": "EPO ID",
+  "cardHint": "A Business Service or Service Instance without an EPO ID, or with one used twice. SACM looks first: known case, or ask the owner.",
+  "cardText": "The EPO ID is the Asset tag. A Business Service or Service Instance without one was most likely created in ServiceNow and not in EPO. SACM looks at each line first. Created in ServiceNow on purpose (the known cases of the instruction, section 3.1): use Not followed up once, with a reason. It must be in EPO: open the CI and press \"Must be created in EPO: ask the owner\": the owner is asked to create it in EPO. Service Offerings are ServiceNow records and are not checked.",
+  "family": "epo",
+  "dimension": "completeness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_service",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "ci/epo-id",
+    "ref": "reference/epo-id"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "askWhenUnsure": "Must be created in EPO: ask the owner",
+    "message": {
+      "subject": "EPO ID to check",
+      "intro": "These CIs have no EPO ID in ServiceNow, or the same EPO ID as another CI, so they cannot be matched with EPO.",
+      "ask": "Please check that the system or service exists in EPO, once only. If it is not in EPO, please create it there: ServiceNow receives it from EPO. {Reply} if you have a question.",
+      "why": "The EPO ID links the ServiceNow record to EPO. Without it the two cannot be compared."
+    }
+  }
+}

@@ -1,0 +1,1311 @@
+[
+  {
+    "pack": "APP-INSTANCE-MATCH",
+    "id": "APP-INSTANCE-MATCH",
+    "label": "Application ≠ Instance",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case APP-INSTANCE-MATCH:member engine:owned_by",
+      "case APP-INSTANCE-MATCH:member engine:managed_by",
+      "case APP-INSTANCE-MATCH:member engine:name",
+      "case APP-INSTANCE-MATCH:index tool:managed_by",
+      "case APP-INSTANCE-MATCH:index tool:description",
+      "case APP-INSTANCE-MATCH:index tool:name"
+    ],
+    "open": [
+      "case APP-INSTANCE-MATCH:member engine:owned_by",
+      "case APP-INSTANCE-MATCH:member engine:managed_by",
+      "case APP-INSTANCE-MATCH:member engine:name",
+      "case APP-INSTANCE-MATCH:index tool:managed_by",
+      "case APP-INSTANCE-MATCH:index tool:description",
+      "case APP-INSTANCE-MATCH:index tool:name"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case APP-INSTANCE-MATCH:member engine:owned_by",
+      "case APP-INSTANCE-MATCH:member engine:managed_by",
+      "case APP-INSTANCE-MATCH:member engine:name",
+      "case APP-INSTANCE-MATCH:index tool:managed_by",
+      "case APP-INSTANCE-MATCH:index tool:description",
+      "case APP-INSTANCE-MATCH:index tool:name"
+    ],
+    "cis": 2,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CONTRACT-PROCUREMENT",
+    "id": "CONTRACT-PROCUREMENT",
+    "label": "For Procurement",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft",
+      "case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber",
+      "case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired",
+      "case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown"
+    ],
+    "open": [
+      "case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft",
+      "case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber",
+      "case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired",
+      "case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft",
+      "case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber",
+      "case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired",
+      "case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown"
+    ],
+    "cis": 3,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 4,
+    "later": false
+  },
+  {
+    "pack": "CONTRACT-NOT-IN-SOLUSI",
+    "id": "CONTRACT-NOT-IN-SOLUSI",
+    "label": "Not in Solusi",
+    "module": "compliance",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record"
+    ],
+    "open": [
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record",
+      "case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record"
+    ],
+    "cis": 4,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 1,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CONTRACT-SN-FIX",
+    "id": "CONTRACT-SN-FIX",
+    "label": "Contracts to fix in ServiceNow",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CONTRACT-SN-FIX:contract:ct000003:endPassed"
+    ],
+    "open": [
+      "case CONTRACT-SN-FIX:contract:ct000003:endPassed"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CONTRACT-SN-FIX:contract:ct000003:endPassed"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 1,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CONTRACT-STATUS",
+    "id": "CONTRACT-STATUS",
+    "label": "Contract status",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CONTRACT-STATUS:contract:ct000002:status",
+      "case CONTRACT-STATUS:contract:ct000004:status",
+      "case CONTRACT-STATUS:contract:ct000005:status"
+    ],
+    "open": [
+      "case CONTRACT-STATUS:contract:ct000002:status",
+      "case CONTRACT-STATUS:contract:ct000004:status",
+      "case CONTRACT-STATUS:contract:ct000005:status"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CONTRACT-STATUS:contract:ct000002:status",
+      "case CONTRACT-STATUS:contract:ct000004:status",
+      "case CONTRACT-STATUS:contract:ct000005:status"
+    ],
+    "cis": 3,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 1,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CONTRACT-TO-CLEAR",
+    "id": "CONTRACT-TO-CLEAR",
+    "label": "To clear by hand",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CONTRACT-TO-CLEAR:contract:ct000002:end",
+      "case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible"
+    ],
+    "open": [
+      "case CONTRACT-TO-CLEAR:contract:ct000002:end",
+      "case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CONTRACT-TO-CLEAR:contract:ct000002:end",
+      "case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 1,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CONTRACT-UPLOAD",
+    "id": "CONTRACT-UPLOAD",
+    "label": "Upload check",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CONTRACT-UPLOAD:contract:ct000005:vendor",
+      "case CONTRACT-UPLOAD:contract:ct000006:end",
+      "case CONTRACT-UPLOAD:contract:ct000007:record"
+    ],
+    "open": [
+      "case CONTRACT-UPLOAD:contract:ct000005:vendor",
+      "case CONTRACT-UPLOAD:contract:ct000006:end",
+      "case CONTRACT-UPLOAD:contract:ct000007:record"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CONTRACT-UPLOAD:contract:ct000005:vendor",
+      "case CONTRACT-UPLOAD:contract:ct000006:end",
+      "case CONTRACT-UPLOAD:contract:ct000007:record"
+    ],
+    "cis": 3,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CRIT-ABOVE-PARENT",
+    "id": "CRIT-ABOVE-PARENT",
+    "label": "Above parent",
+    "module": "correctness",
+    "light": "review",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CRIT-ABOVE-PARENT:member engine - prod:integrity"
+    ],
+    "open": [],
+    "review": [
+      "case CRIT-ABOVE-PARENT:member engine - prod:integrity"
+    ],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 1,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "CRIT-AUTO-JUSTIFICATION",
+    "id": "CRIT-AUTO-JUSTIFICATION",
+    "label": "Automatic justification only",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability"
+    ],
+    "open": [
+      "case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "CRIT-NO-JUSTIFICATION",
+    "id": "CRIT-NO-JUSTIFICATION",
+    "label": "No justification",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CRIT-NO-JUSTIFICATION:index tool:confidentiality"
+    ],
+    "open": [
+      "case CRIT-NO-JUSTIFICATION:index tool:confidentiality"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case CRIT-NO-JUSTIFICATION:index tool:confidentiality"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 1,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CRIT-NONE-REACHES",
+    "id": "CRIT-NONE-REACHES",
+    "label": "No criticality reaches the CI",
+    "module": "completeness",
+    "light": "review",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case CRIT-NONE-REACHES:event engine:target",
+      "case CRIT-NONE-REACHES:event desk:target",
+      "case CRIT-NONE-REACHES:event gateway - prod:target"
+    ],
+    "open": [],
+    "review": [
+      "case CRIT-NONE-REACHES:event engine:target"
+    ],
+    "waiting": [
+      "case CRIT-NONE-REACHES:event gateway - prod:target"
+    ],
+    "known": [
+      "case CRIT-NONE-REACHES:event desk:target"
+    ],
+    "main": [
+      "case CRIT-NONE-REACHES:event engine:target"
+    ],
+    "cis": 1,
+    "waitingCis": 1,
+    "knownCis": 1,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "CRIT-TARGET-MISSING",
+    "id": "CRIT-TARGET-MISSING",
+    "label": "BIA missing",
+    "module": "completeness",
+    "light": "green",
+    "tested": true,
+    "notes": [],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "DESC-QUALITY",
+    "id": "DESC-QUALITY",
+    "label": "Description",
+    "module": "completeness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case DESC-QUALITY:reconcile index:description",
+      "case DESC-QUALITY:members:description",
+      "case DESC-QUALITY:members - standard:description",
+      "case DESC-QUALITY:close the month:description"
+    ],
+    "open": [
+      "case DESC-QUALITY:reconcile index:description",
+      "case DESC-QUALITY:members:description",
+      "case DESC-QUALITY:members - standard:description",
+      "case DESC-QUALITY:close the month:description"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case DESC-QUALITY:reconcile index:description",
+      "case DESC-QUALITY:members:description",
+      "case DESC-QUALITY:members - standard:description",
+      "case DESC-QUALITY:close the month:description"
+    ],
+    "cis": 4,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 5,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 2,
+    "later": false
+  },
+  {
+    "pack": "EPO-DIFF",
+    "id": "EPO-DIFF",
+    "label": "EPO ≠ ServiceNow",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [
+      "The chip \"changed in EPO\" needs an earlier EPO systems report: this is the first one loaded."
+    ],
+    "cases": [
+      "case EPO-DIFF:member engine - prod:managed_by",
+      "case EPO-DIFF:index tool - prod:description"
+    ],
+    "open": [
+      "case EPO-DIFF:member engine - prod:managed_by",
+      "case EPO-DIFF:index tool - prod:description"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case EPO-DIFF:member engine - prod:managed_by",
+      "case EPO-DIFF:index tool - prod:description"
+    ],
+    "cis": 2,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "EPO-ID",
+    "id": "EPO-ID",
+    "label": "EPO ID",
+    "module": "completeness",
+    "light": "green",
+    "tested": true,
+    "notes": [],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "EPO-NOT-ARRIVED",
+    "id": "EPO-NOT-ARRIVED",
+    "label": "EPO update not arrived",
+    "module": "correctness",
+    "light": "review",
+    "tested": true,
+    "notes": [
+      "1 EPO system that is not Retired has no Service Instance with its EPO ID: Archive Service (AST-0030)."
+    ],
+    "cases": [
+      "case EPO-NOT-ARRIVED:event gateway - prod:description"
+    ],
+    "open": [],
+    "review": [
+      "case EPO-NOT-ARRIVED:event gateway - prod:description"
+    ],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case EPO-NOT-ARRIVED:event gateway - prod:description"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "LIFECYCLE-REVIEW",
+    "id": "LIFECYCLE-REVIEW",
+    "label": "Lifecycle review",
+    "module": "compliance",
+    "light": "grey",
+    "tested": false,
+    "notes": [
+      "No lifecycle review yet. A manager starts one on the Audit page, under Lifecycle."
+    ],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "MAPPING",
+    "id": "MAPPING",
+    "label": "Mapping backlog",
+    "module": "compliance",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case MAPPING:fines hub - prod:mapping",
+      "case MAPPING:event engine:mapping",
+      "case MAPPING:event desk:mapping",
+      "case MAPPING:event gateway - prod:mapping"
+    ],
+    "open": [
+      "case MAPPING:fines hub - prod:mapping",
+      "case MAPPING:event engine:mapping",
+      "case MAPPING:event desk:mapping",
+      "case MAPPING:event gateway - prod:mapping"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case MAPPING:fines hub - prod:mapping",
+      "case MAPPING:event engine:mapping",
+      "case MAPPING:event desk:mapping",
+      "case MAPPING:event gateway - prod:mapping"
+    ],
+    "cis": 4,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "NAME-DUPLICATE",
+    "id": "NAME-DUPLICATE",
+    "label": "Duplicate names",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case NAME-DUPLICATE:fines hub - prod:name",
+      "case NAME-DUPLICATE:manage fines|ast-0013:name",
+      "case NAME-DUPLICATE:manage fines|ast-0014:name"
+    ],
+    "open": [
+      "case NAME-DUPLICATE:fines hub - prod:name",
+      "case NAME-DUPLICATE:manage fines|ast-0013:name",
+      "case NAME-DUPLICATE:manage fines|ast-0014:name"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case NAME-DUPLICATE:fines hub - prod:name",
+      "case NAME-DUPLICATE:manage fines|ast-0013:name",
+      "case NAME-DUPLICATE:manage fines|ast-0014:name"
+    ],
+    "cis": 3,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "NAME-FORMAT",
+    "id": "NAME-FORMAT",
+    "label": "Name to tidy",
+    "module": "compliance",
+    "light": "green",
+    "tested": true,
+    "notes": [],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "NAME-HIDDEN-CHAR",
+    "id": "NAME-HIDDEN-CHAR",
+    "label": "Hidden character in name",
+    "module": "correctness",
+    "light": "grey",
+    "tested": false,
+    "notes": [
+      "Not tested: a CSV report cannot show hidden characters (it writes \"?\" instead). Load the CI report as .xlsx, or load the Relationship report with it."
+    ],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "NAME-STANDARD",
+    "id": "NAME-STANDARD",
+    "label": "Name not standard",
+    "module": "compliance",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case NAME-STANDARD:members:bs-suffix"
+    ],
+    "open": [
+      "case NAME-STANDARD:members:bs-suffix"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case NAME-STANDARD:members:bs-suffix"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 1,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "OFFERING-OWNER",
+    "id": "OFFERING-OWNER",
+    "label": "Offering owner ≠ Service owner",
+    "module": "correctness",
+    "light": "green",
+    "tested": true,
+    "notes": [
+      "1 Service Offering comes from EPO: it takes its owner from EPO and is not checked here."
+    ],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "OFFERING-PARENT",
+    "id": "OFFERING-PARENT",
+    "label": "Offering parent",
+    "module": "correctness",
+    "light": "grey",
+    "tested": false,
+    "notes": [
+      "Not tested: the report has no Parent column (ref_cmdb_ci_service.parent). Add it to the CI report."
+    ],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "PROCESS-STAGE",
+    "id": "PROCESS-STAGE",
+    "label": "Process stage",
+    "module": "compliance",
+    "light": "green",
+    "tested": true,
+    "notes": [],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "READY-TOO-LONG",
+    "id": "READY-TOO-LONG",
+    "label": "Ready too long",
+    "module": "compliance",
+    "light": "green",
+    "tested": true,
+    "notes": [],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": true
+  },
+  {
+    "pack": "REL-MISSING",
+    "id": "REL-MISSING",
+    "label": "Relationship missing",
+    "module": "compliance",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case REL-MISSING:manage fines|ast-0013:bc-below",
+      "case REL-MISSING:manage fines|ast-0014:bc-below"
+    ],
+    "open": [
+      "case REL-MISSING:manage fines|ast-0013:bc-below",
+      "case REL-MISSING:manage fines|ast-0014:bc-below"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case REL-MISSING:manage fines|ast-0013:bc-below",
+      "case REL-MISSING:manage fines|ast-0014:bc-below"
+    ],
+    "cis": 2,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "REL-ONE-TO-ONE",
+    "id": "REL-ONE-TO-ONE",
+    "label": "Too many partners",
+    "module": "compliance",
+    "light": "green",
+    "tested": true,
+    "notes": [],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "REL-TWICE",
+    "id": "REL-TWICE",
+    "label": "Relationship entered twice",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case REL-TWICE:members:twice:members>provides::providedby>members - standard"
+    ],
+    "open": [
+      "case REL-TWICE:members:twice:members>provides::providedby>members - standard"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case REL-TWICE:members:twice:members>provides::providedby>members - standard"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 1,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "REL-WRONG-TYPE",
+    "id": "REL-WRONG-TYPE",
+    "label": "Wrong relationship type",
+    "module": "compliance",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool"
+    ],
+    "open": [
+      "case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "RESP-INACTIVE",
+    "id": "RESP-INACTIVE",
+    "label": "Inactive person",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case RESP-INACTIVE:reconcile index:owned_by",
+      "case RESP-INACTIVE:member engine - prod:managed_by"
+    ],
+    "open": [
+      "case RESP-INACTIVE:reconcile index:owned_by"
+    ],
+    "review": [],
+    "waiting": [
+      "case RESP-INACTIVE:member engine - prod:managed_by"
+    ],
+    "known": [],
+    "main": [
+      "case RESP-INACTIVE:reconcile index:owned_by"
+    ],
+    "cis": 1,
+    "waitingCis": 1,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "RESP-MISSING",
+    "id": "RESP-MISSING",
+    "label": "Owner or manager missing",
+    "module": "completeness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case RESP-MISSING:manage member records:owned_by",
+      "case RESP-MISSING:manage fines|ast-0013:owned_by",
+      "case RESP-MISSING:manage fines|ast-0014:owned_by",
+      "case RESP-MISSING:members:managed_by",
+      "case RESP-MISSING:manage fines|ast-0013:managed_by",
+      "case RESP-MISSING:manage fines|ast-0014:managed_by",
+      "case RESP-MISSING:close the month:managed_by",
+      "case RESP-MISSING:event gateway - prod:managed_by"
+    ],
+    "open": [
+      "case RESP-MISSING:manage member records:owned_by",
+      "case RESP-MISSING:manage fines|ast-0013:owned_by",
+      "case RESP-MISSING:manage fines|ast-0014:owned_by",
+      "case RESP-MISSING:members:managed_by",
+      "case RESP-MISSING:manage fines|ast-0013:managed_by",
+      "case RESP-MISSING:manage fines|ast-0014:managed_by",
+      "case RESP-MISSING:close the month:managed_by",
+      "case RESP-MISSING:event gateway - prod:managed_by"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case RESP-MISSING:manage member records:owned_by",
+      "case RESP-MISSING:manage fines|ast-0013:owned_by",
+      "case RESP-MISSING:manage fines|ast-0014:owned_by",
+      "case RESP-MISSING:members:managed_by",
+      "case RESP-MISSING:manage fines|ast-0013:managed_by",
+      "case RESP-MISSING:manage fines|ast-0014:managed_by",
+      "case RESP-MISSING:close the month:managed_by",
+      "case RESP-MISSING:event gateway - prod:managed_by"
+    ],
+    "cis": 6,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 4,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 5,
+    "later": false
+  },
+  {
+    "pack": "RESP-SAME-PERSON",
+    "id": "RESP-SAME-PERSON",
+    "label": "Owner = Manager",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case RESP-SAME-PERSON:register a new member:owned_by"
+    ],
+    "open": [
+      "case RESP-SAME-PERSON:register a new member:owned_by"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case RESP-SAME-PERSON:register a new member:owned_by"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "SUPPORT-GROUP-INACTIVE",
+    "id": "SUPPORT-GROUP-INACTIVE",
+    "label": "Support group inactive",
+    "module": "correctness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group"
+    ],
+    "open": [
+      "case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "SUPPORT-GROUP-MISSING",
+    "id": "SUPPORT-GROUP-MISSING",
+    "label": "Support group",
+    "module": "completeness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case SUPPORT-GROUP-MISSING:members - standard:support_group",
+      "case SUPPORT-GROUP-MISSING:fines hub - prod:support_group"
+    ],
+    "open": [
+      "case SUPPORT-GROUP-MISSING:members - standard:support_group",
+      "case SUPPORT-GROUP-MISSING:fines hub - prod:support_group"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case SUPPORT-GROUP-MISSING:members - standard:support_group",
+      "case SUPPORT-GROUP-MISSING:fines hub - prod:support_group"
+    ],
+    "cis": 2,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 2,
+    "later": false
+  },
+  {
+    "pack": "SUPPORTED-BY",
+    "id": "SUPPORTED-BY",
+    "label": "Supported by",
+    "module": "completeness",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case SUPPORTED-BY:member engine - test:supported_by",
+      "case SUPPORTED-BY:index tool - prod:supported_by",
+      "case SUPPORTED-BY:members - standard:supported_by"
+    ],
+    "open": [
+      "case SUPPORTED-BY:member engine - test:supported_by",
+      "case SUPPORTED-BY:index tool - prod:supported_by",
+      "case SUPPORTED-BY:members - standard:supported_by"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case SUPPORTED-BY:member engine - test:supported_by",
+      "case SUPPORTED-BY:index tool - prod:supported_by",
+      "case SUPPORTED-BY:members - standard:supported_by"
+    ],
+    "cis": 3,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 4,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 2,
+    "later": true
+  },
+  {
+    "pack": "TAG-MISSING",
+    "id": "TAG-MISSING",
+    "label": "Tag missing",
+    "module": "compliance",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case TAG-MISSING:reconcile index:tags"
+    ],
+    "open": [
+      "case TAG-MISSING:reconcile index:tags"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case TAG-MISSING:reconcile index:tags"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 3,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": false
+  },
+  {
+    "pack": "TAG-STATUS-CONFLICT",
+    "id": "TAG-STATUS-CONFLICT",
+    "label": "Deleted but operational",
+    "module": "compliance",
+    "light": "red",
+    "tested": true,
+    "notes": [],
+    "cases": [
+      "case TAG-STATUS-CONFLICT:fines hub - prod:tags"
+    ],
+    "open": [
+      "case TAG-STATUS-CONFLICT:fines hub - prod:tags"
+    ],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [
+      "case TAG-STATUS-CONFLICT:fines hub - prod:tags"
+    ],
+    "cis": 1,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 2,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 1,
+    "later": false
+  },
+  {
+    "pack": "UNDER-RETIREMENT-LONG",
+    "id": "UNDER-RETIREMENT-LONG",
+    "label": "Under retirement too long",
+    "module": "compliance",
+    "light": "green",
+    "tested": true,
+    "notes": [],
+    "cases": [],
+    "open": [],
+    "review": [],
+    "waiting": [],
+    "known": [],
+    "main": [],
+    "cis": 0,
+    "waitingCis": 0,
+    "knownCis": 0,
+    "reviewCis": 0,
+    "people": 0,
+    "contacted": 0,
+    "due": 0,
+    "answered": 0,
+    "verified": 0,
+    "untaken": 0,
+    "later": true
+  }
+]

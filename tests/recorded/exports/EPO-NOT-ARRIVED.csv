@@ -1,0 +1,2 @@
+﻿"Name","EPO ID","Class","Owned by","Managed by","Operational status","Support group","Tags","What we found"
+"Event Gateway - PROD","AST-0020","Service Instance","Dee Owner","Cy Keeper","Operational","Core Team","","Description (starts differently from the EPO text) is ""Production instance of the event gateway"" in ServiceNow, EPO has ""Routes ticket orders to the & ticket partners."" (last change in EPO: 20 October 2026)"

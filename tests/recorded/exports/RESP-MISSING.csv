@@ -1,0 +1,7 @@
+﻿"Name","EPO ID","Class","Owned by","Managed by","Operational status","Support group","Tags","What we found"
+"Close the Month","AST-0021","Business Process","Dee Owner","","Operational","Finance Team","Internal BP","Managed by is empty"
+"Event Gateway - PROD","AST-0020","Service Instance","Dee Owner","Cy Keeper","Operational","Core Team","","Managed by is empty in EPO (Primary Responsible); ServiceNow still shows Cy Keeper (cy01), because the sync never clears a field"
+"Manage Fines","AST-0013","Business Capability","","","Operational","","","Owned by is empty; Managed by is empty"
+"Manage Fines","AST-0014","Business Capability","","","Operational","","","Owned by is empty; Managed by is empty"
+"Manage Member Records","AST-0001","Business Capability","","Cy Keeper","Operational","","","Owned by is empty"
+"Members","AST-0010","Business Service","Ada Example","","Operational","","","Managed by is empty"

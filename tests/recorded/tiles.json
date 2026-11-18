@@ -1,0 +1,204 @@
+[
+  {
+    "type": {
+      "kind": "ci",
+      "label": "CI report",
+      "hint": "ServiceNow: the CIs, their people and their criticality",
+      "needs": [
+        {
+          "label": "Name",
+          "any": [
+            "name",
+            "display_name",
+            "ci",
+            "configuration_item"
+          ]
+        },
+        {
+          "label": "Class",
+          "any": [
+            "sys_class_name",
+            "class",
+            "ci_class"
+          ]
+        }
+      ]
+    },
+    "load": {
+      "file": "cmdb_ci-sample.csv",
+      "date": "2026-11-11",
+      "loadedByName": "",
+      "loadedAt": "",
+      "summary": "19 CIs · 58 findings to solve · 3 to clarify when there is time",
+      "details": []
+    },
+    "ageDays": 0,
+    "stale": false
+  },
+  {
+    "type": {
+      "kind": "relationship",
+      "label": "Relationship report",
+      "hint": "ServiceNow: how the CIs are linked",
+      "needs": [
+        {
+          "label": "Parent",
+          "any": [
+            "parent",
+            "parent.name"
+          ]
+        },
+        {
+          "label": "Type",
+          "any": [
+            "type",
+            "type.name",
+            "relationship_type"
+          ]
+        },
+        {
+          "label": "Child",
+          "any": [
+            "child",
+            "child.name"
+          ]
+        }
+      ]
+    },
+    "load": {
+      "file": "cmdb_rel_ci-sample.csv",
+      "date": "2026-11-11",
+      "loadedByName": "",
+      "loadedAt": "",
+      "summary": "15 relationships",
+      "details": [
+        "Every parent and child is a CI of the CI report."
+      ]
+    },
+    "ageDays": 0,
+    "stale": false
+  },
+  {
+    "type": {
+      "kind": "epo",
+      "label": "EPO systems report",
+      "hint": "EPO: every system, its status and its people, to compare with ServiceNow",
+      "needs": [
+        {
+          "label": "EPO ID",
+          "any": [
+            "epoid",
+            "epo_id"
+          ]
+        },
+        {
+          "label": "System name",
+          "any": [
+            "systemname",
+            "system_name"
+          ]
+        },
+        {
+          "label": "System status",
+          "any": [
+            "systemstatus",
+            "system_status"
+          ]
+        }
+      ]
+    },
+    "load": {
+      "file": "epo-systems-sample.csv",
+      "date": "2026-11-11",
+      "loadedByName": "",
+      "loadedAt": "",
+      "summary": "6 systems · 5 not Retired",
+      "details": [
+        "1 system that is not Retired has no live Service Instance in the CI report of 11 Nov 2026."
+      ]
+    },
+    "ageDays": 0,
+    "stale": false
+  },
+  {
+    "type": {
+      "kind": "solusi",
+      "label": "Solusi contract file",
+      "hint": "Solusi: every contract as Procurement keeps it (Excel, every Monday)",
+      "staleAfter": 8,
+      "needs": [
+        {
+          "label": "Contract number",
+          "any": [
+            "contract_no"
+          ]
+        },
+        {
+          "label": "Contract status",
+          "any": [
+            "contract_status"
+          ]
+        },
+        {
+          "label": "Partner name",
+          "any": [
+            "partner_name"
+          ]
+        }
+      ]
+    },
+    "load": {
+      "file": "solusi-contracts-sample.csv",
+      "date": "2026-11-11",
+      "loadedByName": "",
+      "loadedAt": "",
+      "summary": "7 contracts · 0 terminated in the last 7 days",
+      "details": [
+        "1 contract is not in the ServiceNow contract report of 11 Nov 2026 (not imported yet).",
+        "5 changes since the Solusi contract file of 4 Nov 2026: see Contract changes."
+      ]
+    },
+    "ageDays": 0,
+    "stale": false
+  },
+  {
+    "type": {
+      "kind": "contract",
+      "label": "ServiceNow contract report",
+      "hint": "ServiceNow: the contracts, to compare with Solusi",
+      "staleAfter": 8,
+      "needs": [
+        {
+          "label": "Number",
+          "any": [
+            "number"
+          ]
+        },
+        {
+          "label": "Vendor contract",
+          "any": [
+            "vendor_contract"
+          ]
+        },
+        {
+          "label": "State",
+          "any": [
+            "state"
+          ]
+        }
+      ]
+    },
+    "load": {
+      "file": "servicenow-contracts-sample.csv",
+      "date": "2026-11-11",
+      "loadedByName": "",
+      "loadedAt": "",
+      "summary": "10 contracts",
+      "details": [
+        "6 contracts are also in the Solusi contract file of 11 Nov 2026; 4 are not."
+      ]
+    },
+    "ageDays": 0,
+    "stale": false
+  }
+]

@@ -1,0 +1,2996 @@
+{
+  "APP-INSTANCE-MATCH": [
+    {
+      "key": "owner::Nobody to ask is named",
+      "owner": null,
+      "noOwner": "Nobody to ask is named",
+      "cases": [
+        "case APP-INSTANCE-MATCH:member engine:owned_by",
+        "case APP-INSTANCE-MATCH:member engine:managed_by",
+        "case APP-INSTANCE-MATCH:member engine:name"
+      ],
+      "open": [
+        "case APP-INSTANCE-MATCH:member engine:owned_by",
+        "case APP-INSTANCE-MATCH:member engine:managed_by",
+        "case APP-INSTANCE-MATCH:member engine:name"
+      ],
+      "rows": [
+        {
+          "ciKey": "member engine",
+          "name": "Member Engine",
+          "classLabel": "Business Application",
+          "people": {
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case APP-INSTANCE-MATCH:member engine:owned_by",
+            "case APP-INSTANCE-MATCH:member engine:managed_by",
+            "case APP-INSTANCE-MATCH:member engine:name"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case APP-INSTANCE-MATCH:index tool:managed_by",
+        "case APP-INSTANCE-MATCH:index tool:description",
+        "case APP-INSTANCE-MATCH:index tool:name"
+      ],
+      "open": [
+        "case APP-INSTANCE-MATCH:index tool:managed_by",
+        "case APP-INSTANCE-MATCH:index tool:description",
+        "case APP-INSTANCE-MATCH:index tool:name"
+      ],
+      "rows": [
+        {
+          "ciKey": "index tool",
+          "name": "Index Tool",
+          "classLabel": "Business Application",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case APP-INSTANCE-MATCH:index tool:managed_by",
+            "case APP-INSTANCE-MATCH:index tool:description",
+            "case APP-INSTANCE-MATCH:index tool:name"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CONTRACT-PROCUREMENT": [
+    {
+      "key": "kind:Contract owner left",
+      "owner": null,
+      "label": "Contract owner left",
+      "cases": [
+        "case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft"
+      ],
+      "open": [
+        "case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000003",
+          "name": "CT000003: Example Data - data feed",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "iin",
+              "name": "Ian Inactive",
+              "email": "ian.inactive@example.com",
+              "active": false
+            }
+          },
+          "cases": [
+            "case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "procurement-mailbox",
+          "name": "Procurement",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Procurement",
+          "email": "",
+          "via": "owner of the contract data in Solusi"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "kind:No vendor number",
+      "owner": null,
+      "label": "No vendor number",
+      "cases": [
+        "case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber"
+      ],
+      "open": [
+        "case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000002",
+          "name": "CT000002: Example Consulting - framework agreement",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "procurement-mailbox",
+          "name": "Procurement",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Procurement",
+          "email": "",
+          "via": "owner of the contract data in Solusi"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "kind:The EPO ID is not a known EPO ID",
+      "owner": null,
+      "label": "The EPO ID is not a known EPO ID",
+      "cases": [
+        "case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown"
+      ],
+      "open": [
+        "case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000005",
+          "name": "CT000005: Example Network - connectivity",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "procurement-mailbox",
+          "name": "Procurement",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Procurement",
+          "email": "",
+          "via": "owner of the contract data in Solusi"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "kind:The EPO ID names a Retired system",
+      "owner": null,
+      "label": "The EPO ID names a Retired system",
+      "cases": [
+        "case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired"
+      ],
+      "open": [
+        "case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000003",
+          "name": "CT000003: Example Data - data feed",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "iin",
+              "name": "Ian Inactive",
+              "email": "ian.inactive@example.com",
+              "active": false
+            }
+          },
+          "cases": [
+            "case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "procurement-mailbox",
+          "name": "Procurement",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Procurement",
+          "email": "",
+          "via": "owner of the contract data in Solusi"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CONTRACT-NOT-IN-SOLUSI": [
+    {
+      "key": "owner:oow",
+      "owner": {
+        "id": "oow",
+        "name": "Olga Owner",
+        "email": "olga.owner@example.com",
+        "active": true
+      },
+      "cases": [
+        "case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record",
+        "case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record",
+        "case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record",
+        "case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record"
+      ],
+      "open": [
+        "case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record",
+        "case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record",
+        "case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record",
+        "case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:cntr0001100",
+          "name": "CNTR0001100: Example Draft - typed in by hand",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record"
+          ]
+        },
+        {
+          "ciKey": "contract:ct000090",
+          "name": "CT000090: Example Archive - old storage agreement",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record"
+          ]
+        },
+        {
+          "ciKey": "contract:ct000091",
+          "name": "CT000091: Example Print - printer lease",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record"
+          ]
+        },
+        {
+          "ciKey": "contract:ct000092",
+          "name": "CT000092: Example Legacy - maintenance",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "oow",
+          "name": "Olga Owner",
+          "email": "olga.owner@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CONTRACT-SN-FIX": [
+    {
+      "key": "kind:Concluded, but the end date has passed",
+      "owner": null,
+      "label": "Concluded, but the end date has passed",
+      "cases": [
+        "case CONTRACT-SN-FIX:contract:ct000003:endPassed"
+      ],
+      "open": [
+        "case CONTRACT-SN-FIX:contract:ct000003:endPassed"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000003",
+          "name": "CT000003: Example Data - data feed",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "iin",
+              "name": "Ian Inactive",
+              "email": "ian.inactive@example.com",
+              "active": false
+            }
+          },
+          "cases": [
+            "case CONTRACT-SN-FIX:contract:ct000003:endPassed"
+          ]
+        }
+      ],
+      "people": [],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CONTRACT-STATUS": [
+    {
+      "key": "owner:oow",
+      "owner": {
+        "id": "oow",
+        "name": "Olga Owner",
+        "email": "olga.owner@example.com",
+        "active": true
+      },
+      "cases": [
+        "case CONTRACT-STATUS:contract:ct000002:status",
+        "case CONTRACT-STATUS:contract:ct000004:status",
+        "case CONTRACT-STATUS:contract:ct000005:status"
+      ],
+      "open": [
+        "case CONTRACT-STATUS:contract:ct000002:status",
+        "case CONTRACT-STATUS:contract:ct000004:status",
+        "case CONTRACT-STATUS:contract:ct000005:status"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000002",
+          "name": "CT000002: Example Consulting - framework agreement",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-STATUS:contract:ct000002:status"
+          ]
+        },
+        {
+          "ciKey": "contract:ct000004",
+          "name": "CT000004: Example Hosting - hosting agreement",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-STATUS:contract:ct000004:status"
+          ]
+        },
+        {
+          "ciKey": "contract:ct000005",
+          "name": "CT000005: Example Network - connectivity",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-STATUS:contract:ct000005:status"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "oow",
+          "name": "Olga Owner",
+          "email": "olga.owner@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CONTRACT-TO-CLEAR": [
+    {
+      "key": "owner:oow",
+      "owner": {
+        "id": "oow",
+        "name": "Olga Owner",
+        "email": "olga.owner@example.com",
+        "active": true
+      },
+      "cases": [
+        "case CONTRACT-TO-CLEAR:contract:ct000002:end",
+        "case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible"
+      ],
+      "open": [
+        "case CONTRACT-TO-CLEAR:contract:ct000002:end",
+        "case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000002",
+          "name": "CT000002: Example Consulting - framework agreement",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-TO-CLEAR:contract:ct000002:end",
+            "case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "oow",
+          "name": "Olga Owner",
+          "email": "olga.owner@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CONTRACT-UPLOAD": [
+    {
+      "key": "kind:End date",
+      "owner": null,
+      "label": "End date",
+      "cases": [
+        "case CONTRACT-UPLOAD:contract:ct000006:end"
+      ],
+      "open": [
+        "case CONTRACT-UPLOAD:contract:ct000006:end"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000006",
+          "name": "CT000006: Example Tools - support agreement",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-UPLOAD:contract:ct000006:end"
+          ]
+        }
+      ],
+      "people": [],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "kind:Not in ServiceNow yet",
+      "owner": null,
+      "label": "Not in ServiceNow yet",
+      "cases": [
+        "case CONTRACT-UPLOAD:contract:ct000007:record"
+      ],
+      "open": [
+        "case CONTRACT-UPLOAD:contract:ct000007:record"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000007",
+          "name": "CT000007: Example Cloud - new platform",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "olga owner",
+              "name": "Olga Owner",
+              "email": "",
+              "active": null
+            }
+          },
+          "cases": [
+            "case CONTRACT-UPLOAD:contract:ct000007:record"
+          ]
+        }
+      ],
+      "people": [],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "kind:Vendor",
+      "owner": null,
+      "label": "Vendor",
+      "cases": [
+        "case CONTRACT-UPLOAD:contract:ct000005:vendor"
+      ],
+      "open": [
+        "case CONTRACT-UPLOAD:contract:ct000005:vendor"
+      ],
+      "rows": [
+        {
+          "ciKey": "contract:ct000005",
+          "name": "CT000005: Example Network - connectivity",
+          "classLabel": "Contract",
+          "people": {
+            "owned_by": {
+              "id": "oow",
+              "name": "Olga Owner",
+              "email": "olga.owner@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CONTRACT-UPLOAD:contract:ct000005:vendor"
+          ]
+        }
+      ],
+      "people": [],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CRIT-ABOVE-PARENT": [],
+  "CRIT-AUTO-JUSTIFICATION": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability"
+      ],
+      "open": [
+        "case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability"
+      ],
+      "rows": [
+        {
+          "ciKey": "member engine - prod",
+          "name": "Member Engine - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "bo01",
+          "name": "Bo Leaver",
+          "email": "bo@example.com",
+          "active": false
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "via": "owned by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CRIT-NO-JUSTIFICATION": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case CRIT-NO-JUSTIFICATION:index tool:confidentiality"
+      ],
+      "open": [
+        "case CRIT-NO-JUSTIFICATION:index tool:confidentiality"
+      ],
+      "rows": [
+        {
+          "ciKey": "index tool",
+          "name": "Index Tool",
+          "classLabel": "Business Application",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CRIT-NO-JUSTIFICATION:index tool:confidentiality"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "via": "owned by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CRIT-NONE-REACHES": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case CRIT-NONE-REACHES:event engine:target"
+      ],
+      "open": [
+        "case CRIT-NONE-REACHES:event engine:target"
+      ],
+      "rows": [
+        {
+          "ciKey": "event engine",
+          "name": "Event Engine",
+          "classLabel": "Business Application",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case CRIT-NONE-REACHES:event engine:target"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "CRIT-TARGET-MISSING": [],
+  "DESC-QUALITY": [
+    {
+      "key": "owner:ada01",
+      "owner": {
+        "id": "ada01",
+        "name": "Ada Example",
+        "email": "ada@example.com",
+        "active": true
+      },
+      "cases": [
+        "case DESC-QUALITY:members:description",
+        "case DESC-QUALITY:members - standard:description"
+      ],
+      "open": [
+        "case DESC-QUALITY:members:description",
+        "case DESC-QUALITY:members - standard:description"
+      ],
+      "rows": [
+        {
+          "ciKey": "members",
+          "name": "Members",
+          "classLabel": "Business Service",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case DESC-QUALITY:members:description"
+          ]
+        },
+        {
+          "ciKey": "members - standard",
+          "name": "Members - Standard",
+          "classLabel": "Service Offering",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case DESC-QUALITY:members - standard:description"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "ada01",
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "via": "owned by"
+        },
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "team:team:process-management",
+      "owner": {
+        "id": "team:process-management",
+        "name": "Process Management",
+        "email": "",
+        "active": null
+      },
+      "team": true,
+      "cases": [
+        "case DESC-QUALITY:reconcile index:description",
+        "case DESC-QUALITY:close the month:description"
+      ],
+      "open": [
+        "case DESC-QUALITY:reconcile index:description",
+        "case DESC-QUALITY:close the month:description"
+      ],
+      "rows": [
+        {
+          "ciKey": "close the month",
+          "name": "Close the Month",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case DESC-QUALITY:close the month:description"
+          ]
+        },
+        {
+          "ciKey": "reconcile index",
+          "name": "Reconcile Index",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case DESC-QUALITY:reconcile index:description"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "team:process-management",
+          "name": "Process Management",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Process Management",
+          "email": "",
+          "via": "Process Management team"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "EPO-DIFF": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case EPO-DIFF:member engine - prod:managed_by",
+        "case EPO-DIFF:index tool - prod:description"
+      ],
+      "open": [
+        "case EPO-DIFF:member engine - prod:managed_by",
+        "case EPO-DIFF:index tool - prod:description"
+      ],
+      "rows": [
+        {
+          "ciKey": "index tool - prod",
+          "name": "Index Tool - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            }
+          },
+          "cases": [
+            "case EPO-DIFF:index tool - prod:description"
+          ]
+        },
+        {
+          "ciKey": "member engine - prod",
+          "name": "Member Engine - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case EPO-DIFF:member engine - prod:managed_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "bo01",
+          "name": "Bo Leaver",
+          "email": "bo@example.com",
+          "active": false
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "EPO-ID": [],
+  "EPO-NOT-ARRIVED": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case EPO-NOT-ARRIVED:event gateway - prod:description"
+      ],
+      "open": [
+        "case EPO-NOT-ARRIVED:event gateway - prod:description"
+      ],
+      "rows": [
+        {
+          "ciKey": "event gateway - prod",
+          "name": "Event Gateway - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case EPO-NOT-ARRIVED:event gateway - prod:description"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "LIFECYCLE-REVIEW": [],
+  "MAPPING": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case MAPPING:fines hub - prod:mapping",
+        "case MAPPING:event engine:mapping",
+        "case MAPPING:event desk:mapping",
+        "case MAPPING:event gateway - prod:mapping"
+      ],
+      "open": [
+        "case MAPPING:fines hub - prod:mapping",
+        "case MAPPING:event engine:mapping",
+        "case MAPPING:event desk:mapping",
+        "case MAPPING:event gateway - prod:mapping"
+      ],
+      "rows": [
+        {
+          "ciKey": "event desk",
+          "name": "Event Desk",
+          "classLabel": "Business Application",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case MAPPING:event desk:mapping"
+          ]
+        },
+        {
+          "ciKey": "event engine",
+          "name": "Event Engine",
+          "classLabel": "Business Application",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case MAPPING:event engine:mapping"
+          ]
+        },
+        {
+          "ciKey": "event gateway - prod",
+          "name": "Event Gateway - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case MAPPING:event gateway - prod:mapping"
+          ]
+        },
+        {
+          "ciKey": "fines hub - prod",
+          "name": "Fines  Hub - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case MAPPING:fines hub - prod:mapping"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "via": "owned by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "NAME-DUPLICATE": [
+    {
+      "key": "owner::No Owned by and no Managed by",
+      "owner": null,
+      "noOwner": "No Owned by and no Managed by",
+      "cases": [
+        "case NAME-DUPLICATE:manage fines|ast-0013:name",
+        "case NAME-DUPLICATE:manage fines|ast-0014:name"
+      ],
+      "open": [
+        "case NAME-DUPLICATE:manage fines|ast-0013:name",
+        "case NAME-DUPLICATE:manage fines|ast-0014:name"
+      ],
+      "rows": [
+        {
+          "ciKey": "manage fines|ast-0013",
+          "name": "Manage Fines",
+          "classLabel": "Business Capability",
+          "people": {},
+          "cases": [
+            "case NAME-DUPLICATE:manage fines|ast-0013:name"
+          ]
+        },
+        {
+          "ciKey": "manage fines|ast-0014",
+          "name": "Manage Fines",
+          "classLabel": "Business Capability",
+          "people": {},
+          "cases": [
+            "case NAME-DUPLICATE:manage fines|ast-0014:name"
+          ]
+        }
+      ],
+      "people": [],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case NAME-DUPLICATE:fines hub - prod:name"
+      ],
+      "open": [
+        "case NAME-DUPLICATE:fines hub - prod:name"
+      ],
+      "rows": [
+        {
+          "ciKey": "fines hub - prod",
+          "name": "Fines  Hub - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case NAME-DUPLICATE:fines hub - prod:name"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "NAME-FORMAT": [],
+  "NAME-HIDDEN-CHAR": [],
+  "NAME-STANDARD": [
+    {
+      "key": "owner:ada01",
+      "owner": {
+        "id": "ada01",
+        "name": "Ada Example",
+        "email": "ada@example.com",
+        "active": true
+      },
+      "cases": [
+        "case NAME-STANDARD:members:bs-suffix"
+      ],
+      "open": [
+        "case NAME-STANDARD:members:bs-suffix"
+      ],
+      "rows": [
+        {
+          "ciKey": "members",
+          "name": "Members",
+          "classLabel": "Business Service",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case NAME-STANDARD:members:bs-suffix"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "ada01",
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "via": "owned by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "OFFERING-OWNER": [],
+  "OFFERING-PARENT": [],
+  "PROCESS-STAGE": [],
+  "READY-TOO-LONG": [],
+  "REL-MISSING": [
+    {
+      "key": "owner::No Owned by and no Managed by",
+      "owner": null,
+      "noOwner": "No Owned by and no Managed by",
+      "cases": [
+        "case REL-MISSING:manage fines|ast-0013:bc-below",
+        "case REL-MISSING:manage fines|ast-0014:bc-below"
+      ],
+      "open": [
+        "case REL-MISSING:manage fines|ast-0013:bc-below",
+        "case REL-MISSING:manage fines|ast-0014:bc-below"
+      ],
+      "rows": [
+        {
+          "ciKey": "manage fines|ast-0013",
+          "name": "Manage Fines",
+          "classLabel": "Business Capability",
+          "people": {},
+          "cases": [
+            "case REL-MISSING:manage fines|ast-0013:bc-below"
+          ]
+        },
+        {
+          "ciKey": "manage fines|ast-0014",
+          "name": "Manage Fines",
+          "classLabel": "Business Capability",
+          "people": {},
+          "cases": [
+            "case REL-MISSING:manage fines|ast-0014:bc-below"
+          ]
+        }
+      ],
+      "people": [],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "REL-ONE-TO-ONE": [],
+  "REL-TWICE": [
+    {
+      "key": "owner:ada01",
+      "owner": {
+        "id": "ada01",
+        "name": "Ada Example",
+        "email": "ada@example.com",
+        "active": true
+      },
+      "cases": [
+        "case REL-TWICE:members:twice:members>provides::providedby>members - standard"
+      ],
+      "open": [
+        "case REL-TWICE:members:twice:members>provides::providedby>members - standard"
+      ],
+      "rows": [
+        {
+          "ciKey": "members",
+          "name": "Members",
+          "classLabel": "Business Service",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case REL-TWICE:members:twice:members>provides::providedby>members - standard"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "ada01",
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "REL-WRONG-TYPE": [
+    {
+      "key": "owner:bo01",
+      "owner": {
+        "id": "bo01",
+        "name": "Bo Leaver",
+        "email": "bo@example.com",
+        "active": false
+      },
+      "cases": [
+        "case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool"
+      ],
+      "open": [
+        "case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool"
+      ],
+      "rows": [
+        {
+          "ciKey": "reconcile index",
+          "name": "Reconcile Index",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "bo01",
+          "name": "Bo Leaver",
+          "email": "bo@example.com",
+          "active": false
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "RESP-INACTIVE": [
+    {
+      "key": "team:team:process-management",
+      "owner": {
+        "id": "team:process-management",
+        "name": "Process Management",
+        "email": "",
+        "active": null
+      },
+      "team": true,
+      "cases": [
+        "case RESP-INACTIVE:reconcile index:owned_by"
+      ],
+      "open": [
+        "case RESP-INACTIVE:reconcile index:owned_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "reconcile index",
+          "name": "Reconcile Index",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case RESP-INACTIVE:reconcile index:owned_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "team:process-management",
+          "name": "Process Management",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Process Management",
+          "email": "",
+          "via": "Process Management team"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "RESP-MISSING": [
+    {
+      "key": "owner::No Owned by and no Managed by",
+      "owner": null,
+      "noOwner": "No Owned by and no Managed by",
+      "cases": [
+        "case RESP-MISSING:manage fines|ast-0013:owned_by",
+        "case RESP-MISSING:manage fines|ast-0014:owned_by",
+        "case RESP-MISSING:manage fines|ast-0013:managed_by",
+        "case RESP-MISSING:manage fines|ast-0014:managed_by"
+      ],
+      "open": [
+        "case RESP-MISSING:manage fines|ast-0013:owned_by",
+        "case RESP-MISSING:manage fines|ast-0014:owned_by",
+        "case RESP-MISSING:manage fines|ast-0013:managed_by",
+        "case RESP-MISSING:manage fines|ast-0014:managed_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "manage fines|ast-0013",
+          "name": "Manage Fines",
+          "classLabel": "Business Capability",
+          "people": {},
+          "cases": [
+            "case RESP-MISSING:manage fines|ast-0013:owned_by",
+            "case RESP-MISSING:manage fines|ast-0013:managed_by"
+          ]
+        },
+        {
+          "ciKey": "manage fines|ast-0014",
+          "name": "Manage Fines",
+          "classLabel": "Business Capability",
+          "people": {},
+          "cases": [
+            "case RESP-MISSING:manage fines|ast-0014:owned_by",
+            "case RESP-MISSING:manage fines|ast-0014:managed_by"
+          ]
+        }
+      ],
+      "people": [],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner::No Owned by: managed by is asked",
+      "owner": null,
+      "noOwner": "No Owned by: managed by is asked",
+      "cases": [
+        "case RESP-MISSING:manage member records:owned_by"
+      ],
+      "open": [
+        "case RESP-MISSING:manage member records:owned_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "manage member records",
+          "name": "Manage Member Records",
+          "classLabel": "Business Capability",
+          "people": {
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case RESP-MISSING:manage member records:owned_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner:ada01",
+      "owner": {
+        "id": "ada01",
+        "name": "Ada Example",
+        "email": "ada@example.com",
+        "active": true
+      },
+      "cases": [
+        "case RESP-MISSING:members:managed_by"
+      ],
+      "open": [
+        "case RESP-MISSING:members:managed_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "members",
+          "name": "Members",
+          "classLabel": "Business Service",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case RESP-MISSING:members:managed_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "ada01",
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "via": "owned by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case RESP-MISSING:event gateway - prod:managed_by"
+      ],
+      "open": [
+        "case RESP-MISSING:event gateway - prod:managed_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "event gateway - prod",
+          "name": "Event Gateway - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case RESP-MISSING:event gateway - prod:managed_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "via": "owned by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "team:team:process-management",
+      "owner": {
+        "id": "team:process-management",
+        "name": "Process Management",
+        "email": "",
+        "active": null
+      },
+      "team": true,
+      "cases": [
+        "case RESP-MISSING:close the month:managed_by"
+      ],
+      "open": [
+        "case RESP-MISSING:close the month:managed_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "close the month",
+          "name": "Close the Month",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case RESP-MISSING:close the month:managed_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "team:process-management",
+          "name": "Process Management",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Process Management",
+          "email": "",
+          "via": "Process Management team"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "RESP-SAME-PERSON": [
+    {
+      "key": "team:team:process-management",
+      "owner": {
+        "id": "team:process-management",
+        "name": "Process Management",
+        "email": "",
+        "active": null
+      },
+      "team": true,
+      "cases": [
+        "case RESP-SAME-PERSON:register a new member:owned_by"
+      ],
+      "open": [
+        "case RESP-SAME-PERSON:register a new member:owned_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "register a new member",
+          "name": "Register a New Member",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case RESP-SAME-PERSON:register a new member:owned_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "team:process-management",
+          "name": "Process Management",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Process Management",
+          "email": "",
+          "via": "Process Management team"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "SUPPORT-GROUP-INACTIVE": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group"
+      ],
+      "open": [
+        "case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group"
+      ],
+      "rows": [
+        {
+          "ciKey": "index tool - prod",
+          "name": "Index Tool - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            }
+          },
+          "cases": [
+            "case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        },
+        {
+          "id": "bo01",
+          "name": "Bo Leaver",
+          "email": "bo@example.com",
+          "active": false
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "SUPPORT-GROUP-MISSING": [
+    {
+      "key": "owner:ada01",
+      "owner": {
+        "id": "ada01",
+        "name": "Ada Example",
+        "email": "ada@example.com",
+        "active": true
+      },
+      "cases": [
+        "case SUPPORT-GROUP-MISSING:members - standard:support_group"
+      ],
+      "open": [
+        "case SUPPORT-GROUP-MISSING:members - standard:support_group"
+      ],
+      "rows": [
+        {
+          "ciKey": "members - standard",
+          "name": "Members - Standard",
+          "classLabel": "Service Offering",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case SUPPORT-GROUP-MISSING:members - standard:support_group"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "ada01",
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case SUPPORT-GROUP-MISSING:fines hub - prod:support_group"
+      ],
+      "open": [
+        "case SUPPORT-GROUP-MISSING:fines hub - prod:support_group"
+      ],
+      "rows": [
+        {
+          "ciKey": "fines hub - prod",
+          "name": "Fines  Hub - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case SUPPORT-GROUP-MISSING:fines hub - prod:support_group"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "SUPPORTED-BY": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case SUPPORTED-BY:member engine - test:supported_by",
+        "case SUPPORTED-BY:index tool - prod:supported_by"
+      ],
+      "open": [
+        "case SUPPORTED-BY:member engine - test:supported_by",
+        "case SUPPORTED-BY:index tool - prod:supported_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "index tool - prod",
+          "name": "Index Tool - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            }
+          },
+          "cases": [
+            "case SUPPORTED-BY:index tool - prod:supported_by"
+          ]
+        },
+        {
+          "ciKey": "member engine - test",
+          "name": "Member Engine - TEST",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case SUPPORTED-BY:member engine - test:supported_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        },
+        {
+          "id": "bo01",
+          "name": "Bo Leaver",
+          "email": "bo@example.com",
+          "active": false
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner:ada01",
+      "owner": {
+        "id": "ada01",
+        "name": "Ada Example",
+        "email": "ada@example.com",
+        "active": true
+      },
+      "cases": [
+        "case SUPPORTED-BY:members - standard:supported_by"
+      ],
+      "open": [
+        "case SUPPORTED-BY:members - standard:supported_by"
+      ],
+      "rows": [
+        {
+          "ciKey": "members - standard",
+          "name": "Members - Standard",
+          "classLabel": "Service Offering",
+          "people": {
+            "owned_by": {
+              "id": "ada01",
+              "name": "Ada Example",
+              "email": "ada@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case SUPPORTED-BY:members - standard:supported_by"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "ada01",
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "via": "managed by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "TAG-MISSING": [
+    {
+      "key": "team:team:process-management",
+      "owner": {
+        "id": "team:process-management",
+        "name": "Process Management",
+        "email": "",
+        "active": null
+      },
+      "team": true,
+      "cases": [
+        "case TAG-MISSING:reconcile index:tags"
+      ],
+      "open": [
+        "case TAG-MISSING:reconcile index:tags"
+      ],
+      "rows": [
+        {
+          "ciKey": "reconcile index",
+          "name": "Reconcile Index",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "bo01",
+              "name": "Bo Leaver",
+              "email": "bo@example.com",
+              "active": false
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case TAG-MISSING:reconcile index:tags"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "team:process-management",
+          "name": "Process Management",
+          "email": "",
+          "active": null
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Process Management",
+          "email": "",
+          "via": "Process Management team"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "TAG-STATUS-CONFLICT": [
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case TAG-STATUS-CONFLICT:fines hub - prod:tags"
+      ],
+      "open": [
+        "case TAG-STATUS-CONFLICT:fines hub - prod:tags"
+      ],
+      "rows": [
+        {
+          "ciKey": "fines hub - prod",
+          "name": "Fines  Hub - PROD",
+          "classLabel": "Service Instance",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            },
+            "managed_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            },
+            "supported_by": {
+              "id": "cy01",
+              "name": "Cy Keeper",
+              "email": "cy@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case TAG-STATUS-CONFLICT:fines hub - prod:tags"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        },
+        {
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [
+        {
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "via": "owned by"
+        }
+      ],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    }
+  ],
+  "UNDER-RETIREMENT-LONG": []
+}

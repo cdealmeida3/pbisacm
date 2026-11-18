@@ -1,0 +1,99 @@
+/// Per check: what the HTML app finds on the samples, and what this model finds.
+table SelfCheck
+
+	/// How many checks give the result the HTML app records for the samples. Only for the sample data.
+	measure 'Self-check result' =
+			VAR total = COUNTROWS ( SelfCheck )
+			VAR matching = CALCULATE ( COUNTROWS ( SelfCheck ), SelfCheck[Match] = TRUE () ) + 0
+			RETURN
+			    IF (
+			        SELECTEDVALUE ( About[SourceMode] ) = "Sample",
+			        matching & " of " & total & " checks give the recorded result",
+			        "The self-check runs on the sample data only (SourceMode = Sample)"
+			    )
+
+	column CheckId
+		dataType: string
+		sourceColumn: CheckId
+
+	column ExpectedState
+		dataType: string
+		sourceColumn: ExpectedState
+
+	column ExpectedTested
+		dataType: boolean
+		sourceColumn: ExpectedTested
+
+	column ExpectedToSolve
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ExpectedToSolve
+
+	column ExpectedToCheck
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ExpectedToCheck
+
+	column ExpectedWaiting
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ExpectedWaiting
+
+	column ExpectedKnown
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ExpectedKnown
+
+	column ExpectedCis
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ExpectedCis
+
+	column Found
+		dataType: string
+		sourceColumn: Found
+
+	column FoundState
+		dataType: string
+		sourceColumn: FoundState
+
+	column FoundTested
+		dataType: boolean
+		sourceColumn: FoundTested
+
+	column FoundToSolve
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: FoundToSolve
+
+	column FoundToCheck
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: FoundToCheck
+
+	column FoundWaiting
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: FoundWaiting
+
+	column FoundKnown
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: FoundKnown
+
+	column FoundCis
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: FoundCis
+
+	column Match
+		dataType: boolean
+		sourceColumn: Match
+
+	column Why
+		dataType: string
+		sourceColumn: Why
+
+	partition SelfCheck = m
+		mode: import
+		source = SelfCheckRows

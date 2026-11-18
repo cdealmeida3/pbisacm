@@ -1,0 +1,68 @@
+{
+  "id": "CRIT-NO-JUSTIFICATION",
+  "status": "live",
+  "title": "Criticality exception without a valid justification",
+  "cardLabel": "No justification",
+  "cardHint": "A lowered criticality value has no justification of its own. SACM applied it, so SACM adds the justification from the request.",
+  "family": "criticality",
+  "dimension": "correctness",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_instance"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "forEach": [
+      "confidentiality",
+      "integrity",
+      "availability",
+      "authenticity"
+    ],
+    "when": {
+      "all": [
+        {
+          "op": "lessThanField",
+          "field": "target.{each}",
+          "value": "inherited.{each}"
+        },
+        {
+          "op": "lacksValidEntryFor",
+          "field": "exception_justification",
+          "value": "{each}",
+          "ignore": "\\(Auto generated\\)"
+        },
+        {
+          "op": "notOnlyMatches",
+          "field": "exception_justification",
+          "value": "\\(Auto generated\\)"
+        }
+      ]
+    }
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "owned_by",
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "askWhenUnsure": "The request gives none: ask the owner",
+    "message": {
+      "subject": "Criticality exception without a justification",
+      "intro": "A target value is lower than the inherited value, and the request gives no justification for it.",
+      "ask": "Could you tell us why the value is lower than the one inherited from the parent? {Reply} with the reason, and we select the justification in ServiceNow. If the value should follow the parent, tell us and we raise the target.",
+      "why": "Without a justification, the exception cannot be explained to an auditor."
+    }
+  },
+  "cardText": "The target criticality is lower than the inherited one, and no justification covers that value. SACM applied the values of the request, so SACM adds the justification the request gives for each lowered value. Only when the request gives none: open the CI and press \"The request gives none: ask the owner\". A CI whose field holds only the automatic text is on the card Only the automatic justification."
+}

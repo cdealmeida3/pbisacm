@@ -1,0 +1,17 @@
+{
+  "completeness": {
+    "score": 80,
+    "tests": 70,
+    "problems": 14
+  },
+  "correctness": {
+    "score": 93,
+    "tests": 451,
+    "problems": 30
+  },
+  "compliance": {
+    "score": 90,
+    "tests": 137,
+    "problems": 14
+  }
+}

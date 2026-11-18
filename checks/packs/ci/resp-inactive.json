@@ -1,0 +1,67 @@
+{
+  "id": "RESP-INACTIVE",
+  "status": "live",
+  "title": "Responsible person is an inactive user",
+  "cardLabel": "Inactive person",
+  "cardHint": "Owned by or Managed by names a person who is no longer active, so we ask who took over. Supported by has its own card.",
+  "family": "responsibility",
+  "dimension": "correctness",
+  "severity": "high",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "forEach": [
+      "owned_by",
+      "managed_by",
+      "supported_by"
+    ],
+    "when": {
+      "op": "refInactive"
+    },
+    "forEachClasses": {
+      "supported_by": []
+    }
+  },
+  "playbook": {
+    "path": "service-request",
+    "audience": [
+      "managed_by",
+      "otherRoles",
+      "managerOf(field)",
+      "departmentHeadOf(field)",
+      "managerOf(owned_by)",
+      "departmentHeadOf(owned_by)"
+    ],
+    "message": {
+      "subject": "Inactive {who}",
+      "intro": "Their {role} is no longer an active user.",
+      "ask": "Could you tell us who took over? You can {reply}, or raise the request {request}.",
+      "why": "Without an active owner, approvals for these CIs are rejected automatically.",
+      "request": "role",
+      "askNoRequest": "Could you tell us who took over? Please {reply}, and we will update ServiceNow for you.",
+      "askByClass": {
+        "service_offering": "Could you tell us who took over? You can {reply}, or raise the request {request:modify-service-offering}."
+      },
+      "askByTeam": {
+        "process-management": "Could you tell us who took over? Please {reply} with the name of the person for each process, and we will update ServiceNow."
+      }
+    },
+    "routeBy": "epo"
+  }
+}

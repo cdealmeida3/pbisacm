@@ -1,0 +1,52 @@
+/// The relationships of the newest Relationship report.
+table Relationships
+
+	/// Relationships in the newest Relationship report.
+	measure 'Relationship count' = COUNTROWS ( Relationships ) + 0
+		formatString: #,0
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column FileName
+		dataType: string
+		sourceColumn: FileName
+
+	column Parent
+		dataType: string
+		sourceColumn: Parent
+
+	column Type
+		dataType: string
+		sourceColumn: Type
+
+	column Child
+		dataType: string
+		sourceColumn: Child
+
+	column ParentClass
+		dataType: string
+		sourceColumn: ParentClass
+
+	column ChildClass
+		dataType: string
+		sourceColumn: ChildClass
+
+	column ParentTag
+		dataType: string
+		sourceColumn: ParentTag
+
+	column ChildTag
+		dataType: string
+		sourceColumn: ChildTag
+
+	column Excluded
+		dataType: boolean
+		sourceColumn: Excluded
+
+	partition Relationships = m
+		mode: import
+		source = RelationshipsRows

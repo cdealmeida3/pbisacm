@@ -1,0 +1,54 @@
+/// Every Business Capability of the newest CI report with the capabilities above and below, the processes below and its people (D205), for Enterprise Architecture.
+table CapabilitySheet
+
+	/// How many Business Capabilities the sheet holds, or why it is empty (it needs the Relationship report).
+	measure 'Capability line' = VAR n = COUNTROWS ( CapabilitySheet ) + 0 RETURN IF ( n = 0, "No capability sheet: it needs the Relationship report and the relationship model.", FORMAT ( n, "#,0" ) & IF ( n = 1, " Business Capability", " Business Capabilities" ) )
+
+	column Name
+		dataType: string
+		sourceColumn: Name
+
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	column CapabilitiesAbove
+		dataType: string
+		sourceColumn: CapabilitiesAbove
+
+	column CapabilitiesBelow
+		dataType: string
+		sourceColumn: CapabilitiesBelow
+
+	column ProcessesBelow
+		dataType: string
+		sourceColumn: ProcessesBelow
+
+	column Description
+		dataType: string
+		sourceColumn: Description
+
+	column Tags
+		dataType: string
+		sourceColumn: Tags
+
+	column OwnedBy
+		dataType: string
+		sourceColumn: OwnedBy
+
+	column ManagedBy
+		dataType: string
+		sourceColumn: ManagedBy
+
+	column HiddenCharacters
+		dataType: string
+		sourceColumn: HiddenCharacters
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition CapabilitySheet = m
+		mode: import
+		source = CapabilitySheetRows

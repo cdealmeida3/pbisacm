@@ -1,0 +1,5 @@
+{
+  "business_process": [
+    { "label": "process type (customer facing or internal)", "oneOf": ["Internal process", "Internal BP"], "endsWith": ["facing", "facing process"] }
+  ]
+}

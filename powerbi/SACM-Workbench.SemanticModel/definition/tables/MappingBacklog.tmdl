@@ -1,0 +1,102 @@
+/// One line per CI to map (D200 to D204): owner, why, stage, criticality lines of the same CI and the next step.
+table MappingBacklog
+
+	/// Lines of the mapping backlog to solve.
+	measure 'CIs to map' = CALCULATE ( COUNTROWS ( MappingBacklog ), MappingBacklog[State] = "open" ) + 0
+		formatString: #,0
+
+	/// Owners of the lines to solve.
+	measure 'Owners to invite' = CALCULATE ( DISTINCTCOUNT ( MappingBacklog[Owner] ), MappingBacklog[State] = "open" ) + 0
+		formatString: #,0
+
+	/// "N CIs to map for M owners" for the head of the page.
+	measure 'Backlog line' = [CIs to map] & IF ( [CIs to map] = 1, " CI", " CIs" ) & " to map for " & [Owners to invite] & IF ( [Owners to invite] = 1, " owner", " owners" )
+
+	column Key
+		dataType: string
+		sourceColumn: Key
+
+	column CiKey
+		dataType: string
+		sourceColumn: CiKey
+
+	column CiName
+		dataType: string
+		sourceColumn: CiName
+
+	column ClassLabel
+		dataType: string
+		sourceColumn: ClassLabel
+
+	/// Owned by, else who is asked.
+	column Owner
+		dataType: string
+		sourceColumn: Owner
+
+	/// Why it is on the list, one reason per line.
+	column Reasons
+		dataType: string
+		sourceColumn: Reasons
+
+	/// 1 To solve, 2 To check, 3 Waiting, 4 Planned: the order of the page.
+	column StateOrder
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: StateOrder
+
+	/// The rules of the reasons (reference/mapping-backlog).
+	column ReasonIds
+		dataType: string
+		sourceColumn: ReasonIds
+
+	/// The stage of the case (the first one until the journal is read, build B5).
+	column Stage
+		dataType: string
+		sourceColumn: Stage
+
+	column StageNumber
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: StageNumber
+
+	/// The stages its class goes through.
+	column Steps
+		dataType: string
+		sourceColumn: Steps
+
+	column State
+		dataType: string
+		sourceColumn: State
+
+	/// To solve, Waiting (in Ready) or Planned (tagged).
+	column StateLabel
+		dataType: string
+		sortByColumn: StateOrder
+		sourceColumn: StateLabel
+
+	column StateWhy
+		dataType: string
+		sourceColumn: StateWhy
+
+	/// The criticality lines of the same CI (Above parent, No criticality reaches the CI).
+	column Criticality
+		dataType: string
+		sourceColumn: Criticality
+
+	/// The case can be marked The process does not exist (stage 2).
+	column CanMarkProcessMissing
+		dataType: boolean
+		sourceColumn: CanMarkProcessMissing
+
+	column NextStep
+		dataType: string
+		sourceColumn: NextStep
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition MappingBacklog = m
+		mode: import
+		source = MappingBacklogRows

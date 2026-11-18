@@ -1,0 +1,35 @@
+{
+  "id": "READY-TOO-LONG-BC",
+  "status": "off",
+  "title": "Business Capability is in status Ready for too long",
+  "cardLabel": "Capability Ready too long",
+  "cardHint": "A Business Capability has been in status Ready for too long. SACM makes it Operational itself.",
+  "cardText": "The Business Capability was created more than the number of days in Settings ago (90 at first) and is still in status Ready. SACM makes it Operational itself in ServiceNow; Enterprise Architecture owns the capabilities and only answers questions. Mark as fixed when it is done. A line is Verified when a later report shows it Operational.",
+  "family": "lifecycle",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "ci/status-age",
+    "ref": "reference/lifecycle",
+    "rules": [
+      "ready"
+    ]
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

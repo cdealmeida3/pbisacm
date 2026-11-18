@@ -1,0 +1,32 @@
+{
+  "id": "PROCESS-STAGE",
+  "status": "proposed",
+  "title": "Business Process in Ready that is mapped: make it Operational",
+  "cardLabel": "Process stage",
+  "cardHint": "A Business Process in Ready has its CIA values and something linked below: SACM makes it Operational.",
+  "cardText": "A Business Process is created in Ready. After the BIA its CIA values are added: that is the sign to map it. To map: nothing is linked below yet, so the process is a case of the Mapping backlog, where SACM plans a mapping session with the process owner. Mapped: a Business Application or Business Service is linked below, so SACM makes the process Operational: that is the line of this card. A process in Ready without CIA values waits for the BIA: it has no line, and nobody is chased. Needs the Relationship report.",
+  "family": "lifecycle",
+  "dimension": "compliance",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_process"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "code",
+    "module": "process/stage",
+    "ref": "reference/lifecycle"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

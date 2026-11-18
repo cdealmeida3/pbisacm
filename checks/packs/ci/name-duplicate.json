@@ -1,0 +1,62 @@
+{
+  "id": "NAME-DUPLICATE",
+  "status": "live",
+  "title": "CI name is used twice in one class, or has double spaces",
+  "cardLabel": "Duplicate names",
+  "cardHint": "Two live CIs of one class have the same name, or a name has two spaces. SACM looks first: one thing twice, retire one.",
+  "cardText": "Two live CIs of the same class with the same name, or a name with two spaces in a row. A Retired CI, or a CI of another class, with the same name does not count. SACM looks at each line first. Two records for one thing: SACM retires one, and removes the double space itself. Two real CIs: open the CI and press \"Two real CIs: ask the owner\": the owner gives each one its own name (in EPO for a Business Service or a Service Instance).",
+  "family": "name",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "any": [
+        {
+          "op": "duplicatedInClass",
+          "field": "name",
+          "value": 1
+        },
+        {
+          "op": "hasDoubleSpaces",
+          "field": "name"
+        }
+      ]
+    }
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "managed_by",
+      "owned_by",
+      "managerOf(owned_by)"
+    ],
+    "askWhenUnsure": "Two real CIs: ask the owner",
+    "routeBy": "epo",
+    "message": {
+      "subject": "Duplicate name",
+      "intro": "Another live CI of the same class has the same name. They are two different CIs.",
+      "ask": "Could you give each one a name of its own? {Reply} with the right names, and we will update ServiceNow for you.",
+      "why": "A CI is found by its name, so each name must be unique.",
+      "epoWhat": "name"
+    }
+  }
+}

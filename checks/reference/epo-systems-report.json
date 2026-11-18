@@ -1,0 +1,38 @@
+{
+  "note": "The EPO systems report (piece 5A): one line per EPO system. How its columns are called, what its status words mean, and how a system matches a CI. A system matches the Service Instance whose Asset tag is its EPO ID. The fix is always made in EPO; a service mapped CI is then updated in ServiceNow by SACM by hand.",
+  "columns": {
+    "epoId": ["epoid", "epo_id"],
+    "name": ["systemname", "system_name"],
+    "description": ["systemdescription", "system_description"],
+    "status": ["systemstatus", "system_status"],
+    "department": ["ownerdepartment", "owner_department"],
+    "owner": ["owner"],
+    "responsible1": ["responsible1", "responsible_1"],
+    "responsible2": ["responsible2", "responsible_2"],
+    "changed": ["ajour_tms", "last_change", "changed"]
+  },
+  "statuses": {
+    "Kørende": "Operational",
+    "Nedlagt": "Retired",
+    "Konstruktion": "Ready",
+    "Udgående": "Under retirement"
+  },
+  "classes": ["service_instance"],
+  "nameSuffix": " - PROD",
+  "retiredStatuses": ["Retired"],
+  "roles": [
+    { "role": "owned_by", "column": "owner", "label": "Owned by", "epoLabel": "System Owner" },
+    { "role": "managed_by", "column": "responsible1", "label": "Managed by", "epoLabel": "Primary Responsible" },
+    { "role": "supported_by", "column": "responsible2", "label": "Supported by", "epoLabel": "Secondary Responsible" }
+  ],
+  "sourceFirst": {
+    "note": "The source first: a people line of these checks on a CI that pairs with an EPO system is compared with EPO before anybody is asked. EPO already names another person: the line waits (SACM copies it, or the sync brings it). EPO is wrong or empty too: the owner is asked, and the line says what EPO holds. A leftover (empty in EPO, a person still in ServiceNow) is asked of the owner; when its person is still active, the line is made on the check named in 'leftover'.",
+    "checks": ["RESP-MISSING", "RESP-INACTIVE", "SUPPORTED-BY"],
+    "samePerson": ["RESP-SAME-PERSON"],
+    "leftover": { "owned_by": "RESP-MISSING", "managed_by": "RESP-MISSING", "supported_by": "SUPPORTED-BY" },
+    "cards": { "mapped": "EPO-DIFF", "notMapped": "EPO-NOT-ARRIVED" }
+  },
+  "waitDays": 2,
+  "descriptionStart": 40,
+  "notCompared": "The two EPO criticality numbers (scale 1 to 5, ServiceNow uses another scale) and the GDPR marks are not compared."
+}

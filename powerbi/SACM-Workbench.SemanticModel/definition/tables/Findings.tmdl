@@ -1,0 +1,210 @@
+/// One row per finding of the newest CI report: what was found, who is asked, how it is listed, where it is fixed (DATA-MODEL §3, a fact).
+table Findings
+
+	/// Findings to solve (listed as To solve).
+	measure 'To solve' = CALCULATE ( COUNTROWS ( Findings ), Findings[State] = "open" ) + 0
+		formatString: #,0
+
+	/// Findings to check first (a review: never red).
+	measure 'To check' = CALCULATE ( COUNTROWS ( Findings ), Findings[State] = "review" ) + 0
+		formatString: #,0
+
+	/// Findings that wait (a CI not live yet, or EPO already names another person).
+	measure Waiting = CALCULATE ( COUNTROWS ( Findings ), Findings[State] = "waiting" ) + 0
+		formatString: #,0
+
+	/// Findings a tag of the team explains.
+	measure Known = CALCULATE ( COUNTROWS ( Findings ), Findings[State] = "known" ) + 0
+		formatString: #,0
+
+	/// Distinct CIs of the findings in the filter.
+	measure 'Finding CIs' = DISTINCTCOUNT ( Findings[CiKey] ) + 0
+		formatString: #,0
+
+	/// The state of one finding as a colour (LOOK.md): red to solve, blue to check, grey waiting or known.
+	measure 'Finding colour' = SWITCH ( SELECTEDVALUE ( Findings[State] ), "open", "#b42318", "review", "#175cd3", "#475467" )
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column Key
+		dataType: string
+		sourceColumn: Key
+
+	column CheckId
+		dataType: string
+		sourceColumn: CheckId
+
+	column CiKey
+		dataType: string
+		sourceColumn: CiKey
+
+	column CiName
+		dataType: string
+		sourceColumn: CiName
+
+	column Class
+		dataType: string
+		sourceColumn: Class
+
+	column ClassLabel
+		dataType: string
+		sourceColumn: ClassLabel
+
+	column Field
+		dataType: string
+		sourceColumn: Field
+
+	column Severity
+		dataType: string
+		sourceColumn: Severity
+
+	column Detail
+		dataType: string
+		sourceColumn: Detail
+
+	column Module
+		dataType: string
+		sourceColumn: Module
+
+	column Route
+		dataType: string
+		sourceColumn: Route
+
+	column State
+		dataType: string
+		sourceColumn: State
+
+	column StateLabel
+		dataType: string
+		sourceColumn: StateLabel
+
+	column StateWhy
+		dataType: string
+		sourceColumn: StateWhy
+
+	column Source
+		dataType: string
+		sourceColumn: Source
+
+	column Wait
+		dataType: string
+		sourceColumn: Wait
+
+	column Review
+		dataType: string
+		sourceColumn: Review
+
+	column ContactId
+		dataType: string
+		sourceColumn: ContactId
+
+	column ContactName
+		dataType: string
+		sourceColumn: ContactName
+
+	column ContactEmail
+		dataType: string
+		sourceColumn: ContactEmail
+
+	column ContactVia
+		dataType: string
+		sourceColumn: ContactVia
+
+	column AskWho
+		dataType: string
+		sourceColumn: AskWho
+
+	column Cc
+		dataType: string
+		sourceColumn: Cc
+
+	column EscalateName
+		dataType: string
+		sourceColumn: EscalateName
+
+	column EscalateEmail
+		dataType: string
+		sourceColumn: EscalateEmail
+
+	column EscalateVia
+		dataType: string
+		sourceColumn: EscalateVia
+
+	column FixChange
+		dataType: string
+		sourceColumn: FixChange
+
+	column FixCurrent
+		dataType: string
+		sourceColumn: FixCurrent
+
+	column FixSet
+		dataType: string
+		sourceColumn: FixSet
+
+	column FixValue
+		dataType: string
+		sourceColumn: FixValue
+
+	column FixRelatedTo
+		dataType: string
+		sourceColumn: FixRelatedTo
+
+	column Group
+		dataType: string
+		sourceColumn: Group
+
+	column EpoId
+		dataType: string
+		sourceColumn: EpoId
+
+	column Status
+		dataType: string
+		sourceColumn: Status
+
+	column SupportGroup
+		dataType: string
+		sourceColumn: SupportGroup
+
+	column OwnedBy
+		dataType: string
+		sourceColumn: OwnedBy
+
+	column ManagedBy
+		dataType: string
+		sourceColumn: ManagedBy
+
+	column SupportedBy
+		dataType: string
+		sourceColumn: SupportedBy
+
+	column Chips
+		dataType: string
+		sourceColumn: Chips
+
+	column Tags
+		dataType: string
+		sourceColumn: Tags
+
+	column ServiceNowLink
+		dataType: string
+		dataCategory: WebUrl
+		sourceColumn: ServiceNowLink
+
+	/// The reasons of a case of the mapping backlog, by id of the rule (D200).
+	column Mapping
+		dataType: string
+		sourceColumn: Mapping
+
+	/// "EPO already has …": EPO names another person than ServiceNow for a fix made in EPO, so nobody needs to be asked.
+	column EpoCorrection
+		dataType: string
+		sourceColumn: EpoCorrection
+
+	partition Findings = m
+		mode: import
+		source = FindingsRows

@@ -1,0 +1,7 @@
+﻿EPOID;SystemName;SystemDescription;SystemStatus;OwnerDepartment;Owner;Responsible1;Responsible2;BusinessCriticality;PlatformBusinessCriticality;GDPRData;GDPRAwarenessForm;AJOUR_TMS
+"AST-0006";"Member Engine";"<p class={Q}MsoNormal{Q}><span>Production instance of the member engine</span></p>";"Kørende";"D-100";"DEE01";"CY01";"CY01";"3";"";"Y";"Y";"10-11-2026 14:05:11"
+"AST-0008";"Index Tool";"<p>Production instance of the index tool. It keeps the index of every library and writes the daily bookings file.</p>";"Kørende";"D-100";"dee01";"cy01";"bo01";"2";"";"N";"Y";"02-03-2026 09:12:40"
+"AST-0012";"Fines Hub";"<p>Production instance of the fines hub</p>";"Kørende";"D-200";"dee01";"cy01";"cy01";"3";"";"Y";"Y";"15-08-2026 10:00:00"
+"AST-0009";"Old Receipt Printer";"<p>Printed the receipts. Replaced in 2025.</p>";"Nedlagt";"D-200";"";"";"";"";"";"N";"N";"01-02-2025 08:00:00"
+"AST-0020";"Event Gateway";"<p>Routes ticket orders to the &amp; ticket partners.</p>";"Kørende";"D-300";"dee01";"";"cy01";"2";"";"Y";"Y";"20-10-2026 16:45:02"
+"AST-0030";"Archive Service";"<p>Keeps old documents for ten years.</p>";"Konstruktion";"D-300";"dee01";"cy01";"";"";"";"N";"N";"05-11-2026 11:00:00"

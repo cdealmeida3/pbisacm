@@ -1,0 +1,74 @@
+{
+  "id": "CONTRACT-PROCUREMENT",
+  "status": "live",
+  "family": "contracts",
+  "subject": "contract",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "contract"
+    ]
+  },
+  "title": "A problem in Solusi itself: only Procurement can correct it",
+  "cardLabel": "For Procurement",
+  "cardHint": "Problems in Solusi itself, such as no contract owner or a person who left. Only Procurement can correct them: one message to their mailbox.",
+  "cardText": "Problems in Solusi itself: no contract owner, a contract owner or Procurement partner who left (inactive in ServiceNow, and no active account with that name is known), no vendor number, and an EPO ID that is unknown or names a Retired system. Nobody in SACM can correct them, and a correction in ServiceNow is lost at the next upload. One message goes to the Procurement mailbox (its address is in Settings), with one table per problem. After the reminders, the escalation goes to the Procurement lead of Settings. Export this list gives the same tables as a file. Nothing is sent before you press Send.",
+  "detector": {
+    "type": "code",
+    "module": "contracts/problems",
+    "ref": "reference/contract-reports",
+    "rules": [
+      "noOwner",
+      "ownerLeft",
+      "partnerLeft",
+      "noVendorNumber",
+      "epoRetired",
+      "epoUnknown"
+    ]
+  },
+  "playbook": {
+    "path": "source-fix",
+    "audience": [
+      "procurement"
+    ],
+    "message": {
+      "subject": "Contracts to correct in Solusi",
+      "intro": "These contracts need a correction in Solusi.",
+      "ask": "Please correct them in Solusi.",
+      "why": "ServiceNow receives the contract data from Solusi with each upload, so these values can only be corrected in Solusi. Please {reply} when it is done, or when a contract is right as it is.",
+      "byProblem": {
+        "noOwner": {
+          "subject": "No contract owner",
+          "intro": "These running contracts have no contract owner in Solusi.",
+          "ask": "Please add the contract owner in Solusi."
+        },
+        "ownerLeft": {
+          "subject": "Contract owner left",
+          "intro": "The contract owner of these running contracts is no longer an active user in ServiceNow, and we know no active account with that name.",
+          "ask": "Please name a new contract owner in Solusi, or tell us if the person is still with the company."
+        },
+        "partnerLeft": {
+          "subject": "Procurement partner left",
+          "intro": "The Procurement partner of these running contracts is no longer an active user in ServiceNow, and we know no active account with that name.",
+          "ask": "Please name a new Procurement partner in Solusi, or tell us if the person is still with the company."
+        },
+        "noVendorNumber": {
+          "subject": "No vendor number",
+          "intro": "These contracts have no vendor number in Solusi. The upload finds the vendor by this number, so the vendor stays empty in ServiceNow.",
+          "ask": "Please add the vendor number in Solusi."
+        },
+        "epoRetired": {
+          "subject": "The EPO ID names a Retired system",
+          "intro": "These running contracts name a system that is Retired in ServiceNow.",
+          "ask": "Please check if the contract still covers a system in use, and correct the EPO ID in Solusi."
+        },
+        "epoUnknown": {
+          "subject": "The EPO ID is not a known EPO ID",
+          "intro": "The EPO ID of these running contracts holds a number that is not the EPO ID of a system in ServiceNow.",
+          "ask": "Please check the number, and correct the EPO ID in Solusi."
+        }
+      }
+    }
+  }
+}

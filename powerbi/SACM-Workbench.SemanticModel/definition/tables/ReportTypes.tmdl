@@ -1,0 +1,70 @@
+/// One row per report type, with its newest file (the Reports page).
+table ReportTypes
+
+	/// Days since the newest report of the type, counted from Today.
+	measure 'Report age' =
+			VAR newest = MAX ( ReportTypes[NewestDate] )
+			RETURN IF ( ISBLANK ( newest ), BLANK (), DATEDIFF ( newest, [Today], DAY ) )
+		formatString: 0
+
+	/// Missing, Old (older than its days, D14) or Up to date.
+	measure 'Report state' =
+			VAR newest = MAX ( ReportTypes[NewestDate] )
+			RETURN
+			    IF (
+			        HASONEVALUE ( ReportTypes[Kind] ),
+			        IF ( ISBLANK ( newest ), "Missing", IF ( [Report age] > MAX ( ReportTypes[StaleAfter] ), "Old", "Up to date" ) )
+			    )
+
+	/// The text colour of the state (LOOK.md: red a problem, amber a warning, green OK).
+	measure 'Report state colour' = SWITCH ( [Report state], "Missing", "#b42318", "Old", "#7d5700", "Up to date", "#067647" )
+
+	/// The soft background of the state.
+	measure 'Report state fill' = SWITCH ( [Report state], "Missing", "#fef3f2", "Old", "#fffaeb", "Up to date", "#ecfdf3" )
+
+	column Kind
+		dataType: string
+		sourceColumn: Kind
+
+	column Label
+		dataType: string
+		sortByColumn: Order
+		sourceColumn: Label
+
+	column Hint
+		dataType: string
+		sourceColumn: Hint
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	column StaleAfter
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: StaleAfter
+
+	column Files
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Files
+
+	column NewestFile
+		dataType: string
+		sourceColumn: NewestFile
+
+	column NewestDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: NewestDate
+
+	column NewestRows
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: NewestRows
+
+	partition ReportTypes = m
+		mode: import
+		source = ReportTypesRows

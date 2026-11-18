@@ -1,0 +1,48 @@
+{
+  "id": "TAG-INVALID",
+  "status": "off",
+  "title": "Tag key or value is not allowed",
+  "cardLabel": "Tag not allowed",
+  "family": "tags",
+  "dimension": "compliance",
+  "severity": "low",
+  "scope": {
+    "classes": [
+      "business_capability",
+      "business_process",
+      "business_application",
+      "business_service",
+      "service_offering",
+      "service_instance",
+      "api",
+      "application",
+      "technology_management_service"
+    ],
+    "exclude": {
+      "operational_status": [
+        "retired"
+      ]
+    }
+  },
+  "detector": {
+    "type": "rule",
+    "when": {
+      "op": "tagsNotIn",
+      "ref": "reference/allowed-tags",
+      "field": "tags"
+    }
+  },
+  "playbook": {
+    "path": "self-fix",
+    "audience": [
+      "managed_by",
+      "managerOf(owned_by)"
+    ],
+    "message": {
+      "subject": "Tag not allowed",
+      "intro": "These CIs carry a tag that is not in the agreed list.",
+      "ask": "Could you tell us the right tag for each CI, or confirm that we can remove it?",
+      "why": "Reports and rules read the tags, so only the agreed tags can be used."
+    }
+  }
+}

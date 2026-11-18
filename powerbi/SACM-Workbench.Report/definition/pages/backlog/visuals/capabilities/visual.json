@@ -1,0 +1,269 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "capabilities",
+  "position": {
+    "x": 24,
+    "y": 468,
+    "z": 3000,
+    "height": 204,
+    "width": 1232,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "Name"
+                }
+              },
+              "queryRef": "CapabilitySheet.Name",
+              "nativeQueryRef": "Name",
+              "displayName": "Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "CapabilitySheet.Status",
+              "nativeQueryRef": "Status",
+              "displayName": "Operational status"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "CapabilitiesAbove"
+                }
+              },
+              "queryRef": "CapabilitySheet.CapabilitiesAbove",
+              "nativeQueryRef": "CapabilitiesAbove",
+              "displayName": "Capabilities above"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "CapabilitiesBelow"
+                }
+              },
+              "queryRef": "CapabilitySheet.CapabilitiesBelow",
+              "nativeQueryRef": "CapabilitiesBelow",
+              "displayName": "Capabilities below"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "ProcessesBelow"
+                }
+              },
+              "queryRef": "CapabilitySheet.ProcessesBelow",
+              "nativeQueryRef": "ProcessesBelow",
+              "displayName": "Business Processes below"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "Description"
+                }
+              },
+              "queryRef": "CapabilitySheet.Description",
+              "nativeQueryRef": "Description",
+              "displayName": "Description"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "Tags"
+                }
+              },
+              "queryRef": "CapabilitySheet.Tags",
+              "nativeQueryRef": "Tags",
+              "displayName": "Tags"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "OwnedBy"
+                }
+              },
+              "queryRef": "CapabilitySheet.OwnedBy",
+              "nativeQueryRef": "OwnedBy",
+              "displayName": "Owned by"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "ManagedBy"
+                }
+              },
+              "queryRef": "CapabilitySheet.ManagedBy",
+              "nativeQueryRef": "ManagedBy",
+              "displayName": "Managed by"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "HiddenCharacters"
+                }
+              },
+              "queryRef": "CapabilitySheet.HiddenCharacters",
+              "nativeQueryRef": "HiddenCharacters",
+              "displayName": "Hidden characters"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "CapabilitySheet"
+                  }
+                },
+                "Property": "Name"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The capability sheet for Enterprise Architecture: every Business Capability with what is above and below it'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Capability sheet: every Business Capability (More options, Export data)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

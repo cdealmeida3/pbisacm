@@ -1,0 +1,28 @@
+{
+  "id": "CONTRACT-TO-CLEAR",
+  "status": "proposed",
+  "title": "A value removed in Solusi is still in ServiceNow",
+  "cardLabel": "To clear by hand",
+  "cardHint": "A value Procurement removed in Solusi stays in ServiceNow, because the import never clears a field. SACM clears it by hand.",
+  "cardText": "The import from Solusi never clears a field (procedure 2.8, known challenge 2). A value that Procurement removed in Solusi stays in ServiceNow until SACM clears it by hand. An old end date matters most: ServiceNow shows the contract as Expired because of it.",
+  "family": "contracts",
+  "subject": "contract",
+  "dimension": "correctness",
+  "severity": "medium",
+  "scope": {
+    "classes": [
+      "contract"
+    ]
+  },
+  "detector": {
+    "type": "code",
+    "module": "contracts/to-clear",
+    "ref": "reference/contract-reports"
+  },
+  "playbook": {
+    "path": "sacm-fix",
+    "audience": [
+      "sacm"
+    ]
+  }
+}

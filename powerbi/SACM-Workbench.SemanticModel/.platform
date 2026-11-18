@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "SACM-Workbench"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "5f3b2c1e-8d4a-4e6f-9b7c-2a1d0e9f8c71"
+  }
+}
