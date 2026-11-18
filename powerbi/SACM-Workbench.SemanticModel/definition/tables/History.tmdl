@@ -1,0 +1,219 @@
+/// Every finding of every CI report date (D290), from the table HistoryRun: the trends per card, team and class, new and solved between two reports, the days to fix.
+table History
+
+	/// The findings of the report dates in view (one date: that report).
+	measure 'History findings' = COUNTROWS ( History ) + 0
+		formatString: #,0
+
+	/// The findings to solve of the report dates in view.
+	measure 'History to solve' = CALCULATE ( COUNTROWS ( History ), History[State] = "open" ) + 0
+		formatString: #,0
+
+	/// The date of the newest CI report.
+	measure 'Newest report date' = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) )
+		formatString: d mmm yyyy
+
+	/// The findings of the newest CI report.
+	measure 'Findings at the newest report' =
+			VAR d = [Newest report date]
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d ) + 0
+		formatString: #,0
+
+	/// The findings of the CI report before the newest.
+	measure 'Findings at the report before' =
+			VAR d = [Newest report date]
+			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = before ) + 0
+		formatString: #,0
+
+	/// New since the report before (D172): findings to solve of the report date in view (the newest when none is chosen) that the CI report before did not show. Blank for the first report date.
+	measure New =
+			VAR d = MAX ( Runs[ReportDate] )
+			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR shown = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open" )
+			VAR shownBefore = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = before )
+			RETURN IF ( NOT ISBLANK ( before ), COUNTROWS ( EXCEPT ( shown, shownBefore ) ) + 0 )
+		formatString: #,0
+
+	/// Solved since the report before (D59, D174): findings of the CI report before that the report date in view (the newest when none is chosen) no longer shows, where it contains the CI and tested that part of the check. Blank for the first report date.
+	measure Solved =
+			VAR d = MAX ( Runs[ReportDate] )
+			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR shown = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d )
+			VAR parts = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part" )
+			VAR cis = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "ci" )
+			VAR solved =
+			    FILTER (
+			        CALCULATETABLE ( History, REMOVEFILTERS ( Runs ), Runs[ReportDate] = before ),
+			        NOT ( History[Key] IN shown ) && ( History[CheckId] & ":" & History[Field] ) IN parts && History[CiKey] IN cis
+			    )
+			RETURN IF ( NOT ISBLANK ( before ), COUNTROWS ( solved ) + 0 )
+		formatString: #,0
+
+	/// The average days from the first report that showed a finding to the report that solved it, for the findings solved at the report date in view.
+	measure 'Days to fix' =
+			VAR d = MAX ( Runs[ReportDate] )
+			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR shown = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d )
+			VAR parts = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part" )
+			VAR cis = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "ci" )
+			VAR solved =
+			    FILTER (
+			        CALCULATETABLE ( History, REMOVEFILTERS ( Runs ), Runs[ReportDate] = before ),
+			        NOT ( History[Key] IN shown ) && ( History[CheckId] & ":" & History[Field] ) IN parts && History[CiKey] IN cis
+			    )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( before ),
+			        AVERAGEX ( solved, DATEDIFF ( CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( Runs ), ALLEXCEPT ( History, History[Key] ) ), d, DAY ) )
+			    )
+		formatString: 0
+
+	/// New since the report before on a daily card (My day, D182); blank when none.
+	measure 'New (daily)' =
+			VAR n = CALCULATE ( [New], KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+
+	/// Solved since the report before on a daily card; blank when none.
+	measure 'Solved (daily)' =
+			VAR n = CALCULATE ( [Solved], KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+
+	/// The line of My day: "Since the report of 4 Nov: 23 new, 2 solved."
+	measure 'Since line' =
+			VAR d = [Newest report date]
+			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			RETURN
+			    IF (
+			        ISBLANK ( before ),
+			        "One CI report so far: new and solved show from the second report.",
+			        "Since the report of " & FORMAT ( before, "d mmm" ) & ": " & FORMAT ( CALCULATE ( [New], REMOVEFILTERS ( Runs ) ), "#,0" ) & " new, "
+			            & FORMAT ( CALCULATE ( [Solved], REMOVEFILTERS ( Runs ) ), "#,0" ) & " solved."
+			    )
+
+	/// The first report date that showed the finding.
+	measure 'First seen' = CALCULATE ( MIN ( History[ReportDate] ), ALLEXCEPT ( History, History[Key] ) )
+		formatString: d mmm yyyy
+
+	/// On a line of one finding and one report date: the next report date, when that report contains the CI, tested the part and no longer shows the finding (the export of the Audit page); blank otherwise.
+	measure 'Verified on' =
+			VAR shownOn = SELECTEDVALUE ( History[ReportDate] )
+			VAR findingKey = SELECTEDVALUE ( History[Key] )
+			VAR part = SELECTEDVALUE ( History[CheckId] ) & ":" & SELECTEDVALUE ( History[Field] )
+			VAR ciKey = SELECTEDVALUE ( History[CiKey] )
+			VAR d = CALCULATE ( MIN ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] > shownOn )
+			VAR shownNext = CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), REMOVEFILTERS ( History ), History[Key] = findingKey, Runs[ReportDate] = d )
+			VAR tested = CALCULATE ( COUNTROWS ( HistoryChecked ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part", HistoryChecked[Id] = part )
+			VAR checked = CALCULATE ( COUNTROWS ( HistoryChecked ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "ci", HistoryChecked[Id] = ciKey )
+			RETURN IF ( NOT ISBLANK ( findingKey ) && NOT ISBLANK ( d ) && ISBLANK ( shownNext ) && tested > 0 && checked > 0, d )
+		formatString: d mmm yyyy
+
+	/// The first report date of a finding that a later report verified (the export of the Audit page); blank otherwise.
+	measure 'First seen (verified)' = IF ( NOT ISBLANK ( [Verified on] ), [First seen] )
+		formatString: d mmm yyyy
+
+	/// The verification record (Audit): the findings to solve of the report date in view.
+	measure 'Record to solve' =
+			VAR d = MAX ( Runs[ReportDate] )
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open" ) + 0
+		formatString: #,0
+
+	/// The verification record: the CIs to solve of the report date in view.
+	measure 'Record CIs to solve' =
+			VAR d = MAX ( Runs[ReportDate] )
+			RETURN CALCULATE ( DISTINCTCOUNT ( History[CiKey] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open" ) + 0
+		formatString: #,0
+
+	/// The verification record: the other findings (waiting, known, to check) of the report date in view.
+	measure 'Record other' =
+			VAR d = MAX ( Runs[ReportDate] )
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] <> "open" ) + 0
+		formatString: #,0
+
+	column ReportDate
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReportDate]
+
+	column Key
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Key]
+
+	column CheckId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
+
+	column CiKey
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiKey]
+
+	column CiName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiName]
+
+	column Class
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Class]
+
+	column ClassLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ClassLabel]
+
+	column Field
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Field]
+
+	column State
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [State]
+
+	column SupportGroup
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [SupportGroup]
+
+	column ContactName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ContactName]
+
+	partition History = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( HistoryRun, HistoryRun[Part] = "History" ),
+					"ReportDate", HistoryRun[History.ReportDate],
+					"Key", HistoryRun[History.Key],
+					"CheckId", HistoryRun[History.CheckId],
+					"CiKey", HistoryRun[History.CiKey],
+					"CiName", HistoryRun[History.CiName],
+					"Class", HistoryRun[History.Class],
+					"ClassLabel", HistoryRun[History.ClassLabel],
+					"Field", HistoryRun[History.Field],
+					"State", HistoryRun[History.State],
+					"SupportGroup", HistoryRun[History.SupportGroup],
+					"ContactName", HistoryRun[History.ContactName]
+				)

@@ -1,3 +1,11 @@
+/// The day after the last day of the history the table HistoryRun computes (D290), with RangeStart. In the workspace the incremental refresh sets it for each part of the history; in Power BI Desktop keep it in the future.
+expression RangeEnd = #datetime(2030, 1, 1, 0, 0, 0) meta [IsParameterQuery = true, Type = "DateTime", IsParameterQueryRequired = true]
+	queryGroup: Parameters
+
+/// The first day of the history the table HistoryRun computes (D290). In the workspace the incremental refresh sets it for each part of the history (keep 24 months, look at the last 7 days); in Power BI Desktop only the CI reports from this day to RangeEnd are computed, so keep it a few weeks back. The invented samples are of 4 and 11 November 2026.
+expression RangeStart = #datetime(2026, 11, 1, 0, 0, 0) meta [IsParameterQuery = true, Type = "DateTime", IsParameterQueryRequired = true]
+	queryGroup: Parameters
+
 /// The folder of the report files inside the site, from the document library down ("Shared Documents/..."). Invented here.
 expression ReportsFolder = "Shared Documents/Workbench/Reports" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
 	queryGroup: Parameters
@@ -14,12 +22,55 @@ expression SharePointSite = "https://contoso.sharepoint.com/sites/sacm" meta [Is
 expression SourceMode = "Sample" meta [IsParameterQuery = true, List = {"Sample", "SharePoint"}, DefaultValue = "Sample", Type = "Text", IsParameterQueryRequired = true]
 	queryGroup: Parameters
 
+/// Where the team's state comes from (D291): the journal, the replies, the settings, the team and the lifecycle reviews. "Sample": invented rows packed in this file (powerbi/samples/state/), so the history pages show something. "SharePoint": the five lists of the team site (SharePointSite; powerbi/README.md says how to make them). Empty lists are fine: every case is then New. "None": no state at all (every case New), for the real reports before the lists exist.
+expression StateMode = "Sample" meta [IsParameterQuery = true, List = {"Sample", "SharePoint", "None"}, DefaultValue = "Sample", Type = "Text", IsParameterQueryRequired = true]
+	queryGroup: Parameters
+
 /// GENERATED from checks/packs/. Every check file, in the order of the file names, with its folder.
 expression CheckFiles = "[{""path"":""checks/packs/relationships/app-instance-match.json"",""folder"":""relationships"",""pack"":{""id"":""APP-INSTANCE-MATCH"",""status"":""live"",""title"":""Business Application differs from its Service Instance"",""cardLabel"":""Application ≠ Instance"",""cardHint"":""A Business Application is a copy of its Service Instance: owners, status, description and name. SACM copies what differs."",""cardText"":""A Business Application has the same Owned by, Managed by, Operational status and description as its Service Instance, and its name is the instance name without \"" - PROD\"" or \"" - TEST\"", plus \""_BA\"" (procedure 2.9). With several instances: the production one whose name it carries. Nobody is asked about the owners, status, description or name of an application: SACM copies the value of the instance in ServiceNow. Use the fix list. When the instance itself is wrong, its own card asks its owner, in EPO."",""family"":""relationships"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""business_application""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/application-instance"",""ref"":""reference/relationship-model""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/contracts/contract-for-procurement.json"",""folder"":""contracts"",""pack"":{""id"":""CONTRACT-PROCUREMENT"",""status"":""live"",""family"":""contracts"",""subject"":""contract"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""contract""]},""title"":""A problem in Solusi itself: only Procurement can correct it"",""cardLabel"":""For Procurement"",""cardHint"":""Problems in Solusi itself, such as no contract owner or a person who left. Only Procurement can correct them: one message to their mailbox."",""cardText"":""Problems in Solusi itself: no contract owner, a contract owner or Procurement partner who left (inactive in ServiceNow, and no active account with that name is known), no vendor number, and an EPO ID that is unknown or names a Retired system. Nobody in SACM can correct them, and a correction in ServiceNow is lost at the next upload. One message goes to the Procurement mailbox (its address is in Settings), with one table per problem. After the reminders, the escalation goes to the Procurement lead of Settings. Export this list gives the same tables as a file. Nothing is sent before you press Send."",""detector"":{""type"":""code"",""module"":""contracts/problems"",""ref"":""reference/contract-reports"",""rules"":[""noOwner"",""ownerLeft"",""partnerLeft"",""noVendorNumber"",""epoRetired"",""epoUnknown""]},""playbook"":{""path"":""source-fix"",""audience"":[""procurement""],""message"":{""subject"":""Contracts to correct in Solusi"",""intro"":""These contracts need a correction in Solusi."",""ask"":""Please correct them in Solusi."",""why"":""ServiceNow receives the contract data from Solusi with each upload, so these values can only be corrected in Solusi. Please {reply} when it is done, or when a contract is right as it is."",""byProblem"":{""noOwner"":{""subject"":""No contract owner"",""intro"":""These running contracts have no contract owner in Solusi."",""ask"":""Please add the contract owner in Solusi.""},""ownerLeft"":{""subject"":""Contract owner left"",""intro"":""The contract owner of these running contracts is no longer an active user in ServiceNow, and we know no active account with that name."",""ask"":""Please name a new contract owner in Solusi, or tell us if the person is still with the company.""},""partnerLeft"":{""subject"":""Procurement partner left"",""intro"":""The Procurement partner of these running contracts is no longer an active user in ServiceNow, and we know no active account with that name."",""ask"":""Please name a new Procurement partner in Solusi, or tell us if the person is still with the company.""},""noVendorNumber"":{""subject"":""No vendor number"",""intro"":""These contracts have no vendor number in Solusi. The upload finds the vendor by this number, so the vendor stays empty in ServiceNow."",""ask"":""Please add the vendor number in Solusi.""},""epoRetired"":{""subject"":""The EPO ID names a Retired system"",""intro"":""These running contracts name a system that is Retired in ServiceNow."",""ask"":""Please check if the contract still covers a system in use, and correct the EPO ID in Solusi.""},""epoUnknown"":{""subject"":""The EPO ID is not a known EPO ID"",""intro"":""The EPO ID of these running contracts holds a number that is not the EPO ID of a system in ServiceNow."",""ask"":""Please check the number, and correct the EPO ID in Solusi.""}}}}}},{""path"":""checks/packs/contracts/contract-not-in-solusi.json"",""folder"":""contracts"",""pack"":{""id"":""CONTRACT-NOT-IN-SOLUSI"",""status"":""live"",""title"":""A contract in ServiceNow is not in Solusi"",""cardLabel"":""Not in Solusi"",""cardHint"":""Contracts in ServiceNow that the Solusi contract file does not hold. SACM deletes them in ServiceNow; the app deletes nothing."",""cardText"":""Contracts that ServiceNow holds and the Solusi contract file does not (procedure 2.8). What is not in Solusi does not exist, or should not exist, in ServiceNow: every line is to delete. SACM deletes them in ServiceNow; the app deletes nothing. A note \""Still linked\"" on a line only says what links the contract to the CMDB. If Procurement asks to keep a contract, open it and choose Not followed up, with the reason."",""family"":""contracts"",""subject"":""contract"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""contract""]},""detector"":{""type"":""code"",""module"":""contracts/not-in-solusi"",""ref"":""reference/contract-reports""},""playbook"":{""path"":""sacm-fix"",""markWord"":""deleted"",""audience"":[""sacm""]}}},{""path"":""checks/packs/contracts/contract-servicenow-fix.json"",""folder"":""contracts"",""pack"":{""id"":""CONTRACT-SN-FIX"",""status"":""live"",""title"":""A contract value SACM corrects in ServiceNow"",""cardLabel"":""Contracts to fix in ServiceNow"",""cardHint"":""Contract fields that are wrong in ServiceNow, such as an inactive account with the name of an active person. SACM corrects them itself."",""cardText"":""SACM corrects these contracts itself in ServiceNow; no email is needed: a contract owner or Procurement partner for whom the upload picked an inactive account while an active account with the same name exists (the line names the account to set), a person ServiceNow shows differently from Solusi, a fixed-term contract without an end date, and a Concluded contract whose end date has passed. A person who really left is on the card \""For Procurement\"". Mark as fixed when it is done. A line is Verified when a later report no longer shows it."",""family"":""contracts"",""subject"":""contract"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""contract""]},""detector"":{""type"":""code"",""module"":""contracts/problems"",""ref"":""reference/contract-reports"",""rules"":[""ownerInactive"",""partnerInactive"",""personName"",""endPassed"",""noEnd""]},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/contracts/contract-status.json"",""folder"":""contracts"",""pack"":{""id"":""CONTRACT-STATUS"",""status"":""proposed"",""title"":""The status tag of a contract does not say what Solusi says"",""cardLabel"":""Contract status"",""cardHint"":""The real status from Solusi is kept as a tag, because ServiceNow sets Expired by itself. The list shows the tag to set."",""cardText"":""ServiceNow sets \""Expired\"" by itself from the end date, so the real status from Solusi is kept as a tag, for example \""S - Concluded\"" (procedure 2.8, known challenge 4). This list shows the tag to add, change or remove. Contracts terminated in the last 7 days are checked the same way."",""family"":""contracts"",""subject"":""contract"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""contract""]},""detector"":{""type"":""code"",""module"":""contracts/status"",""ref"":""reference/contract-reports""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/contracts/contract-to-clear.json"",""folder"":""contracts"",""pack"":{""id"":""CONTRACT-TO-CLEAR"",""status"":""proposed"",""title"":""A value removed in Solusi is still in ServiceNow"",""cardLabel"":""To clear by hand"",""cardHint"":""A value Procurement removed in Solusi stays in ServiceNow, because the import never clears a field. SACM clears it by hand."",""cardText"":""The import from Solusi never clears a field (procedure 2.8, known challenge 2). A value that Procurement removed in Solusi stays in ServiceNow until SACM clears it by hand. An old end date matters most: ServiceNow shows the contract as Expired because of it."",""family"":""contracts"",""subject"":""contract"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""contract""]},""detector"":{""type"":""code"",""module"":""contracts/to-clear"",""ref"":""reference/contract-reports""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/contracts/contract-upload-check.json"",""folder"":""contracts"",""pack"":{""id"":""CONTRACT-UPLOAD"",""status"":""live"",""family"":""contracts"",""subject"":""contract"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""contract""]},""title"":""A field differs between Solusi and ServiceNow after the upload"",""cardLabel"":""Upload check"",""cardHint"":""Solusi and ServiceNow differ. First check that the Solusi file was uploaded; if it was, SACM sets the Solusi value itself."",""cardText"":""First question: was this Solusi contract file uploaded to ServiceNow? If not, upload it, load a new ServiceNow contract report and look again. If it was, SACM sets the value of Solusi in ServiceNow itself and marks the line as fixed; no incident is raised. A person's name that differs is on Contracts to fix in ServiceNow."",""detector"":{""type"":""code"",""module"":""contracts/upload-check"",""ref"":""reference/contract-reports""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/ci/crit-above-parent.json"",""folder"":""ci"",""pack"":{""id"":""CRIT-ABOVE-PARENT"",""status"":""live"",""title"":""Target criticality is higher than every parent passes on"",""cardLabel"":""Above parent"",""cardHint"":""The target criticality is higher than every parent passes on. Often a parent relationship is missing: SACM checks the mapping first."",""cardText"":""A target value higher than every value the parents pass on is unusual: often a parent relationship is missing. SACM checks the mapping first, so these CIs start under Check the mapping first. Parents over a relationship excluded from calculation do not count. When the mapping of a CI is complete, press \""Mapping is complete: ask the owner\"" on its line: the CI moves to Asked of the owner, and the owner is asked to confirm the value or lower it with the criticality request."",""family"":""criticality"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""business_process"",""business_application"",""business_service"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""criticality/above-parents"",""ref"":""reference/criticality""},""playbook"":{""path"":""service-request"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)""],""askAfterReview"":""Mapping done: ask owner"",""message"":{""subject"":""Criticality above the parent CIs"",""intro"":""A target value is higher than every value the parent CIs pass on. We checked the mapping: no parent relationship is missing."",""ask"":""Could you confirm that the value is right? If it is too high, please lower it with the request {request:criticality}."",""why"":""Criticality flows down from the parents. A CI rated higher than all of its parents is unusual.""}}}},{""path"":""checks/packs/ci/crit-auto-justification.json"",""folder"":""ci"",""pack"":{""id"":""CRIT-AUTO-JUSTIFICATION"",""status"":""live"",""title"":""Criticality exception with only the automatic justification"",""cardLabel"":""Automatic justification only"",""cardHint"":""A CI kept a lower value after its parent was raised; its only justification is the automatic text. The owner says why."",""cardText"":""When the inherited value rises, ServiceNow keeps the lower target with the text \""Inherited value increased (Auto generated)\"". That text gives no reason. The owner is asked which justification applies, or if the value should follow the parent. SACM then selects the justification, or raises the target."",""family"":""criticality"",""dimension"":""correctness"",""severity"":""high"",""scope"":{""classes"":[""business_process"",""business_application"",""business_service"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""forEach"":[""confidentiality"",""integrity"",""availability"",""authenticity""],""when"":{""all"":[{""op"":""lessThanField"",""field"":""target.{each}"",""value"":""inherited.{each}""},{""op"":""onlyMatches"",""field"":""exception_justification"",""value"":""\\(Auto generated\\)""}]}},""playbook"":{""path"":""email"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)""],""message"":{""subject"":""Lower criticality without a reason"",""intro"":""The parent of these CIs was raised, and the CIs kept a lower value. The only justification is the automatic text, which gives no reason."",""ask"":""Which justification applies, or should the value follow the parent? {Reply}, and we select the justification in ServiceNow, or raise the target."",""why"":""If it is lower, we should know why: an exception needs a reason.""}}}},{""path"":""checks/packs/ci/crit-no-justification.json"",""folder"":""ci"",""pack"":{""id"":""CRIT-NO-JUSTIFICATION"",""status"":""live"",""title"":""Criticality exception without a valid justification"",""cardLabel"":""No justification"",""cardHint"":""A lowered criticality value has no justification of its own. SACM applied it, so SACM adds the justification from the request."",""family"":""criticality"",""dimension"":""correctness"",""severity"":""high"",""scope"":{""classes"":[""business_process"",""business_application"",""business_service"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""forEach"":[""confidentiality"",""integrity"",""availability"",""authenticity""],""when"":{""all"":[{""op"":""lessThanField"",""field"":""target.{each}"",""value"":""inherited.{each}""},{""op"":""lacksValidEntryFor"",""field"":""exception_justification"",""value"":""{each}"",""ignore"":""\\(Auto generated\\)""},{""op"":""notOnlyMatches"",""field"":""exception_justification"",""value"":""\\(Auto generated\\)""}]}},""playbook"":{""path"":""sacm-fix"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)""],""askWhenUnsure"":""The request gives none: ask the owner"",""message"":{""subject"":""Criticality exception without a justification"",""intro"":""A target value is lower than the inherited value, and the request gives no justification for it."",""ask"":""Could you tell us why the value is lower than the one inherited from the parent? {Reply} with the reason, and we select the justification in ServiceNow. If the value should follow the parent, tell us and we raise the target."",""why"":""Without a justification, the exception cannot be explained to an auditor.""}},""cardText"":""The target criticality is lower than the inherited one, and no justification covers that value. SACM applied the values of the request, so SACM adds the justification the request gives for each lowered value. Only when the request gives none: open the CI and press \""The request gives none: ask the owner\"". A CI whose field holds only the automatic text is on the card Only the automatic justification.""}},{""path"":""checks/packs/ci/crit-none-reaches.json"",""folder"":""ci"",""pack"":{""id"":""CRIT-NONE-REACHES"",""status"":""live"",""reviewOnly"":true,""reviewWhy"":""SACM checks the mapping: no criticality reaches these CIs"",""title"":""No criticality reaches the CI"",""cardLabel"":""No criticality reaches the CI"",""cardHint"":""No target and nothing inherited: no parent passes a criticality to the CI. Often a parent relationship is missing."",""cardText"":""The owner is not asked for a target: criticality flows down from the Business Process. These CIs have no target and nothing inherited, so no parent passes a criticality to them. Often a parent relationship is missing, or the only parent is over a relationship excluded from calculation. SACM checks the mapping. A CI with Inherited set and Target empty waits two weeks: ServiceNow then copies Inherited to Target. A target without Inherited is fine."",""family"":""criticality"",""dimension"":""completeness"",""severity"":""medium"",""scope"":{""classes"":[""business_application"",""business_service"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""criticality/none-reaches"",""ref"":""reference/criticality""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/ci/crit-target-missing.json"",""folder"":""ci"",""pack"":{""id"":""CRIT-TARGET-MISSING"",""status"":""live"",""title"":""Business Process without target criticality (BIA missing)"",""cardLabel"":""BIA missing"",""cardHint"":""An Operational Business Process has no CIA values and no tag BIA N/A or BIA is pending. SACM checks the status or the tag."",""cardText"":""Criticality starts on the Business Process: its CIA values come from the BIA, and the process becomes Operational after its mapping. A process in Ready without CIA values is not listed: it may wait there. An Operational (or Under retirement) process without CIA values is wrong, unless the tag BIA N/A or BIA is pending says why: SACM checks the status, or adds the tag. Nobody is written to: SACM does not chase the BIA."",""family"":""criticality"",""dimension"":""completeness"",""severity"":""high"",""scope"":{""classes"":[""business_process""],""exclude"":{""operational_status"":[""retired"",""ready""]}},""detector"":{""type"":""rule"",""when"":{""op"":""levelsMissing"",""field"":""target""}},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/ci/desc-quality.json"",""folder"":""ci"",""pack"":{""id"":""DESC-QUALITY"",""status"":""proposed"",""title"":""Description is missing or of poor quality"",""cardLabel"":""Description"",""cardHint"":""The description is empty, too short, the same as the name, or a placeholder. The owner writes what the CI is and what it is for."",""cardText"":""The description is empty, too short, the same as the name, or a placeholder. The owner writes what the CI is and what it is for. On a Business Service or a Service Instance the owner corrects it in EPO. A Business Application is not asked: SACM copies the description of its Service Instance (card Application ≠ Instance)."",""family"":""description"",""dimension"":""completeness"",""severity"":""medium"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""any"":[{""field"":""description"",""op"":""isEmpty""},{""field"":""description"",""op"":""shorterThan"",""value"":30},{""field"":""description"",""op"":""equalsField"",""value"":""name""},{""field"":""description"",""op"":""matchesAny"",""value"":[""^tbd$"",""^n/?a$"",""^test(ing)?$"",""^to ?do$"",""^[-.?x]+$"",""^none$"",""^unknown$""]},{""field"":""description"",""op"":""duplicatedMoreThan"",""value"":10}]}},""playbook"":{""path"":""self-fix"",""audience"":[""managed_by"",""owned_by"",""managerOf(owned_by)""],""message"":{""subject"":""No useful description"",""intro"":""The description is empty, or does not say what the CI is."",""ask"":""Could you reply with one or two sentences per CI: what it is, and what it is used for? We will update ServiceNow for you. You can also raise the request {form:modify-service-offering}."",""why"":""The service desk and change approvers read it to understand the CI."",""epoWhat"":""description"",""askByClass"":{""service_offering"":""Could you reply with one or two sentences per offering: what it is, and what it is used for? We will update ServiceNow for you. You can also raise the request {request:modify-service-offering}.""},""askByTeam"":{""process-management"":""Could you reply with one or two sentences per process: what the process is and what it does? We will update ServiceNow.""}},""routeBy"":""epo""}}},{""path"":""checks/packs/epo/epo-differs.json"",""folder"":""epo"",""pack"":{""id"":""EPO-DIFF"",""status"":""live"",""title"":""A service mapped CI differs from EPO"",""cardLabel"":""EPO ≠ ServiceNow"",""cardHint"":""Service mapped CIs whose status, name, people or description differ from EPO. SACM copies the EPO value into ServiceNow."",""cardText"":""Service mapped CIs whose status, name, people or description in ServiceNow are not the same as in EPO (procedure 2.7). The description is compared by letters and digits only: empty in ServiceNow, cut short, or another start. The sync to these CIs is cut, so SACM copies the EPO value into ServiceNow by hand: use the fix list. When the Service Instance changes, change its Business Application too (the card \""Application ≠ Instance\"" shows it at the next report). Never remove the relationships."",""family"":""epo-report"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""service_instance""]},""detector"":{""type"":""code"",""module"":""epo/differs"",""ref"":""reference/epo-systems-report""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/ci/epo-id.json"",""folder"":""ci"",""pack"":{""id"":""EPO-ID"",""status"":""proposed"",""title"":""EPO ID missing or used twice"",""cardLabel"":""EPO ID"",""cardHint"":""A Business Service or Service Instance without an EPO ID, or with one used twice. SACM looks first: known case, or ask the owner."",""cardText"":""The EPO ID is the Asset tag. A Business Service or Service Instance without one was most likely created in ServiceNow and not in EPO. SACM looks at each line first. Created in ServiceNow on purpose (the known cases of the instruction, section 3.1): use Not followed up once, with a reason. It must be in EPO: open the CI and press \""Must be created in EPO: ask the owner\"": the owner is asked to create it in EPO. Service Offerings are ServiceNow records and are not checked."",""family"":""epo"",""dimension"":""completeness"",""severity"":""medium"",""scope"":{""classes"":[""business_service"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""ci/epo-id"",""ref"":""reference/epo-id""},""playbook"":{""path"":""sacm-fix"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""askWhenUnsure"":""Must be created in EPO: ask the owner"",""message"":{""subject"":""EPO ID to check"",""intro"":""These CIs have no EPO ID in ServiceNow, or the same EPO ID as another CI, so they cannot be matched with EPO."",""ask"":""Please check that the system or service exists in EPO, once only. If it is not in EPO, please create it there: ServiceNow receives it from EPO. {Reply} if you have a question."",""why"":""The EPO ID links the ServiceNow record to EPO. Without it the two cannot be compared.""}}}},{""path"":""checks/packs/epo/epo-not-arrived.json"",""folder"":""epo"",""pack"":{""id"":""EPO-NOT-ARRIVED"",""reviewOnly"":true,""reviewWhy"":""ServiceNow should follow EPO by itself: listed for a review of the sync"",""status"":""live"",""title"":""EPO change not in ServiceNow (not service mapped)"",""cardLabel"":""EPO update not arrived"",""cardHint"":""CIs that should follow EPO by themselves but differ from it: the sync did not bring the change. A list to look at."",""cardText"":""CIs that are not service mapped: ServiceNow must follow EPO by itself, so a difference means the sync did not bring the change. Status, name, the three people and the description are compared (the description by letters and digits only). Check a few of them in EPO and in ServiceNow. A change made in EPO less than two days before the report waits: the sync may still bring it. After two days, raise one incident for the pattern with the ServiceNow development team, and keep its number on the cases."",""family"":""epo-report"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""service_instance""]},""detector"":{""type"":""code"",""module"":""epo/not-arrived"",""ref"":""reference/epo-systems-report""},""playbook"":{""path"":""source-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/lifecycle/lifecycle-review.json"",""folder"":""lifecycle"",""pack"":{""id"":""LIFECYCLE-REVIEW"",""status"":""proposed"",""title"":""Status in ServiceNow is not the same as in EPO (lifecycle review)"",""cardLabel"":""Lifecycle review"",""cardHint"":""A manager found that the status of a sampled CI is not the same as in EPO. SACM looks at the source first."",""cardText"":""From the lifecycle review (Audit, Lifecycle): a manager compared the status of a sampled CI with EPO and marked it Not the same. A service mapped CI: SACM copies the status of EPO into ServiceNow. A CI that is not service mapped should follow EPO by itself: raise an incident with the ServiceNow development team. Only when EPO itself looks wrong, press \""EPO itself looks wrong: ask the owner\"" on the line. A line stays to solve until a later report shows another status for the CI."",""family"":""lifecycle"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""manual"",""module"":""review/lifecycle"",""ref"":""reference/lifecycle""},""playbook"":{""path"":""sacm-fix"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""message"":{""subject"":""Status differs from EPO"",""intro"":""In our lifecycle review, their status in ServiceNow was not the same as in EPO, and the status in EPO looks wrong to us."",""ask"":""Which status is right? Please correct it in EPO, or {reply}."",""why"":""The status decides whether a CI is followed up, and whether incidents and changes can use it.""},""askWhenUnsure"":""EPO itself looks wrong: ask the owner""}}},{""path"":""checks/packs/relationships/mapping.json"",""folder"":""relationships"",""pack"":{""id"":""MAPPING"",""status"":""proposed"",""title"":""CI to map with its owner"",""cardLabel"":""Mapping backlog"",""cardHint"":""One case per CI to map: SACM invites the owner to a mapping session and moves the case through its stages."",""cardText"":""Everything that must be mapped, one case per CI: a Service Instance without a Business Application, a Business Service or Business Application without a Business Process, a Business Application without a Service Instance, a Business Process with nothing below (in Ready only once it has CIA values), and a Business Application tagged To be deleted that is still Operational. SACM invites the owner to a mapping session (no list of questions), maps the CI with the owner in the Service Mapping Workspace and makes the changes in ServiceNow. Set the stage on the case as it moves on. When the owner says the Business Process does not exist, mark it: Tell Process Management writes one message to the team. A case is solved when a later report no longer shows the problem. CIs tagged To Be Mapped, Descoped or Process is missing or unknown are planned (known); CIs in Ready wait."",""family"":""relationships"",""dimension"":""compliance"",""severity"":""high"",""scope"":{""classes"":[""business_process"",""business_application"",""business_service"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""mapping/backlog"",""ref"":""reference/mapping-backlog""},""playbook"":{""path"":""mapping"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)""],""message"":{""subject"":""Mapping session"",""intro"":""SACM maps every CI of the CMDB to the CIs above and below it. These CIs of yours are not fully mapped yet."",""ask"":""Could we plan a 30-minute mapping session with you? {Reply} with a time that suits you. There is nothing to prepare: we go through it together."",""why"":""Without these relationships, criticality cannot flow to the CIs that support your service, and incidents cannot be linked to it."",""byProblem"":{""no-process"":{""subject"":""No Business Process"",""intro"":""In a mapping session, the owners of these CIs told us that the Business Process they belong to does not exist yet."",""ask"":""Could you identify the Business Process of each CI, or have it created? {Reply} with the process, and SACM links the CI to it in ServiceNow.""}}}}}},{""path"":""checks/packs/ci/name-duplicate.json"",""folder"":""ci"",""pack"":{""id"":""NAME-DUPLICATE"",""status"":""live"",""title"":""CI name is used twice in one class, or has double spaces"",""cardLabel"":""Duplicate names"",""cardHint"":""Two live CIs of one class have the same name, or a name has two spaces. SACM looks first: one thing twice, retire one."",""cardText"":""Two live CIs of the same class with the same name, or a name with two spaces in a row. A Retired CI, or a CI of another class, with the same name does not count. SACM looks at each line first. Two records for one thing: SACM retires one, and removes the double space itself. Two real CIs: open the CI and press \""Two real CIs: ask the owner\"": the owner gives each one its own name (in EPO for a Business Service or a Service Instance)."",""family"":""name"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""any"":[{""op"":""duplicatedInClass"",""field"":""name"",""value"":1},{""op"":""hasDoubleSpaces"",""field"":""name""}]}},""playbook"":{""path"":""sacm-fix"",""audience"":[""managed_by"",""owned_by"",""managerOf(owned_by)""],""askWhenUnsure"":""Two real CIs: ask the owner"",""routeBy"":""epo"",""message"":{""subject"":""Duplicate name"",""intro"":""Another live CI of the same class has the same name. They are two different CIs."",""ask"":""Could you give each one a name of its own? {Reply} with the right names, and we will update ServiceNow for you."",""why"":""A CI is found by its name, so each name must be unique."",""epoWhat"":""name""}}}},{""path"":""checks/packs/ci/name-format.json"",""folder"":""ci"",""pack"":{""id"":""NAME-FORMAT"",""status"":""proposed"",""title"":""CI name has a wrong dash or a space at its start or end"",""cardLabel"":""Name to tidy"",""cardHint"":""Small faults in a name, such as a space at the start or the end. SACM corrects them itself; nobody is asked."",""cardText"":""Small faults in a name that SACM corrects itself, nobody is asked: an API offering that does not start with \""API - \"" (for example another dash), and a space at the start or the end of a name."",""family"":""name"",""dimension"":""compliance"",""severity"":""low"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""ci/name-standard"",""ref"":""reference/name-rules"",""rules"":[""api-prefix"",""outer-space""]},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/ci/name-hidden-char.json"",""folder"":""ci"",""pack"":{""id"":""NAME-HIDDEN-CHAR"",""status"":""live"",""title"":""CI name holds a hidden character"",""cardLabel"":""Hidden character in name"",""cardHint"":""The name holds a character nobody can see, so searching and matching fail. SACM removes it in ServiceNow."",""cardText"":""The name holds a character nobody can see, most often a zero-width space. ServiceNow does not show it, but it is in the record, so searching for the name or matching it with another report fails. A CSV export shows it as \""?\"". SACM removes it in ServiceNow; nobody needs to be asked."",""family"":""name"",""dimension"":""correctness"",""severity"":""low"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""op"":""hasHiddenCharacters"",""field"":""name""}},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/ci/name-standard.json"",""folder"":""ci"",""pack"":{""id"":""NAME-STANDARD"",""status"":""proposed"",""title"":""CI name does not follow the naming standard"",""cardLabel"":""Name not standard"",""cardHint"":""The name does not end as the instruction asks for its class, for example _BS. The owner corrects it in EPO."",""cardText"":""The instruction gives each class an ending: a Business Service ends with _BS, a Service Instance with \"" - PROD\"" or \"" - TEST\"". The owner is asked to correct the name in EPO. The name of a Business Application is on Application ≠ Instance: SACM copies it from its Service Instance."",""family"":""name"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""business_service"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""ci/name-standard"",""ref"":""reference/name-rules"",""rules"":[""bs-suffix"",""si-suffix""]},""playbook"":{""path"":""service-request"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""routeBy"":""epo"",""message"":{""subject"":""Name not standard"",""intro"":""Their name does not follow the SACM naming standard."",""ask"":""Please correct the name. {Reply} if you need help, or if the name is right as it is."",""why"":""A standard name lets everybody find the CI and see what it is."",""epoWhat"":""name""}}}},{""path"":""checks/packs/relationships/offering-owner.json"",""folder"":""relationships"",""pack"":{""id"":""OFFERING-OWNER"",""status"":""live"",""title"":""Service Offering owner differs from its Business Service owner"",""cardLabel"":""Offering owner ≠ Service owner"",""cardHint"":""A Service Offering made by a person has another owner than its Business Service. SACM copies the service owner."",""cardText"":""A Service Offering made by a person has the owner of its Business Service (procedure 2.6). Offerings from EPO take their owner from EPO and are not raised. SACM copies the owner of the Business Service onto the offering in ServiceNow: use the fix list. Nobody is asked."",""family"":""relationships"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""service_offering""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/offering-owner"",""ref"":""reference/relationship-model""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/relationships/offering-parent.json"",""folder"":""relationships"",""pack"":{""id"":""OFFERING-PARENT"",""status"":""live"",""title"":""Parent field and Business Service relationship of an offering do not match"",""cardLabel"":""Offering parent"",""cardHint"":""The Parent field of a Service Offering and its Business Service relationship do not name the same service. SACM fixes it."",""cardText"":""The Parent field of a Service Offering and its Business Service relationship must name the same, single Business Service. SACM fixes it, nobody is asked: use the fix list. When the Parent field names a service and no relationship exists, add the relationship to that service."",""family"":""relationships"",""dimension"":""correctness"",""severity"":""high"",""scope"":{""classes"":[""service_offering""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/offering-parent"",""ref"":""reference/relationship-model""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/lifecycle/process-stage.json"",""folder"":""lifecycle"",""pack"":{""id"":""PROCESS-STAGE"",""status"":""proposed"",""title"":""Business Process in Ready that is mapped: make it Operational"",""cardLabel"":""Process stage"",""cardHint"":""A Business Process in Ready has its CIA values and something linked below: SACM makes it Operational."",""cardText"":""A Business Process is created in Ready. After the BIA its CIA values are added: that is the sign to map it. To map: nothing is linked below yet, so the process is a case of the Mapping backlog, where SACM plans a mapping session with the process owner. Mapped: a Business Application or Business Service is linked below, so SACM makes the process Operational: that is the line of this card. A process in Ready without CIA values waits for the BIA: it has no line, and nobody is chased. Needs the Relationship report."",""family"":""lifecycle"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""business_process""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""process/stage"",""ref"":""reference/lifecycle""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/lifecycle/ready-too-long-capability.json"",""folder"":""lifecycle"",""pack"":{""id"":""READY-TOO-LONG-BC"",""status"":""off"",""title"":""Business Capability is in status Ready for too long"",""cardLabel"":""Capability Ready too long"",""cardHint"":""A Business Capability has been in status Ready for too long. SACM makes it Operational itself."",""cardText"":""The Business Capability was created more than the number of days in Settings ago (90 at first) and is still in status Ready. SACM makes it Operational itself in ServiceNow; Enterprise Architecture owns the capabilities and only answers questions. Mark as fixed when it is done. A line is Verified when a later report shows it Operational."",""family"":""lifecycle"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""business_capability""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""ci/status-age"",""ref"":""reference/lifecycle"",""rules"":[""ready""]},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/lifecycle/ready-too-long.json"",""folder"":""lifecycle"",""pack"":{""id"":""READY-TOO-LONG"",""status"":""proposed"",""title"":""CI is in status Ready for too long"",""cardLabel"":""Ready too long"",""cardHint"":""The CI has been in status Ready for months. Its other problems wait while it is not live, so the owner is asked."",""cardText"":""The CI was created more than the number of days in Settings ago (90 at first) and is still in status Ready. A CI in Ready is not live, so its other problems wait. That is right for a new CI, not for one that sits in Ready for months: clarify it with the owner when there is time. Business Processes and Business Applications are not on this card."",""family"":""lifecycle"",""dimension"":""compliance"",""severity"":""medium"",""priority"":""later"",""scope"":{""classes"":[""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""ci/status-age"",""ref"":""reference/lifecycle"",""rules"":[""ready""]},""playbook"":{""path"":""email"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""message"":{""subject"":""In status Ready for a long time"",""intro"":""They are still in status Ready, long after they were created."",""ask"":""Is it in use? Then the status must be Operational. Is it not needed any more? Then it must be retired. Please make the change, or {reply}."",""askByClass"":{""service_instance"":""Is this system in use? Then its status must be Operational. Is it not needed any more? Then it must be retired. Please make the change in EPO, or {reply}.""},""why"":""A CI in Ready is treated as not live: its owner, criticality and relationships are not followed up.""}}}},{""path"":""checks/packs/relationships/rel-missing.json"",""folder"":""relationships"",""pack"":{""id"":""REL-MISSING"",""status"":""live"",""title"":""Mandatory relationship is missing (unmapped CI)"",""cardLabel"":""Relationship missing"",""cardHint"":""A CI lacks a relationship the model asks for, such as a Business Service without a Service Offering."",""cardText"":""A CI without a relationship the model asks for. On a Business Service and on an offering from EPO the change goes into EPO. A Business Capability needs at least one Business Process or Business Capability below it. One rule is only listed for a review (offering without a Service Instance): it is not agreed yet. What SACM maps with the owner (a Service Instance without a Business Application, a Business Application without a Service Instance or a Business Process, a Business Service without a Business Process, a Business Process with nothing below) is on the Mapping backlog."",""family"":""relationships"",""dimension"":""compliance"",""severity"":""high"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/missing"",""ref"":""reference/relationship-model"",""rules"":[""bc-below"",""bp-business-capability"",""bs-offering"",""bso-business-service"",""bso-service-instance""]},""playbook"":{""path"":""self-fix"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)""],""routeBy"":""epo"",""message"":{""subject"":""Relationship missing"",""intro"":""A relationship the CMDB model asks for is missing on these CIs."",""ask"":""Could you tell us which CI is missing? {Reply} with its name (or EPO ID), and we add the relationship {request:service-mapping}."",""several"":""As there are several CIs, a 30-minute mapping session may be quicker. Reply with a time that suits you."",""why"":""Without these relationships, criticality cannot flow to the CIs that support your service, and incidents cannot be linked to it."",""epoAsk"":""Please add the missing relationship in EPO. If you are not sure which one, reply with the Business Process your system delivers and the systems it depends on (EPO IDs or names)."",""askByClass"":{""business_capability"":""Which Business Processes or Business Capabilities carry out this capability? {Reply}, and we add the relationships {request:service-mapping}.""}}}}},{""path"":""checks/packs/relationships/rel-one-to-one.json"",""folder"":""relationships"",""pack"":{""id"":""REL-ONE-TO-ONE"",""status"":""live"",""title"":""CI has more than the one allowed partner"",""cardLabel"":""Too many partners"",""cardHint"":""A CI has more partners than the model allows, such as an offering with two Business Services. SACM fixes the mapping."",""cardText"":""An offering has exactly one Business Service; a Service Instance exactly one Business Application; a Business Application one Service Instance per environment. SACM fixes the mapping in ServiceNow: use the fix list. When SACM cannot tell which one is right, open the CI and press \""Cannot tell which one is right: ask the owner\"": the owner is asked."",""family"":""relationships"",""dimension"":""compliance"",""severity"":""high"",""scope"":{""classes"":[""business_application"",""service_offering"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/too-many"",""ref"":""reference/relationship-model"",""rules"":[""bso-business-service"",""ba-service-instance"",""si-business-application""]},""playbook"":{""path"":""sacm-fix"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)""],""askWhenUnsure"":""Cannot tell which one is right: ask the owner"",""message"":{""subject"":""Too many related CIs"",""intro"":""These CIs are related to more CIs than the CMDB model allows. The table shows which."",""ask"":""Which one is right? {Reply}, and SACM removes the other relationships in ServiceNow."",""why"":""With two parents, criticality and ownership are not clear.""}}}},{""path"":""checks/packs/relationships/rel-retired.json"",""folder"":""relationships"",""pack"":{""id"":""REL-RETIRED"",""status"":""off"",""title"":""Relationship to a Retired CI"",""cardLabel"":""Relationship to a Retired CI"",""cardHint"":""One end of the relationship is Retired, the other is not (procedure 2.12). SACM removes it in ServiceNow: use the fix list, grouped by the live CI."",""family"":""relationships"",""dimension"":""correctness"",""severity"":""low"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/retired-end"",""ref"":""reference/relationship-model""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/relationships/rel-twice.json"",""folder"":""relationships"",""pack"":{""id"":""REL-TWICE"",""status"":""live"",""title"":""More than one relationship between two CIs"",""cardLabel"":""Relationship entered twice"",""cardHint"":""Two CIs are linked more than once. Only one relationship is allowed: SACM keeps the right one and removes the others."",""cardText"":""Between two CIs only one relationship is allowed. This lists the same relationship entered more than once, and two CIs linked by relationships of different types or in both directions. SACM keeps the right one and removes the others: use the fix list."",""family"":""relationships"",""dimension"":""correctness"",""severity"":""low"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/twice"",""ref"":""reference/relationship-model""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/relationships/rel-wrong-type.json"",""folder"":""relationships"",""pack"":{""id"":""REL-WRONG-TYPE"",""status"":""live"",""title"":""Relationship type is not allowed between these classes"",""cardLabel"":""Wrong relationship type"",""cardHint"":""The relationship has a type the model does not allow between these classes. SACM corrects it in ServiceNow."",""cardText"":""SACM corrects these in ServiceNow: use the fix list. A Platform above the Service Instance that uses it is only listed for a review: confirm with the criticality owner before changing production, because criticality flows down."",""family"":""relationships"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""relationships/wrong-type"",""ref"":""reference/relationship-model""},""playbook"":{""path"":""sacm-fix"",""audience"":[""sacm""]}}},{""path"":""checks/packs/ci/resp-inactive.json"",""folder"":""ci"",""pack"":{""id"":""RESP-INACTIVE"",""status"":""live"",""title"":""Responsible person is an inactive user"",""cardLabel"":""Inactive person"",""cardHint"":""Owned by or Managed by names a person who is no longer active, so we ask who took over. Supported by has its own card."",""family"":""responsibility"",""dimension"":""correctness"",""severity"":""high"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""forEach"":[""owned_by"",""managed_by"",""supported_by""],""when"":{""op"":""refInactive""},""forEachClasses"":{""supported_by"":[]}},""playbook"":{""path"":""service-request"",""audience"":[""managed_by"",""otherRoles"",""managerOf(field)"",""departmentHeadOf(field)"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""message"":{""subject"":""Inactive {who}"",""intro"":""Their {role} is no longer an active user."",""ask"":""Could you tell us who took over? You can {reply}, or raise the request {request}."",""why"":""Without an active owner, approvals for these CIs are rejected automatically."",""request"":""role"",""askNoRequest"":""Could you tell us who took over? Please {reply}, and we will update ServiceNow for you."",""askByClass"":{""service_offering"":""Could you tell us who took over? You can {reply}, or raise the request {request:modify-service-offering}.""},""askByTeam"":{""process-management"":""Could you tell us who took over? Please {reply} with the name of the person for each process, and we will update ServiceNow.""}},""routeBy"":""epo""}}},{""path"":""checks/packs/ci/resp-missing.json"",""folder"":""ci"",""pack"":{""id"":""RESP-MISSING"",""status"":""live"",""title"":""Responsible person is missing"",""cardLabel"":""Owner or manager missing"",""cardHint"":""Owned by or Managed by is empty: every CI needs an owner and a manager. Supported by has its own card."",""family"":""responsibility"",""dimension"":""completeness"",""severity"":""high"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""forEach"":[""owned_by"",""managed_by"",""supported_by""],""when"":{""op"":""isEmpty""},""forEachClasses"":{""supported_by"":[]}},""playbook"":{""path"":""service-request"",""audience"":[""managed_by"",""otherRoles"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""message"":{""subject"":""No {who}"",""intro"":""The role {role} is empty."",""ask"":""Could you tell us who it should be? You can {reply}, or raise the request {request}."",""why"":""Incidents, changes and approvals for these CIs have nobody to go to."",""request"":""role"",""askNoRequest"":""Could you tell us who it should be? Please {reply}, and we will update ServiceNow for you."",""askByClass"":{""service_offering"":""Could you tell us who it should be? You can {reply}, or raise the request {request:modify-service-offering}.""},""askByTeam"":{""process-management"":""Could you tell us who it should be? Please {reply} with the name of the person for each process, and we will update ServiceNow.""}},""routeBy"":""epo""}}},{""path"":""checks/packs/ci/resp-same-person.json"",""folder"":""ci"",""pack"":{""id"":""RESP-SAME-PERSON"",""status"":""proposed"",""title"":""Owned by and Managed by are the same person"",""cardLabel"":""Owner = Manager"",""cardHint"":""Owned by and Managed by name the same person. They should be two different people."",""family"":""responsibility"",""dimension"":""correctness"",""severity"":""medium"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""op"":""samePersonAs"",""field"":""owned_by"",""value"":""managed_by""}},""playbook"":{""path"":""service-request"",""audience"":[""managed_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""routeBy"":""epo"",""message"":{""subject"":""Same person as owner and manager"",""intro"":""The same person is Owned by and Managed by."",""ask"":""Could you name a second person for Managed by? You can reply, or raise the request {request:managed-by-update}."",""why"":""The two roles approve changes together. One person in both means there is no second check."",""epoAsk"":""Could you name a second person as Primary Responsible (Managed by) in EPO?"",""askByTeam"":{""process-management"":""Could you name a second person for Managed by? Please {reply} with the name for each process, and we will update ServiceNow.""}}}}},{""path"":""checks/packs/ci/support-group-inactive.json"",""folder"":""ci"",""pack"":{""id"":""SUPPORT-GROUP-INACTIVE"",""status"":""live"",""title"":""Support group of the CI is not active"",""cardLabel"":""Support group inactive"",""cardHint"":""The Support group is no longer active, so incidents on the CI reach nobody."",""cardText"":""The Service Offering or Service Instance has a Support group, but the group is no longer active, so incidents on the CI reach nobody (procedure 2.5). A CI with no Support group at all is on the card Support group."",""family"":""support"",""dimension"":""correctness"",""severity"":""high"",""scope"":{""classes"":[""service_offering"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""op"":""groupInactive"",""field"":""support_group""}},""playbook"":{""path"":""service-request"",""audience"":[""managed_by"",""owned_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""message"":{""subject"":""Inactive Support group"",""intro"":""Their Support group is no longer active."",""ask"":""Please raise the request {request:support-group-update} and name an active group."",""askByClass"":{""service_offering"":""Please raise the request {request:modify-service-offering} and name an active group.""},""why"":""Without an active Support group, incidents on these CIs are not assigned to a team.""}}}},{""path"":""checks/packs/ci/support-group-missing.json"",""folder"":""ci"",""pack"":{""id"":""SUPPORT-GROUP-MISSING"",""status"":""live"",""title"":""Service Offering or Service Instance has no support group"",""cardLabel"":""Support group"",""cardHint"":""A Service Offering or Service Instance has no Support group, so incidents on it reach nobody."",""family"":""support"",""dimension"":""completeness"",""severity"":""high"",""scope"":{""classes"":[""service_offering"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""op"":""isEmpty"",""field"":""support_group""}},""playbook"":{""path"":""service-request"",""audience"":[""managed_by"",""owned_by"",""supported_by"",""managerOf(owned_by)""],""message"":{""subject"":""No Support group"",""intro"":""These CIs have no Support group."",""ask"":""Please raise the request {request:support-group-update}. If the group does not exist yet, there is a request to create it."",""askByClass"":{""service_offering"":""Please raise the request {request:modify-service-offering}. If the group does not exist yet, there is a request to create it.""},""why"":""Without an active Support group, incidents on these CIs are not assigned to a team.""}}}},{""path"":""checks/packs/ci/supported-by.json"",""folder"":""ci"",""pack"":{""id"":""SUPPORTED-BY"",""status"":""live"",""title"":""Supported by is empty or an inactive user"",""cardLabel"":""Supported by"",""cardHint"":""Supported by is empty, or names a person who is no longer active. The owner or manager names the person."",""cardText"":""Supported by is important, but it comes after Owned by and Managed by. On a Service Instance the owner fills it in EPO (Secondary Responsible). On a Service Offering the owner or manager replies, or raises the request to modify the offering. Only these two classes are checked."",""family"":""responsibility"",""dimension"":""completeness"",""severity"":""medium"",""priority"":""later"",""scope"":{""classes"":[""service_offering"",""service_instance""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""forEach"":[""supported_by""],""when"":{""any"":[{""op"":""isEmpty""},{""op"":""refInactive""}]}},""playbook"":{""path"":""service-request"",""audience"":[""managed_by"",""owned_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""routeBy"":""epo"",""message"":{""subject"":""Supported by to fill"",""intro"":""The role Supported by is empty, or names a person who is no longer active."",""ask"":""Could you tell us who it should be? Please {reply}, and we will update ServiceNow for you."",""why"":""The support person is the second contact for incidents on these CIs."",""askByClass"":{""service_offering"":""Could you tell us who it should be? You can {reply}, or raise the request {request:modify-service-offering}.""}}}}},{""path"":""checks/packs/ci/tag-invalid.json"",""folder"":""ci"",""pack"":{""id"":""TAG-INVALID"",""status"":""off"",""title"":""Tag key or value is not allowed"",""cardLabel"":""Tag not allowed"",""family"":""tags"",""dimension"":""compliance"",""severity"":""low"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""op"":""tagsNotIn"",""ref"":""reference/allowed-tags"",""field"":""tags""}},""playbook"":{""path"":""self-fix"",""audience"":[""managed_by"",""managerOf(owned_by)""],""message"":{""subject"":""Tag not allowed"",""intro"":""These CIs carry a tag that is not in the agreed list."",""ask"":""Could you tell us the right tag for each CI, or confirm that we can remove it?"",""why"":""Reports and rules read the tags, so only the agreed tags can be used.""}}}},{""path"":""checks/packs/ci/tag-missing.json"",""folder"":""ci"",""pack"":{""id"":""TAG-MISSING"",""status"":""proposed"",""title"":""Mandatory tag is missing"",""cardLabel"":""Tag missing"",""cardHint"":""A tag the class must carry is missing (a process: customer facing or internal). SACM sets it, and asks Process Management when it cannot tell."",""family"":""tags"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_application"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""op"":""missingTags"",""ref"":""reference/mandatory-tags"",""field"":""tags""}},""playbook"":{""path"":""sacm-fix"",""audience"":[""managed_by"",""owned_by"",""managerOf(owned_by)""],""askWhenUnsure"":""Cannot tell which type: ask Process Management"",""message"":{""subject"":""Missing tag"",""intro"":""A mandatory tag is missing on these CIs."",""ask"":""Could you tell us the right value for each CI? We will update ServiceNow for you."",""why"":""The mandatory tags say what kind of CI it is. Reports and rules depend on them."",""askByTeam"":{""process-management"":""Is each process customer facing or internal? Please {reply}, and we will set the tag in ServiceNow.""}}}}},{""path"":""checks/packs/ci/tag-status-conflict.json"",""folder"":""ci"",""pack"":{""id"":""TAG-STATUS-CONFLICT"",""status"":""proposed"",""title"":""Tagged To be deleted, but still Operational"",""cardLabel"":""Deleted but operational"",""cardHint"":""The CI is tagged To be deleted and is still Operational. The owner gives the planned retirement date."",""cardText"":""The CI is tagged To be deleted and is still Operational. Some are kept on purpose, for example to keep their data for some years. The owner is asked for the planned retirement date. Write it on the case (Planned retirement date): the CI then waits until that date. Business Applications are not on this card: they are decided in the mapping of their system."",""family"":""tags"",""dimension"":""compliance"",""severity"":""medium"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""rule"",""when"":{""all"":[{""op"":""tagMatchesAny"",""field"":""tags"",""value"":[""to be deleted""]},{""op"":""equals"",""field"":""operational_status"",""value"":""Operational""}]}},""playbook"":{""path"":""self-fix"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)""],""routeBy"":""epo"",""retirementDate"":true,""message"":{""subject"":""Tagged for deletion but still Operational"",""intro"":""These CIs are tagged To be deleted, but they are still Operational."",""ask"":""When will they be retired? Please reply with the planned retirement date of each CI. It is fine to keep a CI for some years, for example to keep its data: we only need the date."",""why"":""A CI tagged To be deleted needs a planned date: on that date it is retired, so it no longer receives incidents or changes."",""epoAsk"":""When will they be retired? Please reply with the planned retirement date of each CI, and retire them in EPO on that date. It is fine to keep a CI for some years, for example to keep its data: we only need the date.""}}}},{""path"":""checks/packs/lifecycle/under-retirement-long.json"",""folder"":""lifecycle"",""pack"":{""id"":""UNDER-RETIREMENT-LONG"",""status"":""proposed"",""title"":""CI is Under retirement for too long"",""cardLabel"":""Under retirement too long"",""cardHint"":""The CI has been Under retirement for months without a change. The owner says if and when it is retired."",""cardText"":""The CI is in status Under retirement and its record did not change for more than the number of days in Settings (90 at first). The owner is asked if it is still going to be retired, and when. Write the date the owner gives on the case (Planned retirement date): the CI then waits until that date. Clarify it when there is time. Business Applications are not on this card: they follow their Service Instance."",""family"":""lifecycle"",""dimension"":""compliance"",""severity"":""medium"",""priority"":""later"",""scope"":{""classes"":[""business_capability"",""business_process"",""business_service"",""service_offering"",""service_instance"",""api"",""application"",""technology_management_service""],""exclude"":{""operational_status"":[""retired""]}},""detector"":{""type"":""code"",""module"":""ci/status-age"",""ref"":""reference/lifecycle"",""rules"":[""under-retirement""]},""playbook"":{""path"":""email"",""audience"":[""owned_by"",""managed_by"",""managerOf(owned_by)"",""departmentHeadOf(owned_by)""],""retirementDate"":true,""message"":{""subject"":""Under retirement for a long time"",""intro"":""They are in status Under retirement, and nothing changed on them for a long time."",""ask"":""Is this CI still going to be retired, and when? Please {reply}. If it is no longer in use, please retire it."",""askByClass"":{""service_instance"":""Is this system still going to be retired, and when? Please {reply}. If it is no longer in use, please retire it in EPO.""},""why"":""A CI that stays Under retirement keeps its relationships and its criticality, and nobody knows if it is still used."",""askByTeam"":{""process-management"":""Is this process still going to be retired, and when? Please {reply}. If it is no longer in use, we will retire it in ServiceNow.""}}}}}]"
 	queryGroup: Packed
 
+/// GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team's state, for the Self-check page.
+expression ExpectedHistory = "[{""metric"":""Report dates"",""expected"":2},{""metric"":""Findings in the newest report"",""expected"":67},{""metric"":""Findings in the report before"",""expected"":45},{""metric"":""New since the last report"",""expected"":23},{""metric"":""Solved since the last report"",""expected"":2},{""metric"":""Days to fix"",""expected"":7},{""metric"":""Open cases"",""expected"":64},{""metric"":""Reminders due"",""expected"":1},{""metric"":""To escalate"",""expected"":3},{""metric"":""Replies to read"",""expected"":1},{""metric"":""Mine"",""expected"":2},{""metric"":""Not followed up"",""expected"":2}]"
+	queryGroup: Packed
+
 /// GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.
 expression ExpectedResult = "{""date"":""2026-11-11"",""cards"":[{""id"":""APP-INSTANCE-MATCH"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case APP-INSTANCE-MATCH:member engine:owned_by"",""case APP-INSTANCE-MATCH:member engine:managed_by"",""case APP-INSTANCE-MATCH:member engine:name"",""case APP-INSTANCE-MATCH:index tool:managed_by"",""case APP-INSTANCE-MATCH:index tool:description"",""case APP-INSTANCE-MATCH:index tool:name""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-PROCUREMENT"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft"",""case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber"",""case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired"",""case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-NOT-IN-SOLUSI"",""light"":""red"",""tested"":true,""cis"":4,""open"":[""case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record"",""case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record"",""case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record"",""case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-SN-FIX"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CONTRACT-SN-FIX:contract:ct000003:endPassed""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-STATUS"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case CONTRACT-STATUS:contract:ct000002:status"",""case CONTRACT-STATUS:contract:ct000004:status"",""case CONTRACT-STATUS:contract:ct000005:status""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-TO-CLEAR"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CONTRACT-TO-CLEAR:contract:ct000002:end"",""case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-UPLOAD"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case CONTRACT-UPLOAD:contract:ct000005:vendor"",""case CONTRACT-UPLOAD:contract:ct000006:end"",""case CONTRACT-UPLOAD:contract:ct000007:record""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CRIT-ABOVE-PARENT"",""light"":""review"",""tested"":true,""cis"":1,""open"":[],""review"":[""case CRIT-ABOVE-PARENT:member engine - prod:integrity""],""waiting"":[],""known"":[]},{""id"":""CRIT-AUTO-JUSTIFICATION"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CRIT-NO-JUSTIFICATION"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CRIT-NO-JUSTIFICATION:index tool:confidentiality""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CRIT-NONE-REACHES"",""light"":""review"",""tested"":true,""cis"":1,""open"":[],""review"":[""case CRIT-NONE-REACHES:event engine:target""],""waiting"":[""case CRIT-NONE-REACHES:event gateway - prod:target""],""known"":[""case CRIT-NONE-REACHES:event desk:target""]},{""id"":""CRIT-TARGET-MISSING"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""DESC-QUALITY"",""light"":""red"",""tested"":true,""cis"":4,""open"":[""case DESC-QUALITY:reconcile index:description"",""case DESC-QUALITY:members:description"",""case DESC-QUALITY:members - standard:description"",""case DESC-QUALITY:close the month:description""],""review"":[],""waiting"":[],""known"":[]},{""id"":""EPO-DIFF"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case EPO-DIFF:member engine - prod:managed_by"",""case EPO-DIFF:index tool - prod:description""],""review"":[],""waiting"":[],""known"":[]},{""id"":""EPO-ID"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""EPO-NOT-ARRIVED"",""light"":""review"",""tested"":true,""cis"":1,""open"":[],""review"":[""case EPO-NOT-ARRIVED:event gateway - prod:description""],""waiting"":[],""known"":[]},{""id"":""LIFECYCLE-REVIEW"",""light"":""grey"",""tested"":false,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""MAPPING"",""light"":""red"",""tested"":true,""cis"":4,""open"":[""case MAPPING:fines hub - prod:mapping"",""case MAPPING:event engine:mapping"",""case MAPPING:event desk:mapping"",""case MAPPING:event gateway - prod:mapping""],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-DUPLICATE"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case NAME-DUPLICATE:fines hub - prod:name"",""case NAME-DUPLICATE:manage fines|ast-0013:name"",""case NAME-DUPLICATE:manage fines|ast-0014:name""],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-FORMAT"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-HIDDEN-CHAR"",""light"":""grey"",""tested"":false,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-STANDARD"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case NAME-STANDARD:members:bs-suffix""],""review"":[],""waiting"":[],""known"":[]},{""id"":""OFFERING-OWNER"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""OFFERING-PARENT"",""light"":""grey"",""tested"":false,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""PROCESS-STAGE"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""READY-TOO-LONG"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-MISSING"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case REL-MISSING:manage fines|ast-0013:bc-below"",""case REL-MISSING:manage fines|ast-0014:bc-below""],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-ONE-TO-ONE"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-TWICE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case REL-TWICE:members:twice:members>provides::providedby>members - standard""],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-WRONG-TYPE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool""],""review"":[],""waiting"":[],""known"":[]},{""id"":""RESP-INACTIVE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case RESP-INACTIVE:reconcile index:owned_by""],""review"":[],""waiting"":[""case RESP-INACTIVE:member engine - prod:managed_by""],""known"":[]},{""id"":""RESP-MISSING"",""light"":""red"",""tested"":true,""cis"":6,""open"":[""case RESP-MISSING:manage member records:owned_by"",""case RESP-MISSING:manage fines|ast-0013:owned_by"",""case RESP-MISSING:manage fines|ast-0014:owned_by"",""case RESP-MISSING:members:managed_by"",""case RESP-MISSING:manage fines|ast-0013:managed_by"",""case RESP-MISSING:manage fines|ast-0014:managed_by"",""case RESP-MISSING:close the month:managed_by"",""case RESP-MISSING:event gateway - prod:managed_by""],""review"":[],""waiting"":[],""known"":[]},{""id"":""RESP-SAME-PERSON"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case RESP-SAME-PERSON:register a new member:owned_by""],""review"":[],""waiting"":[],""known"":[]},{""id"":""SUPPORT-GROUP-INACTIVE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group""],""review"":[],""waiting"":[],""known"":[]},{""id"":""SUPPORT-GROUP-MISSING"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case SUPPORT-GROUP-MISSING:members - standard:support_group"",""case SUPPORT-GROUP-MISSING:fines hub - prod:support_group""],""review"":[],""waiting"":[],""known"":[]},{""id"":""SUPPORTED-BY"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case SUPPORTED-BY:member engine - test:supported_by"",""case SUPPORTED-BY:index tool - prod:supported_by"",""case SUPPORTED-BY:members - standard:supported_by""],""review"":[],""waiting"":[],""known"":[]},{""id"":""TAG-MISSING"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case TAG-MISSING:reconcile index:tags""],""review"":[],""waiting"":[],""known"":[]},{""id"":""TAG-STATUS-CONFLICT"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case TAG-STATUS-CONFLICT:fines hub - prod:tags""],""review"":[],""waiting"":[],""known"":[]},{""id"":""UNDER-RETIREMENT-LONG"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]}]}"
+	queryGroup: Packed
+
+/// GENERATED from the calculated tables (D290). The type of every column of HistoryRun that a part gives, for fnHistoryRun.
+expression HistoryRunColumnTypes =
+		{
+		    {"History.ReportDate", type nullable date},
+		    {"History.Key", type nullable text},
+		    {"History.CheckId", type nullable text},
+		    {"History.CiKey", type nullable text},
+		    {"History.CiName", type nullable text},
+		    {"History.Class", type nullable text},
+		    {"History.ClassLabel", type nullable text},
+		    {"History.Field", type nullable text},
+		    {"History.State", type nullable text},
+		    {"History.SupportGroup", type nullable text},
+		    {"History.ContactName", type nullable text},
+		    {"HistoryChecked.ReportDate", type nullable date},
+		    {"HistoryChecked.Kind", type nullable text},
+		    {"HistoryChecked.Id", type nullable text},
+		    {"HistoryNotes.CheckId", type nullable text},
+		    {"HistoryNotes.ReportDate", type nullable date},
+		    {"HistoryNotes.Reason", type nullable text},
+		    {"HistoryNotes.Order", Int64.Type},
+		    {"HistoryTested.CheckId", type nullable text},
+		    {"HistoryTested.Part", type nullable text},
+		    {"HistoryTested.ReportDate", type nullable date},
+		    {"HistoryTested.Evaluated", Int64.Type},
+		    {"Runs.ReportDate", type nullable date},
+		    {"Runs.FileName", type nullable text},
+		    {"Runs.CIs", Int64.Type},
+		    {"Runs.RelationshipFile", type nullable text},
+		    {"Runs.EpoFile", type nullable text},
+		    {"Runs.SolusiFile", type nullable text},
+		    {"Runs.ContractFile", type nullable text}
+		}
 	queryGroup: Packed
 
 /// GENERATED from the check files and the reference files (tools/powerbi/regex.ts, D285). For each pattern of Patterns, the fast form that decides most texts without the walk (fnFastMatch).
@@ -52,6 +103,53 @@ expression RunColumnTypes =
 		    {"CapabilitySheet.ManagedBy", type nullable text},
 		    {"CapabilitySheet.HiddenCharacters", type nullable text},
 		    {"CapabilitySheet.Order", Int64.Type},
+		    {"CaseLines.Key", type nullable text},
+		    {"CaseLines.CheckId", type nullable text},
+		    {"CaseLines.CiKey", type nullable text},
+		    {"CaseLines.CiName", type nullable text},
+		    {"CaseLines.ClassLabel", type nullable text},
+		    {"CaseLines.Field", type nullable text},
+		    {"CaseLines.ContactName", type nullable text},
+		    {"CaseLines.InLatest", type nullable logical},
+		    {"CaseLines.Untested", type nullable logical},
+		    {"CaseLines.CiMissing", type nullable logical},
+		    {"CaseLines.State", type nullable text},
+		    {"CaseLines.StateLabel", type nullable text},
+		    {"CaseLines.Status", type nullable text},
+		    {"CaseLines.StatusLabel", type nullable text},
+		    {"CaseLines.AssignedTo", type nullable text},
+		    {"CaseLines.HandoverNote", type nullable text},
+		    {"CaseLines.Request", type nullable text},
+		    {"CaseLines.Messages", Int64.Type},
+		    {"CaseLines.SentOn", type nullable date},
+		    {"CaseLines.LastMessageTo", type nullable text},
+		    {"CaseLines.LastRef", type nullable text},
+		    {"CaseLines.ReminderFrom", type nullable date},
+		    {"CaseLines.Remind", type nullable text},
+		    {"CaseLines.Replies", Int64.Type},
+		    {"CaseLines.LastReplyOn", type nullable date},
+		    {"CaseLines.ExceptionReason", type nullable text},
+		    {"CaseLines.ReviewOn", type nullable date},
+		    {"CaseLines.ExceptionEnded", type nullable date},
+		    {"CaseLines.RetireOn", type nullable date},
+		    {"CaseLines.VerifiedOn", type nullable date},
+		    {"CaseLines.FixedBy", type nullable text},
+		    {"CaseLines.FixedOn", type nullable date},
+		    {"CaseLines.Events", Int64.Type},
+		    {"Exceptions.Target", type nullable text},
+		    {"Exceptions.CheckId", type nullable text},
+		    {"Exceptions.CiKey", type nullable text},
+		    {"Exceptions.CiName", type nullable text},
+		    {"Exceptions.Reason", type nullable text},
+		    {"Exceptions.Note", type nullable text},
+		    {"Exceptions.ReviewOn", type nullable date},
+		    {"Exceptions.ByName", type nullable text},
+		    {"Exceptions.At", type nullable datetime},
+		    {"Exceptions.State", type nullable text},
+		    {"Exceptions.StateLabel", type nullable text},
+		    {"Exceptions.Standing", type nullable logical},
+		    {"Exceptions.Legacy", type nullable logical},
+		    {"Exceptions.Order", Int64.Type},
 		    {"Findings.ReportDate", type nullable date},
 		    {"Findings.Key", type nullable text},
 		    {"Findings.CheckId", type nullable text},
@@ -131,6 +229,16 @@ expression RunColumnTypes =
 		    {"RelationshipLinks.Counts", type nullable text},
 		    {"RelationshipLinks.Excluded", type nullable text},
 		    {"RelationshipLinks.Order", Int64.Type},
+		    {"RepliesToRead.File", type nullable text},
+		    {"RepliesToRead.Ref", type nullable text},
+		    {"RepliesToRead.From", type nullable text},
+		    {"RepliesToRead.Received", type nullable datetime},
+		    {"RepliesToRead.FirstLine", type nullable text},
+		    {"RepliesToRead.Cases", Int64.Type},
+		    {"RepliesToRead.CIs", Int64.Type},
+		    {"RepliesToRead.AssignedTo", type nullable text},
+		    {"RepliesToRead.Checks", type nullable text},
+		    {"RepliesToRead.Daily", type nullable logical},
 		    {"SelfCheck.CheckId", type nullable text},
 		    {"SelfCheck.ExpectedState", type nullable text},
 		    {"SelfCheck.ExpectedTested", type nullable logical},
@@ -163,6 +271,8 @@ expression SampleDate = #date(2026, 11, 11)
 /// GENERATED from samples/ by npm run powerbi:generate. The invented sample reports, as their bytes in base64, with the name they would have in the SharePoint folder.
 expression SampleFiles =
 		#table(type table [FileName = text, Base64 = text], {
+			{"2026-11-04_cmdb_ci-sample-earlier.csv", "bmFtZSxzeXNfY2xhc3NfbmFtZSxhc3NldF90YWcsb3BlcmF0aW9uYWxfc3RhdHVzLHNob3J0X2Rlc2NyaXB0aW9uLG93bmVkX2J5LG93bmVkX2J5LnVzZXJfbmFtZSxvd25lZF9ieS5lbWFpbCxvd25lZF9ieS5hY3RpdmUsb3duZWRfYnkubWFuYWdlcixvd25lZF9ieS5tYW5hZ2VyLmVtYWlsLG93bmVkX2J5Lm1hbmFnZXIuYWN0aXZlLG93bmVkX2J5LmRlcGFydG1lbnQuZGVwdF9oZWFkLG93bmVkX2J5LmRlcGFydG1lbnQuZGVwdF9oZWFkLmVtYWlsLG1hbmFnZWRfYnksbWFuYWdlZF9ieS51c2VyX25hbWUsbWFuYWdlZF9ieS5lbWFpbCxtYW5hZ2VkX2J5LmFjdGl2ZSxzdXBwb3J0X2dyb3VwLHN5c190YWdzLHJlZl9jbWRiX2NpX3NlcnZpY2UudV9zZXJ2aWNlX21hcHBlZCx4X2RlbW9fY3JpdF9pbmhlcml0ZWRfY29uZmlkZW50aWFsaXR5LHhfZGVtb19jcml0X2luaGVyaXRlZF9pbnRlZ3JpdHkseF9kZW1vX2NyaXRfaW5oZXJpdGVkX2F2YWlsYWJpbGl0eSx4X2RlbW9fY3JpdF9pbmhlcml0ZWRfYXV0aGVudGljaXR5LHhfZGVtb19jcml0X3RhcmdldF9jb25maWRlbnRpYWxpdHkseF9kZW1vX2NyaXRfdGFyZ2V0X2ludGVncml0eSx4X2RlbW9fY3JpdF90YXJnZXRfYXZhaWxhYmlsaXR5LHhfZGVtb19jcml0X3RhcmdldF9hdXRoZW50aWNpdHkseF9kZW1vX2NyaXRfZXhjZXB0aW9uX3N0YXR1cyx4X2RlbW9fY3JpdF9qdXN0aWZpY2F0aW9uX2Zvcl9leGNlcHRpb24sc3VwcG9ydF9ncm91cC5hY3RpdmUsc3lzX2NyZWF0ZWRfb24sc3lzX2NyZWF0ZWRfYnksc3lzX3VwZGF0ZWRfb24sc3VwcG9ydGVkX2J5LHN1cHBvcnRlZF9ieS51c2VyX25hbWUsc3VwcG9ydGVkX2J5LmVtYWlsLHN1cHBvcnRlZF9ieS5hY3RpdmUKTWFuYWdlIE1lbWJlciBSZWNvcmRzLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMDEsMSxDYXBhYmlsaXR5IHRvIHJlZ2lzdGVyIGFuZCBtYWludGFpbiBsaWJyYXJ5IG1lbWJlcnMsLCwsRkFMU0UsLCwsLCxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFLCwsRkFMU0UsLCwsLCwsLCxOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFClJlZ2lzdGVyIGEgTmV3IE1lbWJlcixCdXNpbmVzcyBQcm9jZXNzLEFTVC0wMDAyLDEsU3RlcHMgZnJvbSBhIHZpc2l0b3IgcmVxdWVzdCB0byBhbiBhY3RpdmUgbWVtYmVyc2hpcCwsLCxGQUxTRSwsLCwsLEFkYSBFeGFtcGxlLGFkYTAxLGFkYUBleGFtcGxlLmNvbSxUUlVFLCxDdXN0b21lci1mYWNpbmcgcHJvY2VzcyxGQUxTRSwsLCwsNCwzLDMsMyxOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFClJlY29uY2lsZSBJbmRleCxCdXNpbmVzcyBQcm9jZXNzLEFTVC0wMDAzLDEsVEJELEJvIExlYXZlcixibzAxLGJvQGV4YW1wbGUuY29tLEZBTFNFLE1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxUUlVFLEhhbmEgSGVhZCxoYW5hQGV4YW1wbGUuY29tLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUsLCxGQUxTRSwsLCwsMywzLDIsMixOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCk1lbWJlciBFbmdpbmUsQnVzaW5lc3MgQXBwbGljYXRpb24sQVNULTAwMDQsMSxDb3JlIGFwcGxpY2F0aW9uIHRoYXQga2VlcHMgbWVtYmVycyBhbmQgdGhlaXIgYm9va2luZ3MsLCwsRkFMU0UsLCwsLCxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFLENvcmUgVGVhbSwsRkFMU0UsNCwzLDMsMyw0LDMsMywzLE5vdCByZXF1aXJlZCwsdHJ1ZSwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCkluZGV4IFRvb2wsQnVzaW5lc3MgQXBwbGljYXRpb24sQVNULTAwMDUsMSxJbmRleCBUb29sLERlZSBPd25lcixkZWUwMSxkZWVAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSwsLCxGQUxTRSxGaW5hbmNlIFRlYW0sLEZBTFNFLDMsMywyLDIsMiwzLDIsMixSZXF1aXJlZCwsdHJ1ZSwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCk1lbWJlciBFbmdpbmUgLSBQUk9ELFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDYsMSxQcm9kdWN0aW9uIGluc3RhbmNlIG9mIHRoZSBtZW1iZXIgZW5naW5lLERlZSBPd25lcixkZWUwMSxkZWVAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSxCbyBMZWF2ZXIsYm8wMSxib0BleGFtcGxlLmNvbSxGQUxTRSxDb3JlIFRlYW0sLFRSVUUsNCwzLDMsMyw0LDQsMiwzLFJlcXVpcmVkLEF2YWlsYWJpbGl0eSAtIEluaGVyaXRlZCB2YWx1ZSBpbmNyZWFzZWQgKEF1dG8gZ2VuZXJhdGVkKSx0cnVlLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRQpNZW1iZXIgRW5naW5lIC0gVEVTVCxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDA3LDEsVGVzdCBpbnN0YW5jZSBvZiB0aGUgbWVtYmVyIGVuZ2luZSxEZWUgT3duZXIsZGVlMDEsZGVlQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRSxDb3JlIFRlYW0sVG8gYmUgZGVsZXRlZCxUUlVFLDQsMywzLDMsMywzLDEsMyxBcHByb3ZlZCwiQXZhaWxhYmlsaXR5IC0gQ0kgaXMgbm9uLXByb2R1Y3Rpb24sIENvbmZpZGVudGlhbGl0eSAtIENJIGlzIGZvciB0ZW1wb3JhcnkgaW50ZXJuYWwgdXNlIG9ubHkiLHRydWUsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFCkluZGV4IFRvb2wgLSBQUk9ELFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDgsMSxQcm9kdWN0aW9uIGluc3RhbmNlIG9mIHRoZSBpbmRleCB0b29sLERlZSBPd25lcixkZWUwMSxkZWVAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFLEluZGV4IE9wZXJhdGlvbnMsRGVzY29wZWQsVFJVRSwyLDMsMiwyLDMsMywyLDIsTm90IHJlcXVpcmVkLCxmYWxzZSwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLEJvIExlYXZlcixibzAxLGJvQGV4YW1wbGUuY29tLEZBTFNFCk9sZCBSZWNlaXB0IFByaW50ZXIsU2VydmljZSBJbnN0YW5jZSxBU1QtMDAwOSw2LCwsLCxGQUxTRSwsLCwsLCwsLEZBTFNFLCwsRkFMU0UsLCwsLCwsLCwsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCk1lbWJlcnMsQnVzaW5lc3MgU2VydmljZSxBU1QtMDAxMCwxLHRiZCxBZGEgRXhhbXBsZSxhZGEwMSxhZGFAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSwsLCxGQUxTRSwsLEZBTFNFLCwsLCwzLDMsMywzLE5vdCByZXF1aXJlZCwsLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsLCwsRkFMU0UKTWVtYmVycyAtIFN0YW5kYXJkLFNlcnZpY2UgT2ZmZXJpbmcsQVNULTAwMTEsMSxuL2EsQWRhIEV4YW1wbGUsYWRhMDEsYWRhQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRSwsLEZBTFNFLCwsLCwsLCwsTm90IHJlcXVpcmVkLCwsMjAyNC0wMS0xNSAwOTowMDowMCxlcG8uc3luYywyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCkZpbmVzICBIdWIgLSBQUk9ELFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMTIsMSxQcm9kdWN0aW9uIGluc3RhbmNlIG9mIHRoZSBmaW5lcyBodWIsRGVlIE93bmVyLGRlZTAxLGRlZUBleGFtcGxlLmNvbSxUUlVFLE1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxUUlVFLEhhbmEgSGVhZCxoYW5hQGV4YW1wbGUuY29tLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUsLFRvIGJlIGRlbGV0ZWQsVFJVRSwzLDMsMywzLDMsMywzLDMsTm90IHJlcXVpcmVkLCwsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFCk1hbmFnZSBGaW5lcyxCdXNpbmVzcyBDYXBhYmlsaXR5LEFTVC0wMDEzLDEsQ2FwYWJpbGl0eSB0byB0YWtlIGFuZCByZWZ1bmQgbWVtYmVyIGZpbmVzLCwsLEZBTFNFLCwsLCwsLCwsRkFMU0UsLCxGQUxTRSwsLCwsLCwsLE5vdCByZXF1aXJlZCwsLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsLCwsRkFMU0UKTWFuYWdlIEZpbmVzLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMTQsMSxDYXBhYmlsaXR5IHRvIG1vdmUgZmluZXMgYmV0d2VlbiBtZW1iZXIgcmVjb3JkcywsLCxGQUxTRSwsLCwsLCwsLEZBTFNFLCwsRkFMU0UsLCwsLCwsLCxOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCk1hbmFnZSBFdmVudHMsQnVzaW5lc3MgQ2FwYWJpbGl0eSxBU1QtMDAxNSw1LENhcGFiaWxpdHkgdG8gcGxhbiBhbmQgcnVuIGxpYnJhcnkgZXZlbnRzLCwsLEZBTFNFLCwsLCwsLCwsRkFMU0UsLCxGQUxTRSwsLCwsLCwsLE5vdCByZXF1aXJlZCwsLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsLCwsRkFMU0UKRXZlbnQgRW5naW5lLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDE2LDEsQXBwbGljYXRpb24gdGhhdCBib29rcyBhbmQgcHJpbnRzIGV2ZW50IHRpY2tldHMsRGVlIE93bmVyLGRlZTAxLGRlZUBleGFtcGxlLmNvbSxUUlVFLE1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxUUlVFLEhhbmEgSGVhZCxoYW5hQGV4YW1wbGUuY29tLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUsQ29yZSBUZWFtLCxGQUxTRSwsLCwsLCwsLE5vdCByZXF1aXJlZCwsdHJ1ZSwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCkV2ZW50IERlc2ssQnVzaW5lc3MgQXBwbGljYXRpb24sQVNULTAwMTcsMSxBcHBsaWNhdGlvbiB1c2VkIGJ5IHN0YWZmIHRvIHByZXBhcmUgYW5kIGZvbGxvdyBldmVudCBib29raW5ncyxEZWUgT3duZXIsZGVlMDEsZGVlQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRSxGaW5hbmNlIFRlYW0sQklBIGlzIHBlbmRpbmcsRkFMU0UsLCwsLCwsLCxOb3QgcmVxdWlyZWQsLHRydWUsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpFdmVudCBHYXRld2F5IC0gUFJPRCxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDIwLDEsUHJvZHVjdGlvbiBpbnN0YW5jZSBvZiB0aGUgZXZlbnQgZ2F0ZXdheSxEZWUgT3duZXIsZGVlMDEsZGVlQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRSxDb3JlIFRlYW0sLEZBTFNFLDMsMywzLDMsLCwsLE5vdCByZXF1aXJlZCwsdHJ1ZSwyMDI0LTAzLTAxIDA5OjAwOjAwLGFkYSwyMDI2LTExLTA1IDE0OjMwOjAwLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUKQ2xvc2UgdGhlIE1vbnRoLEJ1c2luZXNzIFByb2Nlc3MsQVNULTAwMjEsMSxTdGVwcyB0byBjbG9zZSB0aGUgYm9va3MgYXQgdGhlIGVuZCBvZiBlYWNoIG1vbnRoLERlZSBPd25lcixkZWUwMSxkZWVAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSwsLCxGQUxTRSxGaW5hbmNlIFRlYW0sSW50ZXJuYWwgQlAsRkFMU0UsLCwsLDMsMywyLDIsTm90IHJlcXVpcmVkLCx0cnVlLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsLCwsRkFMU0UK"},
+			{"2026-11-04_cmdb_rel_ci-sample-earlier.csv", "UGFyZW50LFR5cGUsQ2hpbGQsQ29ubmVjdGlvbiBzdHJlbmd0aCxVcGRhdGVkLENyZWF0ZWQsQ3JlYXRlZCBieSxFeGNsdWRlZCBmb3IgY2FsY3VsYXRpb24sUGVyY2VudCBvdXRhZ2UsUG9ydCxUYWdzLFVwZGF0ZWQgYnksVXBkYXRlcyxDbGFzcyxBc3NldCB0YWcsQ2xhc3MsQXNzZXQgdGFnCk1hbmFnZSBNZW1iZXIgUmVjb3JkcyxQcm92aWRlZCBieTo6UHJvdmlkZXMsUmVnaXN0ZXIgYSBOZXcgTWVtYmVyLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMDEsQnVzaW5lc3MgUHJvY2VzcyxBU1QtMDAwMgpNYW5hZ2UgTWVtYmVyIFJlY29yZHMsUHJvdmlkZWQgYnk6OlByb3ZpZGVzLFJlY29uY2lsZSBJbmRleCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxCdXNpbmVzcyBDYXBhYmlsaXR5LEFTVC0wMDAxLEJ1c2luZXNzIFByb2Nlc3MsQVNULTAwMDMKUmVnaXN0ZXIgYSBOZXcgTWVtYmVyLFByb3ZpZGVkIGJ5OjpQcm92aWRlcyxNZW1iZXIgRW5naW5lLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIFByb2Nlc3MsQVNULTAwMDIsQnVzaW5lc3MgQXBwbGljYXRpb24sQVNULTAwMDQKUmVjb25jaWxlIEluZGV4LERlcGVuZHMgb246OlVzZWQgYnksSW5kZXggVG9vbCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxCdXNpbmVzcyBQcm9jZXNzLEFTVC0wMDAzLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA1Ck1lbWJlciBFbmdpbmUsQ29uc3VtZXM6OkNvbnN1bWVkIGJ5LE1lbWJlciBFbmdpbmUgLSBQUk9ELEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA0LFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDYKTWVtYmVyIEVuZ2luZSxDb25zdW1lczo6Q29uc3VtZWQgYnksTWVtYmVyIEVuZ2luZSAtIFRFU1QsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgQXBwbGljYXRpb24sQVNULTAwMDQsU2VydmljZSBJbnN0YW5jZSxBU1QtMDAwNwpJbmRleCBUb29sLENvbnN1bWVzOjpDb25zdW1lZCBieSxJbmRleCBUb29sIC0gUFJPRCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcix0cnVlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA1LFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDgKUmVnaXN0ZXIgYSBOZXcgTWVtYmVyLFByb3ZpZGVkIGJ5OjpQcm92aWRlcyxNZW1iZXJzLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIFByb2Nlc3MsQVNULTAwMDIsQnVzaW5lc3MgU2VydmljZSxBU1QtMDAxMApNZW1iZXJzLFByb3ZpZGVzOjpQcm92aWRlZCBieSxNZW1iZXJzIC0gU3RhbmRhcmQsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgU2VydmljZSxBU1QtMDAxMCxTZXJ2aWNlIE9mZmVyaW5nLEFTVC0wMDExCk1lbWJlcnMsUHJvdmlkZXM6OlByb3ZpZGVkIGJ5LE1lbWJlcnMgLSBTdGFuZGFyZCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxCdXNpbmVzcyBTZXJ2aWNlLEFTVC0wMDEwLFNlcnZpY2UgT2ZmZXJpbmcsQVNULTAwMTEKTWVtYmVycyAtIFN0YW5kYXJkLERlcGVuZHMgb246OlVzZWQgYnksTWVtYmVyIEVuZ2luZSAtIFBST0QsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsU2VydmljZSBPZmZlcmluZyxBU1QtMDAxMSxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDA2CkluZGV4IFRvb2wgLSBQUk9ELERlcGVuZHMgb246OlVzZWQgYnksT2xkIFJlY2VpcHQgUHJpbnRlcixBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDA4LFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDkKTWFuYWdlIEZpbmVzLENvbnRhaW5zOjpDb250YWluZWQgYnksRmluZXMgIEh1YiAtIFBST0QsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgQ2FwYWJpbGl0eSxBU1QtMDAxMyxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDEyCk1hbmFnZSBNZW1iZXIgUmVjb3JkcyxQcm92aWRlZCBieTo6UHJvdmlkZXMsQ2xvc2UgdGhlIE1vbnRoLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMDEsQnVzaW5lc3MgUHJvY2VzcyxBU1QtMDAyMQpDbG9zZSB0aGUgTW9udGgsUHJvdmlkZWQgYnk6OlByb3ZpZGVzLEluZGV4IFRvb2wsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgUHJvY2VzcyxBU1QtMDAyMSxCdXNpbmVzcyBBcHBsaWNhdGlvbixBU1QtMDAwNQo="},
 			{"2026-11-04_solusi-contracts-sample-earlier.csv", "Q09OVFJBQ1RfTk8sQ09OVFJBQ1RfU1RBVFVTLFBBUlRORVJfTkFNRSxDT05UUkFDVF9OQU1FLENPTlRSQUNUX1RZUEUsUEFSVE5FUl9OTyxDT05UUkFDVF9DQVRFR09SWSxDT05UUkFDVF9TVEFSVCxDT05UUkFDVF9FTkQsTUFQX0RVUkFUSU9OX1RZUEUsQ0xNX0NPTlRSQUNUX09XTkVSLENMTV9DT05UUkFDVF9EQUlMWV9SRVNQT05TSUJMRSxDTE1fQ09OVFJBQ1RfU1VQUE9SVEVSLFZFTkRPUl9BQ0NPVU5UX05PLENMTV9DT05UUkFDVF9FUE9fSUQKQ29udHJhY3QgTm8uLFN0YXR1cyxDb21wYW55IG5hbWUsTmFtZSxDb250cmFjdCB0eXBlLENvbXBhbnkgbm8uLENhdGVnb3J5LENvbnRyYWN0IHN0YXJ0LENvbnRyYWN0IGVuZCxEdXJhdGlvbiB0eXBlLENvbnRyYWN0IE93bmVyLERhaWx5IHJlc3BvbnNpYmxlLFByb2N1cmVtZW50IFBhcnRuZXIsVmVuZG9yIGFjY291bnQgbm8sRVBPIElECkNUMDAwMDAxLFMgLSBDb25jbHVkZWQsRXhhbXBsZSBTb2Z0d2FyZSBMdGQsRXhhbXBsZSBTb2Z0d2FyZSAtIGxpY2VuY2UgYWdyZWVtZW50LE1haW4gYWdyZWVtZW50LFYwMDAxLFNvZnR3YXJlLDIwMjMtMDEtMDEsMjA5OS0xMi0zMSxPcGVuLWVuZGVkLElhbiBJbmFjdGl2ZSxEYW5hIERhaWx5LFBhdCBQYXJ0bmVyLDEwMDAxLEFTVC0wMDA2CkNUMDAwMDAyLFMgLSBDb25jbHVkZWQsRXhhbXBsZSBDb25zdWx0aW5nIEx0ZCxFeGFtcGxlIENvbnN1bHRpbmcgLSBmcmFtZXdvcmsgYWdyZWVtZW50LE1haW4gYWdyZWVtZW50LCxDb25zdWx0YW50cywyMDIyLTA1LTAxLCxPcGVuLWVuZGVkLE9sZ2EgT3duZXIsLFBhdCBQYXJ0bmVyLDEwMDAyLApDVDAwMDAwMyxTIC0gQ29uY2x1ZGVkLEV4YW1wbGUgRGF0YSBMdGQsRXhhbXBsZSBEYXRhIC0gZGF0YSBmZWVkLE1haW4gYWdyZWVtZW50LFYwMDAzLERhdGEgZmVlZCwyMDIxLTAzLTAxLDIwMjUtMTItMzEsRml4ZWQtdGVybSxJYW4gSW5hY3RpdmUsRGFuYSBEYWlseSxQYXQgUGFydG5lciwxMDAwMyxBU1QtMDAwOQpDVDAwMDAwNCxTIC0gQ29uY2x1ZGVkLEV4YW1wbGUgSG9zdGluZyBMdGQsRXhhbXBsZSBIb3N0aW5nIC0gaG9zdGluZyBhZ3JlZW1lbnQsTWFpbiBhZ3JlZW1lbnQsVjAwMDQsT3V0c291cmNpbmcsMjAxOS0wMS0wMSwyMDI1LTA2LTMwLEZpeGVkLXRlcm0sT2xnYSBPd25lcixEYW5hIERhaWx5LFBhdCBQYXJ0bmVyLDEwMDA0LApDVDAwMDAwNSxTIC0gQ29uY2x1ZGVkLEV4YW1wbGUgTmV0d29yayBMdGQsRXhhbXBsZSBOZXR3b3JrIC0gY29ubmVjdGl2aXR5LE1haW4gYWdyZWVtZW50LFYwMDA1LENvbm5lY3Rpdml0eSBhZ3JlZW1lbnQsMjAyNC0wMi0wMSwyMDI2LTAxLTMxLEZpeGVkLXRlcm0sT2xnYSBPd25lcixEYW5hIERhaWx5LFBhdCBQYXJ0bmVyLCw5OTk5CkNUMDAwMDA4LEUgLSBFbmRlZCxFeGFtcGxlIENvdXJpZXIgTHRkLEV4YW1wbGUgQ291cmllciAtIGRlbGl2ZXJ5IGFncmVlbWVudCxNYWluIGFncmVlbWVudCxWMDAwOCxMb2dpc3RpY3MsMjAyMC0wMS0wMSwyMDI2LTEwLTMxLEZpeGVkLXRlcm0sT2xnYSBPd25lcixEYW5hIERhaWx5LFBhdCBQYXJ0bmVyLDEwMDA4LApDVDAwMDAwNyxOIC0gSW4gbmVnb3RpYXRpb24sRXhhbXBsZSBDbG91ZCBMdGQsRXhhbXBsZSBDbG91ZCAtIG5ldyBwbGF0Zm9ybSxNYWluIGFncmVlbWVudCxWMDAwNyxTb2Z0d2FyZSwyMDI2LTEyLTAxLCxGaXhlZC10ZXJtLE9sZ2EgT3duZXIsRGFuYSBEYWlseSxQYXQgUGFydG5lciwxMDAwNywK"},
 			{"2026-11-11_cmdb_ci-sample.csv", "bmFtZSxzeXNfY2xhc3NfbmFtZSxhc3NldF90YWcsb3BlcmF0aW9uYWxfc3RhdHVzLHNob3J0X2Rlc2NyaXB0aW9uLG93bmVkX2J5LG93bmVkX2J5LnVzZXJfbmFtZSxvd25lZF9ieS5lbWFpbCxvd25lZF9ieS5hY3RpdmUsb3duZWRfYnkubWFuYWdlcixvd25lZF9ieS5tYW5hZ2VyLmVtYWlsLG93bmVkX2J5Lm1hbmFnZXIuYWN0aXZlLG93bmVkX2J5LmRlcGFydG1lbnQuZGVwdF9oZWFkLG93bmVkX2J5LmRlcGFydG1lbnQuZGVwdF9oZWFkLmVtYWlsLG1hbmFnZWRfYnksbWFuYWdlZF9ieS51c2VyX25hbWUsbWFuYWdlZF9ieS5lbWFpbCxtYW5hZ2VkX2J5LmFjdGl2ZSxzdXBwb3J0X2dyb3VwLHN5c190YWdzLHJlZl9jbWRiX2NpX3NlcnZpY2UudV9zZXJ2aWNlX21hcHBlZCx4X2RlbW9fY3JpdF9pbmhlcml0ZWRfY29uZmlkZW50aWFsaXR5LHhfZGVtb19jcml0X2luaGVyaXRlZF9pbnRlZ3JpdHkseF9kZW1vX2NyaXRfaW5oZXJpdGVkX2F2YWlsYWJpbGl0eSx4X2RlbW9fY3JpdF9pbmhlcml0ZWRfYXV0aGVudGljaXR5LHhfZGVtb19jcml0X3RhcmdldF9jb25maWRlbnRpYWxpdHkseF9kZW1vX2NyaXRfdGFyZ2V0X2ludGVncml0eSx4X2RlbW9fY3JpdF90YXJnZXRfYXZhaWxhYmlsaXR5LHhfZGVtb19jcml0X3RhcmdldF9hdXRoZW50aWNpdHkseF9kZW1vX2NyaXRfZXhjZXB0aW9uX3N0YXR1cyx4X2RlbW9fY3JpdF9qdXN0aWZpY2F0aW9uX2Zvcl9leGNlcHRpb24sc3VwcG9ydF9ncm91cC5hY3RpdmUsc3lzX2NyZWF0ZWRfb24sc3lzX2NyZWF0ZWRfYnksc3lzX3VwZGF0ZWRfb24sc3VwcG9ydGVkX2J5LHN1cHBvcnRlZF9ieS51c2VyX25hbWUsc3VwcG9ydGVkX2J5LmVtYWlsLHN1cHBvcnRlZF9ieS5hY3RpdmUKTWFuYWdlIE1lbWJlciBSZWNvcmRzLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMDEsMSxDYXBhYmlsaXR5IHRvIHJlZ2lzdGVyIGFuZCBtYWludGFpbiBsaWJyYXJ5IG1lbWJlcnMsLCwsRkFMU0UsLCwsLCxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFLCwsRkFMU0UsLCwsLCwsLCxOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFClJlZ2lzdGVyIGEgTmV3IE1lbWJlcixCdXNpbmVzcyBQcm9jZXNzLEFTVC0wMDAyLDEsU3RlcHMgZnJvbSBhIHZpc2l0b3IgcmVxdWVzdCB0byBhbiBhY3RpdmUgbWVtYmVyc2hpcCxBZGEgRXhhbXBsZSxhZGEwMSxhZGFAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSxBZGEgRXhhbXBsZSxhZGEwMSxhZGFAZXhhbXBsZS5jb20sVFJVRSwsQ3VzdG9tZXItZmFjaW5nIHByb2Nlc3MsRkFMU0UsLCwsLDQsMywzLDMsTm90IHJlcXVpcmVkLCwsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpSZWNvbmNpbGUgSW5kZXgsQnVzaW5lc3MgUHJvY2VzcyxBU1QtMDAwMywxLFRCRCxCbyBMZWF2ZXIsYm8wMSxib0BleGFtcGxlLmNvbSxGQUxTRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFLCwsRkFMU0UsLCwsLDMsMywyLDIsTm90IHJlcXVpcmVkLCwsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpNZW1iZXIgRW5naW5lLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA0LDEsQ29yZSBhcHBsaWNhdGlvbiB0aGF0IGtlZXBzIG1lbWJlcnMgYW5kIHRoZWlyIGJvb2tpbmdzLCwsLEZBTFNFLCwsLCwsQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRSxDb3JlIFRlYW0sLEZBTFNFLDQsMywzLDMsNCwzLDMsMyxOb3QgcmVxdWlyZWQsLHRydWUsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpJbmRleCBUb29sLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA1LDEsSW5kZXggVG9vbCxEZWUgT3duZXIsZGVlMDEsZGVlQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sLCwsRkFMU0UsRmluYW5jZSBUZWFtLCxGQUxTRSwzLDMsMiwyLDIsMywyLDIsUmVxdWlyZWQsLHRydWUsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpNZW1iZXIgRW5naW5lIC0gUFJPRCxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDA2LDEsUHJvZHVjdGlvbiBpbnN0YW5jZSBvZiB0aGUgbWVtYmVyIGVuZ2luZSxEZWUgT3duZXIsZGVlMDEsZGVlQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sQm8gTGVhdmVyLGJvMDEsYm9AZXhhbXBsZS5jb20sRkFMU0UsQ29yZSBUZWFtLCxUUlVFLDQsMywzLDMsNCw0LDIsMyxSZXF1aXJlZCxBdmFpbGFiaWxpdHkgLSBJbmhlcml0ZWQgdmFsdWUgaW5jcmVhc2VkIChBdXRvIGdlbmVyYXRlZCksdHJ1ZSwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUKTWVtYmVyIEVuZ2luZSAtIFRFU1QsU2VydmljZSBJbnN0YW5jZSxBU1QtMDAwNywxLFRlc3QgaW5zdGFuY2Ugb2YgdGhlIG1lbWJlciBlbmdpbmUsRGVlIE93bmVyLGRlZTAxLGRlZUBleGFtcGxlLmNvbSxUUlVFLE1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxUUlVFLEhhbmEgSGVhZCxoYW5hQGV4YW1wbGUuY29tLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUsQ29yZSBUZWFtLCxUUlVFLDQsMywzLDMsMywzLDEsMyxBcHByb3ZlZCwiQXZhaWxhYmlsaXR5IC0gQ0kgaXMgbm9uLXByb2R1Y3Rpb24sIENvbmZpZGVudGlhbGl0eSAtIENJIGlzIGZvciB0ZW1wb3JhcnkgaW50ZXJuYWwgdXNlIG9ubHkiLHRydWUsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpJbmRleCBUb29sIC0gUFJPRCxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDA4LDEsUHJvZHVjdGlvbiBpbnN0YW5jZSBvZiB0aGUgaW5kZXggdG9vbCxEZWUgT3duZXIsZGVlMDEsZGVlQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRSxJbmRleCBPcGVyYXRpb25zLERlc2NvcGVkLFRSVUUsMiwzLDIsMiwzLDMsMiwyLE5vdCByZXF1aXJlZCwsZmFsc2UsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCxCbyBMZWF2ZXIsYm8wMSxib0BleGFtcGxlLmNvbSxGQUxTRQpPbGQgUmVjZWlwdCBQcmludGVyLFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDksNiwsLCwsRkFMU0UsLCwsLCwsLCxGQUxTRSwsLEZBTFNFLCwsLCwsLCwsLCwsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpNZW1iZXJzLEJ1c2luZXNzIFNlcnZpY2UsQVNULTAwMTAsMSx0YmQsQWRhIEV4YW1wbGUsYWRhMDEsYWRhQGV4YW1wbGUuY29tLFRSVUUsTWF4IE1hbmFnZXIsbWF4QGV4YW1wbGUuY29tLFRSVUUsSGFuYSBIZWFkLGhhbmFAZXhhbXBsZS5jb20sLCwsRkFMU0UsLCxGQUxTRSwsLCwsMywzLDMsMyxOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCk1lbWJlcnMgLSBTdGFuZGFyZCxTZXJ2aWNlIE9mZmVyaW5nLEFTVC0wMDExLDEsbi9hLEFkYSBFeGFtcGxlLGFkYTAxLGFkYUBleGFtcGxlLmNvbSxUUlVFLE1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxUUlVFLEhhbmEgSGVhZCxoYW5hQGV4YW1wbGUuY29tLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUsLCxGQUxTRSwsLCwsLCwsLE5vdCByZXF1aXJlZCwsLDIwMjQtMDEtMTUgMDk6MDA6MDAsZXBvLnN5bmMsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpGaW5lcyAgSHViIC0gUFJPRCxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDEyLDEsUHJvZHVjdGlvbiBpbnN0YW5jZSBvZiB0aGUgZmluZXMgaHViLERlZSBPd25lcixkZWUwMSxkZWVAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFLCxUbyBiZSBkZWxldGVkLFRSVUUsMywzLDMsMywzLDMsMywzLE5vdCByZXF1aXJlZCwsLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsQ3kgS2VlcGVyLGN5MDEsY3lAZXhhbXBsZS5jb20sVFJVRQpNYW5hZ2UgRmluZXMsQnVzaW5lc3MgQ2FwYWJpbGl0eSxBU1QtMDAxMywxLENhcGFiaWxpdHkgdG8gdGFrZSBhbmQgcmVmdW5kIG1lbWJlciBmaW5lcywsLCxGQUxTRSwsLCwsLCwsLEZBTFNFLCwsRkFMU0UsLCwsLCwsLCxOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCk1hbmFnZSBGaW5lcyxCdXNpbmVzcyBDYXBhYmlsaXR5LEFTVC0wMDE0LDEsQ2FwYWJpbGl0eSB0byBtb3ZlIGZpbmVzIGJldHdlZW4gbWVtYmVyIHJlY29yZHMsLCwsRkFMU0UsLCwsLCwsLCxGQUxTRSwsLEZBTFNFLCwsLCwsLCwsTm90IHJlcXVpcmVkLCwsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpNYW5hZ2UgRXZlbnRzLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMTUsNSxDYXBhYmlsaXR5IHRvIHBsYW4gYW5kIHJ1biBsaWJyYXJ5IGV2ZW50cywsLCxGQUxTRSwsLCwsLCwsLEZBTFNFLCwsRkFMU0UsLCwsLCwsLCxOb3QgcmVxdWlyZWQsLCwyMDI0LTAxLTE1IDA5OjAwOjAwLGFkYSwyMDI2LTEwLTAxIDE0OjMwOjAwLCwsLEZBTFNFCkV2ZW50IEVuZ2luZSxCdXNpbmVzcyBBcHBsaWNhdGlvbixBU1QtMDAxNiwxLEFwcGxpY2F0aW9uIHRoYXQgYm9va3MgYW5kIHByaW50cyBldmVudCB0aWNrZXRzLERlZSBPd25lcixkZWUwMSxkZWVAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFLENvcmUgVGVhbSwsRkFMU0UsLCwsLCwsLCxOb3QgcmVxdWlyZWQsLHRydWUsMjAyNC0wMS0xNSAwOTowMDowMCxhZGEsMjAyNi0xMC0wMSAxNDozMDowMCwsLCxGQUxTRQpFdmVudCBEZXNrLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDE3LDEsQXBwbGljYXRpb24gdXNlZCBieSBzdGFmZiB0byBwcmVwYXJlIGFuZCBmb2xsb3cgZXZlbnQgYm9va2luZ3MsRGVlIE93bmVyLGRlZTAxLGRlZUBleGFtcGxlLmNvbSxUUlVFLE1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxUUlVFLEhhbmEgSGVhZCxoYW5hQGV4YW1wbGUuY29tLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUsRmluYW5jZSBUZWFtLEJJQSBpcyBwZW5kaW5nLEZBTFNFLCwsLCwsLCwsTm90IHJlcXVpcmVkLCx0cnVlLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsLCwsRkFMU0UKRXZlbnQgR2F0ZXdheSAtIFBST0QsU2VydmljZSBJbnN0YW5jZSxBU1QtMDAyMCwxLFByb2R1Y3Rpb24gaW5zdGFuY2Ugb2YgdGhlIGV2ZW50IGdhdGV3YXksRGVlIE93bmVyLGRlZTAxLGRlZUBleGFtcGxlLmNvbSxUUlVFLE1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxUUlVFLEhhbmEgSGVhZCxoYW5hQGV4YW1wbGUuY29tLEN5IEtlZXBlcixjeTAxLGN5QGV4YW1wbGUuY29tLFRSVUUsQ29yZSBUZWFtLCxGQUxTRSwzLDMsMywzLCwsLCxOb3QgcmVxdWlyZWQsLHRydWUsMjAyNC0wMy0wMSAwOTowMDowMCxhZGEsMjAyNi0xMS0wNSAxNDozMDowMCxDeSBLZWVwZXIsY3kwMSxjeUBleGFtcGxlLmNvbSxUUlVFCkNsb3NlIHRoZSBNb250aCxCdXNpbmVzcyBQcm9jZXNzLEFTVC0wMDIxLDEsQ2xvc2UgdGhlIE1vbnRoLERlZSBPd25lcixkZWUwMSxkZWVAZXhhbXBsZS5jb20sVFJVRSxNYXggTWFuYWdlcixtYXhAZXhhbXBsZS5jb20sVFJVRSxIYW5hIEhlYWQsaGFuYUBleGFtcGxlLmNvbSwsLCxGQUxTRSxGaW5hbmNlIFRlYW0sSW50ZXJuYWwgQlAsRkFMU0UsLCwsLDMsMywyLDIsTm90IHJlcXVpcmVkLCx0cnVlLDIwMjQtMDEtMTUgMDk6MDA6MDAsYWRhLDIwMjYtMTAtMDEgMTQ6MzA6MDAsLCwsRkFMU0UK"},
 			{"2026-11-11_cmdb_rel_ci-sample.csv", "UGFyZW50LFR5cGUsQ2hpbGQsQ29ubmVjdGlvbiBzdHJlbmd0aCxVcGRhdGVkLENyZWF0ZWQsQ3JlYXRlZCBieSxFeGNsdWRlZCBmb3IgY2FsY3VsYXRpb24sUGVyY2VudCBvdXRhZ2UsUG9ydCxUYWdzLFVwZGF0ZWQgYnksVXBkYXRlcyxDbGFzcyxBc3NldCB0YWcsQ2xhc3MsQXNzZXQgdGFnCk1hbmFnZSBNZW1iZXIgUmVjb3JkcyxQcm92aWRlZCBieTo6UHJvdmlkZXMsUmVnaXN0ZXIgYSBOZXcgTWVtYmVyLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMDEsQnVzaW5lc3MgUHJvY2VzcyxBU1QtMDAwMgpNYW5hZ2UgTWVtYmVyIFJlY29yZHMsUHJvdmlkZWQgYnk6OlByb3ZpZGVzLFJlY29uY2lsZSBJbmRleCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxCdXNpbmVzcyBDYXBhYmlsaXR5LEFTVC0wMDAxLEJ1c2luZXNzIFByb2Nlc3MsQVNULTAwMDMKUmVnaXN0ZXIgYSBOZXcgTWVtYmVyLFByb3ZpZGVkIGJ5OjpQcm92aWRlcyxNZW1iZXIgRW5naW5lLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIFByb2Nlc3MsQVNULTAwMDIsQnVzaW5lc3MgQXBwbGljYXRpb24sQVNULTAwMDQKUmVjb25jaWxlIEluZGV4LERlcGVuZHMgb246OlVzZWQgYnksSW5kZXggVG9vbCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxCdXNpbmVzcyBQcm9jZXNzLEFTVC0wMDAzLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA1Ck1lbWJlciBFbmdpbmUsQ29uc3VtZXM6OkNvbnN1bWVkIGJ5LE1lbWJlciBFbmdpbmUgLSBQUk9ELEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA0LFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDYKTWVtYmVyIEVuZ2luZSxDb25zdW1lczo6Q29uc3VtZWQgYnksTWVtYmVyIEVuZ2luZSAtIFRFU1QsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgQXBwbGljYXRpb24sQVNULTAwMDQsU2VydmljZSBJbnN0YW5jZSxBU1QtMDAwNwpJbmRleCBUb29sLENvbnN1bWVzOjpDb25zdW1lZCBieSxJbmRleCBUb29sIC0gUFJPRCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcix0cnVlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIEFwcGxpY2F0aW9uLEFTVC0wMDA1LFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDgKUmVnaXN0ZXIgYSBOZXcgTWVtYmVyLFByb3ZpZGVkIGJ5OjpQcm92aWRlcyxNZW1iZXJzLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIFByb2Nlc3MsQVNULTAwMDIsQnVzaW5lc3MgU2VydmljZSxBU1QtMDAxMApNZW1iZXJzLFByb3ZpZGVzOjpQcm92aWRlZCBieSxNZW1iZXJzIC0gU3RhbmRhcmQsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgU2VydmljZSxBU1QtMDAxMCxTZXJ2aWNlIE9mZmVyaW5nLEFTVC0wMDExCk1lbWJlcnMsUHJvdmlkZXM6OlByb3ZpZGVkIGJ5LE1lbWJlcnMgLSBTdGFuZGFyZCxBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxCdXNpbmVzcyBTZXJ2aWNlLEFTVC0wMDEwLFNlcnZpY2UgT2ZmZXJpbmcsQVNULTAwMTEKTWVtYmVycyAtIFN0YW5kYXJkLERlcGVuZHMgb246OlVzZWQgYnksTWVtYmVyIEVuZ2luZSAtIFBST0QsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsU2VydmljZSBPZmZlcmluZyxBU1QtMDAxMSxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDA2CkluZGV4IFRvb2wgLSBQUk9ELERlcGVuZHMgb246OlVzZWQgYnksT2xkIFJlY2VpcHQgUHJpbnRlcixBbHdheXMsMjAyNi0xMC0wMSAwOTowMDowMCwyMDI2LTEwLTAxIDA5OjAwOjAwLGRlbW8udXNlcixmYWxzZSwsLCxkZW1vLnVzZXIsMCxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDA4LFNlcnZpY2UgSW5zdGFuY2UsQVNULTAwMDkKTWFuYWdlIEZpbmVzLENvbnRhaW5zOjpDb250YWluZWQgYnksRmluZXMgIEh1YiAtIFBST0QsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgQ2FwYWJpbGl0eSxBU1QtMDAxMyxTZXJ2aWNlIEluc3RhbmNlLEFTVC0wMDEyCk1hbmFnZSBNZW1iZXIgUmVjb3JkcyxQcm92aWRlZCBieTo6UHJvdmlkZXMsQ2xvc2UgdGhlIE1vbnRoLEFsd2F5cywyMDI2LTEwLTAxIDA5OjAwOjAwLDIwMjYtMTAtMDEgMDk6MDA6MDAsZGVtby51c2VyLGZhbHNlLCwsLGRlbW8udXNlciwwLEJ1c2luZXNzIENhcGFiaWxpdHksQVNULTAwMDEsQnVzaW5lc3MgUHJvY2VzcyxBU1QtMDAyMQpDbG9zZSB0aGUgTW9udGgsUHJvdmlkZWQgYnk6OlByb3ZpZGVzLEluZGV4IFRvb2wsQWx3YXlzLDIwMjYtMTAtMDEgMDk6MDA6MDAsMjAyNi0xMC0wMSAwOTowMDowMCxkZW1vLnVzZXIsZmFsc2UsLCwsZGVtby51c2VyLDAsQnVzaW5lc3MgUHJvY2VzcyxBU1QtMDAyMSxCdXNpbmVzcyBBcHBsaWNhdGlvbixBU1QtMDAwNQo="},
@@ -172,12 +282,52 @@ expression SampleFiles =
 		})
 	queryGroup: Packed
 
+/// GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.
+expression SettingRanges = Json.Document("{""reminderDays"":{""min"":1,""max"":30,""default"":3},""maxReminders"":{""min"":0,""max"":10,""default"":2},""staleDays"":{""min"":1,""max"":60,""default"":3},""exceptionMonths"":{""min"":1,""max"":36,""default"":6},""underRetirementDays"":{""min"":1,""max"":730,""default"":90},""readyDays"":{""min"":1,""max"":730,""default"":90}}")
+	queryGroup: Packed
+
+/// GENERATED from powerbi/samples/state/. The invented lists of the team's state (journal, replies, settings, team, reviews), as their bytes in base64, read when StateMode is Sample (D291).
+expression StateFiles =
+		#table(type table [FileName = text, Base64 = text], {
+			{"journal.csv", "VGl0bGUsQXQsQnksQnlOYW1lLFR5cGUsS2V5cyxUZXh0LFJlZixUbyxDYyxTdWJqZWN0LEtpbmQsQ2hhbm5lbCxQZXJzb24sUmVhc29uLFJldmlld09uLFJldGlyZU9uLENoZWNrSWQsQ2lLZXksQ2lOYW1lCkowMDAxLDIwMjYtMTAtMjZUMDk6MzA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiREVTQy1RVUFMSVRZOm1lbWJlcnM6ZGVzY3JpcHRpb24KUkVTUC1NSVNTSU5HOm1lbWJlcnM6bWFuYWdlZF9ieQpOQU1FLVNUQU5EQVJEOm1lbWJlcnM6YnMtc3VmZml4IiwyMDI2LTEwLTI2X1NBQ00tRUY1NkdILmVtbCxTQUNNLUVGNTZHSCxhZGFAZXhhbXBsZS5jb20sLE1lbWJlcnM6IDMgcG9pbnRzIHRvIGZpeCBbU0FDTS1FRjU2R0hdLGZpcnN0LG1haWxib3gsLCwsLCwsCkowMDAyLDIwMjYtMTAtMzBUMTA6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiREVTQy1RVUFMSVRZOm1lbWJlcnM6ZGVzY3JpcHRpb24KUkVTUC1NSVNTSU5HOm1lbWJlcnM6bWFuYWdlZF9ieQpOQU1FLVNUQU5EQVJEOm1lbWJlcnM6YnMtc3VmZml4IiwyMDI2LTEwLTMwX1NBQ00tRUY1NkdILmVtbCxTQUNNLUVGNTZHSCxhZGFAZXhhbXBsZS5jb20sLFN0aWxsIG9wZW46IE1lbWJlcnMgW1NBQ00tRUY1NkdIXSxyZW1pbmRlcixtYWlsYm94LCwsLCwsLApKMDAwMywyMDI2LTExLTAyVDExOjE1OjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxtZXNzYWdlLFRBRy1TVEFUVVMtQ09ORkxJQ1Q6bWVtYmVyIGVuZ2luZSAtIHRlc3Q6dGFncywsU0FDTS1HSDc4SUosY3lAZXhhbXBsZS5jb20sLE1lbWJlciBFbmdpbmUgLSBURVNUOiB0YWdzIHRvIGNoZWNrIFtTQUNNLUdINzhJSl0sZmlyc3Qsb3V0bG9vaywsLCwsLCwKSjAwMDQsMjAyNi0xMS0wNFQwOTowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxtZXNzYWdlLCJERVNDLVFVQUxJVFk6bWVtYmVyczpkZXNjcmlwdGlvbgpSRVNQLU1JU1NJTkc6bWVtYmVyczptYW5hZ2VkX2J5Ck5BTUUtU1RBTkRBUkQ6bWVtYmVyczpicy1zdWZmaXgiLDIwMjYtMTEtMDRfU0FDTS1FRjU2R0guZW1sLFNBQ00tRUY1NkdILGFkYUBleGFtcGxlLmNvbSwsU3RpbGwgb3BlbjogTWVtYmVycyBbU0FDTS1FRjU2R0hdLHJlbWluZGVyLG1haWxib3gsLCwsLCwsCkowMDA1LDIwMjYtMTEtMDVUMTA6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiQ1JJVC1BVVRPLUpVU1RJRklDQVRJT046bWVtYmVyIGVuZ2luZSAtIHByb2Q6YXZhaWxhYmlsaXR5CkNSSVQtTk8tSlVTVElGSUNBVElPTjppbmRleCB0b29sOmNvbmZpZGVudGlhbGl0eSIsMjAyNi0xMS0wNV9TQUNNLUFCMTJDRC5lbWwsU0FDTS1BQjEyQ0QsZGVlQGV4YW1wbGUuY29tLCxDcml0aWNhbGl0eTogMiBqdXN0aWZpY2F0aW9ucyB0byB3cml0ZSBbU0FDTS1BQjEyQ0RdLGZpcnN0LG1haWxib3gsLCwsLCwsCkowMDA2LDIwMjYtMTEtMDVUMTA6MDU6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiU1VQUE9SVC1HUk9VUC1NSVNTSU5HOm1lbWJlcnMgLSBzdGFuZGFyZDpzdXBwb3J0X2dyb3VwClNVUFBPUlRFRC1CWTptZW1iZXJzIC0gc3RhbmRhcmQ6c3VwcG9ydGVkX2J5IiwyMDI2LTExLTA1X1NBQ00tQ0QzNEVGLmVtbCxTQUNNLUNEMzRFRixjeUBleGFtcGxlLmNvbSwsTWVtYmVycyAtIFN0YW5kYXJkOiAyIHBvaW50cyB0byBmaXggW1NBQ00tQ0QzNEVGXSxmaXJzdCxtYWlsYm94LCwsLCwsLApKMDAwNywyMDI2LTExLTA2VDA4OjQwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLHN0YXR1cyxSRVNQLU1JU1NJTkc6cmVnaXN0ZXIgYSBuZXcgbWVtYmVyOm93bmVkX2J5LEZpeGVkLCwsLCwsLCwsLCwsLApKMDAwOCwyMDI2LTExLTA2VDA5OjEwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxzdGF0dXMsIlNVUFBPUlRFRC1CWTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0ZWRfYnkKU1VQUE9SVC1HUk9VUC1JTkFDVElWRTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0X2dyb3VwIixGaXggaW4gcHJvZ3Jlc3MsLCwsLCwsLCwsLCwsCkowMDA5LDIwMjYtMTEtMDZUMDk6MTE6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLHJlcXVlc3QsIlNVUFBPUlRFRC1CWTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0ZWRfYnkKU1VQUE9SVC1HUk9VUC1JTkFDVElWRTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0X2dyb3VwIixSSVRNMDAwMTIzNCwsLCwsLCwsLCwsLCwKSjAwMTAsMjAyNi0xMS0wOVQxNDowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxzdGF0dXMsUkVTUC1NSVNTSU5HOm1hbmFnZSBtZW1iZXIgcmVjb3Jkczpvd25lZF9ieSxGaXhlZCwsLCwsLCwsLCwsLCwKSjAwMTEsMjAyNi0xMS0wOVQxNDozMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsZXhjZXB0aW9uLFRBRy1NSVNTSU5HOnJlY29uY2lsZSBpbmRleDp0YWdzLFRoZSBvd25lciBrZWVwcyBpdCB1bnRpbCB0aGUgbmV4dCByZXZpZXcsLCwsLCwsLEFncmVlZCB3aXRoIHRoZSBvd25lciwyMDI3LTA1LTEwLCwsLApKMDAxMiwyMDI2LTA1LTA4VDEwOjAwOjAwLG1heEBleGFtcGxlLmNvbSxNYXggTWFuYWdlcixleGNlcHRpb24sUkVTUC1JTkFDVElWRTpyZWNvbmNpbGUgaW5kZXg6b3duZWRfYnksVGhlIG93bmVyIGxlYXZlcyBpbiBhdXR1bW4sLCwsLCwsLEFncmVlZCB3aXRoIHRoZSBvd25lciwyMDI2LTExLTEwLCwsLApKMDAxMywyMDI2LTExLTA5VDE1OjAwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxleGNlcHRpb24sLFR3byByZWNvcmRzIG9uIHB1cnBvc2UgdW50aWwgdGhlIG1vdmUsLCwsLCwsLER1cGxpY2F0ZSByZWNvcmQsMjAyNy0wMS0zMSwsTkFNRS1EVVBMSUNBVEUsbWFuYWdlIGZpbmVzLE1hbmFnZSBGaW5lcwpKMDAxNCwyMDI2LTExLTEwVDA4OjMwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLGFzc2lnbiwiTUFQUElORzpldmVudCBlbmdpbmU6bWFwcGluZwpNQVBQSU5HOmV2ZW50IGRlc2s6bWFwcGluZyIsU2FtIEV4YW1wbGUsLCwsLCwsLCwsLCwsCkowMDE1LDIwMjYtMTEtMTBUMDg6NDU6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLGhhbmRvdmVyLCJERVNDLVFVQUxJVFk6cmVjb25jaWxlIGluZGV4OmRlc2NyaXB0aW9uCkRFU0MtUVVBTElUWTpjbG9zZSB0aGUgbW9udGg6ZGVzY3JpcHRpb24iLEJhY2sgZnJvbSBob2xpZGF5OiBwbGVhc2UgdGFrZSB0aGVzZSB0d28sLEFsZXggRXhhbXBsZSwsLCwsLCwsLCwsCkowMDE2LDIwMjYtMTEtMTBUMDk6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUscmV0aXJlbWVudCxTVVBQT1JURUQtQlk6bWVtYmVyIGVuZ2luZSAtIHRlc3Q6c3VwcG9ydGVkX2J5LFRoZSBvd25lciByZXRpcmVzIGl0IGF0IHRoZSBlbmQgb2YgdGhlIHllYXIsLCwsLCwsLCwsMjAyNi0xMi0zMSwsLApKMDAxNywyMDI2LTExLTEwVDA5OjIwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxyZXZpZXdlZCxDUklULUFCT1ZFLVBBUkVOVDptZW1iZXIgZW5naW5lIC0gcHJvZDppbnRlZ3JpdHksQXNrIHRoZSBvd25lciwsLCwsLCwsLCwsLCwKSjAwMTgsMjAyNi0xMS0xMFQxMTowMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsbWVzc2FnZSxNQVBQSU5HOmV2ZW50IGdhdGV3YXkgLSBwcm9kOm1hcHBpbmcsLFNBQ00tSks5MExNLERlZSBPd25lciwsRXZlbnQgR2F0ZXdheSAtIFBST0Q6IG1hcHBpbmcgc2Vzc2lvbixmaXJzdCx0ZWFtcywsLCwsLCwKSjAwMTksMjAyNi0xMS0xMFQxMTozMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxwZXJzb24tbm90ZSwsUHJlZmVycyBhIFRlYW1zIGNoYXQgdG8gYW4gZW1haWwsLCwsLCwsY3kwMSwsLCwsLApKMDAyMCwyMDI2LTExLTExVDA4OjA1OjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLG5vdGUsUkVTUC1NSVNTSU5HOmNsb3NlIHRoZSBtb250aDptYW5hZ2VkX2J5LEFza2VkIHRoZSBQcm9jZXNzIE1hbmFnZW1lbnQgdGVhbSBpbiB0aGUgd2Vla2x5IG1lZXRpbmcsLCwsLCwsLCwsLCwsCg=="},
+			{"replies.csv", "VGl0bGUsRnJvbSxSZWNlaXZlZCxTdWJqZWN0LEJvZHkKU0FDTS1FRjU2R0gsYWRhQGV4YW1wbGUuY29tLDIwMjYtMTAtMjdUMDk6MDA6MDAsUkU6IE1lbWJlcnM6IDMgcG9pbnRzIHRvIGZpeCBbU0FDTS1FRjU2R0hdLEkgYW0gb24gaG9saWRheSB1bnRpbCAzIE5vdmVtYmVyLgpTQUNNLUFCMTJDRCxkZWVAZXhhbXBsZS5jb20sMjAyNi0xMS0wNlQxNDowMDowMCxSRTogQ3JpdGljYWxpdHk6IDIganVzdGlmaWNhdGlvbnMgdG8gd3JpdGUgW1NBQ00tQUIxMkNEXSwiSSB3aWxsIHdyaXRlIGJvdGgganVzdGlmaWNhdGlvbnMgdGhpcyB3ZWVrLgpEZWUiClNBQ00tWlowMFpaLHNvbWVvbmVAZXhhbXBsZS5jb20sMjAyNi0xMS0wOVQxNjoyMDowMCxSRTogQW4gb2xkIG1lc3NhZ2UgW1NBQ00tWlowMFpaXSxJcyB0aGlzIHN0aWxsIG5lZWRlZD8K"},
+			{"settings.csv", "VGl0bGUsVmFsdWUKcmVtaW5kZXJEYXlzLDMKbWF4UmVtaW5kZXJzLDk5Cg=="},
+			{"team.csv", "VGl0bGUsRW1haWwsQWN0aXZlCkFsZXggRXhhbXBsZSxhbGV4QGV4YW1wbGUuY29tLFllcwpTYW0gRXhhbXBsZSxzYW1AZXhhbXBsZS5jb20sWWVzCk1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxObwo="},
+			{"reviews.csv", "UmV2aWV3RGF0ZSxDaUtleSxDaU5hbWUsQ2xhc3MsU3RhdHVzSW5FcG8sQW5zd2VyLE5vdGUsQnksQXQKMjAyNi0xMS0wMixldmVudCBkZXNrLEV2ZW50IERlc2ssYnVzaW5lc3NfYXBwbGljYXRpb24sS8O4cmVuZGUsc2FtZSwsU2FtIEV4YW1wbGUsMjAyNi0xMS0wMlQxMzowMDowMAoyMDI2LTExLTAyLGZpbmVzIGh1YiAtIHByb2QsRmluZXMgSHViIC0gUFJPRCxzZXJ2aWNlX2luc3RhbmNlLE5lZGxhZ3QsZGlmZmVyZW50LEVQTyBzYXlzIHJldGlyZWQ7IFNlcnZpY2VOb3cgc2F5cyBvcGVyYXRpb25hbCxTYW0gRXhhbXBsZSwyMDI2LTExLTAyVDEzOjEwOjAwCg=="}
+		})
+	queryGroup: Packed
+
+/// GENERATED from tools/powerbi/history.ts (D291). The five lists of the team's state: the name of the SharePoint list, the sample file and the columns.
+expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"",""file"":""journal.csv"",""columns"":[""Title"",""At"",""By"",""ByName"",""Type"",""Keys"",""Text"",""Ref"",""To"",""Cc"",""Subject"",""Kind"",""Channel"",""Person"",""Reason"",""ReviewOn"",""RetireOn"",""CheckId"",""CiKey"",""CiName""]},""replies"":{""list"":""SACM Replies"",""file"":""replies.csv"",""columns"":[""Title"",""From"",""Received"",""Subject"",""Body""]},""settings"":{""list"":""SACM Settings"",""file"":""settings.csv"",""columns"":[""Title"",""Value""]},""team"":{""list"":""SACM Team"",""file"":""team.csv"",""columns"":[""Title"",""Email"",""Active""]},""reviews"":{""list"":""SACM Reviews"",""file"":""reviews.csv"",""columns"":[""ReviewDate"",""CiKey"",""CiName"",""Class"",""StatusInEpo"",""Answer"",""Note"",""By"",""At""]}}")
+	queryGroup: Packed
+
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.41.0"
+expression WorkbenchVersion = "0.42.0"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
 expression AsciiCharacters = List.Buffer(List.Transform(List.Numbers(0, 128), Character.FromNumber))
+	queryGroup: Reading
+
+/// The rules of the cases from the list SACM Settings (D158, D291): the working days before a reminder is due and how many reminders before an escalation. A value that is not a whole number in its range (SettingRanges) is not used: the default is, as the app does.
+expression CaseRules =
+		let
+		    rows = Table.ToRecords(fnStateList("settings")),
+		    value = (key as text) as number =>
+		        let
+		            range = Record.Field(SettingRanges, key),
+		            found = List.First(List.Select(rows, (row) => row[Title] = key), null),
+		            raw = if found = null then "" else Text.Trim(found[Value]),
+		            digits = if Text.StartsWith(raw, "-") then Text.Middle(raw, 1) else raw,
+		            number = if digits <> "" and Text.Remove(digits, {"0".."9"}) = "" then Number.FromText(raw, "en-US") else null
+		        in
+		            if number <> null and number >= range[min] and number <= range[max] then number else range[default]
+		in
+		    [ReminderDays = value("reminderDays"), MaxReminders = value("maxReminders")]
+	queryGroup: Reading
+
+/// The day the cases are worked out for (an exception that ends, a planned retirement date): the day the samples were recorded in Sample mode, else the day of the refresh. What depends on today between two refreshes (a reminder due, a report too old) is DAX, with the measure Today.
+expression CaseToday = if SourceMode = "Sample" then SampleDate else DateTime.Date(DateTime.LocalNow())
 	queryGroup: Reading
 
 /// A report with no header and no row: the readers turn it into an empty table with all their columns.
@@ -186,6 +336,14 @@ expression EmptyRead =
 		    sheet = [Name = "", RawHeaders = {}, Headers = {}, Rows = #table({}, {})]
 		in
 		    [Format = "", Sheets = {sheet}, Headers = {}, RawHeaders = {}, Rows = sheet[Rows]]
+	queryGroup: Reading
+
+/// A date plus a number of working days, Monday to Friday (src/core/shared/dates.ts, addBusinessDays): Friday plus 1 is Monday. When a reminder is due (D39).
+expression fnAddBusinessDays =
+		(start as date, days as number) as date =>
+		    List.Accumulate(List.Numbers(1, days), start, (day, step) =>
+		        let next = Date.AddDays(day, 1), weekday = Date.DayOfWeek(next, Day.Monday) in
+		        if weekday >= 5 then Date.AddDays(next, 7 - weekday) else next)
 	queryGroup: Reading
 
 /// A class as label or table name, as its class id ("Application Service" and cmdb_ci_service_auto are service_instance). Anything else keeps its own name in lower case with "_" for spaces (src/core/sources/ci/ci-report.ts, canonicalClass).
@@ -232,6 +390,124 @@ expression fnCapabilitySheetPart =
 
 /// The text with its first character in upper case (as the details of a finding are shown).
 expression fnCapital = (value as text) as text => Text.Upper(Text.Start(value, 1), "en-US") & Text.Middle(value, 1)
+	queryGroup: Reading
+
+/// The part CaseLines of the table Run (D292), which the DAX table CaseLines shows: one line per case of the newest report (fnCases), with its status (StatusLabel: the word the pages show, "Asked" for Contacted), how it is listed, who has it, the messages, the replies, the decision to stop following it, who marked it fixed and when, and when the newest report verified it. `cases` is fnCases(CheckRun).
+expression fnCaseLinesPart =
+		(cases as list) as table =>
+		    #table(
+		        type table [Key = text, CheckId = text, CiKey = text, CiName = text, ClassLabel = text, Field = text, ContactName = text,
+		            InLatest = logical, Untested = logical, CiMissing = logical, State = text, StateLabel = text, Status = text, StatusLabel = text,
+		            AssignedTo = text, HandoverNote = text, Request = text, Messages = Int64.Type, SentOn = date, LastMessageTo = text, LastRef = text,
+		            ReminderFrom = date, Remind = text, Replies = Int64.Type, LastReplyOn = date, ExceptionReason = text, ReviewOn = date,
+		            ExceptionEnded = date, RetireOn = date, VerifiedOn = date, FixedBy = text, FixedOn = date, Events = Int64.Type],
+		        List.Transform(cases, (item) => {
+		            item[Key], item[CheckId], item[CiKey], item[CiName], item[ClassLabel], item[Field], item[ContactName], item[InLatest], item[Untested], item[CiMissing],
+		            item[State], item[StateLabel], item[Status], item[StatusLabel], item[AssignedTo], item[HandoverNote], item[Request], item[Messages], item[SentOn], item[LastMessageTo],
+		            item[LastRef], item[ReminderFrom], item[Remind], List.Count(item[Replies]), item[LastReplyOn], item[ExceptionReason], item[ReviewOn],
+		            item[ExceptionEnded], item[RetireOn], item[VerifiedOn], item[FixedBy], item[FixedOn], item[Events]}))
+	queryGroup: Reading
+
+/// The cases of the newest report (D292), as the app works out its cases (src/core/cases/cases.ts, buildCases), from the findings of the newest report, the journal and the replies. A case is every finding of the newest report that is not parked, and every key the journal names that the newest report no longer shows (the team worked on it). Status (DOMAIN-RULES §17): New, Contacted, Answered (a reply after the last message), Fix in progress, Fixed, Not followed up (until its review date), Verified (the newest report contains the CI, tested the check and no longer shows the finding). State: how the case is listed, from the finding (a planned retirement date after today makes it wait; "Ask the owner" makes a finding to check one to solve); "" for a key the newest report no longer shows. Remind: "reminder" or "escalation" once ReminderFrom comes, for a case that was asked and did not answer (D39, D40); the measures compare ReminderFrom with today, so it is right between two refreshes. Every message counts as sent on the day it was recorded (the outbox is the app's, D162). `run` is CheckRun (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run.
+expression fnCases =
+		(run as nullable record) as list =>
+		    let
+		        facts = if run = null then {} else run[Facts],
+		        events = JournalEvents,
+		        rules = CaseRules,
+		        today = Date.ToText(CaseToday, [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		        date = if run = null then null else run[Date],
+		        parkedCis = if run = null or run[Parked] = null then [] else run[Parked][KeySet],
+		        parkedFields = if run = null or run[Parked] = null then [] else run[Parked][FieldSet],
+		        current = fnKeySet(List.Transform(facts, (fact) => fact[Key])),
+		        reportCis = fnKeySet(if run = null then {} else List.Transform(run[Cis], (ci) => ci[Key])),
+		        tested = fnKeySet(if run = null then {} else run[Tested]),
+		        // The events of each key, oldest first; the standing exceptions (no keys, for a check and a CI by name, D86).
+		        pairs = List.Combine(List.Transform(events, (event) => List.Transform(event[Keys], (key) => [Key = key, Event = event]))),
+		        byKey = fnGroupBy(pairs, (pair) => pair[Key]),
+		        eventsOf = (key as text) as list => List.Transform(Record.FieldOrDefault(byKey, key, {}), (pair) => pair[Event]),
+		        standing = List.Buffer(List.Select(events, (event) => event[Type] = "exception" and List.IsEmpty(event[Keys]) and event[CiKey] <> "")),
+		        covers = (event as record, checkId as text, ciKey as text) as logical =>
+		            (event[CheckId] = "*" or event[CheckId] = checkId)
+		            and (ciKey = event[CiKey] or Text.StartsWith(ciKey, event[CiKey] & "|") or Text.StartsWith(ciKey, event[CiKey] & "#")),
+		        order = (a as record, b as record) as number => let first = Value.Compare(a[At], b[At]) in if first <> 0 then first else Value.Compare(a[Id], b[Id]),
+		        repliesByRef = fnGroupBy(ReplyItems, (reply) => reply[Ref]),
+		        // Parts of a key: <check>:<CI key>:<field>; a CI key may hold ":" (a contract), a check id and a field never do.
+		        partsOf = (key as text) as record =>
+		            let first = Text.PositionOf(key, ":"), last = Text.PositionOf(key, ":", Occurrence.Last) in
+		            [CheckId = Text.Start(key, first), CiKey = Text.Middle(key, first + 1, last - first - 1), Field = Text.Middle(key, last + 1)],
+		        gone = List.Select(Record.FieldNames(byKey), (key) => not Record.HasFields(current, key) and Text.PositionOf(key, ":") >= 0
+		            and Text.PositionOf(key, ":") < Text.PositionOf(key, ":", Occurrence.Last)),
+		        goneFacts = List.Transform(gone, (key) => let parts = partsOf(key) in parts & [Key = key, CiName = parts[CiKey], ClassLabel = "", ContactName = "", ContactEmail = "", State = null]),
+		        subjects = List.Select(List.Transform(facts, (fact) => fact & [InLatest = true]) & List.Transform(goneFacts, (fact) => fact & [InLatest = false]),
+		            (fact) => not Record.HasFields(parkedCis, fact[CiKey]) and not Record.HasFields(parkedFields, fact[CheckId] & ":" & fact[Field])),
+		        exceptionWords = {"Waived", "Exception accepted", "Not followed up"},
+		        lastText = (timeline as list, kind as text) as text => let found = List.Last(List.Select(timeline, (event) => event[Type] = kind), null) in if found = null then "" else found[Text],
+		        dateOf = (value as text) as nullable date => if value = "" then null else Date.FromText(Text.Start(value, 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		        line = (fact as record) as record =>
+		            let
+		                key = fact[Key],
+		                own = eventsOf(key),
+		                covering = List.Select(standing, (event) => covers(event, fact[CheckId], fact[CiKey])),
+		                timeline = List.Buffer(if List.IsEmpty(covering) then own else List.Sort(own & covering, order)),
+		                inLatest = fact[InLatest],
+		                untested = not inLatest and not Record.HasFields(tested, fact[CheckId] & ":" & fact[Field]),
+		                // A contract is not in the CI report: the contract files are complete lists, so a contract gone from a tested check is solved.
+		                ciMissing = not inLatest and not Record.HasFields(reportCis, fact[CiKey]) and not Text.StartsWith(fact[CiKey], "contract:"),
+		                messages = List.Buffer(List.Select(timeline, (event) => event[Type] = "message")),
+		                lastMessage = List.Last(messages, null),
+		                replies = List.Buffer(List.Sort(List.Distinct(List.Combine(List.Transform(messages, (message) => Record.FieldOrDefault(repliesByRef, message[Ref], {})))),
+		                    (a, b) => Value.Compare(a[Received], b[Received]))),
+		                manual = List.Last(List.Select(timeline, (event) => event[Type] = "status" or event[Type] = "exception"), null),
+		                asked = if lastMessage = null then "New" else if List.AnyTrue(List.Transform(replies, (reply) => reply[Received] >= lastMessage[At])) then "Answered" else "Contacted",
+		                // An exception stands until a manager sets another status or its review date comes; a status stands until a later message.
+		                running = manual <> null and manual[Type] = "exception" and (manual[ReviewOn] = "" or manual[ReviewOn] > today),
+		                legacy = manual <> null and manual[Type] = "status" and List.Contains(exceptionWords, manual[Text]),
+		                exception = if running or legacy then manual else null,
+		                ended = if manual <> null and manual[Type] = "exception" and not running then manual[ReviewOn] else "",
+		                set = if exception <> null then "Not followed up"
+		                    else if manual <> null and manual[Type] = "status" and (lastMessage = null or manual[At] > lastMessage[At]) then manual[Text]
+		                    else asked,
+		                solved = not inLatest and not untested and not ciMissing,
+		                status = if solved and set <> "Not followed up" then "Verified" else set,
+		                retirements = List.Select(timeline, (event) => event[Type] = "retirement"),
+		                retireOn = if List.IsEmpty(retirements) then "" else List.Last(retirements)[RetireOn],
+		                reviewed = List.Select(timeline, (event) => event[Type] = "reviewed"),
+		                ownerAsked = not List.IsEmpty(reviewed) and List.Last(reviewed)[Text] = "Ask the owner",
+		                factState = fact[State],
+		                state = if factState = null then ""
+		                    else if factState = "open" then (if retireOn > today then "waiting" else "open")
+		                    else if factState = "review" then (if ownerAsked then "open" else "review")
+		                    else factState,
+		                // A case that waits for its planned retirement date gets no reminder until then.
+		                due = not (state = "waiting" and factState = "open"),
+		                assignment = List.Last(List.Select(timeline, (event) => event[Type] = "assign" or event[Type] = "handover"), null),
+		                sentOn = if lastMessage = null then null else dateOf(lastMessage[At])
+		            in
+		                [
+		                    Key = key, CheckId = fact[CheckId], CiKey = fact[CiKey], CiName = fact[CiName], ClassLabel = fact[ClassLabel], Field = fact[Field],
+		                    ContactName = fact[ContactName], InLatest = inLatest, Untested = untested, CiMissing = ciMissing, State = state,
+		                    StateLabel = Record.FieldOrDefault([open = "To solve", review = "To check", waiting = "Waiting", known = "Known"], state, ""), Status = status,
+		                    StatusLabel = Record.FieldOrDefault([New = "New", Contacted = "Asked", Answered = "Answered", #"Fix in progress" = "In progress", Fixed = "Marked fixed",
+		                        #"Not followed up" = "Not followed up", Verified = "Verified"], status, status),
+		                    AssignedTo = if assignment = null then "" else if assignment[Type] = "assign" then assignment[Text] else assignment[To],
+		                    HandoverNote = if assignment = null or assignment[Type] <> "handover" then "" else assignment[Text],
+		                    Request = lastText(timeline, "request"), Messages = List.Count(messages), SentOn = sentOn,
+		                    LastMessageTo = if lastMessage = null then "" else lastMessage[To], LastRef = if lastMessage = null then "" else lastMessage[Ref],
+		                    ReminderFrom = if sentOn = null then null else fnAddBusinessDays(sentOn, rules[ReminderDays]),
+		                    Remind = if due and status = "Contacted" then (if List.Count(messages) <= rules[MaxReminders] then "reminder" else "escalation") else "",
+		                    Replies = replies, LastReplyOn = if List.IsEmpty(replies) then null else dateOf(List.Last(replies)[Received]),
+		                    ExceptionReason = if exception = null then "" else if legacy then "Set before version 0.12 (no reason)" else exception[Reason],
+		                    ReviewOn = if exception = null then null else dateOf(exception[ReviewOn]), ExceptionEnded = dateOf(ended), RetireOn = dateOf(retireOn),
+		                    VerifiedOn = if solved then date else null,
+		                    FixedBy = if status = "Fixed" and manual <> null then (if manual[ByName] <> "" then manual[ByName] else manual[By]) else "",
+		                    FixedOn = if status = "Fixed" and manual <> null then dateOf(manual[At]) else null, Events = List.Count(timeline),
+		                    // The last time a manager acted on the case (a status, an exception, a message): a reply before it is read.
+		                    Acted = List.Max(List.Transform(List.Select(timeline, (event) => List.Contains({"status", "exception", "message"}, event[Type])), (event) => event[At]), ""),
+		                    Closed = status = "Verified" or status = "Not followed up"
+		                ]
+		    in
+		        List.Buffer(List.Transform(subjects, line))
 	queryGroup: Reading
 
 /// Any cell as text, as the HTML app reads it: dates as yyyy-mm-dd hh:mm:ss, true/false, numbers without a thousands separator. An empty cell is "".
@@ -379,6 +655,69 @@ expression fnEnvironment =
 		        if alias <> null then alias[name] else Text.Upper(raw, "en-US")
 	queryGroup: Reading
 
+/// The part Exceptions of the table Run (D292), which the DAX table Exceptions shows (the tab Not followed of the Audit page): every decision to stop following a finding, newest first (src/core/audit/audit.ts, exceptionLines). One line per case (an exception on several cases is listed once per case, because each can end on its own), and one per standing exception (for a check and a CI by name, entered before any finding). State: running (still in force), ended (the review date has passed) or closed (a manager set another status after it). CiName: the CI of the finding in the newest report, else the CI key of the finding. `run` is CheckRun (null when no CI report is loaded).
+expression fnExceptionsPart =
+		(run as nullable record) as table =>
+		    let
+		        facts = if run = null then {} else run[Facts],
+		        byKey = Record.FromList(facts, List.Transform(facts, (fact) => fact[Key])),
+		        today = Date.ToText(CaseToday, [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		        isException = (event as record) as logical => event[Type] = "exception"
+		            or (event[Type] = "status" and List.Contains({"Waived", "Exception accepted", "Not followed up"}, event[Text])),
+		        // The last exception of each target, and whether a status came after it.
+		        steps = List.Combine(List.Transform(JournalEvents, (event) =>
+		            if event[Type] = "exception" and List.IsEmpty(event[Keys]) and event[CiKey] <> "" then {[Target = (if event[CheckId] = "" then "*" else event[CheckId]) & "|" & event[CiKey], Event = event, Exception = true]}
+		            else List.Transform(List.Select(event[Keys], (key) => isException(event) or event[Type] = "status"), (key) => [Target = key, Event = event, Exception = isException(event)]))),
+		        // Per target, in the order of the journal: its last exception, and whether a status came after it (speed rule 6:
+		        // grouped once, no growing record).
+		        byTarget = fnGroupBy(steps, (step) => step[Target]),
+		        summaries = List.Buffer(List.RemoveNulls(List.Transform(Record.FieldNames(byTarget), (target) =>
+		            let
+		                group = List.Buffer(Record.Field(byTarget, target)),
+		                lastAt = List.Last(List.Select(List.Positions(group), (at) => group{at}[Exception]), null)
+		            in
+		                if lastAt = null then null else [Target = target, Event = group{lastAt}[Event], After = lastAt < List.Count(group) - 1]))),
+		        state = [
+		            Last = Record.FromList(List.Transform(summaries, (item) => item[Event]), List.Transform(summaries, (item) => item[Target])),
+		            After = fnKeySet(List.Transform(List.Select(summaries, (item) => item[After]), (item) => item[Target]))
+		        ],
+		        targets = Record.FieldNames(state[Last]),
+		        line = (target as text) as list =>
+		            let
+		                event = Record.Field(state[Last], target),
+		                standing = event[Type] = "exception" and List.IsEmpty(event[Keys]),
+		                legacy = event[Type] = "status",
+		                fact = if standing then null else Record.FieldOrDefault(byKey, target, null),
+		                first = Text.PositionOf(target, ":"),
+		                last = Text.PositionOf(target, ":", Occurrence.Last),
+		                keyCi = if first < 0 then target else if last > first then Text.Middle(target, first + 1, last - first - 1) else Text.Middle(target, first + 1),
+		                checkId = if standing then (if event[CheckId] = "" then "*" else event[CheckId]) else if fact <> null then fact[CheckId] else if first < 0 then target else Text.Start(target, first),
+		                ciKey = if standing then event[CiKey] else if fact <> null then fact[CiKey] else keyCi,
+		                ciName = if standing then (if event[CiName] <> "" then event[CiName] else event[CiKey]) else if fact <> null then fact[CiName] else keyCi,
+		                running = event[ReviewOn] = "" or event[ReviewOn] > today,
+		                words = if Record.HasFields(state[After], target) then "closed" else if running then "running" else "ended"
+		            in
+		                {
+		                    target, checkId, ciKey, ciName,
+		                    if legacy then "Set before version 0.12 (no reason)" else event[Reason], if legacy then "" else event[Text],
+		                    if event[ReviewOn] = "" then null else Date.FromText(event[ReviewOn], [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		                    if event[ByName] <> "" then event[ByName] else event[By],
+		                    DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), words,
+		                    Record.Field([running = "Not followed up", ended = "Followed up again (review date passed)", closed = "Followed up again (a later status)"], words),
+		                    standing, legacy
+		                },
+		        lines = List.Transform(targets, line),
+		        sorted = List.Sort(lines, (a, b) =>
+		            let byAt = Value.Compare(b{8}, a{8}), byName = Value.Compare(a{3}, b{3}) in
+		            if byAt <> 0 then byAt else if byName <> 0 then byName else Value.Compare(a{0}, b{0})),
+		        numbered = List.Transform(List.Positions(sorted), (at) => sorted{at} & {at + 1})
+		    in
+		        #table(
+		            type table [Target = text, CheckId = text, CiKey = text, CiName = text, Reason = text, Note = text, ReviewOn = date, ByName = text,
+		                At = datetime, State = text, StateLabel = text, Standing = logical, Legacy = logical, Order = Int64.Type],
+		            numbered)
+	queryGroup: Reading
+
 /// Does the text match the pattern, decided by its fast form (the query PatternForms, D285) when it can, else by the walk (fnRegexTest)? exact, prefix, suffix, contains: the text is one of the words, starts, ends with or holds one of them. only: the length is in range and every character is one of Chars. walk: a quick "no" when the text holds a character a match cannot (Allowed), or does not start or end with a word a match needs (Starts, Ends); then the walk. Lower: the words are lower case, so the text is compared in lower case, and only an ASCII text is decided so (JavaScript's "i" never matches a non-ASCII character to an ASCII one); any other text goes to the walk.
 expression fnFastMatch =
 		(form as record, tree as list, value as text) as logical =>
@@ -493,6 +832,82 @@ expression fnHiddenCharacters =
 		            entry[label] & " (U+" & Text.PadStart(Number.ToText(entry[code], "X"), 4, "0") & ")"
 		    in
 		        if Text.Remove(name, chars) = name then {} else List.Distinct(List.Transform(found, labelOf))
+	queryGroup: Reading
+
+/// The part HistoryChecked of the table HistoryRun (D290): what one CI report could verify (checkedIn of src/core/cases/cases.ts). Kind "ci": the key of each CI of the report that is not parked (D179). Kind "part": <check>:<field> of each part of a check the report tested, without the parked fields. A finding of the report before is solved only when the CI is here, its part is here, and the finding is gone (D59, D292). `run` is a run of fnCheckRun.
+expression fnHistoryCheckedPart =
+		(run as record) as table =>
+		    let
+		        parkedFields = if run[Parked] = null then [] else run[Parked][FieldSet],
+		        cis = List.Transform(Record.FieldNames(run[CheckableKeys]), (key) => {run[Date], "ci", key}),
+		        parts = List.Transform(List.Select(run[Tested], (part) => not Record.HasFields(parkedFields, part)), (part) => {run[Date], "part", part})
+		    in
+		        #table(type table [ReportDate = date, Kind = text, Id = text], cis & parts)
+	queryGroup: Reading
+
+/// The part History of the table HistoryRun (D290), which the DAX table History shows: one row per finding of one CI report date, with only what the history pages count (the check, the CI, its class and support group, how it is listed). The trends per card, class and team, new and solved between two reports and the days to fix are counted from it. `run` is a run of fnCheckRun.
+expression fnHistoryPart =
+		(run as record) as table =>
+		    let
+		        facts = run[Facts]
+		    in
+		        #table(
+		            type table [ReportDate = date, Key = text, CheckId = text, CiKey = text, CiName = text, Class = text, ClassLabel = text, Field = text,
+		                State = text, SupportGroup = text, ContactName = text],
+		            List.Transform(facts, (fact) => {
+		                run[Date], fact[Key], fact[CheckId], fact[CiKey], fact[CiName], fact[Class], fact[ClassLabel], fact[Field], fact[State],
+		                fact[SupportGroup], fact[ContactName]}))
+	queryGroup: Reading
+
+/// The "detect data changes" of the incremental refresh of HistoryRun (D290): for one part of the history (the CI reports dated from `start` to `end`), the newest change of a file that its runs read (the files dated from ReadDays days before `start` up to `end`). The service computes a part of the last 7 days again only when this value changed, so a refresh after an action of the team (the journal) or after a new report recomputes no old day, or only the new one. The folder is listed, no file is opened. A file moved out of the folder does not change it: put the right file in.
+expression fnHistoryPolling =
+		(start as datetime, end as datetime) as datetime =>
+		    let
+		        from = Date.AddDays(DateTime.Date(start), -ReadDays),
+		        to = DateTime.Date(end),
+		        files = Table.SelectRows(ReportSourceFiles, each [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
+		        changed = List.Max(List.RemoveNulls(files[Modified]), null),
+		        // The samples have no time of change: the day they were recorded.
+		        newest = List.Max(files[ReportDate], null)
+		    in
+		        if changed <> null then changed else if newest <> null then DateTime.From(newest) else #datetime(1900, 1, 1, 0, 0, 0)
+	queryGroup: Reading
+
+/// Table HistoryRun (hidden, D290): the checks on every CI report dated from `start` (that day or later) to `end` (before that day), each with the other reports dated on or before it, as the rows of five parts: History (the findings), HistoryTested, HistoryNotes, HistoryChecked (what the report could verify) and Runs. The DAX tables of those names split it, as Run is split (D284). Incremental refresh calls it for each part of the history with RangeStart and RangeEnd: keep 24 months, look at the last 7 days and compute again only the days whose files changed (HistoryPolling), so an old report date is computed once, not at every refresh. The pages of the newest report never read it: they read Run, which is always computed in full. Only the files of the ReadDays days before `start` up to `end` are opened. Two CI reports of one day: the last file name is the run of that day.
+expression fnHistoryRun =
+		(start as datetime, end as datetime) as table =>
+		    let
+		        from = DateTime.Date(start),
+		        to = DateTime.Date(end),
+		        files = fnReadFiles(Date.AddDays(from, -ReadDays), to),
+		        cis = Table.Buffer(Table.Sort(Table.SelectRows(files, each [Kind] = "ci" and [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
+		            {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})),
+		        days = List.Buffer(List.Distinct(cis[ReportDate])),
+		        runOf = (day as date) as record => fnCheckRun(Table.Last(Table.SelectRows(cis, each [ReportDate] = day)), files),
+		        partsOf = (run as record) as list => {
+		            {"History", fnHistoryPart(run)}, {"HistoryTested", fnTestedPart(run)}, {"HistoryNotes", fnNotesPart(run)},
+		            {"HistoryChecked", fnHistoryCheckedPart(run)}, {"Runs", fnRunsPart(run)}
+		        },
+		        // Each part with its columns named <Part>.<Column> and a column Part, typed as the calculated table that shows it
+		        // (HistoryRunColumnTypes, generated), as in RunRows.
+		        prefixed = (part as list) as table =>
+		            let
+		                name = part{0},
+		                rows = part{1}
+		            in
+		                Table.AddColumn(Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})), "Part", each name, type text),
+		        perDay = List.Transform(days, (day) =>
+		            let
+		                run = runOf(day),
+		                combined = Table.Combine(List.Transform(partsOf(run), prefixed))
+		            in
+		                Table.AddColumn(combined, "ReportDate", each day, type date)),
+		        // With no CI report in the dates, every column is still there, so a refresh of an empty part of the history works.
+		        empty = #table({"Part", "ReportDate"} & List.Transform(HistoryRunColumnTypes, (pair) => pair{0}), {}),
+		        combined = Table.Combine({empty} & perDay),
+		        typed = Table.TransformColumnTypes(combined, {{"Part", type text}, {"ReportDate", type date}} & HistoryRunColumnTypes)
+		    in
+		        Table.ReorderColumns(typed, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(typed), (column) => column <> "Part" and column <> "ReportDate"))
 	queryGroup: Reading
 
 /// Is the CI in the scope of a check (src/core/checks/engine.ts, runChecks)? Its class is one of scope.classes ("*": every class), and its status is not one of scope.exclude.operational_status. Parked CIs are left out before (fnCheckRun, which tests the scope of each check itself, with the words in compared form once). `ci` has its StatusKey.
@@ -690,17 +1105,11 @@ expression fnOfferingOrigin =
 		        else "epo"
 	queryGroup: Reading
 
-/// The rows of the report of a type that goes with a CI report (fnPairedFile), as a list of records; null when there is none, so a check that needs it is not tested and says so.
-expression fnPaired =
-		(kind as text, date as nullable date) as nullable list =>
-		    let file = fnPairedFile(kind, date) in if file = null then null else file[Rows]
-	queryGroup: Reading
-
-/// The report of a type that goes with a CI report (plan §4.2, as the engine pairs them): the newest report of that type dated on or before the CI report (the last file name when two share a date). Returns [FileName, ReportDate, Rows, PreviousDate]: Rows as a list of records, PreviousDate the date of the newest report of the type before it (null when it is the first; the chip "changed in EPO" needs it). Null when there is none, so a check that needs it is not tested and says so.
+/// The report of a type that goes with a CI report (plan §4.2, as the engine pairs them): among `files` (rows of ReadFiles, or of fnReadFiles for the history), the newest report of that type dated on or before the CI report (the last file name when two share a date). Returns [FileName, ReportDate, Rows, PreviousDate]: Rows as a list of records, PreviousDate the date of the newest report of the type before it (null when it is the first; the chip "changed in EPO" needs it). Null when there is none, so a check that needs it is not tested and says so.
 expression fnPairedFile =
-		(kind as text, date as nullable date) as nullable record =>
+		(files as table, kind as text, date as nullable date) as nullable record =>
 		    let
-		        candidates = Table.SelectRows(ReadFiles, each [Kind] = kind and date <> null and [ReportDate] <> null and [ReportDate] <= date),
+		        candidates = Table.SelectRows(files, each [Kind] = kind and date <> null and [ReportDate] <> null and [ReportDate] <= date),
 		        sorted = Table.Sort(candidates, {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}}),
 		        newest = Table.LastN(sorted, 1),
 		        earlier = if Table.IsEmpty(newest) then {} else List.Select(sorted[ReportDate], (day) => day < newest{0}[ReportDate])
@@ -1027,6 +1436,23 @@ expression fnReadEpoReport =
 		        Table.SelectColumns(renamed, {"EpoId", "Name", "Status", "StatusWord", "Department", "Owner", "Responsible1", "Responsible2", "Changed", "Description"})
 	queryGroup: Reading
 
+/// The report files dated from `from` (that day or later) up to `to` (before that day), each read once: its sheets (Read), its type by its columns (Kind, TypeLabel) and why it was not read (Message). null leaves that end open; a file with no date is always kept. A file outside the dates is never opened, so an old folder stays fast (D290). A file that cannot be opened is not read, with the reason, and the refresh goes on.
+expression fnReadFiles =
+		(from as nullable date, to as nullable date) as table =>
+		    let
+		        kept = Table.SelectRows(ReportSourceFiles, each [ReportDate] = null or ((from = null or [ReportDate] >= from) and (to = null or [ReportDate] < to))),
+		        read = Table.AddColumn(kept, "Read", each
+		            let attempt = try fnReadTable([Content]) in
+		            if attempt[HasError] then [Format = "", Sheets = {}, Headers = {}, RawHeaders = {}, Rows = #table({}, {}), Error = attempt[Error][Message]]
+		            else attempt[Value]),
+		        typed = Table.AddColumn(read, "Type", each
+		            if Record.HasFields([Read], "Error") then [Kind = "", Label = "Not read", Message = "The file could not be opened: " & [Read][Error]]
+		            else fnReportType([Read][Headers])),
+		        expanded = Table.ExpandRecordColumn(typed, "Type", {"Kind", "Label", "Message"}, {"Kind", "TypeLabel", "Message"})
+		    in
+		        Table.Buffer(expanded)
+	queryGroup: Reading
+
 /// The rows of one report file by its type, with the reader of that type; null for a file of no known type.
 expression fnReadKind =
 		(kind as text, read as record) as nullable table =>
@@ -1227,6 +1653,51 @@ expression fnReplacePattern =
 		    if found[Index] < 0 then value else Text.Start(value, found[Index]) & new & Text.Middle(value, found[End])
 	queryGroup: Reading
 
+/// The part RepliesToRead of the table Run (D292), which the DAX table RepliesToRead shows (My day, My work): one line per reply that waits to be read, newest first (src/app/view/cases.ts, repliesToRead). A reply is read once a manager acted on one of its cases after it arrived (a status, a decision to stop following, a message); a case that is closed (Verified, Not followed up) lists none. FirstLine: the first line of the reply that is not a greeting ("Hi Ana,"). AssignedTo: who has its cases, for "mine first". Daily: one of its cases is on a daily card (My day counts only those, D182). `cases` is fnCases(CheckRun).
+expression fnRepliesToReadPart =
+		(cases as list) as table =>
+		    let
+		        later = fnKeySet(Table.SelectRows(ChecksRows, each [Priority] = "later")[CheckId]),
+		        open = List.Select(cases, (item) => not item[Closed] and not List.IsEmpty(item[Replies])),
+		        pairs = List.Combine(List.Transform(open, (item) => List.Transform(item[Replies], (reply) =>
+		            [File = reply[Ref] & "|" & reply[Received], Reply = reply, Case = item, Read = Text.Start(reply[Received], 19) <= item[Acted]]))),
+		        handled = fnKeySet(List.Transform(List.Select(pairs, (pair) => pair[Read]), (pair) => pair[File])),
+		        waiting = List.Select(pairs, (pair) => not pair[Read] and not Record.HasFields(handled, pair[File])),
+		        byFile = fnGroupBy(waiting, (pair) => pair[File]),
+		        greeting = (line as text) as logical =>
+		            let
+		                lower = Text.Lower(line, "en-US"),
+		                word = List.First(List.Select({"hello", "dear", "hi"}, (item) => Text.StartsWith(lower, item)
+		                    and (Text.Length(lower) = Text.Length(item) or not List.Contains({"a".."z", "0".."9", "_"}, Text.At(lower, Text.Length(item))))), null),
+		                rest = if word = null then "" else Text.Middle(lower, Text.Length(word)),
+		                core = if Text.EndsWith(rest, "!") or Text.EndsWith(rest, ",") then Text.Start(rest, Text.Length(rest) - 1) else rest
+		            in
+		                word <> null and Text.Length(core) <= 40 and Text.Remove(core, {".", "?", "!"}) = core,
+		        firstLine = (body as text) as text =>
+		            let
+		                lines = List.Select(List.Transform(Text.SplitAny(body, "#(cr)#(lf)"), Text.Trim), (line) => line <> ""),
+		                kept = List.Select(lines, (line) => not greeting(line))
+		            in
+		                List.First(kept, List.First(lines, "")),
+		        lines = List.Transform(Record.FieldNames(byFile), (file) =>
+		            let
+		                group = Record.Field(byFile, file),
+		                reply = group{0}[Reply],
+		                own = List.Transform(group, (pair) => pair[Case])
+		            in
+		                {
+		                    file, reply[Ref], reply[From], DateTime.FromText(Text.Start(reply[Received], 19), [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), firstLine(reply[Body]),
+		                    List.Count(own), List.Count(List.Distinct(List.Transform(own, (item) => item[CiKey]))),
+		                    Text.Combine(List.Distinct(List.Select(List.Transform(own, (item) => item[AssignedTo]), (name) => name <> "")), ", "),
+		                    Text.Combine(List.Distinct(List.Transform(own, (item) => item[CheckId])), ", "),
+		                    List.AnyTrue(List.Transform(own, (item) => not Record.HasFields(later, item[CheckId])))
+		                })
+		    in
+		        Table.Sort(
+		            #table(type table [File = text, Ref = text, From = text, Received = datetime, FirstLine = text, Cases = Int64.Type, CIs = Int64.Type, AssignedTo = text, Checks = text, Daily = logical], lines),
+		            {{"Received", Order.Descending}, {"File", Order.Ascending}})
+	queryGroup: Reading
+
 /// The date of a report: the yyyy-MM-dd_ at the start of its file name (flow F1 writes it), else the day the file was last changed (D12, src/core/memory/finder.ts). One difference: a date that does not exist (2026-02-30_) is kept as text by the app, but Power BI cannot hold it, so the day the file changed is used.
 expression fnReportDate =
 		(name as text, modified as nullable datetime) as nullable date =>
@@ -1260,6 +1731,14 @@ expression fnReportType =
 		    in
 		        if best <> null then [Kind = best[kind], Label = best[label], Message = ""]
 		        else [Kind = "", Label = "Not read", Message = "This file is not a report the Workbench knows: " & Text.Combine(parts, "; ") & "."]
+	queryGroup: Reading
+
+/// The part Runs of the table HistoryRun (D290), which the DAX table Runs shows: one row per CI report date, with the file, its CIs and the other reports its checks used (for each type the newest report dated on or before it, as the HTML app pairs them). `run` is a run of fnCheckRun.
+expression fnRunsPart =
+		(run as record) as table =>
+		    #table(
+		        type table [ReportDate = date, FileName = text, CIs = Int64.Type, RelationshipFile = text, EpoFile = text, SolusiFile = text, ContractFile = text],
+		        {{run[Date], run[FileName], List.Count(run[Cis]), run[Paired][Relationship], run[Paired][Epo], run[Paired][Solusi], run[Paired][Contract]}})
 	queryGroup: Reading
 
 /// The same person (relationship-detectors.ts, samePerson): user ID first, then email, then (only when neither is known) the display name. Two empty roles are the same. `a` and `b` are records of fnPerson, or null.
@@ -1439,6 +1918,42 @@ expression fnSingleSpaces =
 expression fnSortedNames = (nodes as list) as text => Text.Combine(List.Sort(List.Transform(nodes, (node) => node[Name]), Comparer.FromCulture("en-US")), ", ")
 	queryGroup: Reading
 
+/// One list of the team's state (D291), by its id in StateLists (journal, replies, settings, team, reviews): its columns in the order of StateLists, every value as text, whatever the mode. A date and time is yyyy-MM-ddTHH:mm:ss, a date yyyy-MM-dd, a yes/no Yes or No, an empty cell "". Sample: the invented CSV file packed in StateFiles. SharePoint: the list of that name on the team site (SharePoint.Tables, plan §5). A list that is not there gives no rows, so a site without the lists still refreshes and every case is New.
+expression fnStateList =
+		(id as text) as table =>
+		    let
+		        spec = Record.Field(StateLists, id),
+		        columns = List.Buffer(spec[columns]),
+		        sample = Table.SelectRows(StateFiles, each [FileName] = spec[file]),
+		        sampleRows =
+		            if Table.IsEmpty(sample) then {}
+		            else
+		                let
+		                    csv = Csv.Document(Binary.FromText(sample{0}[Base64], BinaryEncoding.Base64), [Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		                    promoted = Table.PromoteHeaders(csv, [PromoteAllScalars = true])
+		                in
+		                    Table.ToRecords(promoted),
+		        sharePointRows =
+		            let
+		                lists = SharePoint.Tables(SharePointSite, [Implementation = "2.0", ViewMode = "All"]),
+		                found = Table.SelectRows(lists, each [Title] = spec[list])
+		            in
+		                if Table.IsEmpty(found) then {} else Table.ToRecords(found{0}[Items]),
+		        rows = if StateMode = "SharePoint" then sharePointRows else if StateMode = "None" then {} else sampleRows,
+		        asText = (value as any) as text =>
+		            if value = null then ""
+		            else if value is datetimezone then DateTime.ToText(DateTimeZone.RemoveZone(DateTimeZone.ToLocal(value)), [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])
+		            else if value is datetime then DateTime.ToText(value, [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])
+		            else if value is date then Date.ToText(value, [Format = "yyyy-MM-dd", Culture = "en-US"])
+		            else if value is logical then (if value then "Yes" else "No")
+		            else if value is number then Number.ToText(value, "G", "en-US")
+		            else if value is text then value
+		            else "",
+		        cells = List.Transform(rows, (row) => List.Transform(columns, (column) => asText(Record.FieldOrDefault(row, column, null))))
+		    in
+		        Table.TransformColumnTypes(#table(columns, cells), List.Transform(columns, (column) => {column, type text}))
+	queryGroup: Reading
+
 /// The part Tested of the table Run (D284), which the DAX table Tested shows: each part of a check the newest CI report could test, with the CIs it evaluated (D15). A card with no row here is grey, never green. Part: the field or rule ("owned_by", "outer-space"), as the HTML app's run says it; "" for a check tested as a whole (Process stage). `run` is CheckRun (null when no CI report is loaded).
 expression fnTestedPart =
 		(run as nullable record) as table =>
@@ -1480,6 +1995,21 @@ expression fnVisibleName = (name as text) as text => List.Accumulate(ReadingRule
 expression fnWithoutHidden = (name as text) as text => List.Accumulate(ReadingRules[hiddenCharacters], name, (text, entry) => Text.Replace(text, Character.FromNumber(entry[code]), ""))
 	queryGroup: Reading
 
+/// The events of the list SACM Journal (D291), as the app reads its journal (DATA-MODEL §3): one record per row, oldest first (by At, then by id), every field as text ("" when empty). By is lower case; Keys is the list of the finding keys of the event, one per line of the column Keys. Read by the tables Journal, JournalKeys and Activity, and by the parts CaseLines and Exceptions of the table Run.
+expression JournalEvents =
+		let
+		    rows = Table.ToRecords(fnStateList("journal")),
+		    events = List.Transform(rows, (row) => [
+		        Id = row[Title], At = row[At], By = Text.Lower(row[By], "en-US"), ByName = row[ByName], Type = row[Type],
+		        Keys = List.Select(List.Transform(Text.SplitAny(row[Keys], "#(cr)#(lf)"), Text.Trim), (key) => key <> ""),
+		        Text = row[Text], Ref = row[Ref], To = row[To], Cc = row[Cc], Subject = row[Subject], Kind = row[Kind], Channel = row[Channel],
+		        Person = row[Person], Reason = row[Reason], ReviewOn = row[ReviewOn], RetireOn = row[RetireOn], CheckId = row[CheckId], CiKey = row[CiKey], CiName = row[CiName]
+		    ]),
+		    order = (a as record, b as record) as number => let first = Value.Compare(a[At], b[At]) in if first <> 0 then first else Value.Compare(a[Id], b[Id])
+		in
+		    List.Buffer(List.Sort(events, order))
+	queryGroup: Reading
+
 /// The column of the model for each criticality name of the check files ("target.availability" -> TargetAvailability), made once, so fnLevelAt only looks a name up.
 expression LevelColumns =
 		let
@@ -1502,19 +2032,20 @@ expression ListingRules =
 		    ]
 	queryGroup: Reading
 
-/// Every report file read once: its sheets (Read), its type by its columns (Kind, TypeLabel) and why it was not read (Message). A file that cannot be opened is not read, with the reason, and the refresh goes on.
+/// How many days before a report date the files are read (D290): enough for the weekly reports and the report before each of them (the chip "changed in EPO", Contract changes compares the two newest Solusi files). The pages of the newest report read the files of the last ReadDays days before the newest file (ReadFiles); each day of the history reads the ReadDays days before it (HistoryRun). An older file is never opened, so a folder that keeps two years of reports stays fast; the Reports page does not list it.
+expression ReadDays = 21
+	queryGroup: Reading
+
+/// The report files the pages of the newest report use, each read once (fnReadFiles): every file dated at most ReadDays days before the newest file of the folder. Older files belong to the history, which reads its own days (HistoryRun, D290), so a folder that keeps two years of reports does not slow the refresh.
 expression ReadFiles =
 		let
-		    read = Table.AddColumn(ReportSourceFiles, "Read", each
-		        let attempt = try fnReadTable([Content]) in
-		        if attempt[HasError] then [Format = "", Sheets = {}, Headers = {}, RawHeaders = {}, Rows = #table({}, {}), Error = attempt[Error][Message]]
-		        else attempt[Value]),
-		    typed = Table.AddColumn(read, "Type", each
-		        if Record.HasFields([Read], "Error") then [Kind = "", Label = "Not read", Message = "The file could not be opened: " & [Read][Error]]
-		        else fnReportType([Read][Headers])),
-		    expanded = Table.ExpandRecordColumn(typed, "Type", {"Kind", "Label", "Message"}, {"Kind", "TypeLabel", "Message"})
+		    newest = List.Max(List.RemoveNulls(ReportSourceFiles[ReportDate]), null)
 		in
-		    Table.Buffer(expanded)
+		    fnReadFiles(if newest = null then null else Date.AddDays(newest, -ReadDays), null)
+	queryGroup: Reading
+
+/// The replies of the list SACM Replies (D291): one record per reply, with the reference of the message it answers (Ref, the column Title), who sent it, when it arrived (yyyy-MM-ddTHH:mm:ss), its subject and its text.
+expression ReplyItems = List.Buffer(List.Transform(Table.ToRecords(fnStateList("replies")), (row) => [Ref = row[Title], From = row[From], Received = row[Received], Subject = row[Subject], Body = row[Body]]))
 	queryGroup: Reading
 
 /// Every report file, whatever the mode: FileName, ReportDate, Modified, Content (D271). Sample: the invented samples packed in this file by the generator (SampleFiles). SharePoint: the reports folder of the team site.
@@ -1545,12 +2076,12 @@ expression BuiltDetectors =
 		}
 	queryGroup: Checks
 
-/// The checks on the newest CI report (fnCheckRun), worked out once per refresh; null when no CI report is loaded. Build B5 runs them on every report date (incremental refresh); until then the tables hold the newest report only.
+/// The checks on the newest CI report (fnCheckRun), worked out once per refresh; null when no CI report is loaded. Only the table Run reads it (D284). The history runs the checks on every report date in its own table HistoryRun (D290).
 expression CheckRun =
 		let
 		    newest = fnNewest("ci")
 		in
-		    if Table.IsEmpty(newest) then null else fnCheckRun(newest{0})
+		    if Table.IsEmpty(newest) then null else fnCheckRun(newest{0}, ReadFiles)
 	queryGroup: Checks
 
 /// The small words of the contract checks (src/core/sources/contracts/contract-reports.ts and contract-detectors.ts), SameWord (two texts the same without case and extra spaces), InList (a text is one of a list, the same way), Blank (no value), Shown (a value as a message writes it: a date as "12 November 2026"), StatusTag (the first status tag of a ServiceNow contract, "S - Concluded", or "") and TargetTag (the first tag that sets the criticality by hand, or "").
@@ -1569,19 +2100,20 @@ expression ContractWords =
 		]
 	queryGroup: Checks
 
-/// The checks on one CI report (src/core/checks/engine.ts, runChecks, then src/core/cases/cases.ts, buildRun): the reports of the other types that go with it (fnPaired), the scope of each check, the built detectors, the source first (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles. Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo, Subjects]; Notes are [CheckId, Note]; Subjects are the contracts findings are about (fnContractSubject). Outputs (one lazy field per built check), RunContext and Stages are read only by the probes of the refresh time. Each CI gets its normal forms once (StatusKey, NameKey, IdentityKey, TagKeys, Squashed: the compared text of the six fields a rule counts), so no check normalises a CI field again (ARCHITECTURE §12, the speed rules).
+/// The checks on one CI report (src/core/checks/engine.ts, runChecks, then src/core/cases/cases.ts, buildRun): the reports of the other types that go with it (fnPairedFile), the scope of each check, the built detectors, the source first (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles, `files` the files it is paired from (ReadFiles for the newest report, fnReadFiles of the window for the history, D290). Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo, Subjects, Paired]; Notes are [CheckId, Note]; Subjects are the contracts findings are about (fnContractSubject); Paired the file names of the other reports used (Relationship, Epo, Solusi, Contract; null when none). Outputs (one lazy field per built check), RunContext and Stages are read only by the probes of the refresh time. Each CI gets its normal forms once (StatusKey, NameKey, IdentityKey, TagKeys, Squashed: the compared text of the six fields a rule counts), so no check normalises a CI field again (ARCHITECTURE §12, the speed rules).
 expression fnCheckRun =
-		(file as record) as record =>
+		(file as record, files as table) as record =>
 		    let
 		        date = file[ReportDate],
 		        read = file[Read],
 		        rows = Table.ToRecords(fnReadCiReport(read)),
 		        found = fnCiColumns(read),
-		        relationships = fnPaired("relationship", date),
-		        epoFile = fnPairedFile("epo", date),
+		        relationshipFile = fnPairedFile(files, "relationship", date),
+		        relationships = if relationshipFile = null then null else relationshipFile[Rows],
+		        epoFile = fnPairedFile(files, "epo", date),
 		        epo = if epoFile = null then null else epoFile[Rows],
-		        solusiFile = fnPairedFile("solusi", date),
-		        contractFile = fnPairedFile("contract", date),
+		        solusiFile = fnPairedFile(files, "solusi", date),
+		        contractFile = fnPairedFile(files, "contract", date),
 
 		        // Hidden characters: the name itself, else the name as the Relationship report holds it (a CSV writes "?").
 		        known = if read[Lossless] or relationships = null then [] else
@@ -1761,6 +2293,10 @@ expression fnCheckRun =
 		            Tested = combined[Tested], Evaluated = combined[Evaluated],
 		            Notes = graphNotes & combined[Notes] & source[Notes] & parkedNotes & routingNotes & listingNotes & hiddenNotes,
 		            Parked = parked, Graph = graph, Epo = run[Epo], CheckableKeys = checkableKeys,
+		            Paired = [
+		                Relationship = if relationshipFile = null then null else relationshipFile[FileName], Epo = if epoFile = null then null else epoFile[FileName],
+		                Solusi = if solusiFile = null then null else solusiFile[FileName], Contract = if contractFile = null then null else contractFile[FileName]
+		            ],
 		            // Never loaded into a table: for the probes of the refresh time (tools/powerbi/probes.ts).
 		            Outputs = Outputs, RunContext = run, Stages = [Combined = combined, SourceFirst = source, Kept = kept]
 		        ]
@@ -3531,6 +4067,65 @@ expression AboutRows =
 		        SampleDate, DateTime.LocalNow()}})
 	queryGroup: Tables
 
+/// Table Activity (the Activity page, D293): every event of the journal in words, newest first, as the app's Activity page says it (src/app/view/activity.ts, describeEvent): What it did, By who, Text (the reason, the note, how a message left), the cards it touched (every name up to three, else "4 cards") and the number of CIs. One line per row of the list: a reminder with new points is two rows (the app shows it once). Every email of the shared mailbox counts as sent (the outbox is the app's, D162).
+expression ActivityRows =
+		let
+		    labels = Record.FromList(ChecksRows[CardLabel], ChecksRows[CheckId]),
+		    labelOf = (id as text) as text => Record.FieldOrDefault(labels, id, id),
+		    checkOf = (key as text) as text => let at = Text.PositionOf(key, ":") in if at < 0 then key else Text.Start(key, at),
+		    ciOf = (key as text) as text => let first = Text.PositionOf(key, ":"), last = Text.PositionOf(key, ":", Occurrence.Last) in
+		        if first < 0 or last <= first then "" else Text.Middle(key, first + 1, last - first - 1),
+		    months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+		    screenDate = (iso as text) as text => if Text.Length(iso) < 10 then iso
+		        else Text.From(Number.FromText(Text.Middle(iso, 8, 2))) & " " & months{Number.FromText(Text.Middle(iso, 5, 2)) - 1} & " " & Text.Start(iso, 4),
+		    longDate = (iso as text) as text => fnLongDate(Date.FromText(Text.Start(iso, 10), [Format = "yyyy-MM-dd", Culture = "en-US"])),
+		    reviewWords = [same = "same in EPO", different = "not the same as in EPO", #"not-in-epo" = "not in EPO"],
+		    stageWord = (id as text) as text => if id = "" then "" else Text.Upper(Text.Start(id, 1)) & Text.Replace(Text.Middle(id, 1), "-", " "),
+		    words = (event as record) as record =>
+		        let
+		            kind = event[Type]
+		        in
+		            if kind = "message" then
+		                (if event[Channel] = "teams" then [Icon = "teams", What = "Teams chat started with " & event[To], Text = event[Subject]]
+		                else [
+		                    Icon = if event[Kind] = "reminder" or event[Kind] = "escalation" then "remind" else "mail",
+		                    What = (if event[Kind] = "reminder" then "Reminder" else if event[Kind] = "escalation" then "Escalation" else "Email") & " to " & event[To] & (if event[Cc] <> "" then ", Cc " & event[Cc] else ""),
+		                    Text = (if event[Channel] = "outlook" then "sent from Outlook" else "sent from the shared mailbox") & " · " & event[Ref]])
+		            else if kind = "status" and event[Text] = "Waived" then [Icon = "stop", What = "Not followed up (before version 0.12: no reason or review date)", Text = ""]
+		            else if kind = "status" then [Icon = "ok", What = "Status set to " & event[Text], Text = ""]
+		            else if kind = "assign" then [Icon = "assign", What = if event[Text] <> "" then "Assigned to " & event[Text] else "Assignment removed", Text = ""]
+		            else if kind = "handover" then [Icon = "handover", What = "Handed over to " & event[To], Text = event[Text]]
+		            else if kind = "request" then [Icon = "file", What = "Request number " & event[Text], Text = ""]
+		            else if kind = "report" then [Icon = "load", What = if event[Text] <> "" then event[Text] else "Report", Text = ""]
+		            else if kind = "exception" then
+		                let again = event[Text] = "Ended by hand" in
+		                [Icon = "stop", What = (if again then "Followed up again" else "Not followed up") & (if event[CiName] <> "" then " for " & event[CiName] else ""),
+		                    Text = if again then "" else event[Reason] & (if event[ReviewOn] <> "" then "; review on " & screenDate(event[ReviewOn]) else "") & (if event[Text] <> "" then ". " & event[Text] else "")]
+		            else if kind = "review" then [Icon = "review", What = if event[CiKey] <> "" then "Lifecycle review: " & (if event[CiName] <> "" then event[CiName] else event[CiKey]) & " is " & Record.FieldOrDefault(reviewWords, event[Reason], event[Reason]) else "Lifecycle review started", Text = event[Text]]
+		            else if kind = "reviewed" then [Icon = "eye", What = if event[Text] = "Ask the owner" then "SACM checked it: the owner is asked" else "Back to SACM", Text = ""]
+		            else if kind = "retirement" then [Icon = "calendar", What = if event[RetireOn] <> "" then "Planned retirement date: " & longDate(event[RetireOn]) else "Planned retirement date taken away", Text = event[Text]]
+		            else if kind = "stage" then [Icon = "stage", What = "Mapping stage set to " & stageWord(event[Text]), Text = ""]
+		            else if kind = "no-process" then [Icon = "note", What = if event[Text] = "yes" then "The owner says the Business Process does not exist" else "The mark ""the process does not exist"" taken away", Text = ""]
+		            else if kind = "settings" then [Icon = "settings", What = "Settings changed", Text = event[Text]]
+		            else if kind = "person-note" then [Icon = "note", What = "Note about the person", Text = event[Text]]
+		            else [Icon = "note", What = "Note", Text = event[Text]],
+		    cardWords = (ids as list) as text => let names = List.Distinct(List.Select(List.Transform(ids, labelOf), (name) => name <> "")) in
+		        if List.Count(names) > 3 then Text.From(List.Count(names)) & " cards" else Text.Combine(names, ", "),
+		    line = (event as record) as list =>
+		        let
+		            said = words(event),
+		            checks = List.Transform(event[Keys], checkOf) & (if List.IsEmpty(event[Keys]) and event[CheckId] <> "" and event[CheckId] <> "*" then {event[CheckId]} else {})
+		        in
+		            {
+		                event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), Date.FromText(Text.Start(event[At], 10), [Format = "yyyy-MM-dd", Culture = "en-US"]), event[Type], said[Icon], said[What],
+		                if event[ByName] <> "" then event[ByName] else event[By], said[Text], cardWords(checks),
+		                List.Count(List.Distinct(List.Select(List.Transform(event[Keys], ciOf), (key) => key <> ""))), List.Count(event[Keys])
+		            },
+		    lines = List.Transform(List.Reverse(JournalEvents), line)
+		in
+		    #table(type table [Id = text, At = datetime, Day = date, Type = text, Icon = text, What = text, By = text, Text = text, Cards = text, CIs = Int64.Type, Keys = Int64.Type], lines)
+	queryGroup: Tables
+
 /// Table Checks: one row per check file that is not "off" (D141), from the check files packed by the generator (CheckFiles). The check files stay the one place where a check is described (D16).
 expression ChecksRows =
 		let
@@ -3676,8 +4271,47 @@ expression fnNewestRows =
 		        Table.ReorderColumns(withFile, {"ReportDate", "FileName"} & Table.ColumnNames(rows))
 	queryGroup: Tables
 
+/// Table HistoryExpected (the Self-check page, D293): what the HTML app counts on the samples over the two report dates and the team's state (ExpectedHistory, generated). The measure History found gives the same count from the model.
+expression HistoryExpectedRows =
+		let
+		    items = Json.Document(ExpectedHistory)
+		in
+		    #table(type table [Metric = text, Expected = Int64.Type, Order = Int64.Type],
+		        List.Transform(List.Positions(items), (at) => {items{at}[metric], items{at}[expected], at + 1}))
+	queryGroup: Tables
+
+/// Table HistoryRun (hidden, D290): the checks on every CI report dated from RangeStart to RangeEnd (fnHistoryRun). In the workspace the incremental refresh sets the two dates for each part of the history, so an old report date is computed once; in Power BI Desktop the dates of the parameters count.
+expression HistoryRunRows = fnHistoryRun(RangeStart, RangeEnd)
+	queryGroup: Tables
+
 /// Table Inventory: the CIs of the newest CI report, one row each, with every column the checks read.
 expression InventoryRows = fnNewestRows("ci")
+	queryGroup: Tables
+
+/// Table JournalKeys (D291): one row per finding key of each journal event (the column Keys of the list holds them one per line), so an event can be found from its case and a case from its events.
+expression JournalKeysRows =
+		let
+		    rows = List.Combine(List.Transform(JournalEvents, (event) => List.Transform(event[Keys], (key) =>
+		        {event[Id], key, let at = Text.PositionOf(key, ":") in if at < 0 then key else Text.Start(key, at), event[Type],
+		            DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])})))
+		in
+		    #table(type table [EventId = text, Key = text, CheckId = text, Type = text, At = datetime], rows)
+	queryGroup: Tables
+
+/// Table Journal (D291): every event of the list SACM Journal, oldest first (JournalEvents). Keys holds the finding keys of the event, one per line, as the list does; the table JournalKeys has one row per key. Day: the day of At, for the period of the Audit page (the table Date).
+expression JournalRows =
+		let
+		    dateOf = (value as text) as nullable date => if value = "" then null else Date.FromText(Text.Start(value, 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		    rows = List.Transform(JournalEvents, (event) => {
+		        event[Id], DateTime.FromText(event[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]), dateOf(event[At]), event[By], event[ByName], if event[ByName] <> "" then event[ByName] else event[By],
+		        event[Type], Text.Combine(event[Keys], "#(lf)"), List.Count(event[Keys]), event[Text], event[Ref], event[To], event[Cc], event[Subject], event[Kind],
+		        event[Channel], event[Person], event[Reason], dateOf(event[ReviewOn]), dateOf(event[RetireOn]), event[CheckId], event[CiKey], event[CiName]})
+		in
+		    #table(
+		        type table [Id = text, At = datetime, Day = date, By = text, ByName = text, Who = text, Type = text, Keys = text, KeyCount = Int64.Type, Text = text, Ref = text,
+		            To = text, Cc = text, Subject = text, Kind = text, Channel = text, Person = text, Reason = text, ReviewOn = date, RetireOn = date,
+		            CheckId = text, CiKey = text, CiName = text],
+		        rows)
 	queryGroup: Tables
 
 /// Table NotRead: the files of no known type, with what each type is missing (the Reports page).
@@ -3686,6 +4320,17 @@ expression NotReadRows = Table.SelectColumns(Table.SelectRows(ReportFilesRows, e
 
 /// Table Relationships: the relationships of the newest Relationship report.
 expression RelationshipsRows = fnNewestRows("relationship")
+	queryGroup: Tables
+
+/// Table Replies (D291): every reply the shared mailbox filed in the list SACM Replies, newest first. Matched: a message of the journal has its reference, so the reply shows on that case.
+expression RepliesRows =
+		let
+		    refs = fnKeySet(List.Transform(List.Select(JournalEvents, (event) => event[Type] = "message" and event[Ref] <> ""), (event) => event[Ref])),
+		    rows = List.Transform(ReplyItems, (reply) => {
+		        reply[Ref], reply[From], if reply[Received] = "" then null else DateTime.FromText(reply[Received], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"]),
+		        reply[Subject], reply[Body], Record.HasFields(refs, reply[Ref])})
+		in
+		    Table.Sort(#table(type table [Ref = text, From = text, Received = datetime, Subject = text, Body = text, Matched = logical], rows), {{"Received", Order.Descending}, {"Ref", Order.Ascending}})
 	queryGroup: Tables
 
 /// Table ReportFiles: every report file, its type (by its columns), its report date and how many rows its reader read.
@@ -3725,16 +4370,31 @@ expression ReportTypesRows =
 		        List.Transform(List.Positions(types), row))
 	queryGroup: Tables
 
-/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of eight parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row (the column incremental refresh will use, build B5). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules).
+/// Table Reviews (D291): the marks of the lifecycle review in the list SACM Reviews (the tab Lifecycle of the Audit page, read-only until build B8): per review date and CI, what EPO says and the answer of the review.
+expression ReviewsRows =
+		let
+		    rows = Table.ToRecords(fnStateList("reviews")),
+		    words = [same = "Same in EPO", different = "Not the same as in EPO", #"not-in-epo" = "Not in EPO"],
+		    lines = List.Transform(rows, (row) => {
+		        if row[ReviewDate] = "" then null else Date.FromText(Text.Start(row[ReviewDate], 10), [Format = "yyyy-MM-dd", Culture = "en-US"]),
+		        row[CiKey], row[CiName], row[Class], row[StatusInEpo], row[Answer], Record.FieldOrDefault(words, row[Answer], row[Answer]), row[Note], row[By],
+		        if row[At] = "" then null else DateTime.FromText(row[At], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])})
+		in
+		    #table(type table [ReviewDate = date, CiKey = text, CiName = text, Class = text, StatusInEpo = text, Answer = text, AnswerLabel = text, Note = text, By = text, At = datetime], lines)
+	queryGroup: Tables
+
+/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of eleven parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add the journal of the team, D292). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules).
 expression RunRows =
 		let
 		    run = CheckRun,
 		    findings = Table.Buffer(fnFindingsPart(run)),
 		    tested = Table.Buffer(fnTestedPart(run)),
+		    cases = fnCases(run),
 		    parts = {
 		        {"Findings", findings}, {"Tested", tested}, {"Notes", fnNotesPart(run)}, {"Parked", fnParkedPart(run)},
 		        {"MappingBacklog", fnMappingBacklogPart(run)}, {"RelationshipLinks", fnRelationshipLinksPart(run)},
-		        {"CapabilitySheet", fnCapabilitySheetPart(run)}, {"SelfCheck", fnSelfCheckPart(findings, tested)}
+		        {"CapabilitySheet", fnCapabilitySheetPart(run)}, {"SelfCheck", fnSelfCheckPart(findings, tested)},
+		        {"CaseLines", fnCaseLinesPart(cases)}, {"RepliesToRead", fnRepliesToReadPart(cases)}, {"Exceptions", fnExceptionsPart(run)}
 		    },
 		    // Each part with its columns named <Part>.<Column> and a column Part. The type of each column is the data type of the
 		    // calculated table that shows it (RunColumnTypes, generated), so Run and the calculated tables never differ.
@@ -3751,31 +4411,35 @@ expression RunRows =
 		    Table.ReorderColumns(withDate, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(withDate), (column) => column <> "Part" and column <> "ReportDate"))
 	queryGroup: Tables
 
-/// Table Runs: one row per CI report, with the other reports its checks use: for each type the newest report at or before the CI report's date (as the HTML app pairs them).
-expression RunsRows =
-		let
-		    cis = Table.SelectRows(ReadFiles, each [Kind] = "ci"),
-		    pick = (kind as text, date as nullable date) as nullable text =>
-		        let
-		            candidates = Table.SelectRows(ReadFiles, each [Kind] = kind and [ReportDate] <> null and date <> null and [ReportDate] <= date),
-		            sorted = Table.Sort(candidates, {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})
-		        in
-		            if Table.IsEmpty(sorted) then null else Table.Last(sorted)[FileName],
-		    withCis = Table.AddColumn(cis, "CIs", each fnCiCount([Read]), Int64.Type),
-		    withRelationship = Table.AddColumn(withCis, "RelationshipFile", each pick("relationship", [ReportDate]), type nullable text),
-		    withEpo = Table.AddColumn(withRelationship, "EpoFile", each pick("epo", [ReportDate]), type nullable text),
-		    withSolusi = Table.AddColumn(withEpo, "SolusiFile", each pick("solusi", [ReportDate]), type nullable text),
-		    withContract = Table.AddColumn(withSolusi, "ContractFile", each pick("contract", [ReportDate]), type nullable text)
-		in
-		    Table.TransformColumnTypes(
-		        Table.SelectColumns(withContract, {"ReportDate", "FileName", "CIs", "RelationshipFile", "EpoFile", "SolusiFile", "ContractFile"}),
-		        {{"FileName", type text}})
-	queryGroup: Tables
-
 /// Table ServiceNowContracts: the contracts of the newest ServiceNow contract report.
 expression ServiceNowContractsRows = fnNewestRows("contract")
 	queryGroup: Tables
 
+/// Table Settings (D291): the rows of the list SACM Settings, and the two numbers the cases use (CaseRules): a value that is not a whole number in its range is not used, so the page says which value counts.
+expression SettingsRows =
+		let
+		    rows = Table.ToRecords(fnStateList("settings")),
+		    used = [reminderDays = CaseRules[ReminderDays], maxReminders = CaseRules[MaxReminders]],
+		    lines = List.Transform(rows, (row) => {row[Title], row[Value],
+		        if Record.HasFields(used, row[Title]) then Text.From(Record.Field(used, row[Title])) else row[Value],
+		        if Record.HasFields(used, row[Title]) and Text.Trim(row[Value]) <> Text.From(Record.Field(used, row[Title])) then
+		            "Not used: a whole number from " & Text.From(Record.Field(SettingRanges, row[Title])[min]) & " to " & Text.From(Record.Field(SettingRanges, row[Title])[max]) & ". The default counts."
+		        else ""})
+		in
+		    #table(type table [Key = text, Value = text, Used = text, Note = text], lines)
+	queryGroup: Tables
+
 /// Table SolusiContracts: the contracts of the newest Solusi contract file.
 expression SolusiContractsRows = fnNewestRows("solusi")
+	queryGroup: Tables
+
+/// Table Team (D291): the SACM managers of the list SACM Team. Me: the manager who opens the report, by the email of their sign-in (the measure Me); in Sample mode the first active manager, so My work shows something.
+expression TeamRows =
+		let
+		    rows = Table.ToRecords(fnStateList("team")),
+		    lines = List.Transform(rows, (row) => {row[Title], Text.Lower(Text.Trim(row[Email]), "en-US"), not List.Contains({"no", "false", "0"}, Text.Lower(Text.Trim(row[Active]), "en-US"))}),
+		    firstActive = List.First(List.Select(lines, (item) => item{2}), null),
+		    marked = List.Transform(lines, (item) => item & {StateMode = "Sample" and firstActive <> null and item{1} = firstActive{1}})
+		in
+		    #table(type table [Name = text, Email = text, Active = logical, SampleMe = logical], marked)
 	queryGroup: Tables

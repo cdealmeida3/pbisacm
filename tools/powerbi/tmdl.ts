@@ -12,31 +12,39 @@ import { join } from 'node:path';
 export const MODEL = join(import.meta.dirname, '..', '..', 'powerbi', 'SACM-Workbench.SemanticModel', 'definition');
 
 export interface Expression { name: string; m: string; description: string; queryGroup: string }
-export interface Column { name: string; dataType: string; sourceColumn: string }
+export interface Column { name: string; dataType: string; sourceColumn: string; formatString?: string }
 export interface Measure { name: string; dax: string }
 export interface Table { name: string; file: string; columns: Column[]; measures: Measure[]; partitionM: string; partitionKind: string; dax?: string; calculated?: Calculated }
-/** A calculated table of the fixed form of D284: the part of Run it shows, and each column with the column of Run it takes. */
-export interface Calculated { part: string; columns: Array<[string, string]> }
+/**
+ * A calculated table of the fixed form of D284: the hidden table it splits (Run, or HistoryRun for the history, D290),
+ * the part it shows, and each column with the column of that table it takes.
+ */
+export interface Calculated { source: SourceTable; part: string; columns: Array<[string, string]> }
+/** The hidden tables the calculated tables split: Run (the newest report, refreshed in full) and HistoryRun (every report date, incremental). */
+export const SOURCE_TABLES = ['Run', 'HistoryRun'] as const;
+export type SourceTable = typeof SOURCE_TABLES[number];
 
 /**
- * The one form a calculated table may have (D284): the rows of one part of the hidden table Run, each column taken from
- * the column <Part>.<Column> of Run.
+ * The one form a calculated table may have (D284): the rows of one part of a hidden table (Run, or HistoryRun), each
+ * column taken from the column <Part>.<Column> of that table.
  *   SELECTCOLUMNS ( FILTER ( Run, Run[Part] = "Findings" ), "Key", Run[Findings.Key], ... )
+ *   SELECTCOLUMNS ( FILTER ( HistoryRun, HistoryRun[Part] = "History" ), "Key", HistoryRun[History.Key], ... )
  * Any other DAX fails with the file and the line.
  */
 export function readCalculated(dax: string, where: string): Calculated {
   const text = dax.replace(/\s+/g, ' ').trim();
-  const head = /^SELECTCOLUMNS \( FILTER \( Run, Run\[Part\] = "([A-Za-z]+)" \),(.*)\)$/.exec(text);
-  if (!head) throw new Error(`${where}: a calculated table must be SELECTCOLUMNS ( FILTER ( Run, Run[Part] = "<part>" ), "<column>", Run[<part>.<column>], ... )`);
-  const part = head[1]!;
+  const head = /^SELECTCOLUMNS \( FILTER \( (Run|HistoryRun), \1\[Part\] = "([A-Za-z]+)" \),(.*)\)$/.exec(text);
+  if (!head) throw new Error(`${where}: a calculated table must be SELECTCOLUMNS ( FILTER ( Run, Run[Part] = "<part>" ), "<column>", Run[<part>.<column>], ... ) (or the same with HistoryRun)`);
+  const source = head[1] as SourceTable;
+  const part = head[2]!;
   const columns: Array<[string, string]> = [];
-  const items = head[2]!.split(/,(?=\s*")/);
+  const items = head[3]!.split(/,(?=\s*")/);
   for (const item of items) {
-    const found = /^\s*"([^"]+)",\s*Run\[([^\]]+)\]\s*$/.exec(item);
-    if (!found) throw new Error(`${where}: "${item.trim()}" is not "<column>", Run[<part>.<column>]`);
-    columns.push([found[1]!, found[2]!]);
+    const found = /^\s*"([^"]+)",\s*(Run|HistoryRun)\[([^\]]+)\]\s*$/.exec(item);
+    if (!found || found[2] !== source) throw new Error(`${where}: "${item.trim()}" is not "<column>", ${source}[<part>.<column>]`);
+    columns.push([found[1]!, found[3]!]);
   }
-  return { part, columns };
+  return { source, part, columns };
 }
 
 /** A TMDL name: 'Report date' or ReportDate. */
@@ -105,14 +113,16 @@ export function readTable(file: string): Table {
       const name = unquote(column[1]!);
       let dataType = '';
       let sourceColumn = '';
+      let formatString = '';
       for (let j = i + 1; j < lines.length && (depth(lines[j]!) >= 2 || lines[j]!.trim() === ''); j++) {
-        const property = /^\t\t(dataType|sourceColumn):\s*(.+)$/.exec(lines[j]!);
+        const property = /^\t\t(dataType|sourceColumn|formatString):\s*(.+)$/.exec(lines[j]!);
         if (property?.[1] === 'dataType') dataType = property[2]!.trim();
         if (property?.[1] === 'sourceColumn') sourceColumn = unquote(property[2]!.trim());
+        if (property?.[1] === 'formatString') formatString = property[2]!.trim();
       }
       // A column of a calculated table names its DAX column in brackets: sourceColumn: [Key].
       const bare = /^\[(.*)\]$/.exec(sourceColumn)?.[1] ?? sourceColumn;
-      table.columns.push({ name, dataType, sourceColumn: bare || name });
+      table.columns.push({ name, dataType, sourceColumn: bare || name, ...(formatString ? { formatString } : {}) });
       continue;
     }
     const partition = /^\tpartition\s+('(?:[^']|'')*'|\S+)\s*=\s*(\w+)\s*$/.exec(line);

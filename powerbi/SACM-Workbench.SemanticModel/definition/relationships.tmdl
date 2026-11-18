@@ -38,3 +38,51 @@ relationship RelationshipLinks_Inventory
 relationship MappingBacklog_Inventory
 	fromColumn: MappingBacklog.CiKey
 	toColumn: Inventory.Key
+
+relationship History_Checks
+	fromColumn: History.CheckId
+	toColumn: Checks.CheckId
+
+relationship History_Runs
+	fromColumn: History.ReportDate
+	toColumn: Runs.ReportDate
+
+relationship HistoryTested_Checks
+	fromColumn: HistoryTested.CheckId
+	toColumn: Checks.CheckId
+
+relationship HistoryTested_Runs
+	fromColumn: HistoryTested.ReportDate
+	toColumn: Runs.ReportDate
+
+relationship HistoryNotes_Checks
+	fromColumn: HistoryNotes.CheckId
+	toColumn: Checks.CheckId
+
+relationship HistoryNotes_Runs
+	fromColumn: HistoryNotes.ReportDate
+	toColumn: Runs.ReportDate
+
+relationship HistoryChecked_Runs
+	fromColumn: HistoryChecked.ReportDate
+	toColumn: Runs.ReportDate
+
+relationship CaseLines_Checks
+	fromColumn: CaseLines.CheckId
+	toColumn: Checks.CheckId
+
+relationship JournalKeys_Journal
+	fromColumn: JournalKeys.EventId
+	toColumn: Journal.Id
+
+relationship JournalKeys_CaseLines
+	fromColumn: JournalKeys.Key
+	toColumn: CaseLines.Key
+
+relationship Journal_Date
+	fromColumn: Journal.Day
+	toColumn: Date.Date
+
+relationship Activity_Date
+	fromColumn: Activity.Day
+	toColumn: Date.Date

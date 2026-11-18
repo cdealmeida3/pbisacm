@@ -1,0 +1,117 @@
+/// Every event of the list SACM Journal (D291), oldest first. Keys: the finding keys of the event, one per line.
+table Journal
+
+	/// The events of the journal in view.
+	measure Events = COUNTROWS ( Journal ) + 0
+		formatString: #,0
+
+	/// On a line of the timeline of the Case and Person pages: how many findings of the page (the CI or the person of the drill through) the event names ("2 findings"); blank hides the line.
+	measure 'Timeline mark' =
+			VAR keys = VALUES ( Findings[Key] )
+			VAR n = CALCULATE ( COUNTROWS ( JournalKeys ), TREATAS ( keys, JournalKeys[Key] ) )
+			RETURN IF ( n > 0, n & IF ( n = 1, " finding", " findings" ) )
+
+	column Id
+		dataType: string
+		sourceColumn: Id
+
+	column At
+		dataType: dateTime
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		sourceColumn: At
+
+	column Day
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: Day
+
+	column By
+		dataType: string
+		sourceColumn: By
+
+	column ByName
+		dataType: string
+		sourceColumn: ByName
+
+	column Who
+		dataType: string
+		sourceColumn: Who
+
+	column Type
+		dataType: string
+		sourceColumn: Type
+
+	column Keys
+		dataType: string
+		sourceColumn: Keys
+
+	column KeyCount
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: KeyCount
+
+	column Text
+		dataType: string
+		sourceColumn: Text
+
+	column Ref
+		dataType: string
+		sourceColumn: Ref
+
+	column To
+		dataType: string
+		sourceColumn: To
+
+	column Cc
+		dataType: string
+		sourceColumn: Cc
+
+	column Subject
+		dataType: string
+		sourceColumn: Subject
+
+	column Kind
+		dataType: string
+		sourceColumn: Kind
+
+	column Channel
+		dataType: string
+		sourceColumn: Channel
+
+	column Person
+		dataType: string
+		sourceColumn: Person
+
+	column Reason
+		dataType: string
+		sourceColumn: Reason
+
+	column ReviewOn
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReviewOn
+
+	column RetireOn
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: RetireOn
+
+	column CheckId
+		dataType: string
+		sourceColumn: CheckId
+
+	column CiKey
+		dataType: string
+		sourceColumn: CiKey
+
+	column CiName
+		dataType: string
+		sourceColumn: CiName
+
+	partition Journal = m
+		mode: import
+		source = JournalRows

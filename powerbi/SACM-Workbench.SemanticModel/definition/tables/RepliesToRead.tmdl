@@ -1,0 +1,101 @@
+/// The replies that wait to be read (D292): a reply is read once a manager acted on one of its cases after it arrived. Newest first.
+table RepliesToRead
+
+	/// The replies to read about a daily card (My day, D182).
+	measure 'Replies to read' = CALCULATE ( COUNTROWS ( RepliesToRead ), RepliesToRead[Daily] = TRUE () ) + 0
+		formatString: #,0
+
+	/// Every reply to read (My work).
+	measure 'All replies to read' = COUNTROWS ( RepliesToRead ) + 0
+		formatString: #,0
+
+	/// On a line of the box Replies to read: Reply; blank hides a reply about a card for when there is time.
+	measure 'Reply step' = IF ( CALCULATE ( COUNTROWS ( RepliesToRead ), RepliesToRead[Daily] = TRUE () ) > 0, "Reply" )
+
+	/// On a line of My work: Mine when one of its cases is assigned to me.
+	measure 'Reply mine' =
+			VAR me = [Me]
+			VAR names = SUBSTITUTE ( SELECTEDVALUE ( RepliesToRead[AssignedTo] ), ", ", "|" )
+			RETURN IF ( NOT ISBLANK ( me ) && names <> "" && PATHCONTAINS ( names, me ), "Mine", "Reply" )
+
+	column File
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [File]
+
+	column Ref
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Ref]
+
+	column From
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [From]
+
+	column Received
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Received]
+
+	column FirstLine
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FirstLine]
+
+	column Cases
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Cases]
+
+	column CIs
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CIs]
+
+	column AssignedTo
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AssignedTo]
+
+	column Checks
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Checks]
+
+	column Daily
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Daily]
+
+	partition RepliesToRead = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "RepliesToRead" ),
+					"File", Run[RepliesToRead.File],
+					"Ref", Run[RepliesToRead.Ref],
+					"From", Run[RepliesToRead.From],
+					"Received", Run[RepliesToRead.Received],
+					"FirstLine", Run[RepliesToRead.FirstLine],
+					"Cases", Run[RepliesToRead.Cases],
+					"CIs", Run[RepliesToRead.CIs],
+					"AssignedTo", Run[RepliesToRead.AssignedTo],
+					"Checks", Run[RepliesToRead.Checks],
+					"Daily", Run[RepliesToRead.Daily]
+				)

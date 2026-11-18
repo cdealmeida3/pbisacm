@@ -7,6 +7,22 @@ table ReportTypes
 			RETURN IF ( ISBLANK ( newest ), BLANK (), DATEDIFF ( newest, [Today], DAY ) )
 		formatString: 0
 
+	/// The Reports line under the title of My day (src/app/view/tiles.ts, reportsLine): "5 reports · 11 Nov · fresh", or how many are loaded and which are missing, and a warning for each report that is too old.
+	measure 'Reports line' =
+			VAR today = [Today]
+			VAR all = ALL ( ReportTypes )
+			VAR total = COUNTROWS ( all )
+			VAR loaded = COUNTROWS ( FILTER ( all, NOT ISBLANK ( ReportTypes[NewestDate] ) ) )
+			VAR newest = MAXX ( all, ReportTypes[NewestDate] )
+			VAR missing = CONCATENATEX ( FILTER ( all, ISBLANK ( ReportTypes[NewestDate] ) ), ReportTypes[Label], ", ", ReportTypes[Order], ASC )
+			VAR stale = FILTER ( all, NOT ISBLANK ( ReportTypes[NewestDate] ) && DATEDIFF ( ReportTypes[NewestDate], today, DAY ) > ReportTypes[StaleAfter] )
+			VAR old = CONCATENATEX ( stale, "the " & ReportTypes[Label] & " is " & DATEDIFF ( ReportTypes[NewestDate], today, DAY ) & " days old", ", ", ReportTypes[Order], ASC )
+			VAR head = IF ( missing <> "", loaded & " of " & total & " reports", loaded & IF ( loaded = 1, " report", " reports" ) )
+			VAR day = IF ( NOT ISBLANK ( newest ), " · " & FORMAT ( newest, "d mmm" ) )
+			VAR tail = IF ( missing <> "", " · not loaded: " & missing, IF ( old = "", " · fresh" ) )
+			VAR warning = IF ( old <> "", ". " & UPPER ( LEFT ( old, 1 ) ) & MID ( old, 2, 500 ) & ". Load a newer one before you write to people." )
+			RETURN "Reports: " & head & day & tail & warning
+
 	/// Missing, Old (older than its days, D14) or Up to date.
 	measure 'Report state' =
 			VAR newest = MAX ( ReportTypes[NewestDate] )

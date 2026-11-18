@@ -2,6 +2,20 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.42.0 — The Power BI report, the history and the team's lists (B5)
+
+- **The history of every report date** (D290). The report runs the checks on every CI report of the last 24 months, not only the newest. In the workspace an old date is computed once and kept (incremental refresh), so a refresh after a new report stays fast.
+- **New and solved.** A finding is new when the report before did not show it, and solved (verified) when a later report no longer shows it. A check that was not tested in a report solves nothing.
+- **The team's lists** (D291): the journal, the replies, the settings, the team and the lifecycle reviews are read from five SharePoint lists, or from invented rows in Sample mode. The report only reads them; writing them comes in stage 2. How to make the lists: [powerbi/README.md](../powerbi/README.md) §5.
+- **The cases** (D292): each finding of the newest report gets its status from the journal, as in the app: New, Asked, Answered, Fix in progress, Marked fixed, Not followed up or Verified, when a reminder or an escalation is due, and the next step.
+- **The cards and the card, case and person pages know the cases.** A card's fact can be *+N new*, *N reminders*, *N answered*, *N of M marked as fixed*, *N free* or *Not asked yet*, and a SACM fix list with every line marked is *All marked as fixed*. Each line shows its status, its follow-up and who has it; the Case and Person pages have a timeline and the replies.
+- **Five new pages** (D293): **My day** (the report opens on it), **My work**, **Activity**, **History** (per card over the report dates, per support group and per class) and **Audit** (the verification record, what was verified, the actions of the team, the decisions to stop following, the lifecycle marks).
+- **The guide to publish it for the team** in [powerbi/README.md](../powerbi/README.md) §4: the workspace, the sign-in for SharePoint, the first refresh, the scheduled refresh, the app.
+- The samples have a second CI and Relationship report (4 November), so the history shows two dates, and an invented journal, replies, settings, team and reviews.
+- The Self-check page also compares the numbers of the history with the app's numbers on the samples.
+- A refresh at the size of the real reports takes about 100 seconds on the test machine, under the limit of 2 minutes.
+- The HTML app works as before: no check, number or message changed.
+
 ## 0.41.0 — The Power BI report, the contract checks (B4)
 
 - **38 checks work in the Power BI report.** New in B4: *Not in Solusi*, *To clear by hand*, *Contract status*, *Upload check*, *For Procurement* and *Contracts to fix in ServiceNow*. They find the same lines as the HTML app on the samples. On the SACM fix list of *Not in Solusi*, the note says why a contract to delete is still linked. The Self-check page says 38 of 39: *Lifecycle review* is a manual card.

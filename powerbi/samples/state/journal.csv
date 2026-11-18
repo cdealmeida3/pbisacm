@@ -1,0 +1,33 @@
+Title,At,By,ByName,Type,Keys,Text,Ref,To,Cc,Subject,Kind,Channel,Person,Reason,ReviewOn,RetireOn,CheckId,CiKey,CiName
+J0001,2026-10-26T09:30:00,alex@example.com,Alex Example,message,"DESC-QUALITY:members:description
+RESP-MISSING:members:managed_by
+NAME-STANDARD:members:bs-suffix",2026-10-26_SACM-EF56GH.eml,SACM-EF56GH,ada@example.com,,Members: 3 points to fix [SACM-EF56GH],first,mailbox,,,,,,,
+J0002,2026-10-30T10:00:00,alex@example.com,Alex Example,message,"DESC-QUALITY:members:description
+RESP-MISSING:members:managed_by
+NAME-STANDARD:members:bs-suffix",2026-10-30_SACM-EF56GH.eml,SACM-EF56GH,ada@example.com,,Still open: Members [SACM-EF56GH],reminder,mailbox,,,,,,,
+J0003,2026-11-02T11:15:00,sam@example.com,Sam Example,message,TAG-STATUS-CONFLICT:member engine - test:tags,,SACM-GH78IJ,cy@example.com,,Member Engine - TEST: tags to check [SACM-GH78IJ],first,outlook,,,,,,,
+J0004,2026-11-04T09:00:00,alex@example.com,Alex Example,message,"DESC-QUALITY:members:description
+RESP-MISSING:members:managed_by
+NAME-STANDARD:members:bs-suffix",2026-11-04_SACM-EF56GH.eml,SACM-EF56GH,ada@example.com,,Still open: Members [SACM-EF56GH],reminder,mailbox,,,,,,,
+J0005,2026-11-05T10:00:00,alex@example.com,Alex Example,message,"CRIT-AUTO-JUSTIFICATION:member engine - prod:availability
+CRIT-NO-JUSTIFICATION:index tool:confidentiality",2026-11-05_SACM-AB12CD.eml,SACM-AB12CD,dee@example.com,,Criticality: 2 justifications to write [SACM-AB12CD],first,mailbox,,,,,,,
+J0006,2026-11-05T10:05:00,alex@example.com,Alex Example,message,"SUPPORT-GROUP-MISSING:members - standard:support_group
+SUPPORTED-BY:members - standard:supported_by",2026-11-05_SACM-CD34EF.eml,SACM-CD34EF,cy@example.com,,Members - Standard: 2 points to fix [SACM-CD34EF],first,mailbox,,,,,,,
+J0007,2026-11-06T08:40:00,alex@example.com,Alex Example,status,RESP-MISSING:register a new member:owned_by,Fixed,,,,,,,,,,,,,
+J0008,2026-11-06T09:10:00,sam@example.com,Sam Example,status,"SUPPORTED-BY:index tool - prod:supported_by
+SUPPORT-GROUP-INACTIVE:index tool - prod:support_group",Fix in progress,,,,,,,,,,,,,
+J0009,2026-11-06T09:11:00,sam@example.com,Sam Example,request,"SUPPORTED-BY:index tool - prod:supported_by
+SUPPORT-GROUP-INACTIVE:index tool - prod:support_group",RITM0001234,,,,,,,,,,,,,
+J0010,2026-11-09T14:00:00,alex@example.com,Alex Example,status,RESP-MISSING:manage member records:owned_by,Fixed,,,,,,,,,,,,,
+J0011,2026-11-09T14:30:00,sam@example.com,Sam Example,exception,TAG-MISSING:reconcile index:tags,The owner keeps it until the next review,,,,,,,,Agreed with the owner,2027-05-10,,,,
+J0012,2026-05-08T10:00:00,max@example.com,Max Manager,exception,RESP-INACTIVE:reconcile index:owned_by,The owner leaves in autumn,,,,,,,,Agreed with the owner,2026-11-10,,,,
+J0013,2026-11-09T15:00:00,sam@example.com,Sam Example,exception,,Two records on purpose until the move,,,,,,,,Duplicate record,2027-01-31,,NAME-DUPLICATE,manage fines,Manage Fines
+J0014,2026-11-10T08:30:00,alex@example.com,Alex Example,assign,"MAPPING:event engine:mapping
+MAPPING:event desk:mapping",Sam Example,,,,,,,,,,,,,
+J0015,2026-11-10T08:45:00,sam@example.com,Sam Example,handover,"DESC-QUALITY:reconcile index:description
+DESC-QUALITY:close the month:description",Back from holiday: please take these two,,Alex Example,,,,,,,,,,,
+J0016,2026-11-10T09:00:00,alex@example.com,Alex Example,retirement,SUPPORTED-BY:member engine - test:supported_by,The owner retires it at the end of the year,,,,,,,,,,2026-12-31,,,
+J0017,2026-11-10T09:20:00,sam@example.com,Sam Example,reviewed,CRIT-ABOVE-PARENT:member engine - prod:integrity,Ask the owner,,,,,,,,,,,,,
+J0018,2026-11-10T11:00:00,sam@example.com,Sam Example,message,MAPPING:event gateway - prod:mapping,,SACM-JK90LM,Dee Owner,,Event Gateway - PROD: mapping session,first,teams,,,,,,,
+J0019,2026-11-10T11:30:00,alex@example.com,Alex Example,person-note,,Prefers a Teams chat to an email,,,,,,,cy01,,,,,,
+J0020,2026-11-11T08:05:00,alex@example.com,Alex Example,note,RESP-MISSING:close the month:managed_by,Asked the Process Management team in the weekly meeting,,,,,,,,,,,,,

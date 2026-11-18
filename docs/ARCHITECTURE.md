@@ -381,7 +381,7 @@ That tool designs mappings for one project at a time ("links, not data quality")
 
 ## 12. The Power BI report
 
-The Workbench is being rebuilt as a Power BI report (D268). The HTML app above stays as it is until stage 2 ends; its logic is the answer key of the report (D270). Build B1 is the foundation: the reports are read and the cards are listed. Build B2 runs the checks of the CI report: the rule checks and the CI and criticality code detectors (`BuiltDetectors`). Build B3 adds the relationship, EPO, process stage and mapping backlog detectors. The speed build makes a refresh at the size of the real reports fit in the budget of D283. Build B4 adds the contract detectors and the table *Contract changes*.
+The Workbench is being rebuilt as a Power BI report (D268). The HTML app above stays as it is until stage 2 ends; its logic is the answer key of the report (D270). Build B1 is the foundation: the reports are read and the cards are listed. Build B2 runs the checks of the CI report: the rule checks and the CI and criticality code detectors (`BuiltDetectors`). Build B3 adds the relationship, EPO, process stage and mapping backlog detectors. The speed build makes a refresh at the size of the real reports fit in the budget of D283. Build B4 adds the contract detectors and the table *Contract changes*. Build B5 adds the history of every report date with an incremental refresh, the team's state from five SharePoint lists, the cases, and the pages of the team's day.
 
 ```
 powerbi/
@@ -390,9 +390,9 @@ powerbi/
 │   ├── database.tmdl, model.tmdl, relationships.tmdl
 │   ├── expressions.tmdl                   GENERATED: every query of powerbi/m/, the packed samples, check and reference files
 │   └── tables/<Table>.tmdl                one file per table: its columns, its DAX measures, one query <Table>Rows, or a calculated
-│                                          table that splits Run (D284); Run.tmdl is GENERATED from those
+│                                          table that splits Run or HistoryRun (D284, D290); Run.tmdl and HistoryRun.tmdl are GENERATED
 ├── SACM-Workbench.Report/
-│   ├── definition/                        the pages (Reports, Cards, Card, Case, Person, Mapping backlog, Contract changes, Self-check) and their visuals, in PBIR
+│   ├── definition/                        the pages (My day, Cards, Card, Case, Person, My work, Mapping backlog, Contract changes, Activity, History, Audit, Reports, Self-check) and their visuals, in PBIR
 │   └── StaticResources/RegisteredResources/sacm-theme.json   GENERATED from the colours of LOOK.md
 ├── m/<Query>.pq                           the Power Query queries, one per file (hand-written)
 └── README.md                              how to open, refresh, make a .pbix, switch to SharePoint (for Carlos)
@@ -400,7 +400,7 @@ powerbi/
 
 **How data flows.** `SourceMode` (D271) picks the files: `SampleFiles` (the invented samples, base64 in the model) or `fnSharePointFiles` (one folder of the SharePoint site). `ReadFiles` reads each file once (`fnReadTable`: CSV with its separator and encoding, or every sheet of an `.xlsx`) and finds its kind by its columns (`fnReportType`, the port of `recogniseAmong`). The newest file of each kind (`fnNewest`) goes through its reader (`fnReadCiReport`, `fnReadRelationshipReport`, `fnReadEpoReport`, `fnReadSolusiFile`, `fnReadContractReport`, ports of `src/core/sources/`) into the tables `Inventory`, `Relationships`, `EpoSystems`, `SolusiContracts` and `ServiceNowContracts`. `Checks` lists every check file that is not off; `Notes` gives the grey note of each check whose detector is not built (`BuiltDetectors`), so no card is a silent pass. `SelfCheck` compares the result with the expected result packed from `tests/recorded/cards.json`. Ages and "old" are DAX measures, so they are right on any day.
 
-**How the checks run (B2 to B4).** `CheckRun` runs `fnCheckRun` on the newest CI report (D278), the port of `runChecks` and `buildRun`. It reads the CIs with their tags and hidden characters, pairs the Relationship and EPO reports dated on or before it (`fnPaired`), builds the relationship graph once (`fnRelationshipGraph`), parks the classes of `parked-classes` (`fnParked`), and gives each check in use its scope.
+**How the checks run (B2 to B4).** `CheckRun` runs `fnCheckRun` on the newest CI report (D278), the port of `runChecks` and `buildRun`. It reads the CIs with their tags and hidden characters, pairs the Relationship and EPO reports dated on or before it (`fnPairedFile`), builds the relationship graph once (`fnRelationshipGraph`), parks the classes of `parked-classes` (`fnParked`), and gives each check in use its scope.
 
 Each built module has one function: `fnDetectRule` (every operator of `checks/README.md`), `fnDetectCiNameStandard`, `fnDetectCiEpoId`, `fnDetectCiStatusAge`, `fnDetectCriticalityAboveParents`, `fnDetectCriticalityNoneReaches`, the seven `fnDetectRelationships…` (on the graph: its edges, the partners up and down, the environment of each CI by `fnEnvironment`), `fnDetectEpoDiffers` and `fnDetectEpoNotArrived` (on `fnEpoCompare`, worked out once per run, D281), `fnDetectProcessStage`, `fnDetectMappingBacklog`, and the five `fnDetectContracts…` (on `fnContractCompare`, the Solusi file and the ServiceNow contract report paired with the CI report and compared once per run); each returns `[Findings, Tested, Evaluated, Notes]` and a part it cannot test gives a note (D15).
 
@@ -413,8 +413,16 @@ Then `fnSourceFirst` (D190, on the pairs of `fnEpoCompare`), the parked filter, 
 ```
 files ─▶ ReadFiles ─▶ CheckRun ─▶ Run (hidden, RunRows) ─▶ Findings, Tested, Notes, Parked, MappingBacklog,
                                                            RelationshipLinks, CapabilitySheet, SelfCheck (DAX)
+          │                              (+ CaseLines, RepliesToRead, Exceptions: the cases of the newest report, D292)
+          ├────▶ HistoryRun (hidden, incremental, HistoryRunRows) ─▶ History, HistoryTested, HistoryNotes,
+          │                                                         HistoryChecked, Runs (DAX)
           └────▶ ContractChanges (ContractChangesRows: the two newest Solusi files, no CI report)
+lists ─▶ fnStateList ─▶ Journal, JournalKeys, Replies, Settings, Team, Reviews, Activity
 ```
+
+**The history (B5, D290).** `HistoryRun` (query `HistoryRunRows`) is `fnHistoryRun(RangeStart, RangeEnd)`: `fnCheckRun` on every CI report dated in that range, one run per date, and the parts *History* (every finding key of each date), *HistoryTested*, *HistoryNotes*, *HistoryChecked* (which check was tested in which run) and *Runs*. Its `refreshPolicy` (in `HistoryRun.tmdl`, generated) keeps 24 months, computes the last 7 days again, and asks `fnHistoryPolling` whether a file of a part changed (detect data changes). `ReadDays` (21) is how far before `RangeStart` a part looks for the Relationship and EPO reports. *New*, *Solved*, *Days to fix*, *First seen* and the trends are DAX measures on *History* and *HistoryChecked*: a report is compared with the report before it, and a check not tested there solves nothing.
+
+**The team's state (B5, D291, D292).** `StateMode` picks the packed sample lists (`StateFiles`, from `powerbi/samples/state/`) or the five SharePoint lists; `fnStateList` reads one list as text. `JournalEvents` makes the events of the app's journal, `ReplyItems` the replies, `CaseRules` the rules of *SACM Settings* (with the ranges of `SettingRanges`). `fnCases` (the port of `buildCases`) works out the cases of the newest report on `CaseToday`; the parts `CaseLines`, `RepliesToRead` and `Exceptions` of `Run` hold them. `ActivityRows` writes the words of the app's activity. `tools/powerbi/history.ts` gives the same tables from `src/core/`, for `parity.ts` and for `ExpectedHistory`, the numbers the *Self-check* page compares the DAX of the history with.
 
 `ContractChanges` is its own query, not a part of `Run` (D288): it reads no CI report. Its measures count the days left from the measure `Today`, so *ends in 30 / 90 days* moves with the day the report is opened.
 
@@ -431,8 +439,9 @@ files ─▶ ReadFiles ─▶ CheckRun ─▶ Run (hidden, RunRows) ─▶ Findi
 | `tools/powerbi/time.ps1` | The job *powerbi-time* (Windows): runs each probe as its own PQTest call, with a time cap, minus the start of PQTest; writes the table of times, the growth per doubling and T1 (the sum of the tables) to the job summary; with `-Gate` fails over the budget of D283 |
 | `tools/powerbi/load-check.ps1` | When Power Query refuses the whole test connector (every query says "SacmEval.Contents wasn't recognized"), finds the query that stops it |
 | `tools/powerbi/units.ts` | The unit cases of the reading functions, of every pattern of the checks (against JavaScript), of the search and replace of the relationship patterns, of the environment, the plain text of an EPO description and the ServiceNow address: the same inputs through `src/core/` and through Power Query, in queries of 900 rows (`Units1`, `Units2`: PQTest returns at most 1,000) |
+| `tools/powerbi/history.ts` | The answer key of B5: the runs of the two sample dates, the history, the cases, the replies, the activity and the lists, worked out by `src/core/`; `STATE_LISTS` names the five lists and their columns; `expectedHistory()` gives `ExpectedHistory` |
 | `tools/powerbi/regex.ts` | Compiles the regular expressions of the check and reference files into the trees `fnRegexTest` walks; refuses any form Power Query does not know (D277) |
-| `tools/powerbi/parity.ts` | `npm run powerbi:parity <folder>`: compares the PQTest result with `src/core/` and `tests/recorded/`: the columns of each table, the unit cases, the report files, every CI and every row of the other readers, the checks, every finding of the built checks with all its fields (`tests/recorded/run.json`), what was tested and how many CIs, the notes, the parked lines and the self-check |
+| `tools/powerbi/parity.ts` | `npm run powerbi:parity <folder>`: compares the PQTest result with `src/core/` and `tests/recorded/` (and with `tools/powerbi/history.ts` for the history, the cases and the lists): the columns of each table, the unit cases, the report files, every CI and every row of the other readers, the checks, every finding of the built checks with all its fields (`tests/recorded/run.json`), what was tested and how many CIs, the notes, the parked lines and the self-check |
 | `.github/workflows/powerbi.yml` | The job *powerbi-eval* on GitHub's Windows runner: downloads Microsoft's Power Query SDK tools, runs every table on the samples with PQTest, then `parity.ts`. The job *powerbi-time*: the refresh time at real size (`time.ps1`), on every pull request and by hand with more sizes and the stages |
 
 **Speed rules for the queries (D283, D284).** A refresh at real size must stay under 2 minutes; the job *powerbi-time* fails a pull request above it.

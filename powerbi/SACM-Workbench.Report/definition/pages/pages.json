@@ -1,14 +1,19 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
   "pageOrder": [
-    "reports",
+    "myday",
     "cards",
     "card",
     "case",
     "person",
+    "mywork",
     "backlog",
     "contracts",
+    "activity",
+    "history",
+    "audit",
+    "reports",
     "selfcheck"
   ],
-  "activePageName": "cards"
+  "activePageName": "myday"
 }

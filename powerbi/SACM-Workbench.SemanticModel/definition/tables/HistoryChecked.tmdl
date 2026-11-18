@@ -1,0 +1,32 @@
+/// What each CI report date could verify (D290): Kind "ci", the key of each CI it checked (not parked); Kind "part", each <check>:<field> it tested. A finding of the report before is solved only when its CI and its part are here and the finding is gone.
+table HistoryChecked
+
+	column ReportDate
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReportDate]
+
+	column Kind
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Kind]
+
+	column Id
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Id]
+
+	partition HistoryChecked = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( HistoryRun, HistoryRun[Part] = "HistoryChecked" ),
+					"ReportDate", HistoryRun[HistoryChecked.ReportDate],
+					"Kind", HistoryRun[HistoryChecked.Kind],
+					"Id", HistoryRun[HistoryChecked.Id]
+				)

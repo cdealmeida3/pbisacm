@@ -1,0 +1,196 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "replies",
+  "position": {
+    "x": 24,
+    "y": 124,
+    "z": 2000,
+    "height": 200,
+    "width": 1232,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RepliesToRead"
+                    }
+                  },
+                  "Property": "Reply mine"
+                }
+              },
+              "queryRef": "RepliesToRead.Reply mine",
+              "nativeQueryRef": "Reply mine",
+              "displayName": "Whose"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RepliesToRead"
+                    }
+                  },
+                  "Property": "From"
+                }
+              },
+              "queryRef": "RepliesToRead.From",
+              "nativeQueryRef": "From",
+              "displayName": "From"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RepliesToRead"
+                    }
+                  },
+                  "Property": "FirstLine"
+                }
+              },
+              "queryRef": "RepliesToRead.FirstLine",
+              "nativeQueryRef": "FirstLine",
+              "displayName": "What they wrote"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RepliesToRead"
+                    }
+                  },
+                  "Property": "Received"
+                }
+              },
+              "queryRef": "RepliesToRead.Received",
+              "nativeQueryRef": "Received",
+              "displayName": "Received"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RepliesToRead"
+                    }
+                  },
+                  "Property": "CIs"
+                }
+              },
+              "queryRef": "RepliesToRead.CIs",
+              "nativeQueryRef": "CIs",
+              "displayName": "CIs"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RepliesToRead"
+                    }
+                  },
+                  "Property": "AssignedTo"
+                }
+              },
+              "queryRef": "RepliesToRead.AssignedTo",
+              "nativeQueryRef": "AssignedTo",
+              "displayName": "Assigned to"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "RepliesToRead"
+                  }
+                },
+                "Property": "Received"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Replies to read'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Replies to read'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

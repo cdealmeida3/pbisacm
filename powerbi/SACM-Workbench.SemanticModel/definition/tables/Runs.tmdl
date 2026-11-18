@@ -1,37 +1,65 @@
-/// One row per CI report, with the other reports its checks use.
+/// One row per CI report date, with the other reports its checks used (D290).
 table Runs
+
+	/// The CI report dates the history holds.
+	measure 'Report dates' = COUNTROWS ( Runs ) + 0
+		formatString: #,0
 
 	column ReportDate
 		dataType: dateTime
+		isDataTypeInferred
 		formatString: d mmm yyyy
 		summarizeBy: none
-		sourceColumn: ReportDate
+		isNameInferred
+		sourceColumn: [ReportDate]
 
 	column FileName
 		dataType: string
-		sourceColumn: FileName
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FileName]
 
 	column CIs
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: CIs
+		isNameInferred
+		sourceColumn: [CIs]
 
 	column RelationshipFile
 		dataType: string
-		sourceColumn: RelationshipFile
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [RelationshipFile]
 
 	column EpoFile
 		dataType: string
-		sourceColumn: EpoFile
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EpoFile]
 
 	column SolusiFile
 		dataType: string
-		sourceColumn: SolusiFile
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [SolusiFile]
 
 	column ContractFile
 		dataType: string
-		sourceColumn: ContractFile
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ContractFile]
 
-	partition Runs = m
+	partition Runs = calculated
 		mode: import
-		source = RunsRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( HistoryRun, HistoryRun[Part] = "Runs" ),
+					"ReportDate", HistoryRun[Runs.ReportDate],
+					"FileName", HistoryRun[Runs.FileName],
+					"CIs", HistoryRun[Runs.CIs],
+					"RelationshipFile", HistoryRun[Runs.RelationshipFile],
+					"EpoFile", HistoryRun[Runs.EpoFile],
+					"SolusiFile", HistoryRun[Runs.SolusiFile],
+					"ContractFile", HistoryRun[Runs.ContractFile]
+				)
