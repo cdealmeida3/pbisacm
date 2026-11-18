@@ -60,10 +60,9 @@ fails if one is committed.
 
 ## 3. Read the real reports from SharePoint (when you are ready)
 
-**Not yet at the size of the real reports.** On invented reports as big as the real ones (3,230 CIs, 5,100
-relationships), the Windows check needs 50 seconds for the table *Inventory* alone, and the checks (*Findings*) did not
-finish in 14 minutes. The plan's target is under 2 minutes. Until a later build makes the queries faster, use the
-samples, or try SharePoint with a small report only.
+**Ready for the real reports.** On invented reports as big as the real ones (3,230 CIs, 5,100 relationships, 1,020 EPO
+systems), a refresh takes about 43 seconds on the Windows test machine (version 0.40.0, D283). The slowest table is the
+hidden table *Run*, the checks, at about 30 seconds. Your laptop may be slower or faster; the budget is 2 minutes.
 
 The model reads the reports from one folder of the team's SharePoint site. Power Automate puts the scheduled ServiceNow
 reports there (flow F1 of the plan). The real site and folder are typed in Power BI only, **never in this repository**.
