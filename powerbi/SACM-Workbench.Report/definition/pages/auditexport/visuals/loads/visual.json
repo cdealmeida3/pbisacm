@@ -3,11 +3,11 @@
   "name": "loads",
   "position": {
     "x": 224,
-    "y": 396,
-    "z": 10000,
-    "height": 144,
-    "width": 508,
-    "tabOrder": 10000
+    "y": 508,
+    "z": 11000,
+    "height": 196,
+    "width": 336,
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "tableEx",
@@ -165,7 +165,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "126D"
+                  "Value": "97D"
                 }
               }
             }
@@ -179,7 +179,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "163D"
+                  "Value": "77D"
                 }
               }
             }
@@ -193,7 +193,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "72D"
+                  "Value": "43D"
                 }
               }
             }
@@ -207,7 +207,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "106D"
+                  "Value": "77D"
                 }
               }
             }

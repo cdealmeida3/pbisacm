@@ -69,8 +69,18 @@ public static class DesktopScreen {
   Write-Output "Screen: $([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width) x $([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height) (change: $changed)"
 } catch { Write-Output "Screen size not changed: $($_.Exception.Message)" }
 
-# 2. Open the project, as a double click on the .pbip does; wait for the port of its engine.
-$project = (Resolve-Path "powerbi/SACM-Workbench.pbip").Path
+# 2. Open the project, as a double click on the .pbip does; wait for the port of its engine. Desktop opens a copy in which
+# every page is shown, so the picture step finds a tab for the hidden pages too (Card, Case, Person, Self-check, the
+# parts of Audit); the files of the repository are not changed.
+$copy = Join-Path $Out "project"
+if (Test-Path $copy) { Remove-Item -Recurse -Force $copy }
+Copy-Item -Recurse "powerbi" $copy
+foreach ($file in Get-ChildItem -Recurse -Filter "page.json" (Join-Path $copy "SACM-Workbench.Report")) {
+  $text = Get-Content -Raw $file.FullName
+  $visible = $text -replace ',\s*"visibility":\s*"HiddenInViewMode"', '' -replace '"visibility":\s*"HiddenInViewMode",\s*', ''
+  if ($visible -ne $text) { Set-Content -NoNewline -Encoding utf8NoBOM $file.FullName $visible }
+}
+$project = (Resolve-Path (Join-Path $copy "SACM-Workbench.pbip")).Path
 Write-Output "$(Get-Date -Format HH:mm:ss) Opening $project"
 Start-Process -FilePath $desktop -ArgumentList "`"$project`""
 $workspaces = Join-Path $env:LOCALAPPDATA "Microsoft\Power BI Desktop\AnalysisServicesWorkspaces"

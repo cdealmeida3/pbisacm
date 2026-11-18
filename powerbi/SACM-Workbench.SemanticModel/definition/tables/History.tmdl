@@ -210,6 +210,10 @@ table History
 	measure 'Per group note' = IF ( [History to solve] = 0, "Nothing to solve on the report dates chosen.", "To solve on each CI report date." )
 		displayFolder: Page notes
 
+	/// Under the title of To solve per support group (History): the table leaves out the findings with no support group.
+	measure 'Per team note' = IF ( [History to solve] = 0, "Nothing to solve on the report dates chosen.", "To solve on each CI report date. A contract or a CI with no support group is not in this table." )
+		displayFolder: Page notes
+
 	/// Under the title of the record (Audit).
 	measure 'Record note' = "Per check, on " & FORMAT ( COALESCE ( MAX ( Runs[ReportDate] ), [Newest report date] ), "d mmm yyyy" ) & ": the newest report date when none is chosen."
 		displayFolder: Page notes

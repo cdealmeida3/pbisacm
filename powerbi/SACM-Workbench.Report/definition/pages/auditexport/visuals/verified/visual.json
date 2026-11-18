@@ -5,8 +5,8 @@
     "x": 224,
     "y": 84,
     "z": 8000,
-    "height": 300,
-    "width": 508,
+    "height": 200,
+    "width": 1032,
     "tabOrder": 8000
   },
   "visual": {
@@ -225,7 +225,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "37D"
+                  "Value": "223D"
                 }
               }
             }
@@ -239,7 +239,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "50D"
+                  "Value": "92D"
                 }
               }
             }
@@ -253,7 +253,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "50D"
+                  "Value": "135D"
                 }
               }
             }
@@ -267,7 +267,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "50D"
+                  "Value": "92D"
                 }
               }
             }
@@ -281,7 +281,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "78D"
+                  "Value": "120D"
                 }
               }
             }
@@ -295,7 +295,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "84D"
+                  "Value": "126D"
                 }
               }
             }
@@ -309,7 +309,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "71D"
+                  "Value": "113D"
                 }
               }
             }
@@ -323,7 +323,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "44D"
+                  "Value": "86D"
                 }
               }
             }

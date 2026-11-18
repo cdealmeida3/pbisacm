@@ -82,6 +82,28 @@ function Find-Tab($root, [string]$name) {
   }
   return $best
 }
+# Open a tab: a tab out of sight (the strip scrolls) is scrolled into view first, then clicked in its middle; a tab that
+# stays out of sight is selected as UI Automation offers.
+function Open-Tab($tab) {
+  try {
+    if ($tab.Current.IsOffscreen) { $tab.GetCurrentPattern([System.Windows.Automation.ScrollItemPattern]::Pattern).ScrollIntoView(); Start-Sleep -Milliseconds 300 }
+  } catch { }
+  if (-not $tab.Current.IsOffscreen) { $at = Center $tab; Click $at[0] $at[1]; return }
+  try { $tab.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select(); return } catch { }
+  try { $tab.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke(); return } catch { }
+  $at = Center $tab
+  Click $at[0] $at[1]
+}
+# The names at the foot of the window (the tab strip), for the log when a tab is not found.
+function Tab-Names($root) {
+  $window = $root.Current.BoundingRectangle
+  $names = @()
+  foreach ($element in $root.FindAll($Scope::Descendants, [System.Windows.Automation.Condition]::TrueCondition)) {
+    $r = $element.Current.BoundingRectangle
+    if ($element.Current.Name -and -not $r.IsEmpty -and $r.Y -ge ($window.Y + $window.Height - 140)) { $names += "'$($element.Current.Name)'" }
+  }
+  return ($names | Select-Object -Unique) -join ", "
+}
 # Every name the window shows, once (the text of the canvas, the buttons, the tabs).
 function Words($root) {
   $seen = New-Object System.Collections.Generic.HashSet[string]
@@ -163,13 +185,12 @@ foreach ($page in $list) {
   $slug = "{0:D2}-{1}" -f $n, $page.name
   $n++
   if (-not $tab) {
-    Say "No tab for $($page.displayName)"
+    Say "No tab for $($page.displayName); the foot of the window shows: $(Tab-Names $root)"
     $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $false; seconds = $null; file = $null; broken = @() }
     continue
   }
-  $at = Center $tab
   $clock = [System.Diagnostics.Stopwatch]::StartNew()
-  Click $at[0] $at[1]
+  Open-Tab $tab
   Start-Sleep -Milliseconds 300
   $before = Fingerprint
   $stable = 0

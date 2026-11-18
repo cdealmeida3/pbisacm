@@ -95,6 +95,10 @@ table Checks
 			    )
 		formatString: 0
 
+	/// The place of the card in the order of Card order, 1 for the first: the first column (#) of All cards, so the table keeps the order of the app without showing its key (design D1).
+	measure 'Card place' = IF ( ISBLANK ( [Card order] ), BLANK (), RANKX ( FILTER ( ALLSELECTED ( Checks ), NOT ISBLANK ( [Card order] ) ), [Card order], , ASC, DENSE ) )
+		formatString: 0
+
 	/// Checks that are not off.
 	measure 'Checks in use' = COUNTROWS ( Checks ) + 0
 		formatString: 0

@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "openAtEnd",
   "position": {
-    "x": 224,
-    "y": 552,
+    "x": 572,
+    "y": 508,
     "z": 12000,
-    "height": 152,
-    "width": 1032,
+    "height": 196,
+    "width": 684,
     "tabOrder": 12000
   },
   "visual": {
@@ -225,7 +225,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "149D"
+                  "Value": "107D"
                 }
               }
             }
@@ -239,7 +239,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "87D"
+                  "Value": "53D"
                 }
               }
             }
@@ -253,7 +253,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "125D"
+                  "Value": "57D"
                 }
               }
             }
@@ -267,7 +267,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "87D"
+                  "Value": "53D"
                 }
               }
             }
@@ -281,7 +281,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "121D"
+                  "Value": "87D"
                 }
               }
             }
@@ -295,7 +295,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "128D"
+                  "Value": "94D"
                 }
               }
             }
@@ -309,7 +309,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "173D"
+                  "Value": "105D"
                 }
               }
             }
@@ -323,7 +323,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "115D"
+                  "Value": "81D"
                 }
               }
             }
