@@ -9,6 +9,8 @@
 (cases as list) as table =>
     let
         settings = MessageSettings,
+        // The check files read once for every chat (ARCHITECTURE §12, the speed rules).
+        packs = List.Buffer(List.Transform(Json.Document(CheckFiles), (file) => file[pack])),
         chosen = List.Select(cases, (item) => item[InLatest] and item[ToSolve] and item[Askable] and (item[Messages] = 0 or item[ReminderDue] or item[OverLimit])),
         drafts = fnDrafts(chosen, settings),
         kindWords = [first = "Email", reminder = "Reminder", escalation = "Escalation"],
@@ -19,7 +21,7 @@
             let draft = drafts{at} in
             {
                 "D" & Text.PadStart(Text.From(at + 1), 4, "0"), draft[Ref], draft[Kind], Record.Field(kindWords, draft[Kind]), draft[To], draft[ToName], draft[Cc],
-                draft[Subject], draft[Body], draft[Plain], fnChatMessage(draft[Items], settings, "%%REF%%", draft[To]),
+                draft[Subject], draft[Body], draft[Plain], fnChatMessage(draft[Items], settings, "%%REF%%", draft[To], packs),
                 Text.Combine(draft[Keys], "#(lf)"), Text.Combine(draft[NewKeys], "#(lf)"), Text.Combine(draft[CheckIds], ", "),
                 draft[CiCount], draft[PartIndex], draft[PartCount], draft[About], draft[NobodyAbove], draft[Mailbox], draft[Team], draft[Person], assigned(draft[Items]),
                 Text.Combine(List.Transform(List.Select(draft[Items], (item) => item[AssignedTo] = ""), (item) => item[Key]), "#(lf)")

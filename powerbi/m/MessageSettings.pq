@@ -7,8 +7,12 @@
 // ("Name <address>; Name <address>", one person per part). A key that is not there, or empty, keeps its default. The
 // manager who sends is not a setting: the Power App puts their name in the draft (%%SENDER%%, fnDrafts).
 let
-    rows = Table.ToRecords(fnStateList("settings")),
-    values = Record.FromList(List.Transform(rows, (row) => Text.Trim(row[Value])), List.Transform(rows, (row) => Text.Trim(row[Title]))),
+    // A Title typed twice: the last row counts (as the HTML app reads its settings); an empty Title is left out.
+    rows = List.Select(Table.ToRecords(fnStateList("settings")), (row) => row[Title] <> null and Text.Trim(row[Title]) <> ""),
+    titles = List.Distinct(List.Transform(rows, (row) => Text.Trim(row[Title]))),
+    lastOf = (title as text) as text =>
+        let row = List.Last(List.Select(rows, (candidate) => Text.Trim(candidate[Title]) = title)) in if row[Value] = null then "" else Text.Trim(row[Value]),
+    values = Record.FromList(List.Transform(titles, lastOf), titles),
     value = (key as text, default as text) as text => let found = Record.FieldOrDefault(values, key, "") in if found = "" then default else found,
     requests = Record.FromList(
         List.Transform(MessageWords[requests], (request) => [Name = value("request." & request[id] & ".name", ""), Link = value("request." & request[id] & ".link", "")]),

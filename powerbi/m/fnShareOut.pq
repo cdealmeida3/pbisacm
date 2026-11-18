@@ -1,6 +1,6 @@
 // Share out (D24, build B7; src/core/team/team.ts, shareOut): the manager each free group of a card goes to, as a record
 // case key → name. A group is the cases of one check that go to one person by one route, to solve (groupCases); it is
-// free when none of its open cases is assigned. The groups of each card go out together: the biggest first (by its open
+// free when none of its open cases is assigned. On a SACM fix list a group is a record (a CI), sized by its lines. The groups of each card go out together: the biggest first (by its open
 // CIs, then by its key), each to the active member of the list SACM Team with the fewest CIs so far (the first of the list
 // when equal). Fewer than two active members: nobody (the Power App says to add colleagues first). `lines`: the cases of
 // fnCases, before this column.
@@ -15,11 +15,24 @@
         byCard = fnGroupBy(open, (item) => item[CheckId]),
         card = (items as list) as list =>
             let
-                groups = Record.FieldValues(fnGroupBy(items, (item) => item[CheckId] & "|" & item[Fact][Route] & "|" & contactOf(item[Fact]))),
-                keyed = List.Transform(groups, (members) =>
-                    let fact = members{0}[Fact], openOnes = List.Select(members, (item) => not item[Closed]) in
-                    [Key = fact[CheckId] & "|" & fact[Route] & "|" & contactOf(fact), Open = openOnes, Size = List.Count(List.Distinct(List.Transform(openOnes, (item) => item[CiKey])))]),
-                free = List.Select(keyed, (group) => not List.IsEmpty(group[Open]) and List.AllTrue(List.Transform(group[Open], (item) => item[AssignedTo] = ""))),
+                book = Record.FieldOrDefault(CheckPlaybooks, items{0}[CheckId], [Kind = "", AskWhenUnsure = ""]),
+                // A SACM fix list (FixListCard, ShareRecords): its records (one CI each) that SACM fixes itself, by their
+                // lines still to mark; free when no line not closed has anybody. Without such lines: the lines
+                // handed to the owner, by group, as on an owners card.
+                fixOnes = if book[Kind] = "fix" then List.Select(items, (item) => not (book[AskWhenUnsure] <> "" and item[Askable])) else {},
+                records = List.Transform(Record.FieldValues(fnGroupBy(fixOnes, (item) => item[CiKey])), (rows) =>
+                    let
+                        live = List.Select(rows, (item) => not item[Closed]),
+                        toMark = List.Select(live, (item) => item[Status] <> "Fixed")
+                    in
+                        [Key = rows{0}[CiKey], Open = toMark, Size = List.Count(toMark), Taken = List.AnyTrue(List.Transform(live, (item) => item[AssignedTo] <> ""))]),
+                owned = if book[Kind] = "fix" then List.Select(items, (item) => item[Askable]) else items,
+                groups = Record.FieldValues(fnGroupBy(owned, (item) => item[CheckId] & "|" & item[Fact][Route] & "|" & contactOf(item[Fact]))),
+                keyed = List.Transform(groups, (rows) =>
+                    let fact = rows{0}[Fact], openOnes = List.Select(rows, (item) => not item[Closed]) in
+                    [Key = fact[CheckId] & "|" & fact[Route] & "|" & contactOf(fact), Open = openOnes, Size = List.Count(List.Distinct(List.Transform(openOnes, (item) => item[CiKey]))),
+                        Taken = List.AnyTrue(List.Transform(openOnes, (item) => item[AssignedTo] <> ""))]),
+                free = List.Select(if List.IsEmpty(fixOnes) then keyed else records, (group) => not List.IsEmpty(group[Open]) and not group[Taken]),
                 ordered = List.Buffer(List.Sort(free, (a, b) => let bySize = Value.Compare(b[Size], a[Size]) in if bySize <> 0 then bySize else compare(a[Key], b[Key]))),
                 count = List.Count(ordered),
                 // Each group to the member with the least so far: one step per group, carrying the CIs of each member

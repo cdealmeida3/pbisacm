@@ -15,7 +15,8 @@ import { groupCases } from '../../src/core/cases/cases.ts';
 import type { Case } from '../../src/core/cases/cases.ts';
 import { shareOut } from '../../src/core/team/team.ts';
 import { recordTeams } from '../../src/core/cases/record-teams.ts';
-import { askable } from '../../src/app/view/fix-list.ts';
+import { askable, fixRecords, fixRows, handedToOwner } from '../../src/app/view/fix-list.ts';
+import { cardKind } from '../../src/app/view/cards.ts';
 import { toSolve } from '../../src/app/view/cases.ts';
 import { DEFAULT_SETTINGS } from '../../src/app/state/store.ts';
 import { loadPacks, loadReferences } from '../../src/hosts/cli.ts';
@@ -77,18 +78,22 @@ export function draftCases(cases: Case[], packs = loadPacks()): Case[] {
 }
 
 /** One row of the table Drafts as the answer key gives it: the draft with the tokens of the Power App in place of the reference and the name. */
-export interface DraftRow { Ref: string; Kind: string; To: string; Cc: string; Subject: string; Body: string; Plain: string; Chat: string; Keys: string; NewKeys: string; CheckIds: string; CiCount: number; PartIndex: number; PartCount: number; About: string; NobodyAbove: boolean; Mailbox: boolean; Team: boolean }
+export interface DraftRow { Ref: string; Kind: string; To: string; Cc: string; Subject: string; Body: string; Plain: string; Chat: string; Keys: string; NewKeys: string; CheckIds: string; CiCount: number; PartIndex: number; PartCount: number; About: string; NobodyAbove: boolean; Mailbox: boolean; Team: boolean; Person: string; AssignedTo: string; FreeKeys: string }
 
 /** A draft with %%REF%% where its reference is, as Power Query writes it, and the reference a reminder answers in Ref. */
 export function draftRow(draft: Draft, items: Case[], settings: MessageSettings): DraftRow {
   const tokens = (text: string): string => text.split(draft.ref).join(REF_TOKEN).split(settings.senderName ?? SAMPLE_SENDER).join(SENDER_TOKEN);
   const byKey = new Map(items.map((item) => [item.key, item]));
   const own = draft.keys.map((key) => byKey.get(key)!);
+  const assigned = Array.from(new Set(own.map((item) => item.assignedTo)));
   return {
     Ref: draft.kind !== 'first' && draft.part.index === 1 ? draft.ref : '', Kind: draft.kind, To: draft.to, Cc: draft.cc,
     Subject: tokens(draft.subject), Body: tokens(draft.body), Plain: tokens(draft.plain), Chat: chatMessage(own, loadPacks(), settings, REF_TOKEN, draft.to),
     Keys: draft.keys.join('\n'), NewKeys: draft.newKeys.join('\n'), CheckIds: draft.checkIds.join(', '), CiCount: draft.ciCount,
-    PartIndex: draft.part.index, PartCount: draft.part.count, About: draft.about ?? '', NobodyAbove: !!draft.nobodyAbove, Mailbox: !!draft.mailbox, Team: !!draft.team
+    PartIndex: draft.part.index, PartCount: draft.part.count, About: draft.about ?? '', NobodyAbove: !!draft.nobodyAbove, Mailbox: !!draft.mailbox, Team: !!draft.team,
+    // Who the message is about (the person of its first case), who has its cases, and the cases nobody has (D164).
+    Person: own[0]!.fact.contactId || own[0]!.fact.contactEmail.toLowerCase(), AssignedTo: assigned.length === 1 ? assigned[0]! : 'Several',
+    FreeKeys: own.filter((item) => !item.assignedTo).map((item) => item.key).join('\n')
   };
 }
 
@@ -138,19 +143,27 @@ export function recordedChats(text = readFileSync(join(root, 'tests', 'recorded'
 /**
  * Share out (D24, build B7): the manager each free group of a card goes to, by case key. A group is the cases of one
  * check that go to one person by one route (groupCases), to solve; it is free when none of its open cases is assigned.
+ * On a SACM fix list a group is a record (one CI, fixRecords), sized by its lines still to mark, as the card shares it.
  * The groups of each card go out together, the biggest first, to the active member of SACM Team with the fewest CIs
  * so far (shareOut). Fewer than two active members: nobody (the HTML app asks to add colleagues first).
  */
-export function shareOutOf(cases: Case[], members: string[]): Map<string, string> {
+export function shareOutOf(cases: Case[], members: string[], packs = loadPacks()): Map<string, string> {
   const out = new Map<string, string>();
   if (members.length < 2) return out;
-  const groups = groupCases(cases.filter((item) => item.inLatest)).filter((group) => group.state === 'open');
-  const byCheck = new Map<string, typeof groups>();
-  for (const group of groups) byCheck.set(group.checkId, (byCheck.get(group.checkId) ?? []).concat([group]));
-  for (const card of byCheck.values()) {
-    const free = card.filter((group) => group.open.length && group.open.every((item) => !item.assignedTo));
-    const plan = shareOut(free.map((group) => ({ key: group.key, size: new Set(group.open.map((item) => item.fact.ciKey)).size })), members);
-    for (const group of free) for (const item of group.open) out.set(item.key, plan.get(group.key)!);
+  const open = cases.filter((item) => item.inLatest && item.state === 'open');
+  const byCheck = new Map<string, Case[]>();
+  for (const item of open) byCheck.set(item.fact.checkId, (byCheck.get(item.fact.checkId) ?? []).concat([item]));
+  for (const [checkId, items] of byCheck) {
+    const pack = packs.find((candidate) => candidate.id === checkId);
+    const fix = !!pack && cardKind(pack) === 'fix';
+    // A SACM fix list (FixListCard, ShareRecords): its records by their lines still to mark; else the groups handed to the owner.
+    const fixCases = fix ? items.filter((item) => !handedToOwner(pack, item)) : [];
+    const shares: Array<{ key: string; keys: string[]; size: number }> = fixCases.length
+      ? fixRecords(fixRows(fixCases)).filter((one) => one.open.length && !one.assignedTo).map((one) => ({ key: one.key, keys: one.open, size: one.open.length }))
+      : groupCases(fix ? items.filter((item) => askable(pack, item)) : items).filter((group) => group.open.length && group.open.every((item) => !item.assignedTo))
+        .map((group) => ({ key: group.key, keys: group.open.map((item) => item.key), size: new Set(group.open.map((item) => item.fact.ciKey)).size }));
+    const plan = shareOut(shares, members);
+    for (const share of shares) for (const key of share.keys) out.set(key, plan.get(share.key)!);
   }
   return out;
 }

@@ -8,7 +8,8 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 - **The page *Messages*** lists them: first messages, reminders that are due and escalations.
 - **The Power App *SACM messages*** (D301) sits on that page. Open a message, change To, Cc or the subject if needed, and press **Send**: the flow *SACMSend* sends it from the shared mailbox exactly as shown, then the app records it on the cases and the report refreshes. **Test** sends it to you only. **Outlook** and **Teams** open the message or the chat, then ask whether you sent it.
 - **A colleague wrote lately** (D302): before a message goes, the app warns when a colleague wrote to the same person, or about the same cases, in the last 24 hours.
-- **Share out** (D303) in the app *SACM actions*: the free groups of a card go to the managers, the biggest first, to who has the fewest CIs.
+- **Share out** (D303) in the app *SACM actions*: the free groups of a card go to the managers, the biggest first, to who has the fewest CIs (on a SACM fix list: the free records, by their lines).
+- **The Procurement card** says *One email to the Procurement mailbox* with the memory of the message ("Asked 2 times · last 4 Nov · no reply").
 - **Replies** (D304): the flow *SACM - File replies* adds each reply to the list *SACM Replies* and refreshes the report.
 - **The set-up guide** in [powerbi/README.md](../powerbi/README.md) §6: the three new flows, the second app and the settings the messages read.
 - Every change is checked: a flow sends only what a manager pressed, one message a run, with the inputs of the app as To, Cc, Subject and Body; a flow that starts on a new email never sends.

@@ -99,6 +99,8 @@ const SEND_FIELDS: Record<string, { input: string; or?: string; optional?: boole
   To: { input: 'To', or: '=the user who ran it' }, CC: { input: 'Cc', optional: true }, BCC: { input: 'Bcc', optional: true },
   Subject: { input: 'Subject' }, Body: { input: 'Body' }
 };
+/** The other fields a sending step may set: the shared mailbox it sends from, and the importance. */
+const SEND_OTHER = new Set(['Original Mailbox Address', 'Importance']);
 const REPLIES = STATE_LISTS.replies.list as string;
 
 /** The problems of the flows: what triggers them and what they do. */
@@ -127,10 +129,13 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
         for (const [field, rule] of Object.entries(SEND_FIELDS)) {
           const value = step.fields[field];
           if (value === undefined) { if (!rule.optional) problems.push(`Flows: ${flow.id} sends with no ${field}`); continue; }
-          if (value === rule.or) continue;
+          // A test goes to the manager who ran the flow: only a flow that is given no To may send there.
+          if (value === rule.or && !inputs.has(rule.input)) continue;
           if (value !== `=input ${rule.input}` || !inputs.has(rule.input)) problems.push(`Flows: ${flow.id} sends with ${field} "${value}": it must be the input ${rule.input} of the trigger, exactly what the manager sends`);
         }
-        for (const field of Object.keys(step.fields)) if (field.startsWith('Attachment')) problems.push(`Flows: ${flow.id} sends an attachment: a message of the app has none`);
+        for (const field of Object.keys(step.fields)) {
+          if (!(field in SEND_FIELDS) && !SEND_OTHER.has(field)) problems.push(`Flows: ${flow.id} sends with the field ${field}: a message of the app has only To, Cc, Subject and Body`);
+        }
       }
       continue;
     }

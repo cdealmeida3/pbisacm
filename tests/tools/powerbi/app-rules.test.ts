@@ -46,6 +46,11 @@ test('a flow sends only from the app, one message, exactly the inputs the manage
   assert.ok(problems.some((line) => line.includes('Body "Made by the flow"')));
   assert.ok(problems.some((line) => line.includes('adds an item to SACM Journal')));
   assert.ok(problems.some((line) => line.includes('only a flow the app calls')));
+  const given = { id: 'FY', name: 'Y', purpose: '', trigger: 'Power Apps (V2)', inputs: ['To', 'Subject', 'Body'], concurrency: 1,
+    steps: [{ action: 'Send an email from a shared mailbox (V2)', connector: 'Office 365 Outlook', fields: { To: '=the user who ran it', Subject: '=input Subject', Body: '=input Body', Attachments: 'a file' } }] };
+  const more = flowProblems([given]);
+  assert.ok(more.some((line) => line.includes('To "=the user who ran it"')));
+  assert.ok(more.some((line) => line.includes('the field Attachments')));
 });
 
 test('the app may add a row to the journal with its columns, and run the refresh flow', () => {

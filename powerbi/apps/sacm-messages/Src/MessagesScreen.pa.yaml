@@ -46,7 +46,9 @@ Screens:
             TemplateSize: =56
             Visible: =DraftCount > 0
             OnSelect: |-
-              =Set(varAsk, Blank());
+              =Reset(AnywayCheck);
+              // The journal is read again when a message is opened, so the warning knows a colleague's latest message.
+              Refresh('SACM Journal');
               If(
                   IsBlank(ThisItem.Ref) && varRef.Id <> ThisItem.DraftId,
                   Set(varRef, { Id: ThisItem.DraftId, Ref: "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1)) })
@@ -63,7 +65,8 @@ Screens:
                     =ThisItem.KindLabel & " · " & Coalesce(ThisItem.ToName, ThisItem.To, "Nobody known: type the address") & Char(10) &
                     ThisItem.CiCount & If(ThisItem.CiCount = 1, " CI", " CIs") & If(ThisItem.PartCount > 1, " · part " & ThisItem.PartIndex & " of " & ThisItem.PartCount, "") &
                     If(IsBlank(ThisItem.About), "", " · about " & ThisItem.About) &
-                    " · " & If(IsBlank(ThisItem.AssignedTo), "Free", ThisItem.AssignedTo = MeName, "Mine", ThisItem.AssignedTo)
+                    " · " & If(IsBlank(ThisItem.AssignedTo), "Free", ThisItem.AssignedTo = MeName, "Mine", ThisItem.AssignedTo) &
+                    If(!IsBlank(varAsk) && varAsk.Keys = ThisItem.Keys, " · Sent? Open it to answer", "")
                   FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
                   X: =0
                   Y: =0
@@ -171,7 +174,7 @@ Screens:
           Control: Classic/Button
           Properties:
             Text: ="Send"
-            Visible: =DraftCount > 0 && IsBlank(varAsk)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys)
             DisplayMode: |-
               =If(IsBlank(SendWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
@@ -219,6 +222,7 @@ Screens:
                       );
                       Set(varDone, { Keys: d.Keys, At: Now() });
                       Set(varRef, Blank());
+                      Reset(AnywayCheck);
                       IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning))
                   )
               )
@@ -230,7 +234,7 @@ Screens:
           Control: Classic/Button
           Properties:
             Text: ="Test"
-            Visible: =DraftCount > 0 && IsBlank(varAsk)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys)
             DisplayMode: |-
               =If(IsBlank(RefLabel.Text), DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
@@ -250,7 +254,7 @@ Screens:
           Control: Classic/Button
           Properties:
             Text: ="Outlook"
-            Visible: =DraftCount > 0 && IsBlank(varAsk)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys)
             DisplayMode: |-
               =If(IsBlank(SendWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
@@ -268,7 +272,7 @@ Screens:
                           Notify("The message is copied. Paste it into the email in Outlook.", NotificationType.Information)
                       );
                       Launch("mailto:" & EncodeUrl(to) & "?cc=" & EncodeUrl(cc) & "&subject=" & EncodeUrl(subject) & If(Len(plain) <= MailtoBodyLimit, "&body=" & EncodeUrl(plain), ""));
-                      Set(varAsk, { DraftId: d.DraftId, Channel: "outlook", Ref: ref, To: to, Cc: cc, Subject: subject, Text: "" })
+                      Set(varAsk, { DraftId: d.DraftId, Channel: "outlook", Ref: ref, To: to, Cc: cc, Subject: subject, Text: "", Kind: d.Kind, Keys: d.Keys, NewKeys: d.NewKeys, FreeKeys: d.FreeKeys })
                   )
               )
             X: =578
@@ -279,7 +283,7 @@ Screens:
           Control: Classic/Button
           Properties:
             Text: ="Teams"
-            Visible: =DraftCount > 0 && IsBlank(varAsk)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys)
             DisplayMode: |-
               =If(IsBlank(SendWhy.Text) && IsBlank(TeamsWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
@@ -296,7 +300,9 @@ Screens:
                           "https://teams.microsoft.com/l/chat/0/0?users=" & Concat(users, EncodeUrl(Value), ",") &
                           If(CountRows(users) > 1, "&topicName=" & EncodeUrl(subject), "") &
                           "&message=" & EncodeUrl(chat));
-                      Set(varAsk, { DraftId: d.DraftId, Channel: "teams", Ref: ref, To: Concat(users, Value, "; "), Cc: "", Subject: subject, Text: chat })
+                      // As the HTML app records a chat (TeamsDialog): every case of the message, a first message when
+                      // nobody was asked yet, else a reminder.
+                      Set(varAsk, { DraftId: d.DraftId, Channel: "teams", Ref: ref, To: Concat(users, Value, "; "), Cc: "", Subject: subject, Text: chat, Kind: If(d.Kind = "first", "first", "reminder"), Keys: d.Keys, NewKeys: "", FreeKeys: d.FreeKeys })
                   )
               )
             X: =686
@@ -310,13 +316,14 @@ Screens:
             Text: |-
               =If(
                   DraftCount = 0, "",
+                  !IsBlank(varAsk) && varAsk.Keys <> DraftGallery.Selected.Keys, "Answer first whether the message to " & varAsk.To & " went: open it in the list.",
                   IsBlank(RefLabel.Text), "Press the message in the list to open it.",
                   IsBlank(Trim(ToText.Text)), "Fill in To first.",
                   varDone.Keys = DraftGallery.Selected.Keys && Now() < DateAdd(varDone.At, 10, TimeUnit.Minutes),
                   "Sent just now. The list shows it gone after the refresh, in about a minute.",
                   !IsBlank(WarnLabel.Text) && !AnywayCheck.Value, "Read the warning, then tick Send anyway.",
                   "")
-            Visible: =DraftCount > 0 && IsBlank(varAsk)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys)
             X: =784
             Y: =268
             Width: =Parent.Width - 800
@@ -329,17 +336,18 @@ Screens:
                   DraftGallery.Selected.Mailbox, "A mailbox gets an email, not a chat.",
                   CountRows(Split(Substitute(Trim(ToText.Text), ",", ";"), ";")) > TeamsLimit, "More than " & TeamsLimit & " people: use email.",
                   "")
-            Visible: =false
-            X: =784
-            Y: =268
-            Width: =10
-            Height: =10
+            # Why Teams is off, when Send is on (LOOK rule 7). Below the buttons.
+            Visible: =DraftCount > 0 && IsBlank(varAsk) && IsBlank(SendWhy.Text) && !IsBlank(TeamsWhy.Text)
+            X: =372
+            Y: =306
+            Width: =Parent.Width - 388
+            Height: =24
       - AskLabel:
           Control: Label
           Properties:
             Text: |-
               =If(varAsk.Channel = "teams", "Did you start the chat?", "Sent from Outlook?")
-            Visible: =!IsBlank(varAsk) && varAsk.DraftId = DraftGallery.Selected.DraftId
+            Visible: =!IsBlank(varAsk) && varAsk.Keys = DraftGallery.Selected.Keys
             X: =372
             Y: =268
             Width: =200
@@ -348,7 +356,7 @@ Screens:
           Control: Classic/Button
           Properties:
             Text: ="No"
-            Visible: =!IsBlank(varAsk) && varAsk.DraftId = DraftGallery.Selected.DraftId
+            Visible: =!IsBlank(varAsk) && varAsk.Keys = DraftGallery.Selected.Keys
             OnSelect: =Set(varAsk, Blank())
             X: =580
             Y: =268
@@ -358,28 +366,31 @@ Screens:
           Control: Classic/Button
           Properties:
             Text: ="Yes"
-            Visible: =!IsBlank(varAsk) && varAsk.DraftId = DraftGallery.Selected.DraftId
+            Visible: =!IsBlank(varAsk) && varAsk.Keys = DraftGallery.Selected.Keys
             OnSelect: |-
               =With(
                   {
-                      d: DraftGallery.Selected, sent: varAsk,
-                      still: Concat(Filter(Split(DraftGallery.Selected.Keys, Char(10)) As key, !(key.Value in Split(DraftGallery.Selected.NewKeys, Char(10)).Value)), Value, Char(10))
+                      // The cases are those kept when the manager pressed Outlook or Teams: a refresh in between may
+                      // number the drafts again. A chat is recorded on every case at once (no new points); an email
+                      // splits off the new points (D161).
+                      sent: varAsk,
+                      still: Concat(Filter(Split(varAsk.Keys, Char(10)) As key, !(key.Value in Split(varAsk.NewKeys, Char(10)).Value)), Value, Char(10))
                   },
                   IfError(
                       If(
                           !IsBlank(still),
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: still, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: d.Kind, Channel: sent.Channel, Text: sent.Text })
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: still, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: sent.Kind, Channel: sent.Channel, Text: sent.Text })
                       );
                       If(
-                          !IsBlank(d.NewKeys),
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: d.NewKeys, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: "first", Channel: sent.Channel, Text: sent.Text })
+                          !IsBlank(sent.NewKeys),
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: sent.NewKeys, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: "first", Channel: sent.Channel, Text: sent.Text })
                       );
                       If(
-                          !IsBlank(d.FreeKeys) && !IsBlank(MeName),
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "assign", Keys: d.FreeKeys, Text: MeName })
+                          !IsBlank(sent.FreeKeys) && !IsBlank(MeName),
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "assign", Keys: sent.FreeKeys, Text: MeName })
                       );
                       Notify(If(sent.Channel = "teams", "Recorded: the Teams chat.", "Recorded as sent from Outlook.") & " The report shows it after the next refresh.", NotificationType.Success);
-                      Set(varDone, { Keys: d.Keys, At: Now() });
+                      Set(varDone, { Keys: sent.Keys, At: Now() });
                       Set(varAsk, Blank());
                       Set(varRef, Blank());
                       IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
@@ -398,6 +409,6 @@ Screens:
               =Substitute(Substitute(DraftGallery.Selected.Body, "%%REF%%", Coalesce(RefLabel.Text, "(the reference)")), "%%SENDER%%", MeHtml)
             Visible: =DraftCount > 0
             X: =372
-            Y: =312
+            Y: =334
             Width: =Parent.Width - 388
-            Height: =Parent.Height - 320
+            Height: =Parent.Height - 342

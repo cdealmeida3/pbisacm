@@ -8,16 +8,16 @@
 // key the newest report no longer shows. Remind: "reminder" or "escalation" once ReminderFrom comes, for a case that
 // was asked and did not answer (D39, D40); the measures compare ReminderFrom with today, so it is right between two
 // refreshes. Every message counts as sent on the day it was recorded (the outbox is the app's, D162). `run` is CheckRun
-// (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run. `state` (build B7):
+// (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run. `given` (build B7):
 // [Events, Replies] instead of the journal and the replies of the team; the answer key gives none, to compare the
 // drafts with the recorded messages (DraftsRecorded). Each case also keeps, for the drafts (fnDrafts): Fact (its
 // finding), MessageEvents (its messages), ReminderDue and OverLimit (as buildCases: asked, no answer, the working days
 // to the reminder passed by CaseToday, and the reminders used or not) and Askable (a line of a fix list with
 // askWhenUnsure only once SACM handed it to the owner, src/app/view/fix-list.ts).
-(run as nullable record, optional state as nullable record) as list =>
+(run as nullable record, optional given as nullable record) as list =>
     let
         facts = if run = null then {} else run[Facts],
-        events = if state = null then JournalEvents else state[Events],
+        events = if given = null then JournalEvents else given[Events],
         rules = CaseRules,
         today = Date.ToText(CaseToday, [Format = "yyyy-MM-dd", Culture = "en-US"]),
         date = if run = null then null else run[Date],
@@ -35,7 +35,7 @@
             (event[CheckId] = "*" or event[CheckId] = checkId)
             and (ciKey = event[CiKey] or Text.StartsWith(ciKey, event[CiKey] & "|") or Text.StartsWith(ciKey, event[CiKey] & "#")),
         order = (a as record, b as record) as number => let first = Value.Compare(a[At], b[At]) in if first <> 0 then first else Value.Compare(a[Id], b[Id]),
-        repliesByRef = fnGroupBy(if state = null then ReplyItems else state[Replies], (reply) => reply[Ref]),
+        repliesByRef = fnGroupBy(if given = null then ReplyItems else given[Replies], (reply) => reply[Ref]),
         todayDate = CaseToday,
         // Parts of a key: <check>:<CI key>:<field>; a CI key may hold ":" (a contract), a check id and a field never do.
         partsOf = (key as text) as record =>

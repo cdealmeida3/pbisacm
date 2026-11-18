@@ -3,13 +3,13 @@
 // `to` (the address of the person asked) is asked about, at most eight and then "and 3 more CIs". With `to` "": every
 // CI. `items`: the cases, each with its Fact; `settings`: MessageSettings; `ref`: the reference, or %%REF%% for the
 // Power App to fill.
-(items as list, settings as record, ref as text, to as text) as text =>
+(items as list, settings as record, ref as text, to as text, optional checkPacks as nullable list) as text =>
     let
         chat = settings & [Channel = "chat"],
         lower = (value as text) as text => Text.Lower(value, "en-US"),
         theirs = if to = "" then items else List.Select(items, (item) => lower(fnRecipient(item[Fact], settings)[Email]) = lower(to)),
         own = if List.IsEmpty(theirs) then items else theirs,
-        packs = List.Transform(Json.Document(CheckFiles), (file) => file[pack]),
+        packs = if checkPacks <> null then checkPacks else List.Transform(Json.Document(CheckFiles), (file) => file[pack]),
         pack = if List.IsEmpty(own) then null else List.First(List.Select(packs, (candidate) => candidate[id] = own{0}[Fact][CheckId]), null),
         message = if pack = null then null else Record.FieldOrDefault(Record.FieldOrDefault(pack, "playbook", []), "message", null)
     in
