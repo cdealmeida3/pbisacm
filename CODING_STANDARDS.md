@@ -13,7 +13,7 @@ For whoever reviews a change, a person or the `/code-review` skill. It points to
 | A check file | [checks/README.md](checks/README.md), [docs/HOW-TO.md](docs/HOW-TO.md#1-add-a-check-that-uses-the-ci-report) §1 |
 | The words | [docs/DATA-MODEL.md](docs/DATA-MODEL.md#1-glossary) §1 |
 | The team-folder files, old and new | [docs/DATA-MODEL.md](docs/DATA-MODEL.md#5-what-older-files-may-lack) §5 |
-| The agent skills | [docs/agents/domain.md](docs/agents/domain.md), [docs/agents/web-guidance.md](docs/agents/web-guidance.md) |
+| The agent skills | [docs/agents/domain.md](docs/agents/domain.md), [docs/agents/web-guidance.md](docs/agents/web-guidance.md), [docs/agents/powerbi-skills.md](docs/agents/powerbi-skills.md) |
 
 ## Already checked by a test: skip these in review
 

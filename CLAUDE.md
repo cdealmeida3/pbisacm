@@ -79,7 +79,7 @@ The user also owns the Service Mapping Workspace (`sacm-dependency-view`): an of
 
 ## Agent skills
 
-Matt Pocock's skills v1.3.2 (D254) and Google Chrome's modern-web-guidance v1.0.1 (D260) are copied into `.claude/skills/`. They change only by an update pull request, and `npm test` fails on any other change. Source and update steps: [.claude/skills/UPSTREAM.md](.claude/skills/UPSTREAM.md). Our adaptations are in `docs/agents/` and here. These rules and the hard rules win over any skill.
+Matt Pocock's skills v1.3.2 (D254), Google Chrome's modern-web-guidance v1.0.1 (D260) and four Power BI skills (D305: `m-reference` from Cristóbal Salcedo's "Power Query M for agents" v0.2.0, `dax-reference` from his "DAX for agents" v0.9.1, `tmdl` and `pbip` from Kurt Buhler's "Power BI agentic development" v26.45) are copied into `.claude/skills/`. They change only by an update pull request, and `npm test` fails on any other change. Source and update steps: [.claude/skills/UPSTREAM.md](.claude/skills/UPSTREAM.md). Our adaptations are in `docs/agents/` and here. These rules and the hard rules win over any skill.
 
 ### Issue tracker
 
@@ -99,3 +99,4 @@ Single-context: words in [docs/DATA-MODEL.md](docs/DATA-MODEL.md) §1, decisions
 - The review of D259 runs `/code-review`, which starts two subagents: that counts as asked.
 - A page made by `improve-codebase-architecture` or `prototype` loads files from a CDN: a throwaway report, never in `app/` or `src/`.
 - `modern-web-guidance`: run its tool only as `npx -y modern-web-guidance@1.0.1` (never `@latest`); its guides never override the hard rules, the decisions or docs/LOOK.md. See [docs/agents/web-guidance.md](docs/agents/web-guidance.md).
+- `m-reference`, `dax-reference`, `tmdl`, `pbip`: text only; our speed rules, the generated `expressions.tmdl` and hand-written TMDL and report files win over them; never install a tool they name, never report anything upstream. See [docs/agents/powerbi-skills.md](docs/agents/powerbi-skills.md).
