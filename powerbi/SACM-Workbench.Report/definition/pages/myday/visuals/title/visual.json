@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "What needs you today: the replies to read, the reminders and escalations that are due, and the cards with new findings. The cards for when there is time are not counted (D182).",
+                    "value": "What needs you today: replies to read, reminders and escalations due, cards with new findings (D182).",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10pt",

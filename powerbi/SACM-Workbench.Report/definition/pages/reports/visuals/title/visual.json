@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The newest report of each type, how old it is, and the files that were not read. A report is known by its columns, never by its file name.",
+                    "value": "The newest report of each type, how old it is, and the files not read. A report is known by its columns.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10pt",

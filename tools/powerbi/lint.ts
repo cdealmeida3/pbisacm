@@ -133,6 +133,8 @@ const visit = (value: unknown, where: string): void => {
 for (const file of filesUnder(join(REPORT, 'definition'), /visual\.json$/)) visit(JSON.parse(readFileSync(file, 'utf8')), relative(root, file));
 for (const table of tables) {
   for (const measure of table.measures) {
+    // A column a measure makes itself (ADDCOLUMNS ( …, "@days", … )) is named with @ and read as [@days].
+    const made = new Set(Array.from(measure.dax.matchAll(/"(@[^"]+)"/g), (match) => match[1]!));
     const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
     for (const match of dax.matchAll(/(?:'([^']+)'|\b([A-Za-z_][A-Za-z0-9_]*))\s*\[([^\]]+)\]/g)) {
       const entity = match[1] ?? match[2]!;
@@ -140,7 +142,7 @@ for (const table of tables) {
       else if (!columns.get(entity)!.has(match[3]!) && !measures.get(entity)!.has(match[3]!)) problems.push(`References: measure ${table.name}[${measure.name}] names ${entity}[${match[3]}], which is not in the model`);
     }
     for (const match of dax.matchAll(/(?<![\w'\]])\[([^\]]+)\]/g)) {
-      if (!allMeasures.has(match[1]!)) problems.push(`References: measure ${table.name}[${measure.name}] names the measure [${match[1]}], which is not in the model`);
+      if (!allMeasures.has(match[1]!) && !made.has(match[1]!)) problems.push(`References: measure ${table.name}[${measure.name}] names the measure [${match[1]}], which is not in the model`);
     }
   }
 }
@@ -151,6 +153,48 @@ for (const table of tables) {
   } else if (!table.partitionM) problems.push(`References: table ${table.name} has no M partition`);
 }
 done.push('References: every field of the visuals and the measures is in the model');
+
+/* 4b. DAX variable names */
+// Desktop drops a measure whose variable is a word DAX keeps for itself, and every visual that shows it is empty
+// ("Select or drag fields"): in 0.44.0 the variables before, day and all emptied My day, History and Self-check, and the
+// Desktop check (D309) found from, to and status. No variable may be a DAX function (the list of the copied skill
+// dax-reference), a keyword or a table of the model. And IF takes at most three arguments (SWITCH ( TRUE (), … ) takes more).
+const DAX_KEYWORDS = ['define', 'evaluate', 'order', 'by', 'start', 'at', 'return', 'var', 'measure', 'column', 'table', 'function', 'in', 'not',
+  'true', 'false', 'asc', 'desc', 'day', 'month', 'year', 'quarter', 'week', 'hour', 'minute', 'second', 'before', 'after', 'boolean', 'integer',
+  'string', 'double', 'currency', 'datetime', 'variant', 'scalar', 'expr', 'anyval', 'anyref', 'val', 'from', 'to', 'status', 'with', 'skip',
+  'dense', 'abs', 'rel', 'partitionby', 'orderby', 'matchby', 'keep', 'blanks', 'default', 'first', 'last'];
+const daxCatalog = JSON.parse(readFileSync(join(root, '.claude', 'skills', 'dax-reference', 'generated', 'catalog.json'), 'utf8')) as { functions: Array<{ name: string }> };
+const kept = new Set([...DAX_KEYWORDS, ...daxCatalog.functions.map((entry) => entry.name.toLowerCase()), ...tables.map((table) => table.name.toLowerCase())]);
+for (const table of tables) {
+  for (const measure of table.measures) {
+    const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
+    const names = new Set<string>();
+    for (const match of dax.matchAll(/\bVAR\s+([A-Za-z_][A-Za-z0-9_]*)/gi)) {
+      const name = match[1]!.toLowerCase();
+      if (kept.has(name)) problems.push(`DAX: measure ${table.name}[${measure.name}] has the variable ${match[1]}, a word DAX keeps (a function, a keyword or a table): Desktop drops the measure`);
+      if (names.has(name)) problems.push(`DAX: measure ${table.name}[${measure.name}] names the variable ${match[1]} twice: Desktop drops the measure`);
+      names.add(name);
+    }
+    for (const match of dax.matchAll(/\bIF\s*\(/gi)) {
+      let depth = 1;
+      let commas = 0;
+      for (let at = match.index + match[0].length; at < dax.length && depth > 0; at++) {
+        const char = dax[at]!;
+        if ('([{'.includes(char)) depth++;
+        else if (')]}'.includes(char)) depth--;
+        else if (char === ',' && depth === 1) commas++;
+      }
+      if (commas > 2) problems.push(`DAX: measure ${table.name}[${measure.name}] gives IF ${commas + 1} arguments; IF takes at most 3 (use SWITCH ( TRUE (), … )): Desktop drops the measure`);
+    }
+    // A measure inside a filter of CALCULATE (Runs[ReportDate] <= [Period to]): Desktop refuses it ("A function
+    // 'PLACEHOLDER' has been used in a True/False expression that is used as a table filter expression"). Put the
+    // measure in a variable first.
+    for (const match of dax.matchAll(/(?:\w|')\[[^\]]+\]\s*(?:<=|>=|<>|=|<|>)\s*\[(?!@)([^\]]+)\]/g)) {
+      problems.push(`DAX: measure ${table.name}[${measure.name}] compares a column with the measure [${match[1]}] in place: put the measure in a variable first (Desktop refuses a measure in a filter of CALCULATE)`);
+    }
+  }
+}
+done.push(`DAX: no variable of a measure is one of the ${kept.size} words DAX keeps, and none is named twice in one measure; every IF has at most 3 arguments; no filter compares a column with a measure in place`);
 
 /* 5. Generated */
 for (const problem of staleQueries()) problems.push(`Generated: ${problem} (npm run powerbi:generate)`);

@@ -3,14 +3,14 @@ table Checks
 
 	/// The state of one card (src/app/view/cards.ts, cardSummaries): Not tested when the newest report tested no part of the check (grey, never green: D15), To solve when a finding is to solve, To check when a finding is to check first, else OK. All marked as fixed (D168, from the team's journal): a SACM fix list whose every open line a manager marked as fixed; it waits for the next report and still counts as to solve.
 	measure 'Card state' =
-			VAR tested = CALCULATE ( COUNTROWS ( Tested ) ) > 0
+			VAR testedRows = CALCULATE ( COUNTROWS ( Tested ) ) > 0
 			VAR openLines = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE () ) + 0
 			VAR marked = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), CaseLines[Status] = "Fixed" ) + 0
 			VAR allMarked = SELECTEDVALUE ( Checks[Kind] ) = "fix" && openLines > 0 && marked = openLines
 			RETURN
 			    IF (
-			        HASONEVALUE ( Checks[CheckId] ),
-			        IF ( NOT tested, "Not tested", IF ( [To solve] > 0, IF ( allMarked, "All marked as fixed", "To solve" ), IF ( [To check] > 0, "To check", "OK" ) ) )
+			        NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ),
+			        IF ( NOT testedRows, "Not tested", IF ( [To solve] > 0, IF ( allMarked, "All marked as fixed", "To solve" ), IF ( [To check] > 0, "To check", "OK" ) ) )
 			    )
 
 	/// The one number of a card and its word (D220): CIs on an owners card, lines on a SACM fix list or a review list, contracts on a contract card. OK says Nothing to do.
@@ -22,21 +22,21 @@ table Checks
 			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), Findings[State] = shown ) + 0
 			VAR lines = CALCULATE ( COUNTROWS ( Findings ), Findings[State] = shown ) + 0
 			VAR byLine = kind = "fix" || ( kind = "review" && state = "To check" )
-			VAR count = IF ( byLine, lines, cis )
+			VAR cardTotal = IF ( byLine, lines, cis )
 			VAR word =
-			    IF ( byLine, IF ( count = 1, "line", "lines" ), IF ( contracts, IF ( count = 1, "contract", "contracts" ), IF ( count = 1, "CI", "CIs" ) ) )
+			    IF ( byLine, IF ( cardTotal = 1, "line", "lines" ), IF ( contracts, IF ( cardTotal = 1, "contract", "contracts" ), IF ( cardTotal = 1, "CI", "CIs" ) ) )
 			RETURN
-			    IF ( state = "OK", "Nothing to do", IF ( state = "To solve" || state = "All marked as fixed" || state = "To check" || ( state = "Not tested" && cis > 0 ), FORMAT ( IF ( state = "Not tested", cis, count ), "#,0" ) & " " & IF ( state = "Not tested", IF ( contracts, IF ( cis = 1, "contract", "contracts" ), IF ( cis = 1, "CI", "CIs" ) ), word ) ) )
+			    IF ( state = "OK", "Nothing to do", IF ( state = "To solve" || state = "All marked as fixed" || state = "To check" || ( state = "Not tested" && cis > 0 ), FORMAT ( IF ( state = "Not tested", cis, cardTotal ), "#,0" ) & " " & IF ( state = "Not tested", IF ( contracts, IF ( cis = 1, "contract", "contracts" ), IF ( cis = 1, "CI", "CIs" ) ), word ) ) )
 
 	/// The one fact of a card besides its number (D220, src/app/view/cards.ts cardLine), the first of: +N new since the report before, Partly tested, N reminders (due or over the limit), N answered, N of M marked as fixed (a SACM fix list), N free (contacts with open cases nobody has taken, on an owners or mapping card to solve), Not asked yet (the Procurement mailbox, to solve, never asked). Counted in CIs, as the app does.
 	measure 'Card fact' =
-			VAR tested = CALCULATE ( COUNTROWS ( Tested ) ) > 0
-			VAR notes = CALCULATE ( COUNTROWS ( Notes ) ) + 0
+			VAR testedRows = CALCULATE ( COUNTROWS ( Tested ) ) > 0
+			VAR noteRows = CALCULATE ( COUNTROWS ( Notes ) ) + 0
 			VAR kind = SELECTEDVALUE ( Checks[Kind] )
 			VAR state = [Card state]
-			VAR today = [Today]
+			VAR asOf = [Today]
 			VAR added = CALCULATE ( [New], REMOVEFILTERS ( Runs ) ) + 0
-			VAR due = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), CaseLines[Remind] <> "", CaseLines[ReminderFrom] <= today ) + 0
+			VAR due = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), CaseLines[Remind] <> "", CaseLines[ReminderFrom] <= asOf ) + 0
 			VAR answered = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), CaseLines[Status] = "Answered" ) + 0
 			VAR lines = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE () ) + 0
 			VAR marked = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), CaseLines[Status] = "Fixed" ) + 0
@@ -46,9 +46,9 @@ table Checks
 			VAR contacted = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), CaseLines[Messages] > 0 ) + 0
 			RETURN
 			    IF (
-			        HASONEVALUE ( Checks[CheckId] ),
+			        NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ),
 			        IF ( added > 0, "+" & FORMAT ( added, "#,0" ) & " new",
-			        IF ( tested && notes > 0, "Partly tested",
+			        IF ( testedRows && noteRows > 0, "Partly tested",
 			        IF ( kind <> "fix" && due > 0, due & IF ( due = 1, " reminder", " reminders" ),
 			        IF ( kind <> "fix" && answered > 0, answered & " answered",
 			        IF ( kind = "fix" && marked > 0 && marked < lines, marked & " of " & FORMAT ( lines, "#,0" ) & " marked as fixed",
@@ -57,7 +57,7 @@ table Checks
 			    )
 
 	/// What the card says when it is not tested or only partly tested: its notes, in the order of the run.
-	measure 'Card note' = IF ( HASONEVALUE ( Checks[CheckId] ), CONCATENATEX ( Notes, Notes[Reason], " ", Notes[Order], ASC ) )
+	measure 'Card note' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), CONCATENATEX ( Notes, Notes[Reason], " ", Notes[Order], ASC ) )
 
 	/// The title of the lines by kind of problem on a card page: one email to Procurement with the memory of the message ("Asked 2 times · last 4 Nov · no reply", or "Not asked yet", D226), one table per kind of problem (plan §6.1, build B7), or a SACM list grouped by problem or field (D146).
 	measure 'Problems title' =
@@ -87,9 +87,12 @@ table Checks
 			VAR state = [Card state]
 			VAR size = IF ( state IN { "To solve", "All marked as fixed" }, [To solve], IF ( state = "To check", [To check], 0 ) )
 			RETURN
-			    SELECTEDVALUE ( Checks[SectionOrder] ) * 1000000000
-			        + IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", 100000000, 0 )
-			        + [Card rank] * 10000000 + ( 99999 - MIN ( size, 99999 ) ) * 100 + SELECTEDVALUE ( Checks[FileOrder] )
+			    IF (
+			        NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ),
+			        SELECTEDVALUE ( Checks[SectionOrder] ) * 1000000000
+			            + IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", 100000000, 0 )
+			            + [Card rank] * 10000000 + ( 99999 - MIN ( size, 99999 ) ) * 100 + SELECTEDVALUE ( Checks[FileOrder] )
+			    )
 		formatString: 0
 
 	/// Checks that are not off.
@@ -97,18 +100,18 @@ table Checks
 		formatString: 0
 
 	/// What the card page says to do: the hint of the check file.
-	measure 'Card hint' = SELECTEDVALUE ( Checks[CardHint] )
+	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "The page shows every card until you choose one." )
 
 	/// The name of the check on its card page.
-	measure 'Card title' = SELECTEDVALUE ( Checks[CardLabel] ) & IF ( HASONEVALUE ( Checks[CheckId] ), " · " & [Card state] )
+	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen: on All cards, right-click a line and choose Drill through, Card." )
 
 	/// The line of the section Completeness (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
 	measure Completeness =
-			VAR checks = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "completeness" )
-			VAR toSolve = SUMX ( checks, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
-			VAR toCheck = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
-			VAR later = SUMX ( checks, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
-			VAR notTested = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
+			VAR checkRows = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "completeness" )
+			VAR toSolve = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
+			VAR toCheck = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
+			VAR later = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
+			VAR notTested = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
 			VAR solveText = IF ( toSolve > 0, toSolve & " to solve" )
 			VAR checkText = IF ( toCheck > 0, toCheck & " to check" )
 			VAR laterText = IF ( later > 0, later & " when there is time" )
@@ -120,11 +123,11 @@ table Checks
 
 	/// The line of the section Correctness (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
 	measure Correctness =
-			VAR checks = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "correctness" )
-			VAR toSolve = SUMX ( checks, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
-			VAR toCheck = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
-			VAR later = SUMX ( checks, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
-			VAR notTested = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
+			VAR checkRows = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "correctness" )
+			VAR toSolve = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
+			VAR toCheck = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
+			VAR later = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
+			VAR notTested = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
 			VAR solveText = IF ( toSolve > 0, toSolve & " to solve" )
 			VAR checkText = IF ( toCheck > 0, toCheck & " to check" )
 			VAR laterText = IF ( later > 0, later & " when there is time" )
@@ -136,11 +139,11 @@ table Checks
 
 	/// The line of the section Compliance (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
 	measure Compliance =
-			VAR checks = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "compliance" )
-			VAR toSolve = SUMX ( checks, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
-			VAR toCheck = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
-			VAR later = SUMX ( checks, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
-			VAR notTested = SUMX ( checks, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
+			VAR checkRows = CALCULATETABLE ( VALUES ( Checks[CheckId] ), Checks[Dimension] = "compliance" )
+			VAR toSolve = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) <> "later", 1 ) ) + 0
+			VAR toCheck = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) = "To check", 1 ) ) + 0
+			VAR later = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) IN { "To solve", "All marked as fixed" } && CALCULATE ( SELECTEDVALUE ( Checks[Priority] ) ) = "later", 1 ) ) + 0
+			VAR notTested = SUMX ( checkRows, IF ( CALCULATE ( [Card state] ) = "Not tested", 1 ) ) + 0
 			VAR solveText = IF ( toSolve > 0, toSolve & " to solve" )
 			VAR checkText = IF ( toCheck > 0, toCheck & " to check" )
 			VAR laterText = IF ( later > 0, later & " when there is time" )

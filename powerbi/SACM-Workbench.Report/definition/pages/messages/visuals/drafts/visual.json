@@ -92,17 +92,17 @@
             },
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Drafts"
                     }
                   },
-                  "Property": "Subject"
+                  "Property": "Subject line"
                 }
               },
-              "queryRef": "Drafts.Subject",
-              "nativeQueryRef": "Subject",
+              "queryRef": "Drafts.Subject line",
+              "nativeQueryRef": "Subject line",
               "displayName": "Subject"
             }
           ]

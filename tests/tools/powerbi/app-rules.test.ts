@@ -65,7 +65,15 @@ test('changing or removing a row, another list, an unknown column, another conne
   assert.ok(problems.some((line) => line.includes('column Colour')));
   assert.ok(problems.some((line) => line.includes('Patch(SACM Journal, …)')));
   assert.ok(problems.some((line) => line.includes('RemoveIf')));
-  assert.ok(problems.some((line) => line.includes('Patch(SACM Settings, …)')));
+  assert.ok(problems.some((line) => line.includes('adds a row to SACM Settings: only the Settings screen of the app SACM audit')));
   assert.ok(problems.some((line) => line.includes('Office365Outlook.SendEmailV2')));
   assert.ok(callProblems([formula('none', [])]).some((line) => line.includes('no formula adds a row')));
+});
+
+test('the app SACM audit adds rows to SACM Settings with Title and Value only, and changes none (build B8, D308)', () => {
+  const audit = (calls: Formula['calls']): Formula => ({ ...formula('audit', calls), file: 'powerbi/apps/sacm-audit/Src/AuditScreen.pa.yaml' });
+  assert.deepEqual(callProblems([audit([patch(['Title', 'Value'], 'Defaults', 'SACM Settings'), patch(['Title', 'Type', 'Items'])])]), []);
+  const problems = callProblems([audit([patch(['Title', 'Colour'], 'Defaults', 'SACM Settings'), patch(['Title'], null, 'SACM Settings'), patch(['Title'])])]);
+  assert.ok(problems.some((line) => line.includes('column Colour, which SACM Settings does not have')));
+  assert.ok(problems.some((line) => line.includes('Patch(SACM Settings, …)')));
 });

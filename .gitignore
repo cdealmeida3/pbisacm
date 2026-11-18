@@ -33,3 +33,6 @@ tools/powerbi/tmdl-check/obj/
 # The build of the Power Fx check (tools/powerbi/powerfx-check/)
 tools/powerbi/powerfx-check/bin/
 tools/powerbi/powerfx-check/obj/
+# The build of the Desktop check (tools/powerbi/desktop-check/)
+tools/powerbi/desktop-check/bin/
+tools/powerbi/desktop-check/obj/

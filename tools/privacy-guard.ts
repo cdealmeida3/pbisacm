@@ -21,6 +21,8 @@ export const ALLOWED_HOSTS = [
   'developer.microsoft.com', 'learn.microsoft.com', 'json-schema.org', 'api.nuget.org', 'contoso.sharepoint.com',
   // The id of Microsoft's schema of the Power Apps source (tools/powerbi/schemas/pa-yaml/, build B6).
   'powerapps.com',
+  // Microsoft's installer of Power BI Desktop, for the Desktop check on GitHub's runner (tools/powerbi/desktop.ps1, D309).
+  'download.microsoft.com',
   // A one-letter placeholder host in the test files of the .xlsx reader.
   'x'
 ];

@@ -1,0 +1,251 @@
+/// The lifecycle review (D306, the tab Lifecycle of the Audit page): one line per CI of each review the journal holds, with its mark and the follow-up of the case it opened, as the evidence file of the HTML app; then the CIs a new review would draw from the newest report (Review "next"). The Power App SACM audit reads it.
+table ReviewLines
+
+	/// The CIs of the newest review that a manager checked.
+	measure 'Review checked' = CALCULATE ( COUNTROWS ( ReviewLines ), ReviewLines[IsCurrent] = TRUE (), ReviewLines[Result] <> "" ) + 0
+		formatString: #,0
+
+	/// The CIs of the newest review.
+	measure 'Review size' = CALCULATE ( COUNTROWS ( ReviewLines ), ReviewLines[IsCurrent] = TRUE () ) + 0
+		formatString: #,0
+
+	/// The line over the review: "12 of 70 checked · 1 CI not the same as in EPO", or how to start one.
+	measure 'Review line' =
+			VAR total = [Review size]
+			VAR differs = CALCULATE ( COUNTROWS ( ReviewLines ), ReviewLines[IsCurrent] = TRUE (), ReviewLines[Result] = "different" ) + 0
+			VAR label = CALCULATE ( MAX ( ReviewLines[ReviewLabel] ), ReviewLines[IsCurrent] = TRUE () )
+			RETURN
+			    IF (
+			        total = 0,
+			        "No lifecycle review yet. New review in the app draws the sample from the newest CI report.",
+			        label & ": " & FORMAT ( [Review checked], "#,0" ) & " of " & FORMAT ( total, "#,0" ) & " checked"
+			            & IF ( differs > 0, " · " & FORMAT ( differs, "#,0" ) & IF ( differs = 1, " CI", " CIs" ) & " not the same as in EPO", "" ) & "."
+			    )
+
+	/// The id of the review ("2026-11-12_lifecycle"), or "next" for the CIs a new review would draw.
+	column Review
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Review]
+
+	column IsNext
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [IsNext]
+
+	/// The newest review (the one the Power App shows first).
+	column IsCurrent
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [IsCurrent]
+
+	column ReviewDate
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReviewDate]
+
+	column ReviewLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ReviewLabel]
+
+	column Report
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Report]
+
+	column ReportDate
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReportDate]
+
+	column Group
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Group]
+
+	column GroupLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [GroupLabel]
+
+	column CiKey
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiKey]
+
+	column CiName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiName]
+
+	column ClassLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ClassLabel]
+
+	column ClassName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ClassName]
+
+	column EpoId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EpoId]
+
+	column Status
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Status]
+
+	column EpoStatus
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EpoStatus]
+
+	/// Status in EPO: the word of EPO, then its meaning ("Kørende (Operational)").
+	column EpoStatusWords
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EpoStatusWords]
+
+	/// Not checked yet, and the EPO systems report shows the same status: the app marks these Same in EPO in one press.
+	column Agrees
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Agrees]
+
+	column Result
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Result]
+
+	column ResultLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ResultLabel]
+
+	column Note
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Note]
+
+	column CheckedBy
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckedBy]
+
+	column CheckedOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CheckedOn]
+
+	/// The status of the case a "Not the same" opened; Verified once the newest report shows another status.
+	column CaseStatus
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CaseStatus]
+
+	column FirstMessage
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FirstMessage]
+
+	column Reminders
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Reminders]
+
+	column EscalatedOn
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EscalatedOn]
+
+	/// The date of the EPO systems report the statuses in EPO come from (blank without one).
+	column EpoDate
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [EpoDate]
+
+	column Order
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Order]
+
+	partition ReviewLines = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "ReviewLines" ),
+					"Review", Run[ReviewLines.Review],
+					"IsNext", Run[ReviewLines.IsNext],
+					"IsCurrent", Run[ReviewLines.IsCurrent],
+					"ReviewDate", Run[ReviewLines.ReviewDate],
+					"ReviewLabel", Run[ReviewLines.ReviewLabel],
+					"Report", Run[ReviewLines.Report],
+					"ReportDate", Run[ReviewLines.ReportDate],
+					"Group", Run[ReviewLines.Group],
+					"GroupLabel", Run[ReviewLines.GroupLabel],
+					"CiKey", Run[ReviewLines.CiKey],
+					"CiName", Run[ReviewLines.CiName],
+					"ClassLabel", Run[ReviewLines.ClassLabel],
+					"ClassName", Run[ReviewLines.ClassName],
+					"EpoId", Run[ReviewLines.EpoId],
+					"Status", Run[ReviewLines.Status],
+					"EpoStatus", Run[ReviewLines.EpoStatus],
+					"EpoStatusWords", Run[ReviewLines.EpoStatusWords],
+					"Agrees", Run[ReviewLines.Agrees],
+					"Result", Run[ReviewLines.Result],
+					"ResultLabel", Run[ReviewLines.ResultLabel],
+					"Note", Run[ReviewLines.Note],
+					"CheckedBy", Run[ReviewLines.CheckedBy],
+					"CheckedOn", Run[ReviewLines.CheckedOn],
+					"CaseStatus", Run[ReviewLines.CaseStatus],
+					"FirstMessage", Run[ReviewLines.FirstMessage],
+					"Reminders", Run[ReviewLines.Reminders],
+					"EscalatedOn", Run[ReviewLines.EscalatedOn],
+					"EpoDate", Run[ReviewLines.EpoDate],
+					"Order", Run[ReviewLines.Order]
+				)

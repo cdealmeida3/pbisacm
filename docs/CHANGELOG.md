@@ -2,6 +2,18 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.45.0 — The Power BI report, the lifecycle review, Settings and the audit export (B8)
+
+- **The lifecycle review** (D306): the new Power App *SACM audit* sits on the Audit page. **New review** draws the sample from the newest CI report: the same report always gives the same CIs. Tick CIs, pick *Same in EPO*, *Not the same* or *Not in EPO*, add a note and press **Save**. **Mark N same in EPO** marks at once the CIs whose status the EPO systems report shows the same. *Not the same* opens a case on the card *Lifecycle review*, as in the HTML app. The Audit page lists every review, newest first, with the evidence columns of the HTML app, and the next draw.
+- **The Settings screen** (D308) is the second tab of *SACM audit*: the six numbers of the team with their ranges. Save adds rows to the list *SACM Settings* and one journal row that says what changed. The last row of a setting counts. The report now reads all six numbers.
+- **The audit export is complete**: on the Audit page, the verified findings with their days to verify, the CI reports loaded, the findings per check (new in the period), what was open at the end of the period, the exceptions and the lifecycle reviews. **Export data** on each table gives the Excel file.
+- **Fixed in Desktop** (what Carlos saw in 0.44.0): the empty visuals on My day, History, Self-check and Contract changes (measures that Desktop dropped because a variable had a name DAX keeps), *(Blank)* on the Card page, *[%%REF%%]* in the subjects of the Messages page, blank lines at the top of tables, lines that said *Not asked yet* for nothing, the empty *Open Reports* button, subtitles cut off.
+- **The Desktop check** (D309): every pull request now opens the report in Power BI Desktop on GitHub's Windows runner, refreshes it and runs every visual of every page. It fails when Desktop would show a visual broken or empty, a card *(Blank)* or a blank line. Its first runs found seven more measures Desktop refused (variables named `from`, `to` and `status`, an `IF` with five arguments, a measure inside a filter of CALCULATE), all fixed; the lint now refuses each of them.
+- **Follow again on the Audit page**: the new table *Cases not followed up*; select lines of it for **Follow again**.
+- **Settings say what is wrong**: a red line under a number that cannot be saved, and the name of a saved value that is not used.
+- **A faster refresh** (D307): 83 s at the size of the real reports, from 115 s.
+- The HTML app is replaced by the Power BI report: it still works, but gets no new features.
+
 ## 0.44.0 — The Power BI report, messages and replies (B7)
 
 - **The messages are built in the report** (D300): every message ready to send, one per person across the cards, at most 25 CIs a part, with the reminder and its new points, the escalation, one message with every table for a team or for Procurement. The words are those of the HTML app: the check of every pull request compares each message of the samples with the recorded messages, word for word.

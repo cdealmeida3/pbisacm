@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Every event of the journal, newest first: what was done, by whom, about which cards and CIs.",
+                    "value": "Every event of the journal, newest first: what, who, which cards.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10pt",

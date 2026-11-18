@@ -31,7 +31,10 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES, tmdlName } from './t
 import type { SourceTable } from './tmdl.ts';
 import { expectedHistory, HISTORY_FILES, STATE_LISTS } from './history.ts';
 import { compilePattern, fastForm } from './regex.ts';
-import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml, MESSAGES_APP_FORMULAS_FILE, MESSAGES_APP_YAML_FILE, messagesFormulas } from './actions.ts';
+import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml, AUDIT_APP_FORMULAS_FILE, AUDIT_APP_YAML_FILE, auditFormulas, MESSAGES_APP_FORMULAS_FILE, MESSAGES_APP_YAML_FILE, messagesFormulas } from './actions.ts';
+import { SETTING_LABELS } from '../../src/app/view/setup.ts';
+import { reviewConfig } from '../../src/core/cases/inventory.ts';
+import { loadReferences } from '../../src/hosts/cli.ts';
 import { STATUSES } from '../../src/core/cases/cases.ts';
 import { EXCEPTION_REASONS } from '../../src/core/audit/audit.ts';
 import { statusWord } from '../../src/app/view/cases.ts';
@@ -276,9 +279,9 @@ function packed(): Query[] {
     { name: 'PatternForms', group: 'Packed', description: 'GENERATED from the check files and the reference files (tools/powerbi/regex.ts, D285). For each pattern of Patterns, the fast form that decides most texts without the walk (fnFastMatch).', m: json(patternForms()) },
     { name: 'RunColumnTypes', group: 'Packed', description: 'GENERATED from the calculated tables (D284). The type of every column of Run that a part gives, for RunRows: the data type of the column of the calculated table.', m: runColumnTypes('Run') },
     { name: 'HistoryRunColumnTypes', group: 'Packed', description: 'GENERATED from the calculated tables (D290). The type of every column of HistoryRun that a part gives, for fnHistoryRun.', m: runColumnTypes('HistoryRun') },
-    { name: 'StateFiles', group: 'Packed', description: 'GENERATED from powerbi/samples/state/. The invented lists of the team\'s state (journal, replies, settings, team, reviews), as their bytes in base64, read when StateMode is Sample (D291).',
+    { name: 'StateFiles', group: 'Packed', description: 'GENERATED from powerbi/samples/state/. The invented lists of the team\'s state (journal, replies, settings, team), as their bytes in base64, read when StateMode is Sample (D291).',
       m: `#table(type table [FileName = text, Base64 = text], {\n${stateFiles().map((file) => `\t{${mText(file.name)}, ${mText(file.base64)}}`).join(',\n')}\n})` },
-    { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The five lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
+    { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The four lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
     { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.',
       m: json(Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }]))) },
     { name: 'MessageWords', group: 'Packed', description: 'GENERATED from src/core/messages/messages.ts (build B7, D300). The words of the messages: the requests of the Service Portal (id, name, the action inside its form, the name before 0.14.1), the words of the roles, EPO\'s names for them, the request that changes each role, the columns of the tables and the most CIs in one message.',
@@ -425,14 +428,18 @@ const themeText = (): string => `${JSON.stringify(theme(), null, 2)}\n`;
 
 /* ------------------------------------------------------------------ the Power App (build B6) */
 
-/** The generated files of the Power Apps SACM actions (D294) and SACM messages (D301), by path: their named formulas and their App. */
+/** The generated files of the Power Apps SACM actions (D294), SACM messages (D301) and SACM audit (D306, D308), by path: their named formulas and their App. */
 export function appFiles(): Array<{ file: string; text: string }> {
   const formulas = appFormulas(STATUSES, statusWord, EXCEPTION_REASONS, DEFAULT_SETTINGS.exceptionMonths);
   const messages = messagesFormulas();
+  const review = reviewConfig(loadReferences());
+  const audit = auditFormulas(SETTING_LABELS, DEFAULT_SETTINGS as unknown as Record<string, number>, review ? review.results : []);
   return [
     { file: APP_FORMULAS_FILE, text: formulas }, { file: APP_YAML_FILE, text: appYaml(formulas) },
     { file: MESSAGES_APP_FORMULAS_FILE, text: messages },
-    { file: MESSAGES_APP_YAML_FILE, text: appYaml(messages, 'SACM messages', 'MessagesScreen', 'powerbi/apps/sacm-messages/formulas.fx') }
+    { file: MESSAGES_APP_YAML_FILE, text: appYaml(messages, 'SACM messages', 'MessagesScreen', 'powerbi/apps/sacm-messages/formulas.fx') },
+    { file: AUDIT_APP_FORMULAS_FILE, text: audit },
+    { file: AUDIT_APP_YAML_FILE, text: appYaml(audit, 'SACM audit', 'AuditScreen', 'powerbi/apps/sacm-audit/formulas.fx') }
   ];
 }
 

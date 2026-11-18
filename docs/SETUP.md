@@ -2,7 +2,7 @@
 
 Two stages. Stage 1 takes five minutes and needs nothing from Microsoft 365. Stage 2 connects the shared mailbox.
 
-This guide is for the HTML app. **For the Power BI report** (D268): how to open it, read the reports from SharePoint, make the team's five lists and publish it for the team is in [powerbi/README.md](../powerbi/README.md) (sections 3, 4 and 5).
+This guide is for the HTML app. **For the Power BI report** (D268): how to open it, read the reports from SharePoint, make the team's four lists and publish it for the team is in [powerbi/README.md](../powerbi/README.md) (sections 3, 4 and 5).
 
 ## Stage 1 — Try the app
 

@@ -11,14 +11,14 @@ table CaseLines
 
 	/// Cases on a daily card that were asked, did not answer, and whose working days to the reminder have passed (D39, D182); counted from Today, so right between two refreshes.
 	measure 'Reminders due' =
-			VAR today = [Today]
-			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+			VAR asOf = [Today]
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
 		formatString: #,0
 
 	/// Cases on a daily card that got every reminder and still no answer (D40).
 	measure 'To escalate' =
-			VAR today = [Today]
-			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+			VAR asOf = [Today]
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
 		formatString: #,0
 
 	/// The open cases assigned to the manager who opens the report (the measure Me).
@@ -29,15 +29,15 @@ table CaseLines
 
 	/// On a line of the box Reminders due: its CIs with a reminder due; blank hides the line.
 	measure 'Reminder mark' =
-			VAR today = [Today]
-			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			VAR asOf = [Today]
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) )
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 
 	/// On a line of the box To escalate: its CIs to escalate; blank hides the line.
 	measure 'Escalation mark' =
-			VAR today = [Today]
-			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			VAR asOf = [Today]
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) )
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 
@@ -48,12 +48,15 @@ table CaseLines
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 
-	/// The memory of a line: "Asked 3 times · last 4 Nov · no reply", or "Not asked yet" (D226).
+	/// The memory of a line: "Asked 3 times · last 4 Nov · no reply", or "Not asked yet" (D226); blank with no case, so a table shows no line that has none.
 	measure 'Follow-up' =
 			VAR n = MAX ( CaseLines[Messages] )
 			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "Answered" )
 			RETURN
-			    IF (
+			    SWITCH (
+			        TRUE (),
+			        COUNTROWS ( CaseLines ) = 0,
+			        BLANK (),
 			        n = 0,
 			        "Not asked yet",
 			        "Asked " & n & IF ( n = 1, " time", " times" ) & " · last " & FORMAT ( MAX ( CaseLines[SentOn] ), "d mmm" ) & IF ( answered > 0, " · answered", " · no reply" )
@@ -61,10 +64,10 @@ table CaseLines
 
 	/// The next step of a line of My work, as the group on the card says it: Reply, Escalate, Remind, Wait for the answer, Email. The button comes with build B7.
 	measure 'Next step' =
-			VAR today = [Today]
+			VAR asOf = [Today]
 			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "Answered" )
-			VAR escalate = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= today )
-			VAR remind = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= today )
+			VAR escalate = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= asOf )
+			VAR remind = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= asOf )
 			VAR asked = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "Contacted" )
 			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "New" )
 			RETURN
@@ -83,7 +86,8 @@ table CaseLines
 			VAR fixedBy = CALCULATE ( SELECTEDVALUE ( CaseLines[FixedBy] ), TREATAS ( keys, CaseLines[Key] ) )
 			VAR fixedOn = CALCULATE ( MAX ( CaseLines[FixedOn] ), TREATAS ( keys, CaseLines[Key] ) )
 			VAR fixedText = IF ( fixedBy <> "", "Marked fixed by " & fixedBy & " on " & FORMAT ( fixedOn, "d mmm" ) )
-			RETURN assigned & IF ( assigned <> "" && fixedText <> "", " · " ) & fixedText
+			VAR who = assigned & IF ( assigned <> "" && fixedText <> "", " · " ) & fixedText
+			RETURN IF ( who <> "", who )
 
 	/// For the Power App visual (build B6): 1 on a line whose case is on the page (the drill through of the Card, Case and Person pages and the rows selected filter Findings), blank otherwise. Put it in the visual-level filter of the Power Apps visual as "is 1" (powerbi/README.md §6).
 	measure 'For the app' =

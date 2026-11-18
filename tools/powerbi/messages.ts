@@ -105,7 +105,7 @@ export function draftRow(draft: Draft, items: Case[], settings: MessageSettings)
  */
 export function draftRows(key: HistoryKey): DraftRow[] {
   const settings = sampleMessageSettings();
-  const latest = key.runs[key.runs.length - 1]!;
+  const latest = key.reviewed;
   const position = new Map(latest.facts.map((fact, at) => [fact.key, at]));
   const chosen = draftCases(key.cases).sort((a, b) => (position.get(a.key) ?? Infinity) - (position.get(b.key) ?? Infinity));
   let ref = 0;

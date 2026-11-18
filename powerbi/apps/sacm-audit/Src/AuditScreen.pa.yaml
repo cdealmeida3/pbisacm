@@ -1,0 +1,264 @@
+# The one screen of the Power App "SACM audit" (build B8, D306, D308), written by hand. To use it: in Power Apps Studio,
+# select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6.8). Structure only: the
+# visual design pass comes later.
+# What it does, on two tabs:
+#   - Lifecycle review: New review adds one row to SACM Journal with the sample the report drew from the newest CI report
+#     (D306). Then a manager ticks CIs of the newest review, picks the result (Same in EPO, Not the same, Not in EPO) and
+#     a note, and Save adds one row per CI. "Mark N same in EPO" marks at once the CIs whose status EPO shows the same.
+#   - Settings: the six numbers of the team (D158) with their ranges. Save adds one row to SACM Settings per changed
+#     number (the last row counts, D308) and one settings row to SACM Journal that says what changed.
+# Every Save asks flow F5 (SACMRefresh) to refresh the report. The app changes and removes no row, and sends nothing.
+Screens:
+  AuditScreen:
+    Properties:
+      Fill: =RGBA(255, 255, 255, 1)
+      OnVisible: =Set(varTab, "review"); Set(varDone, Blank())
+    Children:
+      - TitleLabel:
+          Control: Label
+          Properties:
+            Text: |-
+              ="SACM audit" & If(IsBlank(MeName), "", " · " & MeName) & If(TooManyLines, " · The report gives the app 1,000 lines at most: filter the page.", "")
+            FontWeight: =FontWeight.Semibold
+            Size: =14
+            X: =16
+            Y: =8
+            Width: =Parent.Width - 32
+            Height: =32
+      - ReviewTab:
+          Control: Classic/Button
+          Properties:
+            Text: ="Lifecycle review"
+            OnSelect: =Set(varTab, "review")
+            X: =16
+            Y: =44
+            Width: =180
+            Height: =36
+      - SettingsTab:
+          Control: Classic/Button
+          Properties:
+            Text: ="Settings"
+            OnSelect: =Set(varTab, "settings")
+            X: =204
+            Y: =44
+            Width: =140
+            Height: =36
+      # ------------------------------------------------------------------ the lifecycle review
+      - ReviewLine:
+          Control: Label
+          Properties:
+            Text: |-
+              =If(
+                  IsEmpty(CurrentLines), "No lifecycle review yet. New review draws " & CountRows(NextLines) & " CIs from the newest CI report.",
+                  "Lifecycle review " & CurrentId & ": " & MarkedCount & " of " & CountRows(CurrentLines) & " checked.")
+            Visible: =varTab = "review"
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 200
+            Height: =36
+      - NewReviewButton:
+          Control: Classic/Button
+          Properties:
+            Text: ="New review"
+            Visible: =varTab = "review"
+            DisplayMode: |-
+              =If(StartedToday || IsEmpty(NextLines) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |-
+              =IfError(
+                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: TodayId, Text: NewReviewText, Items: NewReviewItems });
+                  Notify("The review is started: " & CountRows(NextLines) & " CIs. The report shows them after the next refresh, in about a minute.", NotificationType.Success);
+                  IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                  Notify("Not started: " & FirstError.Message, NotificationType.Error)
+              )
+            X: =Parent.Width - 176
+            Y: =88
+            Width: =160
+            Height: =36
+      - LineGallery:
+          Control: Gallery
+          Variant: Vertical
+          Properties:
+            Items: =CurrentLines
+            TemplateSize: =48
+            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            X: =16
+            Y: =132
+            Width: =Parent.Width - 32
+            Height: =Parent.Height - 332
+          Children:
+            - MarkCheck:
+                Control: Classic/CheckBox
+                Properties:
+                  Text: =""
+                  Default: =false
+                  AccessibleLabel: ="Mark " & ThisItem.CiName
+                  X: =0
+                  Y: =8
+                  Width: =32
+                  Height: =32
+            - MarkLine:
+                Control: Label
+                Properties:
+                  Text: |-
+                    =ThisItem.CiName & " · " & ThisItem.ClassLabel & Char(10) &
+                    "ServiceNow: " & ThisItem.Status & " · EPO: " & Coalesce(ThisItem.EpoStatus, "not in the EPO report") & " · " & ThisItem.ResultLabel
+                  X: =40
+                  Y: =0
+                  Width: =Parent.TemplateWidth - 40
+                  Height: =Parent.TemplateHeight
+      - ResultPick:
+          Control: Classic/DropDown
+          Properties:
+            Items: =ReviewResults
+            AccessibleLabel: ="Result"
+            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            X: =16
+            Y: =Parent.Height - 192
+            Width: =280
+            Height: =36
+      - NoteText:
+          Control: Classic/TextInput
+          Properties:
+            Default: =""
+            HintText: ="Note (what EPO says)"
+            AccessibleLabel: ="Note"
+            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            X: =304
+            Y: =Parent.Height - 192
+            Width: =Parent.Width - 320
+            Height: =36
+      - MarkButton:
+          Control: Classic/Button
+          Properties:
+            Text: ="Save the mark"
+            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            DisplayMode: |-
+              =If(IsEmpty(Filter(LineGallery.AllItems, MarkCheck.Value)) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |-
+              =With(
+                  { ticked: Filter(LineGallery.AllItems, MarkCheck.Value), result: ResultPick.Selected.Id, note: Trim(NoteText.Text) },
+                  IfError(
+                      ForAll(
+                          ticked As line,
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: result, Text: note })
+                      );
+                      Notify(CountRows(ticked) & If(CountRows(ticked) = 1, " CI marked ", " CIs marked ") & ResultPick.Selected.Label & ". The report shows it after the next refresh.", NotificationType.Success);
+                      Reset(NoteText);
+                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Notify("Not saved: " & FirstError.Message, NotificationType.Error)
+                  )
+              )
+            X: =16
+            Y: =Parent.Height - 148
+            Width: =200
+            Height: =36
+      - SameButton:
+          Control: Classic/Button
+          Properties:
+            Text: ="Mark " & CountRows(AgreeingLines) & " same in EPO"
+            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            DisplayMode: |-
+              =If(IsEmpty(AgreeingLines) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |-
+              =With(
+                  { agreeing: AgreeingLines, note: AgreeNote },
+                  IfError(
+                      ForAll(
+                          agreeing As line,
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: "same", Text: note })
+                      );
+                      Notify(CountRows(agreeing) & " CIs marked Same in EPO. The report shows it after the next refresh.", NotificationType.Success);
+                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Notify("Not saved: " & FirstError.Message, NotificationType.Error)
+                  )
+              )
+            X: =224
+            Y: =Parent.Height - 148
+            Width: =240
+            Height: =36
+      # ------------------------------------------------------------------ the settings
+      - SettingGallery:
+          Control: Gallery
+          Variant: Vertical
+          Properties:
+            Items: =Sort(SettingRows, Order)
+            TemplateSize: =56
+            Visible: =varTab = "settings"
+            X: =16
+            Y: =88
+            Width: =Parent.Width - 32
+            Height: =360
+          Children:
+            - SettingLabel:
+                Control: Label
+                Properties:
+                  Text: |-
+                    =ThisItem.Label & Char(10) & "A whole number from " & ThisItem.Min & " to " & ThisItem.Max & ". Default " & ThisItem.Default & "." & If(ThisItem.Unused <> "", " The saved value " & ThisItem.Unused & " is not used: the default counts.", "")
+                  X: =0
+                  Y: =0
+                  Width: =Parent.TemplateWidth - 140
+                  Height: =Parent.TemplateHeight
+            - ValueInput:
+                Control: Classic/TextInput
+                Properties:
+                  Default: =Text(ThisItem.Current)
+                  AccessibleLabel: =ThisItem.Label
+                  X: =Parent.TemplateWidth - 128
+                  Y: =10
+                  Width: =120
+                  Height: =36
+            - ValueBadLine:
+                Control: Label
+                Properties:
+                  # The red line under a number Save refuses (D158).
+                  Text: =""
+                  Fill: =RGBA(164, 38, 44, 1)
+                  Visible: =!(IsMatch(Trim(ValueInput.Text), "\d+") && Value(Trim(ValueInput.Text)) >= ThisItem.Min && Value(Trim(ValueInput.Text)) <= ThisItem.Max)
+                  X: =Parent.TemplateWidth - 128
+                  Y: =47
+                  Width: =120
+                  Height: =3
+      - SettingsWhy:
+          Control: Label
+          Properties:
+            # Why Save is off: a value that is not a whole number in its range (D158), named by its label.
+            Text: |-
+              =Concat(
+                  Filter(SettingGallery.AllItems As row, !(IsMatch(Trim(row.ValueInput.Text), "\d+") && Value(Trim(row.ValueInput.Text)) >= row.Min && Value(Trim(row.ValueInput.Text)) <= row.Max)) As bad,
+                  bad.Label & ": a whole number from " & bad.Min & " to " & bad.Max & ".",
+                  " ")
+            Visible: =varTab = "settings"
+            X: =16
+            Y: =456
+            Width: =Parent.Width - 32
+            Height: =48
+      - SaveSettingsButton:
+          Control: Classic/Button
+          Properties:
+            Text: ="Save the settings"
+            Visible: =varTab = "settings"
+            DisplayMode: |-
+              =If(!IsBlank(SettingsWhy.Text) || IsBlank(MeEmail), DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |-
+              =With(
+                  {
+                      changed: Filter(
+                          ForAll(SettingGallery.AllItems As row, { Key: row.Key, Label: row.Label, Before: Text(row.Current), After: Text(Value(Trim(row.ValueInput.Text))) }),
+                          After <> Before)
+                  },
+                  If(
+                      IsEmpty(changed),
+                      Notify("Nothing changed.", NotificationType.Information),
+                      IfError(
+                          ForAll(changed As setting, Patch('SACM Settings', Defaults('SACM Settings'), { Title: setting.Key, Value: setting.After }));
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "settings", Text: "Team settings changed. " & Concat(changed, Label & ": " & Before & " → " & After, "; ") });
+                          Notify("Saved. The report uses the new numbers after the next refresh, in about a minute.", NotificationType.Success);
+                          IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                          Notify("Not saved: " & FirstError.Message, NotificationType.Error)
+                      )
+                  )
+              )
+            X: =16
+            Y: =512
+            Width: =200
+            Height: =36

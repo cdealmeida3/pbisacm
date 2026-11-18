@@ -8,7 +8,9 @@ let
         Id = row[Title], At = row[At], By = Text.Lower(row[By], "en-US"), ByName = row[ByName], Type = row[Type],
         Keys = List.Select(List.Transform(Text.SplitAny(row[Keys], "#(cr)#(lf)"), Text.Trim), (key) => key <> ""),
         Text = row[Text], Ref = row[Ref], To = row[To], Cc = row[Cc], Subject = row[Subject], Kind = row[Kind], Channel = row[Channel],
-        Person = row[Person], Reason = row[Reason], ReviewOn = row[ReviewOn], RetireOn = row[RetireOn], CheckId = row[CheckId], CiKey = row[CiKey], CiName = row[CiName]
+        Person = row[Person], Reason = row[Reason], ReviewOn = row[ReviewOn], RetireOn = row[RetireOn], CheckId = row[CheckId], CiKey = row[CiKey], CiName = row[CiName],
+        // The sample of a lifecycle review, on the row that starts it (build B8, D306; LifecycleReviews).
+        Items = row[Items]
     ]),
     order = (a as record, b as record) as number => let first = Value.Compare(a[At], b[At]) in if first <> 0 then first else Value.Compare(a[Id], b[Id])
 in

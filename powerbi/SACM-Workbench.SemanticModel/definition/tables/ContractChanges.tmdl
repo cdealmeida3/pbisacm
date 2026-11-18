@@ -5,28 +5,28 @@ table ContractChanges
 	measure 'Changes line' =
 			VAR added = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "New contract" ) + 0
 			VAR gone = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "No longer in the file" ) + 0
-			VAR status = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Status change" ) + 0
+			VAR statusChanges = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Status change" ) + 0
 			VAR fields = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "Changed field" ) + 0
 			RETURN
-			    added & " new · " & gone & " no longer in the file · " & status & IF ( status = 1, " status change", " status changes" ) & " · " & fields & IF ( fields = 1, " changed field", " changed fields" )
+			    added & " new · " & gone & " no longer in the file · " & statusChanges & IF ( statusChanges = 1, " status change", " status changes" ) & " · " & fields & IF ( fields = 1, " changed field", " changed fields" )
 
 	/// Which two Solusi contract files are compared, or why nothing is. From the files themselves, so it is right when nothing changed.
 	measure 'Changes head' =
 			VAR solusi = FILTER ( ReportFiles, ReportFiles[Kind] = "solusi" && NOT ISBLANK ( ReportFiles[ReportDate] ) )
 			VAR newest = TOPN ( 1, solusi, ReportFiles[ReportDate], DESC, ReportFiles[FileName], DESC )
 			VAR fileDate = MAXX ( newest, ReportFiles[ReportDate] )
-			VAR earlier = MAXX ( EXCEPT ( solusi, newest ), ReportFiles[ReportDate] )
+			VAR olderDate = MAXX ( EXCEPT ( solusi, newest ), ReportFiles[ReportDate] )
 			RETURN
 			    IF ( ISBLANK ( fileDate ), "No Solusi contract file is loaded yet.",
-			        IF ( ISBLANK ( earlier ), "The Solusi contract file of " & FORMAT ( fileDate, "d mmm yyyy" ) & " is the first one: nothing to compare with yet.",
-			            "The Solusi contract file of " & FORMAT ( fileDate, "d mmm yyyy" ) & " against the one of " & FORMAT ( earlier, "d mmm yyyy" ) & "." ) )
+			        IF ( ISBLANK ( olderDate ), "The Solusi contract file of " & FORMAT ( fileDate, "d mmm yyyy" ) & " is the first one: nothing to compare with yet.",
+			            "The Solusi contract file of " & FORMAT ( fileDate, "d mmm yyyy" ) & " against the one of " & FORMAT ( olderDate, "d mmm yyyy" ) & "." ) )
 
 	/// Days from today (the date of the samples in Sample mode) to the end date of a Concluded contract; empty when it has ended.
 	measure 'Days left' =
 			VAR ends = MAX ( ContractChanges[End] )
-			VAR today = [Today]
+			VAR asOf = [Today]
 			RETURN
-			    IF ( NOT ISBLANK ( ends ) && ends >= today, DATEDIFF ( today, ends, DAY ) )
+			    IF ( NOT ISBLANK ( ends ) && ends >= asOf, DATEDIFF ( asOf, ends, DAY ) )
 		formatString: #,0
 
 	/// Days left, only for a contract that ends in the next 30 days (the other lines of the table stay empty and are not shown).
@@ -45,10 +45,10 @@ table ContractChanges
 
 	/// The running contracts to watch: Concluded contracts that end in the next 30 and 90 days, running contracts with no daily responsible.
 	measure 'Watch line' =
-			VAR today = [Today]
-			VAR ending = FILTER ( ContractChanges, ContractChanges[Kind] = "Concluded with an end date" && ContractChanges[End] >= today )
-			VAR in30 = COUNTROWS ( FILTER ( ending, ContractChanges[End] <= today + 30 ) ) + 0
-			VAR in90 = COUNTROWS ( FILTER ( ending, ContractChanges[End] <= today + 90 ) ) + 0
+			VAR asOf = [Today]
+			VAR ending = FILTER ( ContractChanges, ContractChanges[Kind] = "Concluded with an end date" && ContractChanges[End] >= asOf )
+			VAR in30 = COUNTROWS ( FILTER ( ending, ContractChanges[End] <= asOf + 30 ) ) + 0
+			VAR in90 = COUNTROWS ( FILTER ( ending, ContractChanges[End] <= asOf + 90 ) ) + 0
 			VAR noDaily = CALCULATE ( COUNTROWS ( ContractChanges ), ContractChanges[Kind] = "No daily responsible" ) + 0
 			RETURN
 			    in30 & " Concluded " & IF ( in30 = 1, "contract ends", "contracts end" ) & " in the next 30 days, " & in90 & " in the next 90 days · " & noDaily & " running " & IF ( noDaily = 1, "contract has", "contracts have" ) & " no daily responsible"

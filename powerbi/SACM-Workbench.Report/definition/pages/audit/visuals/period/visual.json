@@ -54,7 +54,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Period of the actions'"
+                  "Value": "'Period of the export'"
                 }
               }
             }
@@ -69,7 +69,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Period of the actions'"
+                  "Value": "'Period of the export'"
                 }
               }
             }

@@ -24,9 +24,12 @@
         prefixed = (part as list) as table =>
             let
                 name = part{0},
-                rows = part{1}
+                rows = part{1},
+                renamed = Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})),
+                present = Table.ColumnNames(renamed),
+                own = List.Select(HistoryRunColumnTypes, (pair) => List.Contains(present, pair{0}))
             in
-                Table.AddColumn(Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})), "Part", each name, type text),
+                Table.AddColumn(Table.TransformColumnTypes(renamed, own), "Part", each name, type text),
         perDay = List.Transform(days, (day) =>
             let
                 run = runOf(day),
@@ -34,8 +37,9 @@
             in
                 Table.AddColumn(combined, "ReportDate", each day, type date)),
         // With no CI report in the dates, every column is still there, so a refresh of an empty part of the history works.
-        empty = #table({"Part", "ReportDate"} & List.Transform(HistoryRunColumnTypes, (pair) => pair{0}), {}),
-        combined = Table.Combine({empty} & perDay),
-        typed = Table.TransformColumnTypes(combined, {{"Part", type text}, {"ReportDate", type date}} & HistoryRunColumnTypes)
+        // Each part is typed alone, before the parts are put together (as in RunRows, D307); the empty frame types every column.
+        types = {{"Part", type text}, {"ReportDate", type date}} & HistoryRunColumnTypes,
+        empty = Table.TransformColumnTypes(#table(List.Transform(types, (pair) => pair{0}), {}), types),
+        typed = Table.Combine({empty} & perDay)
     in
         Table.ReorderColumns(typed, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(typed), (column) => column <> "Part" and column <> "ReportDate"))

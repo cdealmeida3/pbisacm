@@ -3,7 +3,8 @@
 // npm run powerbi:lint runs them on what Microsoft's Power Fx library reads from the app source too
 // (tools/powerbi/powerfx-check/, needs .NET 8).
 //   - The apps only ADD rows to the list SACM Journal (D272): Patch('SACM Journal', Defaults('SACM Journal'), { … }), with
-//     columns of the list; they never change, remove or clear a row of any list of the team, and write no other list.
+//     columns of the list; the app SACM audit also adds rows to SACM Settings (its Settings screen, build B8, D308) the
+//     same way. They never change, remove or clear a row of any list of the team, and write no other list.
 //   - The apps call no connector but the flows of powerbi/apps/flows.json with the trigger Power Apps (V2).
 //   - The flows refresh, wait, file a report or a reply, or send exactly what a manager pressed Send or Test on: the
 //     To, Cc, Subject and Body of a sending step are the inputs of its trigger (a test goes to the manager who ran it).
@@ -25,6 +26,11 @@ export const JOURNAL_TYPES: EventType[] = ['note', 'status', 'assign', 'request'
 const LISTS = Object.values(STATE_LISTS).map((list) => list.list as string);
 const JOURNAL = STATE_LISTS.journal.list as string;
 const JOURNAL_COLUMNS = new Set<string>(STATE_LISTS.journal.columns);
+/** The lists an app may add rows to, each with its columns. */
+const ADD_ONLY = new Map<string, Set<string>>([
+  [JOURNAL, JOURNAL_COLUMNS],
+  [STATE_LISTS.settings.list as string, new Set<string>(STATE_LISTS.settings.columns)]
+]);
 /** Functions that change or remove what a data source holds. Only Patch with Defaults (a new row) is allowed. */
 const WRITERS = new Set(['Patch', 'Collect', 'ClearCollect', 'Clear', 'Remove', 'RemoveIf', 'Update', 'UpdateIf', 'SubmitForm']);
 
@@ -49,11 +55,13 @@ export function callProblems(formulas: Formula[], flows: Flow[] = appFlows()): s
       }
       if (!WRITERS.has(call.name) || !call.source) continue;
       if (!LISTS.includes(call.source)) { problems.push(`App: ${where} writes to ${call.source}, which is not a list of the team`); continue; }
-      if (call.name !== 'Patch' || call.source !== JOURNAL || call.second !== 'Defaults') {
-        problems.push(`App: ${where} uses ${call.name}(${call.source}, …): the app only adds rows to ${JOURNAL}, with Patch(${JOURNAL}, Defaults(${JOURNAL}), { … }) (D272)`);
+      const columns = ADD_ONLY.get(call.source);
+      if (call.name !== 'Patch' || !columns || call.second !== 'Defaults') {
+        problems.push(`App: ${where} uses ${call.name}(${call.source}, …): the apps only add rows to ${Array.from(ADD_ONLY.keys()).join(' and ')}, with Patch(<list>, Defaults(<list>), { … }) (D272)`);
         continue;
       }
-      for (const field of call.fields) if (!JOURNAL_COLUMNS.has(field)) problems.push(`App: ${where} writes the column ${field}, which ${JOURNAL} does not have (powerbi/README.md §5)`);
+      if (call.source !== JOURNAL && !/sacm-audit/.test(formula.file)) problems.push(`App: ${where} adds a row to ${call.source}: only the Settings screen of the app SACM audit does (D308)`);
+      for (const field of call.fields) if (!columns.has(field)) problems.push(`App: ${where} writes the column ${field}, which ${call.source} does not have (powerbi/README.md §5)`);
     }
   }
   if (!formulas.some((formula) => formula.calls.some((call) => call.name === 'Patch' && call.source === JOURNAL))) problems.push(`App: no formula adds a row to ${JOURNAL}`);

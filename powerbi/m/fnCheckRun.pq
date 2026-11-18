@@ -152,6 +152,7 @@
                     (if reference = null or not Value.Is(Record.FieldOrDefault(reference, "rules", null), type list) then skipped(ref)
                     else if not (model <> null and Value.Is(Record.FieldOrDefault(model, "expectations", null), type list)) then skipped("reference/relationship-model")
                     else fnDetectMappingBacklog(pack, run, inScope, reference, model))
+                else if module = "review/lifecycle" then fnDetectReviewLifecycle(pack, run, inScope, reference)
                 else if module = "ci/name-standard" then (if reference = null then skipped(ref) else fnDetectCiNameStandard(pack, run, inScope, reference))
                 else if module = "ci/epo-id" then (if reference = null then skipped(ref) else fnDetectCiEpoId(pack, run, inScope, reference))
                 else if module = "ci/status-age" then (if reference = null then skipped(ref) else fnDetectCiStatusAge(pack, run, inScope, reference))

@@ -30,7 +30,9 @@ App:
           { Value: "Marked fixed", Status: "Fixed" }
       );
       ExceptionReasons = ["Agreed with the owner", "Known and tagged", "Not a CI", "Duplicate record", "Other"];
-      ExceptionMonths = 6;
+      // The months to the review date of a decision to stop following: the last row of exceptionMonths in SACM Settings (the
+      // Settings screen of the app SACM audit, build B8, D308), a whole number in its range (D158), else the default.
+      ExceptionMonths = With({ raw: Trim(Last(Filter('SACM Settings', Title = "exceptionMonths")).Value) }, If(IsMatch(raw, "\d+") && Value(raw) >= 1 && Value(raw) <= 36, Value(raw), 6));
 
       // The named formulas of the Power App "SACM actions" (build B6, D294 to D296), written by hand. npm run powerbi:generate
       // puts them after the catalogue of powerbi/apps/actions.json into App-Formulas.fx (to paste into App → Formulas) and

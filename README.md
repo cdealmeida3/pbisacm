@@ -6,9 +6,13 @@ Nothing happens on its own: a manager loads the report, sends each message and f
 
 **What it checks today:** the nine logical CI classes (responsibilities, criticality, descriptions, tags, names, EPO ID, support group, lifecycle), their relationships (with the Relationship report), EPO compared with ServiceNow (with the EPO systems report), and the contracts of Solusi compared with ServiceNow (with the Solusi contract file and the ServiceNow contract report). Every check is listed in [docs/CHECKS.md](docs/CHECKS.md).
 
+> **Replaced by the Power BI report** (D268, version 0.45.0). The team uses the Power BI version in [`powerbi/`](powerbi/README.md): the same checks, cases and messages, read from SharePoint, with Power Apps for the buttons. The HTML app below still works and stays the answer key of the Power BI report (D270), but it gets no new features.
+
 ## Use it
 
-Open [`app/SACM-Workbench.html`](app/SACM-Workbench.html) in Edge or Chrome and click *Try it with invented data*. To connect the team folder and the shared mailbox, follow the [setup guide](docs/SETUP.md).
+**The Power BI report:** follow [powerbi/README.md](powerbi/README.md).
+
+**The HTML app (replaced):** open [`app/SACM-Workbench.html`](app/SACM-Workbench.html) in Edge or Chrome and click *Try it with invented data*. To connect the team folder and the shared mailbox, follow the [setup guide](docs/SETUP.md).
 
 ## Read more
 

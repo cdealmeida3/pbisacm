@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The messages ready to send: first messages, reminders that are due and escalations. Open one in the app SACM messages, at the right, and press Send.",
+                    "value": "The messages ready to send. Open one in the app SACM messages, at the right, and press Send.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10pt",
