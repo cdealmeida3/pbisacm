@@ -381,7 +381,7 @@ That tool designs mappings for one project at a time ("links, not data quality")
 
 ## 12. The Power BI report
 
-The Workbench is being rebuilt as a Power BI report (D268). The HTML app above stays as it is until stage 2 ends; its logic is the answer key of the report (D270). Build B1 is the foundation: the reports are read and the cards are listed. Build B2 runs the checks of the CI report: the rule checks and the CI and criticality code detectors (`BuiltDetectors`). Build B3 adds the relationship, EPO, process stage and mapping backlog detectors. The speed build makes a refresh at the size of the real reports fit in the budget of D283.
+The Workbench is being rebuilt as a Power BI report (D268). The HTML app above stays as it is until stage 2 ends; its logic is the answer key of the report (D270). Build B1 is the foundation: the reports are read and the cards are listed. Build B2 runs the checks of the CI report: the rule checks and the CI and criticality code detectors (`BuiltDetectors`). Build B3 adds the relationship, EPO, process stage and mapping backlog detectors. The speed build makes a refresh at the size of the real reports fit in the budget of D283. Build B4 adds the contract detectors and the table *Contract changes*.
 
 ```
 powerbi/
@@ -392,7 +392,7 @@ powerbi/
 │   └── tables/<Table>.tmdl                one file per table: its columns, its DAX measures, one query <Table>Rows, or a calculated
 │                                          table that splits Run (D284); Run.tmdl is GENERATED from those
 ├── SACM-Workbench.Report/
-│   ├── definition/                        the pages (Reports, Cards, Card, Case, Person, Mapping backlog, Self-check) and their visuals, in PBIR
+│   ├── definition/                        the pages (Reports, Cards, Card, Case, Person, Mapping backlog, Contract changes, Self-check) and their visuals, in PBIR
 │   └── StaticResources/RegisteredResources/sacm-theme.json   GENERATED from the colours of LOOK.md
 ├── m/<Query>.pq                           the Power Query queries, one per file (hand-written)
 └── README.md                              how to open, refresh, make a .pbix, switch to SharePoint (for Carlos)
@@ -400,9 +400,11 @@ powerbi/
 
 **How data flows.** `SourceMode` (D271) picks the files: `SampleFiles` (the invented samples, base64 in the model) or `fnSharePointFiles` (one folder of the SharePoint site). `ReadFiles` reads each file once (`fnReadTable`: CSV with its separator and encoding, or every sheet of an `.xlsx`) and finds its kind by its columns (`fnReportType`, the port of `recogniseAmong`). The newest file of each kind (`fnNewest`) goes through its reader (`fnReadCiReport`, `fnReadRelationshipReport`, `fnReadEpoReport`, `fnReadSolusiFile`, `fnReadContractReport`, ports of `src/core/sources/`) into the tables `Inventory`, `Relationships`, `EpoSystems`, `SolusiContracts` and `ServiceNowContracts`. `Checks` lists every check file that is not off; `Notes` gives the grey note of each check whose detector is not built (`BuiltDetectors`), so no card is a silent pass. `SelfCheck` compares the result with the expected result packed from `tests/recorded/cards.json`. Ages and "old" are DAX measures, so they are right on any day.
 
-**How the checks run (B2, B3).** `CheckRun` runs `fnCheckRun` on the newest CI report (D278), the port of `runChecks` and `buildRun`. It reads the CIs with their tags and hidden characters, pairs the Relationship and EPO reports dated on or before it (`fnPaired`), builds the relationship graph once (`fnRelationshipGraph`), parks the classes of `parked-classes` (`fnParked`), and gives each check in use its scope.
+**How the checks run (B2 to B4).** `CheckRun` runs `fnCheckRun` on the newest CI report (D278), the port of `runChecks` and `buildRun`. It reads the CIs with their tags and hidden characters, pairs the Relationship and EPO reports dated on or before it (`fnPaired`), builds the relationship graph once (`fnRelationshipGraph`), parks the classes of `parked-classes` (`fnParked`), and gives each check in use its scope.
 
-Each built module has one function: `fnDetectRule` (every operator of `checks/README.md`), `fnDetectCiNameStandard`, `fnDetectCiEpoId`, `fnDetectCiStatusAge`, `fnDetectCriticalityAboveParents`, `fnDetectCriticalityNoneReaches`, the seven `fnDetectRelationships…` (on the graph: its edges, the partners up and down, the environment of each CI by `fnEnvironment`), `fnDetectEpoDiffers` and `fnDetectEpoNotArrived` (on `fnEpoCompare`, worked out once per run, D281), `fnDetectProcessStage` and `fnDetectMappingBacklog`; each returns `[Findings, Tested, Evaluated, Notes]` and a part it cannot test gives a note (D15).
+Each built module has one function: `fnDetectRule` (every operator of `checks/README.md`), `fnDetectCiNameStandard`, `fnDetectCiEpoId`, `fnDetectCiStatusAge`, `fnDetectCriticalityAboveParents`, `fnDetectCriticalityNoneReaches`, the seven `fnDetectRelationships…` (on the graph: its edges, the partners up and down, the environment of each CI by `fnEnvironment`), `fnDetectEpoDiffers` and `fnDetectEpoNotArrived` (on `fnEpoCompare`, worked out once per run, D281), `fnDetectProcessStage`, `fnDetectMappingBacklog`, and the five `fnDetectContracts…` (on `fnContractCompare`, the Solusi file and the ServiceNow contract report paired with the CI report and compared once per run); each returns `[Findings, Tested, Evaluated, Notes]` and a part it cannot test gives a note (D15).
+
+A contract is a subject of its own (D287): `fnContractSubject` gives it the shape of a CI (key `contract:<number>`, class *contract*, the contract owner as Owned by), and the finding carries it, so `fnFacts` finds who is asked from the subject. Each finding also has its kind of problem (`Problem`), which the card page shows as one table per kind.
 
 Then `fnSourceFirst` (D190, on the pairs of `fnEpoCompare`), the parked filter, and `fnFacts`: who is asked (`fnContact`, the port of `resolveContact`), Procurement, the record teams, the EPO inventory owner, where the fix is made (`fnFixedInEpo`), how the finding is listed (`fnListing`) and the CI as the message shows it.
 
@@ -411,7 +413,10 @@ Then `fnSourceFirst` (D190, on the pairs of `fnEpoCompare`), the parked filter, 
 ```
 files ─▶ ReadFiles ─▶ CheckRun ─▶ Run (hidden, RunRows) ─▶ Findings, Tested, Notes, Parked, MappingBacklog,
                                                            RelationshipLinks, CapabilitySheet, SelfCheck (DAX)
+          └────▶ ContractChanges (ContractChangesRows: the two newest Solusi files, no CI report)
 ```
+
+`ContractChanges` is its own query, not a part of `Run` (D288): it reads no CI report. Its measures count the days left from the measure `Today`, so *ends in 30 / 90 days* moves with the day the report is opened.
 
 `fnServiceNowLink` builds the link of `recordSearch` from the parameter `ServiceNowAddress` (D279). The patterns of the checks are compiled by `tools/powerbi/regex.ts` into the packed query `Patterns` and tested by `fnMatches` and `fnRegexTest` (D277); `PatternForms` gives each one a fast form that decides most texts without the walk (`fnFastMatch`, D285); `fnSearch` and `fnReplacePattern` find and replace a match (D280). The DAX measures of `Checks` only count and choose: *Card state*, *Card number*, *Card fact*, the section lines. `SelfCheck` compares the states, the CIs and every finding key with `tests/recorded/cards.json`.
 

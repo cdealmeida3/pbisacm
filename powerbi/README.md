@@ -4,11 +4,10 @@ This folder is the Power BI version of the Workbench (decision D268). It is a **
 and the report are text files, so every change can be reviewed in a pull request. Power BI Desktop opens it like a
 `.pbix`.
 
-This is **build B3**. It reads the five kinds of report, shows which reports are there and how old they are, and runs
-the checks of the CI report, the Relationship report and the EPO systems report: 32 of the 39 cards work, with the same
-result as the HTML app. The other cards are grey ("not built yet"): the contract checks come in build B4, and
-*Lifecycle review* is a manual card. Why it is built this way: decisions D268 to D282 in
-[DECISIONS.md](../docs/DECISIONS.md).
+This is **build B4**. It reads the five kinds of report, shows which reports are there and how old they are, and runs
+the checks of the CI report, the Relationship report, the EPO systems report and the two contract files: 38 of the 39
+cards work, with the same result as the HTML app. *Lifecycle review* is a manual card. Why it is built this way:
+decisions D268 to D289 in [DECISIONS.md](../docs/DECISIONS.md).
 
 ## 1. Open it on your Windows PC
 
@@ -25,12 +24,13 @@ The report opens on the **Cards** page. Look at:
 | Page | What you should see |
 |---|---|
 | **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. Below: the runs, the classes and the files that could not be read (none for the samples). |
-| **Cards** | The three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. **Topic** at the top right filters the cards. Below: the classes that are not checked yet. For the samples the built cards show 19 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
-| **Card** (drill through) | Right-click a row of the Cards page, choose **Drill through**, then **Card**. Who is asked about which CI and why (to solve), the lines to check, waiting or known, the SACM fix list (with **Open in ServiceNow**), and a table with the columns of the SACM template: its **More options (...)**, **Export data** gives the Excel file. |
+| **Cards** | The three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. **Topic** at the top right filters the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
+| **Card** (drill through) | Right-click a row of the Cards page, choose **Drill through**, then **Card**. Who is asked about which CI and why (to solve), the lines to check, waiting or known, the SACM fix list (with **Open in ServiceNow**), the lines by kind of problem (for *For Procurement*: one email to the Procurement mailbox, one table per kind), and a table with the columns of the SACM template: its **More options (...)**, **Export data** gives the Excel file. A contract shows as `CT…: name`. |
 | **Case** (drill through) | Right-click a CI on the Card page, **Drill through**, **Case**: each problem of the CI, its state, who is asked, who is copied and who gets an escalation, the chip *changed in EPO*, and *What EPO already has* when EPO already holds the person asked for (then nobody needs to be asked). Below: **Relationships**, every CI above and below it, its class, status and type, and whether the line counts for the checks. |
 | **Person** (drill through) | Right-click the person asked, **Drill through**, **Person**: everything open with them. |
 | **Mapping backlog** | One line per CI to map with its owner: why it is on the list, the stage of its class, the steps, its criticality and the next step ("Invite the owner to a mapping session", or why it waits). **Lines** filters To solve, To check, Waiting and Planned. Below: the **capability sheet** for Enterprise Architecture (its line says how many, or why it is empty: it needs the Relationship report), every Business Capability with what is above and below it (**Export data** gives the Excel file). For the samples: 4 CIs to map. The backlog has no drill through to the Case page: right-click the CI on the *Mapping backlog* card instead. Until build B5 the stage is the first stage of the class (there is no history yet). |
-| **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples. In B3 it says **32 of 39**: the 32 checks that are built. Each later build raises the number; at the end of stage 1 it says 39 of 39. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
+| **Contract changes** | The newest Solusi contract file against the one before it: new contracts, contracts no longer in the file, status changes and changed fields. Then the Concluded contracts that end in the next 30 and in the next 90 days (counted from today), and the running contracts without a daily responsible. For information only: nobody is asked. The samples have two Solusi files, an earlier one and the newest, so the page compares them; 2 Concluded contracts end in the next 90 days (none in 30) and 1 has no daily responsible. |
+| **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples. In B4 it says **38 of 39**: the 38 checks that are built. *Lifecycle review* is a manual card until build B8. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
 
 At the foot of every page: the version, "invented samples" or "SharePoint", and when the data was refreshed.
 

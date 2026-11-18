@@ -172,7 +172,7 @@ expression SampleFiles =
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.40.0"
+expression WorkbenchVersion = "0.41.0"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
@@ -3631,7 +3631,8 @@ expression ContractChangesRows =
 		                    (contract) => lineOf("No daily responsible", contract, "", "", ""))
 		            in
 		                ending & noDaily,
-		    lines = changes & information,
+		    // Buffered: each row below reads its line by position, and a list that is not buffered is worked out again each time.
+		    lines = List.Buffer(changes & information),
 		    kinds = {"New contract", "No longer in the file", "Status change", "Changed field", "Concluded with an end date", "No daily responsible"}
 		in
 		    #table(

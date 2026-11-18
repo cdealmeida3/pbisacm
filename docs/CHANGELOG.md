@@ -2,6 +2,15 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.41.0 — The Power BI report, the contract checks (B4)
+
+- **38 checks work in the Power BI report.** New in B4: *Not in Solusi*, *To clear by hand*, *Contract status*, *Upload check*, *For Procurement* and *Contracts to fix in ServiceNow*. They find the same lines as the HTML app on the samples. The Self-check page says 38 of 39: *Lifecycle review* is a manual card.
+- A contract is a case of its own, as in the app (D287): the Card, Case and Person pages show it with its contract owner.
+- **Card page:** the lines by kind of problem. For *For Procurement* the title says that one email to the Procurement mailbox holds one table per kind of problem.
+- **New page *Contract changes*** (D288): the newest Solusi file against the one before it (new contracts, contracts no longer in the file, status changes, changed fields), the Concluded contracts that end in the next 30 and 90 days, counted from today, and the running contracts without a daily responsible. For information only: nobody is asked.
+- The time limit of D283 now also reads the contract files at real size (D289). TIME_LINE
+- The HTML app is not changed: no check, number or message changed.
+
 ## 0.40.0 — The Power BI report is fast enough for the real reports (speed build)
 
 - **The refresh at the size of the real reports takes about 43 seconds** on the test machine (invented reports with 3,230 CIs, 5,100 relationships and 1,020 EPO systems). In B3 it did not finish in 14 minutes. Nothing else changes: the same pages, the same numbers; the Self-check page still says 32 of 39.

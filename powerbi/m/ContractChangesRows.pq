@@ -54,7 +54,8 @@ let
                     (contract) => lineOf("No daily responsible", contract, "", "", ""))
             in
                 ending & noDaily,
-    lines = changes & information,
+    // Buffered: each row below reads its line by position, and a list that is not buffered is worked out again each time.
+    lines = List.Buffer(changes & information),
     kinds = {"New contract", "No longer in the file", "Status change", "Changed field", "Concluded with an end date", "No daily responsible"}
 in
     #table(
