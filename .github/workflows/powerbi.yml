@@ -170,6 +170,8 @@ jobs:
   powerbi-desktop:
     if: github.event.pull_request.draft != true && (inputs.jobs == '' || inputs.jobs == null || contains(inputs.jobs, 'desktop'))
     runs-on: windows-latest
+    permissions:
+      contents: write
     timeout-minutes: 40
     defaults:
       run:
@@ -189,7 +191,19 @@ jobs:
       - name: Open the report in Power BI Desktop and run every visual
         run: ./tools/powerbi/desktop.ps1 -Out .build/desktop
       - name: What Desktop would show wrong
+        continue-on-error: true
         run: node tools/powerbi/desktop.ts judge .build/desktop/results.json
+      - name: THROWAWAY commit the pictures of the pages (design review)
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          mkdir -p shots && cp .build/desktop/shots/*.png shots/ || true
+          cp .build/desktop/screen-*.png shots/ || true
+          git add -f shots
+          git commit -m "Pictures of the pages (design review, throwaway)" || true
+          git push origin HEAD:${GITHUB_REF_NAME}
       - uses: actions/upload-artifact@v4
         if: always()
         with:

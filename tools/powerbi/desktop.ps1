@@ -43,6 +43,29 @@ if (-not (Test-Path $desktop)) {
 if (-not (Test-Path $desktop)) { throw "Power BI Desktop is not installed" }
 Write-Output "Power BI Desktop $((Get-Item $desktop).VersionInfo.ProductVersion)"
 
+# THROWAWAY (design review): a bigger screen, so the pictures show the report as on a monitor.
+try {
+  Add-Type @"
+using System; using System.Runtime.InteropServices;
+public static class D {
+  [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)] public struct DEVMODE {
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmDeviceName; public short dmSpecVersion; public short dmDriverVersion;
+    public short dmSize; public short dmDriverExtra; public int dmFields; public int dmPositionX; public int dmPositionY; public int dmDisplayOrientation;
+    public int dmDisplayFixedOutput; public short dmColor; public short dmDuplex; public short dmYResolution; public short dmTTOption; public short dmCollate;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmFormName; public short dmLogPixels; public int dmBitsPerPel; public int dmPelsWidth;
+    public int dmPelsHeight; public int dmDisplayFlags; public int dmDisplayFrequency; public int dmICMMethod; public int dmICMIntent; public int dmMediaType;
+    public int dmDitherType; public int dmReserved1; public int dmReserved2; public int dmPanningWidth; public int dmPanningHeight; }
+  [DllImport("user32.dll")] public static extern int EnumDisplaySettings(string d, int m, ref DEVMODE dm);
+  [DllImport("user32.dll")] public static extern int ChangeDisplaySettings(ref DEVMODE dm, int f);
+  public static string Set(int w, int h) { DEVMODE dm = new DEVMODE(); dm.dmSize = (short)Marshal.SizeOf(dm);
+    string modes = ""; for (int i = 0; EnumDisplaySettings(null, i, ref dm) != 0; i++) { modes += dm.dmPelsWidth + "x" + dm.dmPelsHeight + " "; }
+    EnumDisplaySettings(null, -1, ref dm); dm.dmPelsWidth = w; dm.dmPelsHeight = h; dm.dmFields = 0x80000 | 0x100000;
+    return "modes: " + modes + " result: " + ChangeDisplaySettings(ref dm, 0); }
+}
+"@
+  Write-Output ("Screen: " + [D]::Set(1920, 1080))
+} catch { Write-Output "Screen size not changed: $($_.Exception.Message)" }
+
 # 2. Open the project, as a double click on the .pbip does; wait for the port of its engine.
 $project = (Resolve-Path "powerbi/SACM-Workbench.pbip").Path
 Write-Output "$(Get-Date -Format HH:mm:ss) Opening $project"
@@ -68,6 +91,7 @@ Write-Output "Engine of Desktop on port $port"
 dotnet run --project tools/powerbi/desktop-check -c Release -- $port . $Out
 $code = $LASTEXITCODE
 Show-Screen "after the check"
+& "$PSScriptRoot/shots.ps1" -Out (Join-Path $Out "shots")
 # The errors Desktop wrote to its own traces (Power Query gives its reasons there).
 $traces = Join-Path $env:LOCALAPPDATA "Microsoft\Power BI Desktop\Traces"
 Get-ChildItem $traces -Recurse -Filter *.log -ErrorAction SilentlyContinue |
