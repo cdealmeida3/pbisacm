@@ -228,6 +228,11 @@ table Run
 		summarizeBy: none
 		sourceColumn: Findings.FixRelatedTo
 
+	column 'Findings.FixNote'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Findings.FixNote
+
 	column 'Findings.Group'
 		dataType: string
 		summarizeBy: none
@@ -287,6 +292,11 @@ table Run
 		dataType: string
 		summarizeBy: none
 		sourceColumn: Findings.EpoCorrection
+
+	column 'Findings.Problem'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Findings.Problem
 
 	column 'MappingBacklog.Key'
 		dataType: string

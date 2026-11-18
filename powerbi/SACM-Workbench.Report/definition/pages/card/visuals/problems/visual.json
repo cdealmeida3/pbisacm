@@ -1,0 +1,288 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "problems",
+  "position": {
+    "x": 24,
+    "y": 516,
+    "z": 3500,
+    "height": 156,
+    "width": 1232,
+    "tabOrder": 3500
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Problem"
+                }
+              },
+              "queryRef": "Findings.Problem",
+              "nativeQueryRef": "Problem",
+              "displayName": "Kind of problem"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "Findings.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "Contract or CI"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "OwnedBy"
+                }
+              },
+              "queryRef": "Findings.OwnedBy",
+              "nativeQueryRef": "OwnedBy",
+              "displayName": "Contract owner"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Detail"
+                }
+              },
+              "queryRef": "Findings.Detail",
+              "nativeQueryRef": "Detail",
+              "displayName": "What we found"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "StateLabel"
+                }
+              },
+              "queryRef": "Findings.StateLabel",
+              "nativeQueryRef": "StateLabel",
+              "displayName": "State"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "AskWho"
+                }
+              },
+              "queryRef": "Findings.AskWho",
+              "nativeQueryRef": "AskWho",
+              "displayName": "Who is asked"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Findings"
+                  }
+                },
+                "Property": "Problem"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Findings"
+                  }
+                },
+                "Property": "CiName"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The lines by kind of problem: for Procurement one table per problem in one email; on a SACM list grouped by problem or field'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
+                    }
+                  },
+                  "Property": "Problems title"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "problemFilter",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Findings"
+              }
+            },
+            "Property": "Problem"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f",
+              "Entity": "Findings",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "f"
+                              }
+                            },
+                            "Property": "Problem"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "''"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

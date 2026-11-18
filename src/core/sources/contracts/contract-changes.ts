@@ -23,7 +23,8 @@ export interface ContractChanges {
   fields: ContractChange[];
 }
 
-const CHANGE_FIELDS: Array<{ field: keyof SolusiContract; label: string; date?: boolean }> = [
+/** The fields compared between two Solusi contract files, in the order of the page (also read by the Power BI report). */
+export const CHANGE_FIELDS: Array<{ field: keyof SolusiContract; label: string; date?: boolean }> = [
   { field: 'name', label: 'Name' }, { field: 'vendor', label: 'Vendor' }, { field: 'vendorNumber', label: 'Vendor number' }, { field: 'category', label: 'Category' },
   { field: 'start', label: 'Start date', date: true }, { field: 'end', label: 'End date', date: true }, { field: 'duration', label: 'Duration type' },
   { field: 'owner', label: 'Contract owner' }, { field: 'dailyResponsible', label: 'Daily responsible' }, { field: 'procurementPartner', label: 'Procurement partner' },

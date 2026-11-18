@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseCsv } from '../../../src/core/reading/csv.ts';
-import { copyDescription, copyEpoId, copyName, scaledSampleFiles, scaledSizes } from '../../../tools/powerbi/scaled.ts';
+import { copyDescription, copyEpoId, copyName, copyNumber, scaledSampleFiles, scaledSizes } from '../../../tools/powerbi/scaled.ts';
 import { probes } from '../../../tools/powerbi/probes.ts';
 import { connectorSource } from '../../../tools/powerbi/connector.ts';
 
@@ -53,6 +53,34 @@ test('no EPO ID is on two copies, and the Relationship and EPO reports use the E
   assert.equal(paired, pairedInSample * copies, 'each copy of EPO pairs as the sample does');
   assert.equal(cis.length, scaledSizes(copies).cis);
   assert.equal(relationships.length, scaledSizes(copies).relationships);
+});
+
+test('the contract files have their own numbers per copy, the label row once, and the EPO IDs of the CI report', () => {
+  assert.equal(copyNumber('CT000001', 0), 'CT000001');
+  assert.equal(copyNumber('CT000001', 5), 'CT000001-C5');
+  assert.equal(copyNumber('', 5), '');
+  const copies = 4;
+  const files = scaledSampleFiles(copies);
+  const [solusiHeader, labels, ...solusi] = textOf(files, '_solusi-contracts-sample.csv');
+  const number = solusiHeader!.indexOf('CONTRACT_NO');
+  assert.equal(labels![number], 'Contract No.');
+  assert.ok(!solusi.some((row) => row[number] === 'Contract No.'), 'the label row once');
+  assert.equal(solusi.length, scaledSizes(copies).solusiContracts);
+  assert.equal(new Set(solusi.map((row) => row[number])).size, solusi.length, 'every Solusi number once');
+  const [ciHeader, ...cis] = textOf(files, 'cmdb_ci-sample');
+  const tags = new Set(cis.map((row) => row[ciHeader!.indexOf('asset_tag')]!));
+  const epoId = solusiHeader!.indexOf('CLM_CONTRACT_EPO_ID');
+  for (const row of solusi) if (/^AST-/.test(row[epoId]!)) assert.ok(tags.has(row[epoId]!), row[epoId]);
+  const [servicenowHeader, ...servicenow] = textOf(files, 'servicenow-contracts-sample');
+  assert.equal(servicenow.length, scaledSizes(copies).servicenowContracts);
+  const own = servicenow.map((row) => row[servicenowHeader!.indexOf('number')]!);
+  assert.equal(new Set(own).size, own.length, 'every ServiceNow number once');
+  const numbers = new Set(solusi.map((row) => row[number]!));
+  const paired = servicenow.filter((row) => numbers.has(row[servicenowHeader!.indexOf('vendor_contract')]!)).length;
+  const [, , ...oneSolusi] = textOf(scaledSampleFiles(1), '_solusi-contracts-sample.csv');
+  const oneNumbers = new Set(oneSolusi.map((row) => row[number]!));
+  const [, ...oneServiceNow] = textOf(scaledSampleFiles(1), 'servicenow-contracts-sample');
+  assert.equal(paired, oneServiceNow.filter((row) => oneNumbers.has(row[servicenowHeader!.indexOf('vendor_contract')]!)).length * copies, 'each copy pairs as the sample does');
 });
 
 test('history adds earlier dates of the CI and Relationship report only', () => {

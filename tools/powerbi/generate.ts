@@ -13,6 +13,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 import { REPORT_TYPES } from '../../src/core/sources/report-types.ts';
 import { CLASS_ALIASES, CI_CLASSES, FIELD_ALIASES, OPERATIONAL_STATUS, PERSON_PARTS } from '../../src/core/sources/ci/ci-report.ts';
+import { CHANGE_FIELDS } from '../../src/core/sources/contracts/contract-changes.ts';
 import { CHILD_CLASS, CHILD_TAG, PARENT_CLASS, PARENT_TAG, RELATIONSHIP_REPORT } from '../../src/core/sources/relationships/relationship-report.ts';
 import { APPLICATION_SUFFIX, CLASS_WORDS } from '../../src/core/checks/detectors/relationship-detectors.ts';
 import { CHANGED_CHIP } from '../../src/core/checks/detectors/epo-detectors.ts';
@@ -138,6 +139,11 @@ export function patternUses(): PatternUse[] {
   };
   add(searched(model?.applicationCopy?.instanceSuffix, 'checks/reference/relationship-model.json'), '', 'checks/reference/relationship-model.json');
   add(searched(APPLICATION_SUFFIX, 'src/core/checks/detectors/relationship-detectors.ts'), 'i', 'src/core/checks/detectors/relationship-detectors.ts');
+  // The contract checks: the status tag and the tag that sets the criticality by hand (contract-reports.ts, statusTagOf;
+  // contract-detectors.ts, stillLinked), tested ignoring case.
+  const contracts = references['contract-reports'] as { statusTag?: string; targetTag?: string } | undefined;
+  add(contracts?.statusTag, 'i', 'checks/reference/contract-reports.json');
+  add(contracts?.targetTag, 'i', 'checks/reference/contract-reports.json');
   // The mapping backlog: the tags that make a CI a case.
   const tagged = (references['mapping-backlog'] as { tagged?: { tags?: string[] } } | undefined)?.tagged;
   for (const tag of tagged?.tags ?? []) add(tag, 'i', 'checks/reference/mapping-backlog.json');
@@ -197,6 +203,8 @@ export function readingRules(): Record<string, unknown> {
     procurement: { id: PROCUREMENT, via: PROCUREMENT_VIA },
     epoOwner: { id: EPO_OWNER, name: 'EPO inventory owner', via: 'inventory owner of EPO' },
     classWords: CLASS_WORDS,
+    // The page Contract changes (src/core/sources/contracts/contract-changes.ts): the fields compared, in order.
+    contractChangeFields: CHANGE_FIELDS.map((entry) => ({ field: entry.field, label: entry.label, date: entry.date === true })),
     epoChangedChip: CHANGED_CHIP,
     applicationSuffix: APPLICATION_SUFFIX
   };
@@ -218,7 +226,8 @@ interface Query { name: string; m: string; description: string; group: string }
 
 const PARAMETERS = ['SourceMode', 'SharePointSite', 'ReportsFolder', 'ServiceNowAddress'];
 /** The queries of the checks themselves (group Checks), besides the detectors fnDetect…. */
-const CHECK_QUERIES = new Set(['BuiltDetectors', 'CheckRun', 'fnCheckRun', 'fnFacts', 'fnContact', 'fnListing', 'fnSourceFirst', 'fnParked', 'fnFinding', 'fnMatches', 'fnRegexTest', 'fnRegexWalk', 'fnSearch', 'fnEpoCompare', 'fnEpoTested', 'fnEpoNoFlag', 'fnEpoCorrections']);
+const CHECK_QUERIES = new Set(['BuiltDetectors', 'CheckRun', 'fnCheckRun', 'fnFacts', 'fnContact', 'fnListing', 'fnSourceFirst', 'fnParked', 'fnFinding', 'fnMatches', 'fnRegexTest', 'fnRegexWalk', 'fnSearch', 'fnEpoCompare', 'fnEpoTested', 'fnEpoNoFlag', 'fnEpoCorrections',
+  'fnContractCompare', 'fnContractSubject', 'ContractWords', 'fnEpoIds']);
 
 /** A hand-written query of powerbi/m/: the comment lines at its top are its description, the rest its M. */
 function handWritten(file: string): Query {

@@ -67,7 +67,7 @@ function corpus(): string[] {
       variants.forEach((text) => out.add(text));
     }
   }
-  ['', ' ', 'é', 'É', 'Æble Grød', 'K', 'kelvin K', 'ok', 'x​y', 'abc', 'ABC', 'aB3', 'ab_cd.Ef', 'ab cd', '---', '-.?x', 'X', '?', ' BA'].forEach((text) => out.add(text));
+  ['', ' ', 'é', 'É', 'Œuvre Brûlée', 'K', 'kelvin K', 'ok', 'x​y', 'abc', 'ABC', 'aB3', 'ab_cd.Ef', 'ab cd', '---', '-.?x', 'X', '?', ' BA'].forEach((text) => out.add(text));
   return [...out];
 }
 

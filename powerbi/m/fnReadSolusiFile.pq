@@ -19,10 +19,12 @@
         all = if List.IsEmpty(tables) then #table(names & {"sheet"}, {}) else Table.Combine(tables),
         indexed = Table.AddIndexColumn(all, "Row", 0, 1, Int64.Type),
         withKey = Table.AddColumn(indexed, "NumberKey", each Text.Lower([number], "en-US"), type text),
-        // The last terminated row of a number wins, else the first row of the number.
+        // The last terminated row of a number wins, else the first row of the number. It keeps the place of the first row
+        // of its number, as a JavaScript Map does in src/core.
         ranked = Table.AddColumn(withKey, "Rank", each if [sheet] = "terminated" then 1000000000 + [Row] else -[Row], type number),
-        best = Table.Combine(Table.Group(ranked, {"NumberKey"}, {{"Rows", each Table.FirstN(Table.Sort(_, {{"Rank", Order.Descending}}), 1)}})[Rows]),
-        sorted = Table.Sort(best, {{"Row", Order.Ascending}}),
+        best = Table.Combine(Table.Group(ranked, {"NumberKey"}, {{"Rows", (group) => let place = List.Min(group[Row]) in
+            Table.AddColumn(Table.FirstN(Table.Sort(group, {{"Rank", Order.Descending}}), 1), "Place", each place, Int64.Type)}})[Rows]),
+        sorted = Table.Sort(best, {{"Place", Order.Ascending}}),
         dates = Table.TransformColumns(sorted, {{"start", fnParseDate, type nullable date}, {"end", fnParseDate, type nullable date}, {"terminated", fnParseDate, type nullable date}}),
         renamed = Table.RenameColumns(dates, {
             {"number", "Number"}, {"status", "Status"}, {"name", "Name"}, {"vendor", "Vendor"}, {"vendorNumber", "VendorNumber"},

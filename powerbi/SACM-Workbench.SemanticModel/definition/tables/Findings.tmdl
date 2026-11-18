@@ -218,6 +218,13 @@ table Findings
 		isNameInferred
 		sourceColumn: [FixRelatedTo]
 
+	/// Why a line of the SACM fix list needs care (Not in Solusi: the contract is still linked). Empty for most lines.
+	column FixNote
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixNote]
+
 	column Group
 		dataType: string
 		isDataTypeInferred
@@ -293,6 +300,13 @@ table Findings
 		isNameInferred
 		sourceColumn: [EpoCorrection]
 
+	/// The kind of problem a line is listed under: a problem of the contract data (For Procurement, Contracts to fix in ServiceNow) or a field of the upload check (D146). Empty for most checks.
+	column Problem
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Problem]
+
 	partition Findings = calculated
 		mode: import
 		source =
@@ -330,6 +344,7 @@ table Findings
 					"FixSet", Run[Findings.FixSet],
 					"FixValue", Run[Findings.FixValue],
 					"FixRelatedTo", Run[Findings.FixRelatedTo],
+					"FixNote", Run[Findings.FixNote],
 					"Group", Run[Findings.Group],
 					"EpoId", Run[Findings.EpoId],
 					"Status", Run[Findings.Status],
@@ -341,5 +356,6 @@ table Findings
 					"Tags", Run[Findings.Tags],
 					"ServiceNowLink", Run[Findings.ServiceNowLink],
 					"Mapping", Run[Findings.Mapping],
-					"EpoCorrection", Run[Findings.EpoCorrection]
+					"EpoCorrection", Run[Findings.EpoCorrection],
+					"Problem", Run[Findings.Problem]
 				)

@@ -98,6 +98,21 @@
                       "Entity": "Findings"
                     }
                   },
+                  "Property": "FixNote"
+                }
+              },
+              "queryRef": "Findings.FixNote",
+              "nativeQueryRef": "FixNote",
+              "displayName": "Note"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
                   "Property": "ServiceNowLink"
                 }
               },
