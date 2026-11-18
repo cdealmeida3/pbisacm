@@ -133,6 +133,8 @@ const visit = (value: unknown, where: string): void => {
 for (const file of filesUnder(join(REPORT, 'definition'), /visual\.json$/)) visit(JSON.parse(readFileSync(file, 'utf8')), relative(root, file));
 for (const table of tables) {
   for (const measure of table.measures) {
+    // A column a measure makes itself (ADDCOLUMNS ( …, "@days", … )) is named with @ and read as [@days].
+    const made = new Set(Array.from(measure.dax.matchAll(/"(@[^"]+)"/g), (match) => match[1]!));
     const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
     for (const match of dax.matchAll(/(?:'([^']+)'|\b([A-Za-z_][A-Za-z0-9_]*))\s*\[([^\]]+)\]/g)) {
       const entity = match[1] ?? match[2]!;
@@ -140,7 +142,7 @@ for (const table of tables) {
       else if (!columns.get(entity)!.has(match[3]!) && !measures.get(entity)!.has(match[3]!)) problems.push(`References: measure ${table.name}[${measure.name}] names ${entity}[${match[3]}], which is not in the model`);
     }
     for (const match of dax.matchAll(/(?<![\w'\]])\[([^\]]+)\]/g)) {
-      if (!allMeasures.has(match[1]!)) problems.push(`References: measure ${table.name}[${measure.name}] names the measure [${match[1]}], which is not in the model`);
+      if (!allMeasures.has(match[1]!) && !made.has(match[1]!)) problems.push(`References: measure ${table.name}[${measure.name}] names the measure [${match[1]}], which is not in the model`);
     }
   }
 }

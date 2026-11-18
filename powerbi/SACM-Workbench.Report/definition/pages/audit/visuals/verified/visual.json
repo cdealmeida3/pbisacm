@@ -3,7 +3,7 @@
   "name": "verified",
   "position": {
     "x": 24,
-    "y": 556,
+    "y": 596,
     "z": 2100,
     "height": 300,
     "width": 616,
@@ -119,6 +119,21 @@
               "queryRef": "History.Verified on",
               "nativeQueryRef": "Verified on",
               "displayName": "Verified on"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Days to verify"
+                }
+              },
+              "queryRef": "History.Days to verify",
+              "nativeQueryRef": "Days to verify",
+              "displayName": "Days"
             }
           ]
         }

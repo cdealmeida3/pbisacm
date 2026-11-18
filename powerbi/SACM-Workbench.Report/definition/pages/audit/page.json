@@ -3,7 +3,7 @@
   "name": "audit",
   "displayName": "Audit",
   "displayOption": "FitToPage",
-  "height": 1480,
+  "height": 2280,
   "width": 1280,
   "visualInteractions": [
     {
@@ -39,6 +39,36 @@
     {
       "source": "period",
       "target": "date",
+      "type": "NoFilter"
+    },
+    {
+      "source": "date",
+      "target": "verifiedLine",
+      "type": "NoFilter"
+    },
+    {
+      "source": "date",
+      "target": "loads",
+      "type": "NoFilter"
+    },
+    {
+      "source": "date",
+      "target": "found",
+      "type": "NoFilter"
+    },
+    {
+      "source": "date",
+      "target": "openAtEnd",
+      "type": "NoFilter"
+    },
+    {
+      "source": "date",
+      "target": "reviewLine",
+      "type": "NoFilter"
+    },
+    {
+      "source": "period",
+      "target": "reviewLine",
       "type": "NoFilter"
     }
   ]

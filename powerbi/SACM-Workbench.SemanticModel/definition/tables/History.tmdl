@@ -132,6 +132,66 @@ table History
 			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] <> "open" ) + 0
 		formatString: #,0
 
+	/// The export of the Audit page, the findings per check (findings.csv of the HTML app): the findings to solve on the CI reports dated in the period; blank when none.
+	measure 'Period findings' =
+			VAR n = CALCULATE ( DISTINCTCOUNT ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= [Period from], Runs[ReportDate] <= [Period to], History[State] = "open" )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+
+	/// The CIs with a finding to solve on the CI reports dated in the period (findings.csv).
+	measure 'Period CIs' =
+			VAR n = CALCULATE ( DISTINCTCOUNT ( History[CiKey] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= [Period from], Runs[ReportDate] <= [Period to], History[State] = "open" )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+
+	/// Of the findings of the period, those first seen in it (findings.csv, "New in the period").
+	measure 'New in the period' =
+			VAR from = [Period from]
+			VAR to = [Period to]
+			VAR keys = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= from, Runs[ReportDate] <= to, History[State] = "open" )
+			VAR fresh = FILTER ( keys, VAR first = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( Runs ), ALLEXCEPT ( History, History[Key] ) ) RETURN first >= from && first <= to )
+			RETURN IF ( NOT ISEMPTY ( keys ), COUNTROWS ( fresh ) + 0 )
+		formatString: #,0
+
+	/// The newest CI report dated on or before the end of the period: the report of "Open at the end".
+	measure 'End report date' = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] <= [Period to] )
+		formatString: d mmm yyyy
+
+	/// The export of the Audit page, open at the end (open.csv of the HTML app): the first report date of a finding the report of the end of the period still shows; blank for the others.
+	measure 'Open first seen' =
+			VAR d = [End report date]
+			VAR shown = CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d )
+			RETURN IF ( NOT ISBLANK ( d ) && shown > 0, [First seen] )
+		formatString: d mmm yyyy
+
+	/// The age in days of a finding open at the end of the period: from its first report to the report of the end.
+	measure 'Open age' =
+			VAR first = [Open first seen]
+			RETURN IF ( NOT ISBLANK ( first ), DATEDIFF ( first, [End report date], DAY ) )
+		formatString: 0
+
+	/// On a line of the verified findings: the days from the first report that showed it to the report that verified it (verified.csv, "Days").
+	measure 'Days to verify' =
+			VAR verified = [Verified on]
+			RETURN IF ( NOT ISBLANK ( verified ), DATEDIFF ( [First seen], verified, DAY ) )
+		formatString: 0
+
+	/// The line over the verified findings: how many a report of the period verified, the average and the longest days to verify.
+	measure 'Verified line' =
+			VAR from = [Period from]
+			VAR to = [Period to]
+			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < from )
+			VAR candidates = CALCULATETABLE ( SUMMARIZE ( History, History[Key], History[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < to, Runs[ReportDate] >= COALESCE ( before, from ) )
+			VAR verified = FILTER ( ADDCOLUMNS ( candidates, "@on", [Verified on], "@days", [Days to verify] ), NOT ISBLANK ( [@on] ) && [@on] >= from && [@on] <= to )
+			VAR n = COUNTROWS ( verified ) + 0
+			RETURN
+			    IF (
+			        n = 0,
+			        "No finding was verified by a CI report of the period.",
+			        FORMAT ( n, "#,0" ) & IF ( n = 1, " finding", " findings" ) & " verified by a CI report of the period · on average "
+			            & FORMAT ( AVERAGEX ( verified, [@days] ), "0" ) & " days from the first report · the longest " & FORMAT ( MAXX ( verified, [@days] ), "0" ) & " days."
+			    )
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred

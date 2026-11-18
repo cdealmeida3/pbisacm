@@ -5,6 +5,26 @@ table Runs
 	measure 'Report dates' = COUNTROWS ( Runs ) + 0
 		formatString: #,0
 
+	/// The first day of the period chosen on the Audit page (the slicer of the dates); the first day of the dates without one.
+	measure 'Period from' = MIN ( 'Date'[Date] )
+		formatString: d mmm yyyy
+
+	/// The last day of the period chosen on the Audit page.
+	measure 'Period to' = MAX ( 'Date'[Date] )
+		formatString: d mmm yyyy
+
+	/// The export of the Audit page, the CI reports loaded (loads.csv of the HTML app): the CIs of a report dated in the period; blank outside it.
+	measure 'Load CIs' =
+			VAR d = SELECTEDVALUE ( Runs[ReportDate] )
+			RETURN IF ( NOT ISBLANK ( d ) && d >= [Period from] && d <= [Period to], MAX ( Runs[CIs] ) )
+		formatString: #,0
+
+	/// The findings to solve of a CI report dated in the period (loads.csv); blank outside it.
+	measure 'Load to solve' =
+			VAR d = SELECTEDVALUE ( Runs[ReportDate] )
+			RETURN IF ( NOT ISBLANK ( d ) && d >= [Period from] && d <= [Period to], CALCULATE ( COUNTROWS ( History ), History[State] = "open" ) + 0 )
+		formatString: #,0
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred
