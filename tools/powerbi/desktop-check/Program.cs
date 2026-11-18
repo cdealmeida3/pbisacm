@@ -52,7 +52,9 @@ foreach (var table in database.Model.Tables.Where(table => table.Partitions.Any(
     var started = timer.Elapsed;
     try
     {
-        table.RequestRefresh(Tom.RefreshType.DataOnly);
+        // As Desktop's own Refresh: the incremental refresh policy of HistoryRun applies only in the service (a refresh
+        // that applies it in Desktop fails with "An unexpected exception occurred").
+        table.RequestRefresh(Tom.RefreshType.DataOnly, Tom.RefreshPolicyBehavior.Ignore);
         database.Model.SaveChanges();
         Console.WriteLine($"Refreshed {table.Name} in {(timer.Elapsed - started).TotalSeconds:0.0} s");
     }

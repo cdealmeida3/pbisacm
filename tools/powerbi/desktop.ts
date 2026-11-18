@@ -41,6 +41,7 @@ export function daxLiteral(value: string): string {
   if (/^-?\d+L$/.test(value)) return value.slice(0, -1);
   if (/^-?\d+(\.\d+)?D$/.test(value)) return value.slice(0, -1);
   if (value === 'true' || value === 'false') return `${value.toUpperCase()} ()`;
+  if (value === 'null') return 'BLANK ()';
   const date = /^datetime'(\d{4}-\d{2}-\d{2})/.exec(value);
   if (date) return `DATEVALUE ( "${date[1]}" )`;
   throw new Error(`desktop.ts: a literal it does not read: ${value}`);

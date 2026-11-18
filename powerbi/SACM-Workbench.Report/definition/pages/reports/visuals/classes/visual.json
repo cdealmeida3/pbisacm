@@ -110,7 +110,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'CIs by class (newest CI report)'"
+                  "Value": "'CIs by class (newest CI report; the nine classes of the checks)'"
                 }
               }
             }
@@ -123,7 +123,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'CIs by class (newest CI report)'"
+                  "Value": "'CIs by class (newest CI report; the nine classes of the checks)'"
                 }
               }
             }
@@ -132,5 +132,73 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "knownClass",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Classes"
+              }
+            },
+            "Property": "Label"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "x",
+              "Entity": "Classes",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "x"
+                              }
+                            },
+                            "Property": "Label"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "null"
+                            }
+                          }
+                        ],
+                        [
+                          {
+                            "Literal": {
+                              "Value": "''"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }
