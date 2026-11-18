@@ -68,5 +68,10 @@ Write-Output "Engine of Desktop on port $port"
 dotnet run --project tools/powerbi/desktop-check -c Release -- $port . $Out
 $code = $LASTEXITCODE
 Show-Screen "after the check"
+# The errors Desktop wrote to its own traces (Power Query gives its reasons there).
+$traces = Join-Path $env:LOCALAPPDATA "Microsoft\Power BI Desktop\Traces"
+Get-ChildItem $traces -Recurse -Filter *.log -ErrorAction SilentlyContinue |
+  Select-String -Pattern "Exception|Error" -ErrorAction SilentlyContinue | Select-Object -Last 60 |
+  ForEach-Object { "TRACE " + $_.Line.Substring(0, [Math]::Min(500, $_.Line.Length)) }
 Get-Process PBIDesktop -ErrorAction SilentlyContinue | Stop-Process -Force
 exit $code

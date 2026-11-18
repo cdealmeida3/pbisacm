@@ -44,17 +44,37 @@ Thread.Sleep(TimeSpan.FromSeconds(45));
 
 // 2. Refresh on the samples, as Desktop's Refresh does.
 var timer = Stopwatch.StartNew();
+// One table at a time, so a failing query names itself (a refresh of the whole model says only "An unexpected
+// exception occurred"), then the calculated tables and columns.
+var failed = new List<string>();
+foreach (var table in database.Model.Tables.Where(table => table.Partitions.Any(partition => partition.SourceType == Tom.PartitionSourceType.M)).ToList())
+{
+    var started = timer.Elapsed;
+    try
+    {
+        table.RequestRefresh(Tom.RefreshType.DataOnly);
+        database.Model.SaveChanges();
+        Console.WriteLine($"Refreshed {table.Name} in {(timer.Elapsed - started).TotalSeconds:0.0} s");
+    }
+    catch (Exception error)
+    {
+        failed.Add($"{table.Name}: {error.Message}");
+        Console.WriteLine($"Refresh of {table.Name} failed: {error.Message}");
+        database.Model.UndoLocalChanges();
+    }
+}
 try
 {
-    database.Model.RequestRefresh(Tom.RefreshType.Full);
+    database.Model.RequestRefresh(Tom.RefreshType.Calculate);
     database.Model.SaveChanges();
-    Console.WriteLine($"Refreshed in {timer.Elapsed.TotalSeconds:0} s");
+    Console.WriteLine($"Calculated in {timer.Elapsed.TotalSeconds:0} s in all");
 }
 catch (Exception error)
 {
-    result["refreshError"] = error.Message;
-    Console.WriteLine($"Refresh failed after {timer.Elapsed.TotalSeconds:0} s: {error.Message}");
+    failed.Add($"calculate: {error.Message}");
+    Console.WriteLine($"Calculate failed: {error.Message}");
 }
+if (failed.Count > 0) result["refreshError"] = string.Join("\n", failed);
 
 // 3. Every object with an error, as Desktop marks it with a warning (a measure with an error is left out of the field
 //    list, and a visual that shows it is empty).
