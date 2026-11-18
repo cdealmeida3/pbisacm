@@ -54,16 +54,26 @@ function Find-Tab($root, [string]$name) {
 
 $root = Window
 if (-not $root) { Write-Output "No Desktop window"; exit 0 }
-[System.Windows.Forms.SendKeys]::SendWait("{ESC}"); Start-Sleep 1; [System.Windows.Forms.SendKeys]::SendWait("{ESC}")
-Start-Sleep 3
 Shot "00-after-check"
+# Wait until the window shows the report (its page tabs), up to 15 minutes.
+$deadline = (Get-Date).AddMinutes(15)
+$k = 0
+while ((Get-Date) -lt $deadline) {
+  $root = Window
+  if (Find-Tab $root "My day") { Write-Output "$(Get-Date -Format HH:mm:ss) The report is open"; break }
+  Start-Sleep 20; $k++
+  if ($k % 6 -eq 0) { Shot "01-waiting-$k" }
+}
+[System.Windows.Forms.SendKeys]::SendWait("{ESC}")
+Start-Sleep 5
+Shot "01-report-open"
 
 # Refresh as Carlos does (Home, Refresh), so the visuals of the window show the data.
 $refresh = $null
 $cond = New-Object System.Windows.Automation.PropertyCondition($UIA::NameProperty, "Refresh")
 foreach ($e in $root.FindAll($Scope::Descendants, $cond)) {
   $r = $e.Current.BoundingRectangle
-  if (-not $r.IsEmpty -and $r.Y -lt 200) { $refresh = $e; break }
+  if (-not $r.IsEmpty -and $r.Y -lt 200 -and $e.Current.IsEnabled) { $refresh = $e; break }
 }
 if ($refresh) {
   $r = $refresh.Current.BoundingRectangle
