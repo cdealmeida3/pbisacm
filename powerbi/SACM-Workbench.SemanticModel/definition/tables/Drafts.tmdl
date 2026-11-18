@@ -23,7 +23,7 @@ table Drafts
 			VAR who = SELECTEDVALUE ( Drafts[AssignedTo] )
 			RETURN IF ( NOT ISBLANK ( me ) && who = me, "Mine", IF ( who = "", "Free", who ) )
 
-	/// The draft, D0001 in the order of the HTML app (one refresh only: the next refresh numbers them again).
+	/// The draft, D0001 first: by person in the order the newest report first names them (one refresh only: the next refresh numbers them again).
 	column DraftId
 		dataType: string
 		isDataTypeInferred
@@ -190,6 +190,13 @@ table Drafts
 		isNameInferred
 		sourceColumn: [AssignedTo]
 
+	/// The keys of the draft nobody has, one per line: they become the sender's when the message goes (D164).
+	column FreeKeys
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FreeKeys]
+
 	partition Drafts = calculated
 		mode: import
 		source =
@@ -217,5 +224,6 @@ table Drafts
 					"Mailbox", Run[Drafts.Mailbox],
 					"Team", Run[Drafts.Team],
 					"Person", Run[Drafts.Person],
-					"AssignedTo", Run[Drafts.AssignedTo]
+					"AssignedTo", Run[Drafts.AssignedTo],
+					"FreeKeys", Run[Drafts.FreeKeys]
 				)

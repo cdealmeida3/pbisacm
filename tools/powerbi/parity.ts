@@ -384,8 +384,10 @@ export function messageProblems(recordedRows: Row[], chatRows: Row[], draftRowsF
     for (const [field, found, expected] of fields) if (found !== expected) problems.push(`DraftsRecorded ${want.ref}: ${field} differs from tests/recorded/messages.txt at ${firstDifference(found, expected)}`);
   }
   // Every open case of the record that no draft holds is one the HTML app left out (nobody to write to).
-  const inDrafts = new Set(recordedRows.flatMap((row) => norm(row.Keys).split(' ')));
-  const left = skipped.split(' ').filter((item) => item && inDrafts.has(item));
+  // A key holds spaces (the name of a CI): the keys of a line are told apart by the check id that starts each one.
+  const keysOf = (text: string): string[] => text.split(/ (?=[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*:)/).filter(Boolean);
+  const inDrafts = new Set(recordedRows.flatMap((row) => keysOf(norm(row.Keys))));
+  const left = keysOf(skipped).filter((item) => inDrafts.has(item));
   if (left.length) problems.push(`DraftsRecorded: ${left.length} keys the HTML app left out are in a draft (${left.slice(0, 3).join(' ')})`);
   const chats = recordedChats();
   if (chatRows.length !== chats.size) problems.push(`ChatsRecorded: ${chatRows.length} chats, tests/recorded/teams-messages.txt has ${chats.size}`);
@@ -401,7 +403,7 @@ export function messageProblems(recordedRows: Row[], chatRows: Row[], draftRowsF
   expected.forEach((want, at) => {
     const got = found.get(want.Keys);
     if (!got) { problems.push(`Drafts: no draft with the keys ${want.Keys.replace(/\n/g, ' ')}`); return; }
-    if (norm(got.DraftId) !== `D${String(at + 1).padStart(4, '0')}`) problems.push(`Drafts ${want.Keys.split('\n')[0]}: DraftId is ${norm(got.DraftId)}, expected the order of the HTML app (D${String(at + 1).padStart(4, '0')})`);
+    if (norm(got.DraftId) !== `D${String(at + 1).padStart(4, '0')}`) problems.push(`Drafts ${want.Keys.split('\n')[0]}: DraftId is ${norm(got.DraftId)}, expected the order of buildDrafts (D${String(at + 1).padStart(4, '0')})`);
     for (const field of Object.keys(want) as Array<keyof DraftRow>) {
       if (field === 'Keys') continue;
       if (norm(got[field]) !== norm(want[field])) problems.push(`Drafts ${want.Keys.split('\n')[0]}: ${field} differs at ${firstDifference(norm(got[field]), norm(want[field]))}`);

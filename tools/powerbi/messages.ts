@@ -92,10 +92,17 @@ export function draftRow(draft: Draft, items: Case[], settings: MessageSettings)
   };
 }
 
-/** The rows of the table Drafts on the samples, with the team's state (historyKey). */
+/**
+ * The rows of the table Drafts on the samples, with the team's state (historyKey). The cases go in the order of the
+ * newest report, as the model has them: buildDrafts makes one draft per person in the order it first meets them, and the
+ * HTML app meets the cases in the order they were first seen over all the reports it has. Only the order of the drafts
+ * depends on it, never their text.
+ */
 export function draftRows(key: HistoryKey): DraftRow[] {
   const settings = sampleMessageSettings();
-  const chosen = draftCases(key.cases);
+  const latest = key.runs[key.runs.length - 1]!;
+  const position = new Map(latest.facts.map((fact, at) => [fact.key, at]));
+  const chosen = draftCases(key.cases).sort((a, b) => (position.get(a.key) ?? Infinity) - (position.get(b.key) ?? Infinity));
   let ref = 0;
   return buildDrafts(chosen, loadPacks(), settings, () => `SACM-KEY${String(++ref).padStart(3, '0')}`).drafts.map((draft) => draftRow(draft, chosen, settings));
 }

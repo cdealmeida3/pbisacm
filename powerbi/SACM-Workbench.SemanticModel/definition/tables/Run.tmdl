@@ -378,6 +378,11 @@ table Run
 		summarizeBy: none
 		sourceColumn: Drafts.AssignedTo
 
+	column 'Drafts.FreeKeys'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Drafts.FreeKeys
+
 	column 'Exceptions.Target'
 		dataType: string
 		summarizeBy: none

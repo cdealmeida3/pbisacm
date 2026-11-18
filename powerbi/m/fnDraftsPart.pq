@@ -4,7 +4,7 @@
 // reminders got no answer (ReminderDue, OverLimit): what the Email window of the HTML app offers with "Add the points
 // from other cards" ticked. Keys and NewKeys hold one key per line. Chat: the first message of a Teams chat with the
 // person asked (fnChatMessage). AssignedTo: who has the cases ("Several" when they are not one manager's, "" when
-// nobody has them). The Power App "SACM messages" shows the drafts and sends one when a manager presses Send (D301).
+// nobody has them). FreeKeys: the keys nobody has, which become the sender's when the message goes (D164). The Power App "SACM messages" shows the drafts and sends one when a manager presses Send (D301).
 // `cases` is fnCases(CheckRun).
 (cases as list) as table =>
     let
@@ -21,11 +21,13 @@
                 "D" & Text.PadStart(Text.From(at + 1), 4, "0"), draft[Ref], draft[Kind], Record.Field(kindWords, draft[Kind]), draft[To], draft[ToName], draft[Cc],
                 draft[Subject], draft[Body], draft[Plain], fnChatMessage(draft[Items], settings, "%%REF%%", draft[To]),
                 Text.Combine(draft[Keys], "#(lf)"), Text.Combine(draft[NewKeys], "#(lf)"), Text.Combine(draft[CheckIds], ", "),
-                draft[CiCount], draft[PartIndex], draft[PartCount], draft[About], draft[NobodyAbove], draft[Mailbox], draft[Team], draft[Person], assigned(draft[Items])
+                draft[CiCount], draft[PartIndex], draft[PartCount], draft[About], draft[NobodyAbove], draft[Mailbox], draft[Team], draft[Person], assigned(draft[Items]),
+                Text.Combine(List.Transform(List.Select(draft[Items], (item) => item[AssignedTo] = ""), (item) => item[Key]), "#(lf)")
             }
     in
         #table(
             type table [DraftId = text, Ref = text, Kind = text, KindLabel = text, To = text, ToName = text, Cc = text, Subject = text, Body = text, Plain = text,
                 Chat = text, Keys = text, NewKeys = text, CheckIds = text, CiCount = Int64.Type, PartIndex = Int64.Type, PartCount = Int64.Type, About = text,
-                NobodyAbove = logical, Mailbox = logical, Team = logical, Person = text, AssignedTo = text],
+                NobodyAbove = logical, Mailbox = logical, Team = logical, Person = text, AssignedTo = text,
+                FreeKeys = text],
             List.Transform(List.Positions(drafts), row))

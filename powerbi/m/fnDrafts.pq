@@ -98,14 +98,17 @@
         groups = List.Buffer(List.Transform(Record.FieldValues(grouped), (members) =>
             let first = members{0} in [Kind = first[Kind], PreviousRef = first[PreviousRef], To = first[To], NobodyAbove = first[NobodyAbove], Items = List.Transform(members, (entry) => entry[Item])])),
         // A reminder and the person's new points are one email (D161): a first message joins the person's first reminder.
+        // The first reminder of each address (its position), and the first messages that join each reminder.
+        reminderAt = fnGroupBy(List.Select(List.Positions(groups), (at) => groups{at}[Kind] = "reminder"), (at) => lower(groups{at}[To][Email]) & "|"),
         reminderFor = (group as record) as number =>
             if group[Kind] <> "first" or List.AnyTrue(List.Transform(group[Items], (item) => toMailbox(item[Fact]))) then -1
-            else List.PositionOf(List.Transform(groups, (other) => other[Kind] = "reminder" and lower(other[To][Email]) = lower(group[To][Email])), true),
+            else List.First(Record.FieldOrDefault(reminderAt, lower(group[To][Email]) & "|", {}), -1),
         targets = List.Buffer(List.Transform(groups, reminderFor)),
+        joiners = fnGroupBy(List.Select(List.Positions(groups), (at) => targets{at} >= 0), (at) => Text.From(targets{at})),
         merged = List.Buffer(List.Transform(List.Positions(groups), (at) =>
             let
                 group = groups{at},
-                joining = List.Combine(List.Transform(List.Select(List.Positions(groups), (other) => targets{other} = at), (other) => groups{other}[Items]))
+                joining = List.Combine(List.Transform(Record.FieldOrDefault(joiners, Text.From(at), {}), (other) => groups{other}[Items]))
             in
                 if targets{at} >= 0 then group & [Items = {}, Fresh = []]
                 else group & [Items = group[Items] & joining, Fresh = Record.FromList(List.Transform(joining, (item) => true), List.Transform(joining, (item) => item[Key]))])),
