@@ -107,7 +107,7 @@ How a file is read:
 To go back to the samples, set **SourceMode** to `Sample` again.
 
 The team's lists are read from the same site. **StateMode** picks them: `Sample` (the invented journal, replies,
-settings, team and reviews inside the model), `SharePoint` (the five lists of section 5) or `None` (no lists: every case
+settings, team and reviews inside the model), `SharePoint` (the four lists of section 5) or `None` (no lists: every case
 is *New*). You can switch the reports to
 SharePoint and keep the sample lists, or the other way round.
 

@@ -39,6 +39,8 @@ while (watch.Elapsed < TimeSpan.FromMinutes(5))
 if (database?.Model == null || database.Model.Tables.Count == 0) { result["openError"] = "no model in the engine after 5 minutes"; Save(); return 0; }
 result["opened"] = true;
 Console.WriteLine($"Model: {database.Model.Tables.Count} tables, {database.Model.Tables.Sum(table => table.Measures.Count)} measures, compatibility {database.CompatibilityLevel}");
+// Desktop still loads its queries for a while after the model is there ("Loading queries"); a refresh then can clash.
+Thread.Sleep(TimeSpan.FromSeconds(45));
 
 // 2. Refresh on the samples, as Desktop's Refresh does.
 var timer = Stopwatch.StartNew();
