@@ -1,6 +1,6 @@
 {
   "taken": true,
-  "minutes": 10.8,
+  "minutes": 12.2,
   "pages": [
     {
       "page": "myday",
@@ -14,7 +14,7 @@
       "page": "mywork",
       "displayName": "My work",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "02-mywork.png",
       "broken": []
     },
@@ -30,7 +30,7 @@
       "page": "cards",
       "displayName": "All cards",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "04-cards.png",
       "broken": []
     },
@@ -62,7 +62,7 @@
       "page": "history",
       "displayName": "History",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 1.0,
       "file": "08-history.png",
       "broken": []
     },
@@ -78,7 +78,7 @@
       "page": "auditexport",
       "displayName": "Audit export",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "10-auditexport.png",
       "broken": []
     },
@@ -109,33 +109,33 @@
     {
       "page": "card",
       "displayName": "Card",
-      "found": false,
-      "seconds": null,
-      "file": null,
+      "found": true,
+      "seconds": 2.0,
+      "file": "14-card.png",
       "broken": []
     },
     {
       "page": "case",
       "displayName": "Case",
-      "found": false,
-      "seconds": null,
-      "file": null,
+      "found": true,
+      "seconds": 1.0,
+      "file": "15-case.png",
       "broken": []
     },
     {
       "page": "person",
       "displayName": "Person",
-      "found": false,
-      "seconds": null,
-      "file": null,
+      "found": true,
+      "seconds": 1.0,
+      "file": "16-person.png",
       "broken": []
     },
     {
       "page": "selfcheck",
       "displayName": "Self-check",
-      "found": false,
-      "seconds": null,
-      "file": null,
+      "found": true,
+      "seconds": 1.0,
+      "file": "17-selfcheck.png",
       "broken": []
     }
   ]
