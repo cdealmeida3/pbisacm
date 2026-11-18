@@ -21,10 +21,10 @@
                 if person = null or (person[Name] = "" and person[Email] = "") then null
                 else [Id = if id <> "" then id else Text.Lower(person[Name], "en-US"), Name = if person[Name] <> "" then person[Name] else person[Email]],
         // The people the app keeps with the run: of every CI with a finding and of every CI of the inventory (not parked).
-        parkedKeys = if Record.FieldOrDefault(run, "Parked", null) = null then {} else run[Parked][Keys],
-        kept = List.Transform(List.Select(run[Cis], (ci) => not List.Contains(parkedKeys, ci[Key])), (ci) => ci[Key]),
-        withFinding = List.Transform(facts, (fact) => fact[CiKey]),
-        withPeople = List.Distinct(List.Select(List.Transform(run[Cis], (ci) => ci[Key]), (key) => List.Contains(withFinding, key) or List.Contains(kept, key))),
+        // Both as key sets (fnKeySet), made once: the CIs that are not parked (fnCheckRun) and the CIs with a finding.
+        kept = run[CheckableKeys],
+        withFinding = fnKeySet(List.Transform(facts, (fact) => fact[CiKey])),
+        withPeople = List.Distinct(List.Select(List.Transform(run[Cis], (ci) => ci[Key]), (key) => Record.HasFields(withFinding, key) or Record.HasFields(kept, key))),
         named = List.Combine(List.Transform(withPeople, (key) => List.RemoveNulls(List.Transform(roles, (role) => personOf(Record.Field(ciByKey, key), role))))),
         grouped = fnGroupBy(named, (person) => person[Id]),
         names = Record.FromList(List.Transform(Record.FieldValues(grouped), (list) => list{0}[Name]), Record.FieldNames(grouped)),

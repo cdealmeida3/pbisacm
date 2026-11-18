@@ -14,89 +14,146 @@ table MappingBacklog
 
 	column Key
 		dataType: string
-		sourceColumn: Key
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Key]
 
 	column CiKey
 		dataType: string
-		sourceColumn: CiKey
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiKey]
 
 	column CiName
 		dataType: string
-		sourceColumn: CiName
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiName]
 
 	column ClassLabel
 		dataType: string
-		sourceColumn: ClassLabel
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ClassLabel]
 
 	/// Owned by, else who is asked.
 	column Owner
 		dataType: string
-		sourceColumn: Owner
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Owner]
 
 	/// Why it is on the list, one reason per line.
 	column Reasons
 		dataType: string
-		sourceColumn: Reasons
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Reasons]
 
 	/// 1 To solve, 2 To check, 3 Waiting, 4 Planned: the order of the page.
 	column StateOrder
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: StateOrder
+		isNameInferred
+		sourceColumn: [StateOrder]
 
 	/// The rules of the reasons (reference/mapping-backlog).
 	column ReasonIds
 		dataType: string
-		sourceColumn: ReasonIds
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ReasonIds]
 
 	/// The stage of the case (the first one until the journal is read, build B5).
 	column Stage
 		dataType: string
-		sourceColumn: Stage
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Stage]
 
 	column StageNumber
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: StageNumber
+		isNameInferred
+		sourceColumn: [StageNumber]
 
 	/// The stages its class goes through.
 	column Steps
 		dataType: string
-		sourceColumn: Steps
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Steps]
 
 	column State
 		dataType: string
-		sourceColumn: State
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [State]
 
 	/// To solve, Waiting (in Ready) or Planned (tagged).
 	column StateLabel
 		dataType: string
+		isDataTypeInferred
 		sortByColumn: StateOrder
-		sourceColumn: StateLabel
+		isNameInferred
+		sourceColumn: [StateLabel]
 
 	column StateWhy
 		dataType: string
-		sourceColumn: StateWhy
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [StateWhy]
 
 	/// The criticality lines of the same CI (Above parent, No criticality reaches the CI).
 	column Criticality
 		dataType: string
-		sourceColumn: Criticality
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Criticality]
 
 	/// The case can be marked The process does not exist (stage 2).
 	column CanMarkProcessMissing
 		dataType: boolean
-		sourceColumn: CanMarkProcessMissing
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CanMarkProcessMissing]
 
 	column NextStep
 		dataType: string
-		sourceColumn: NextStep
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [NextStep]
 
 	column Order
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: Order
+		isNameInferred
+		sourceColumn: [Order]
 
-	partition MappingBacklog = m
+	partition MappingBacklog = calculated
 		mode: import
-		source = MappingBacklogRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "MappingBacklog" ),
+					"Key", Run[MappingBacklog.Key],
+					"CiKey", Run[MappingBacklog.CiKey],
+					"CiName", Run[MappingBacklog.CiName],
+					"ClassLabel", Run[MappingBacklog.ClassLabel],
+					"Owner", Run[MappingBacklog.Owner],
+					"Reasons", Run[MappingBacklog.Reasons],
+					"StateOrder", Run[MappingBacklog.StateOrder],
+					"ReasonIds", Run[MappingBacklog.ReasonIds],
+					"Stage", Run[MappingBacklog.Stage],
+					"StageNumber", Run[MappingBacklog.StageNumber],
+					"Steps", Run[MappingBacklog.Steps],
+					"State", Run[MappingBacklog.State],
+					"StateLabel", Run[MappingBacklog.StateLabel],
+					"StateWhy", Run[MappingBacklog.StateWhy],
+					"Criticality", Run[MappingBacklog.Criticality],
+					"CanMarkProcessMissing", Run[MappingBacklog.CanMarkProcessMissing],
+					"NextStep", Run[MappingBacklog.NextStep],
+					"Order", Run[MappingBacklog.Order]
+				)

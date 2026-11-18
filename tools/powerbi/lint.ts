@@ -7,7 +7,9 @@
 //   4. References: every table, column and measure a visual or a measure names is in the model.
 //   5. Generated parts up to date (also in npm test).
 //   6. Checks: every built detector is a module of a check in use and has its query fnDetect<Module>; every other check
-//      gets the note "not built" (NotesRows); card labels are unique.
+//      gets the note "not built" (fnNotesPart); card labels are unique.
+//   8. Run (D284): each calculated table has the fixed form, takes the rows of a part that RunRows makes, and lists its
+//      columns in the order of its TMDL file; Run is hidden and has no relationship; no query of powerbi/m is a probe.
 //   7. Colours: every colour of the theme and the measures is a colour of LOOK.md, and each state colour reads on its
 //      fill and on the page with a contrast of 4.5:1 or more.
 // --no-dotnet skips step 1 and says so (for a computer without .NET); the CI never uses it.
@@ -42,18 +44,44 @@ if (process.argv.includes('--no-dotnet')) {
 }
 
 /* 2. M */
+// A name defined twice in one let, one record or the section parses, but Power Query refuses the whole section: in the test
+// connector no query runs at all ("SacmEval.Contents wasn't recognized").
+interface AstNode {
+  kind?: string; variableList?: { elements: Array<{ node?: { key?: { literal?: string } } }> }; content?: AstNode['variableList'];
+  sectionMembers?: { elements: Array<{ namePairedExpression?: { key?: { literal?: string } } }> }
+}
+const definedTwice = (ast: unknown): string[] => {
+  const out: string[] = [];
+  const walk = (node: unknown): void => {
+    if (!node || typeof node !== 'object') return;
+    const item = node as AstNode;
+    const list = item.kind === 'LetExpression' ? item.variableList?.elements.map((csv) => csv.node?.key?.literal)
+      : item.kind === 'RecordExpression' ? item.content?.elements.map((csv) => csv.node?.key?.literal)
+      : item.kind === 'Section' ? item.sectionMembers?.elements.map((member) => member.namePairedExpression?.key?.literal) : undefined;
+    if (list) {
+      const names = list.map((literal) => (literal ?? '').replace(/^#"(.*)"$/, '$1').replace(/""/g, '"')).filter(Boolean);
+      for (const name of new Set(names)) if (names.indexOf(name) !== names.lastIndexOf(name)) out.push(name);
+    }
+    for (const [key, value] of Object.entries(node)) if (key !== 'parent' && typeof value === 'object') walk(value);
+  };
+  walk(ast);
+  return out;
+};
 const parse = async (what: string, text: string): Promise<void> => {
   const task = await PQP.TaskUtils.tryLexParse(PQP.DefaultSettings, text);
   if (!PQP.TaskUtils.isParseStageOk(task)) {
     const error = (task as { error?: { message?: string } }).error;
     problems.push(`M: ${what} does not parse: ${error?.message ?? task.stage}`);
+    return;
   }
+  for (const name of definedTwice((task as { ast?: unknown }).ast)) problems.push(`M: ${what} defines ${name} twice in one let, record or section`);
 };
 const expressions = readExpressions();
 const tables = readTables();
 for (const expression of expressions) await parse(`query ${expression.name}`, expression.m);
-for (const table of tables) await parse(`the partition of table ${table.name}`, table.partitionM);
+for (const table of tables) if (table.partitionKind !== 'calculated') await parse(`the partition of table ${table.name}`, table.partitionM);
 await parse('the test connector (tools/powerbi/connector.ts)', connectorSource());
+await parse('the test connector with the probes (--real-size --stages)', connectorSource({ realSize: true, copies: 1, stages: true }));
 done.push(`M: ${expressions.length} queries, ${tables.length} partitions and the test connector parse`);
 
 /* 3. PBIR */
@@ -108,7 +136,11 @@ for (const table of tables) {
     }
   }
 }
-for (const table of tables) if (!table.partitionM) problems.push(`References: table ${table.name} has no M partition`);
+for (const table of tables) {
+  if (table.partitionKind === 'calculated') {
+    for (const [, source] of table.calculated!.columns) if (!columns.get('Run')?.has(source)) problems.push(`References: table ${table.name} takes Run[${source}], which is not in the model`);
+  } else if (!table.partitionM) problems.push(`References: table ${table.name} has no M partition`);
+}
 done.push('References: every field of the visuals and the measures is in the model');
 
 /* 5. Generated */
@@ -126,8 +158,8 @@ for (const name of built) {
   if (!modules.has(name)) problems.push(`Checks: BuiltDetectors names "${name}", which no check in use has`);
   if (!names.has(detectorFunction(name))) problems.push(`Checks: BuiltDetectors names "${name}", but the query ${detectorFunction(name)} is not in powerbi/m/`);
 }
-// Every other check in use gets the grey note "not built" from the query NotesRows, so no card is a silent pass.
-if (!/not\s+\[Built\]/.test(expressions.find((expression) => expression.name === 'NotesRows')?.m ?? '')) problems.push('Checks: NotesRows no longer gives a note to every check that is not built');
+// Every other check in use gets the grey note "not built" from the query fnNotesPart, so no card is a silent pass.
+if (!/not\s+\[Built\]/.test(expressions.find((expression) => expression.name === 'fnNotesPart')?.m ?? '')) problems.push('Checks: fnNotesPart no longer gives a note to every check that is not built');
 const labels = new Map<string, string>();
 for (const pack of packs) {
   if (!pack.cardLabel) { problems.push(`Checks: ${pack.id} has no cardLabel`); continue; }
@@ -157,6 +189,24 @@ for (const name of ['red', 'blue', 'teal', 'green', 'violet', 'amber', 'grey']) 
 }
 for (const name of ['ink', 'muted']) if (contrast(look[name]!, look.surface!) < 4.5) problems.push(`Colours: ${name} on surface has a contrast under 4.5`);
 done.push('Colours: all of LOOK.md, every text 4.5:1 or more');
+
+/* 8. Run */
+const calculatedTables = tables.filter((table) => table.partitionKind === 'calculated');
+const runRows = expressions.find((expression) => expression.name === 'RunRows')?.m ?? '';
+const parts = new Set([...runRows.matchAll(/\{"([A-Za-z]+)",\s*[A-Za-z]/g)].map((match) => match[1]!));
+for (const table of calculatedTables) {
+  const { part, columns: taken } = table.calculated!;
+  if (!parts.has(part)) problems.push(`Run: table ${table.name} takes the part "${part}", which RunRows does not make`);
+  const want = table.columns.map((column) => column.name).join(', ');
+  if (taken.map(([name]) => name).join(', ') !== want) problems.push(`Run: table ${table.name} takes the columns [${taken.map(([name]) => name).join(', ')}], its TMDL file declares [${want}]`);
+  for (const [name, source] of taken) if (source !== `${part}.${name}`) problems.push(`Run: table ${table.name} takes ${name} from Run[${source}], not Run[${part}.${name}]`);
+}
+const runTable = tables.find((table) => table.name === 'Run');
+if (!runTable) problems.push('Run: the table Run is not in the model');
+else if (!/^\tisHidden$/m.test(readFileSync(runTable.file, 'utf8'))) problems.push('Run: the table Run is not hidden');
+if (/\b(?:fromColumn|toColumn):\s*'?Run'?\./.test(readFileSync(join(MODEL, 'relationships.tmdl'), 'utf8'))) problems.push('Run: the table Run has a relationship; the calculated tables have them');
+for (const expression of expressions) if (/^(?:Time|RealSize|Probe)/.test(expression.name)) problems.push(`Run: the query ${expression.name} has the name of a probe of tools/powerbi/probes.ts`);
+done.push(`Run: ${calculatedTables.length} calculated tables take their part of Run, Run is hidden`);
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);

@@ -7,7 +7,8 @@
         graph = run[Graph],
         columns = run[Columns],
         target = List.Transform(ReadingRules[dimensions], (dimension) => "target." & dimension),
-        inStatus = List.Buffer(List.Select(inScope, (ci) => fnNameKey(ci[Status], "") = fnNameKey(stages[status], ""))),
+        status = fnNameKey(stages[status], ""),
+        inStatus = List.Buffer(List.Select(inScope, (ci) => ci[StatusKey] = status)),
         hasCia = (ci as record) as logical => List.AnyTrue(List.Transform(ReadingRules[dimensions], (dimension) => fnLevelAt(ci, "target." & dimension) <> null)),
         below = (ci as record) as list =>
             let edges = Record.FieldOrDefault(graph[Down], ci[Key], {}) in

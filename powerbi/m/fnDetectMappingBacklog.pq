@@ -7,19 +7,20 @@
     let
         graph = run[Graph],
         columns = run[Columns],
-        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
+        readyStatus = fnNameKey(config[readyStatus], ""),
+        taggedStatus = if tagged = null then "" else fnNameKey(tagged[status], ""),
         rules = List.Select(model[expectations], (rule) => List.Contains(config[rules], rule[id]) and Record.HasFields(rule, "min")),
         tagged = Record.FieldOrDefault(config, "tagged", null),
         hasCia = (ci as record) as logical => List.AnyTrue(List.Transform(ReadingRules[dimensions], (dimension) => fnLevelAt(ci, "target." & dimension) <> null)),
         lineOf = (ci as record) as nullable record =>
             let
                 node = graph[NodeOf](ci),
-                ready = same(ci[Status], config[readyStatus]),
+                ready = ci[StatusKey] = readyStatus,
                 missed = List.Select(rules, (rule) => List.Contains(rule[classes], node[Cls])
                     and List.Count(fnPartners(graph, node, rule[direction], rule[related])) < rule[min]
                     and not (Record.FieldOrDefault(rule, "parentField", false) = true and List.Contains(columns, "parentService")
                         and Text.Trim(if ci[ParentService] = null then "" else ci[ParentService]) <> "")),
-                isTagged = tagged <> null and List.Contains(tagged[classes], ci[Class]) and same(ci[Status], tagged[status])
+                isTagged = tagged <> null and List.Contains(tagged[classes], ci[Class]) and ci[StatusKey] = taggedStatus
                     and List.AnyTrue(List.Transform(ci[TagList], (tag) => List.AnyTrue(List.Transform(tagged[tags], (pattern) => fnMatches(pattern, "i", tag))))),
                 ids = List.Transform(missed, (rule) => rule[id]) & (if isTagged then {tagged[id]} else {}),
                 words = List.Transform(missed, (rule) => fnReplaceFirst(rule[title], "Service Instance", if node[Cls] = "platform" then "Platform" else "Service Instance"))

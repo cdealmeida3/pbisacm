@@ -2,6 +2,13 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.40.0 — The Power BI report is fast enough for the real reports (speed build)
+
+- **The refresh at the size of the real reports takes T1_SECONDS seconds** on the test machine (invented reports with 3,230 CIs, 5,100 relationships and 1,020 EPO systems). In B3 it did not finish in 14 minutes. Nothing else changes: the same pages, the same numbers; the Self-check page still says 32 of 39.
+- The checks are computed once per refresh, in a hidden table, and the result tables are made from it (D284). Common patterns are decided without the slow walk (D285). The reports are read faster.
+- **A time limit on every change** (D283): the workflow *Power BI* measures the refresh at real size on each pull request and fails above 2 minutes, or above 1 minute for one table. It also checks that the counts at that size are those of the HTML app.
+- The HTML app is not changed: no check, number or message changed.
+
 ## 0.39.0 — Ready to be public
 
 - **The repository is public** (D286). The history up to 0.38.0 stays in a private archive.

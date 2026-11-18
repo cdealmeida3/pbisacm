@@ -13,7 +13,8 @@
                 column = if rule[from] = "created" then "createdOn" else "updatedOn",
                 word = if rule[from] = "created" then "Created (sys_created_on)" else "Updated (sys_updated_on)",
                 sinceOf = (ci as record) as nullable date => if rule[from] = "created" then ci[CreatedOn] else ci[UpdatedOn],
-                inStatus = List.Select(inScope, (ci) => fnNameKey(ci[Status], "") = fnNameKey(rule[status], "")),
+                status = fnNameKey(rule[status], ""),
+                inStatus = List.Buffer(List.Select(inScope, (ci) => ci[StatusKey] = status)),
                 unread = List.Count(List.Select(inStatus, (ci) => sinceOf(ci) = null)),
                 over = List.Select(inStatus, (ci) => sinceOf(ci) <> null and Duration.Days(date - sinceOf(ci)) > rule[days]),
                 fill = (ci as record) as text =>

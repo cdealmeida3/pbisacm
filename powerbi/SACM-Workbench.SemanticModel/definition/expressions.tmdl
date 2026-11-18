@@ -22,6 +22,10 @@ expression CheckFiles = "[{""path"":""checks/packs/relationships/app-instance-ma
 expression ExpectedResult = "{""date"":""2026-11-11"",""cards"":[{""id"":""APP-INSTANCE-MATCH"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case APP-INSTANCE-MATCH:member engine:owned_by"",""case APP-INSTANCE-MATCH:member engine:managed_by"",""case APP-INSTANCE-MATCH:member engine:name"",""case APP-INSTANCE-MATCH:index tool:managed_by"",""case APP-INSTANCE-MATCH:index tool:description"",""case APP-INSTANCE-MATCH:index tool:name""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-PROCUREMENT"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft"",""case CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber"",""case CONTRACT-PROCUREMENT:contract:ct000003:epoRetired"",""case CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-NOT-IN-SOLUSI"",""light"":""red"",""tested"":true,""cis"":4,""open"":[""case CONTRACT-NOT-IN-SOLUSI:contract:ct000090:record"",""case CONTRACT-NOT-IN-SOLUSI:contract:ct000091:record"",""case CONTRACT-NOT-IN-SOLUSI:contract:ct000092:record"",""case CONTRACT-NOT-IN-SOLUSI:contract:cntr0001100:record""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-SN-FIX"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CONTRACT-SN-FIX:contract:ct000003:endPassed""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-STATUS"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case CONTRACT-STATUS:contract:ct000002:status"",""case CONTRACT-STATUS:contract:ct000004:status"",""case CONTRACT-STATUS:contract:ct000005:status""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-TO-CLEAR"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CONTRACT-TO-CLEAR:contract:ct000002:end"",""case CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CONTRACT-UPLOAD"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case CONTRACT-UPLOAD:contract:ct000005:vendor"",""case CONTRACT-UPLOAD:contract:ct000006:end"",""case CONTRACT-UPLOAD:contract:ct000007:record""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CRIT-ABOVE-PARENT"",""light"":""review"",""tested"":true,""cis"":1,""open"":[],""review"":[""case CRIT-ABOVE-PARENT:member engine - prod:integrity""],""waiting"":[],""known"":[]},{""id"":""CRIT-AUTO-JUSTIFICATION"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CRIT-AUTO-JUSTIFICATION:member engine - prod:availability""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CRIT-NO-JUSTIFICATION"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case CRIT-NO-JUSTIFICATION:index tool:confidentiality""],""review"":[],""waiting"":[],""known"":[]},{""id"":""CRIT-NONE-REACHES"",""light"":""review"",""tested"":true,""cis"":1,""open"":[],""review"":[""case CRIT-NONE-REACHES:event engine:target""],""waiting"":[""case CRIT-NONE-REACHES:event gateway - prod:target""],""known"":[""case CRIT-NONE-REACHES:event desk:target""]},{""id"":""CRIT-TARGET-MISSING"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""DESC-QUALITY"",""light"":""red"",""tested"":true,""cis"":4,""open"":[""case DESC-QUALITY:reconcile index:description"",""case DESC-QUALITY:members:description"",""case DESC-QUALITY:members - standard:description"",""case DESC-QUALITY:close the month:description""],""review"":[],""waiting"":[],""known"":[]},{""id"":""EPO-DIFF"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case EPO-DIFF:member engine - prod:managed_by"",""case EPO-DIFF:index tool - prod:description""],""review"":[],""waiting"":[],""known"":[]},{""id"":""EPO-ID"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""EPO-NOT-ARRIVED"",""light"":""review"",""tested"":true,""cis"":1,""open"":[],""review"":[""case EPO-NOT-ARRIVED:event gateway - prod:description""],""waiting"":[],""known"":[]},{""id"":""LIFECYCLE-REVIEW"",""light"":""grey"",""tested"":false,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""MAPPING"",""light"":""red"",""tested"":true,""cis"":4,""open"":[""case MAPPING:fines hub - prod:mapping"",""case MAPPING:event engine:mapping"",""case MAPPING:event desk:mapping"",""case MAPPING:event gateway - prod:mapping""],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-DUPLICATE"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case NAME-DUPLICATE:fines hub - prod:name"",""case NAME-DUPLICATE:manage fines|ast-0013:name"",""case NAME-DUPLICATE:manage fines|ast-0014:name""],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-FORMAT"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-HIDDEN-CHAR"",""light"":""grey"",""tested"":false,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""NAME-STANDARD"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case NAME-STANDARD:members:bs-suffix""],""review"":[],""waiting"":[],""known"":[]},{""id"":""OFFERING-OWNER"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""OFFERING-PARENT"",""light"":""grey"",""tested"":false,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""PROCESS-STAGE"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""READY-TOO-LONG"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-MISSING"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case REL-MISSING:manage fines|ast-0013:bc-below"",""case REL-MISSING:manage fines|ast-0014:bc-below""],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-ONE-TO-ONE"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-TWICE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case REL-TWICE:members:twice:members>provides::providedby>members - standard""],""review"":[],""waiting"":[],""known"":[]},{""id"":""REL-WRONG-TYPE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case REL-WRONG-TYPE:reconcile index:type:reconcile index>dependson::usedby>index tool""],""review"":[],""waiting"":[],""known"":[]},{""id"":""RESP-INACTIVE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case RESP-INACTIVE:reconcile index:owned_by""],""review"":[],""waiting"":[""case RESP-INACTIVE:member engine - prod:managed_by""],""known"":[]},{""id"":""RESP-MISSING"",""light"":""red"",""tested"":true,""cis"":6,""open"":[""case RESP-MISSING:manage member records:owned_by"",""case RESP-MISSING:manage fines|ast-0013:owned_by"",""case RESP-MISSING:manage fines|ast-0014:owned_by"",""case RESP-MISSING:members:managed_by"",""case RESP-MISSING:manage fines|ast-0013:managed_by"",""case RESP-MISSING:manage fines|ast-0014:managed_by"",""case RESP-MISSING:close the month:managed_by"",""case RESP-MISSING:event gateway - prod:managed_by""],""review"":[],""waiting"":[],""known"":[]},{""id"":""RESP-SAME-PERSON"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case RESP-SAME-PERSON:register a new member:owned_by""],""review"":[],""waiting"":[],""known"":[]},{""id"":""SUPPORT-GROUP-INACTIVE"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case SUPPORT-GROUP-INACTIVE:index tool - prod:support_group""],""review"":[],""waiting"":[],""known"":[]},{""id"":""SUPPORT-GROUP-MISSING"",""light"":""red"",""tested"":true,""cis"":2,""open"":[""case SUPPORT-GROUP-MISSING:members - standard:support_group"",""case SUPPORT-GROUP-MISSING:fines hub - prod:support_group""],""review"":[],""waiting"":[],""known"":[]},{""id"":""SUPPORTED-BY"",""light"":""red"",""tested"":true,""cis"":3,""open"":[""case SUPPORTED-BY:member engine - test:supported_by"",""case SUPPORTED-BY:index tool - prod:supported_by"",""case SUPPORTED-BY:members - standard:supported_by""],""review"":[],""waiting"":[],""known"":[]},{""id"":""TAG-MISSING"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case TAG-MISSING:reconcile index:tags""],""review"":[],""waiting"":[],""known"":[]},{""id"":""TAG-STATUS-CONFLICT"",""light"":""red"",""tested"":true,""cis"":1,""open"":[""case TAG-STATUS-CONFLICT:fines hub - prod:tags""],""review"":[],""waiting"":[],""known"":[]},{""id"":""UNDER-RETIREMENT-LONG"",""light"":""green"",""tested"":true,""cis"":0,""open"":[],""review"":[],""waiting"":[],""known"":[]}]}"
 	queryGroup: Packed
 
+/// GENERATED from the check files and the reference files (tools/powerbi/regex.ts, D285). For each pattern of Patterns, the fast form that decides most texts without the walk (fnFastMatch).
+expression PatternForms = Json.Document("{""/ - (PROD|TEST)$"":{""Kind"":""suffix"",""Lower"":false,""Words"":["" - PROD"","" - TEST""]},""/_BA$"":{""Kind"":""suffix"",""Lower"":false,""Words"":[""_BA""]},""/_BS$"":{""Kind"":""suffix"",""Lower"":false,""Words"":[""_BS""]},""/\\s+-\\s+(PROD|TEST)$"":{""Kind"":""walk"",""Lower"":false,""Ends"":[""PROD"",""TEST""]},""/^[a-z]+(_[a-z]+)*(\\.[a-zA-Z]+)*$"":{""Kind"":""walk"",""Lower"":false,""Allowed"":[""."",""A"",""B"",""C"",""D"",""E"",""F"",""G"",""H"",""I"",""J"",""K"",""L"",""M"",""N"",""O"",""P"",""Q"",""R"",""S"",""T"",""U"",""V"",""W"",""X"",""Y"",""Z"",""_"",""a"",""b"",""c"",""d"",""e"",""f"",""g"",""h"",""i"",""j"",""k"",""l"",""m"",""n"",""o"",""p"",""q"",""r"",""s"",""t"",""u"",""v"",""w"",""x"",""y"",""z""]},""/^[A-Za-z0-9]{3}$"":{""Kind"":""only"",""Lower"":false,""Chars"":[""0"",""1"",""2"",""3"",""4"",""5"",""6"",""7"",""8"",""9"",""A"",""B"",""C"",""D"",""E"",""F"",""G"",""H"",""I"",""J"",""K"",""L"",""M"",""N"",""O"",""P"",""Q"",""R"",""S"",""T"",""U"",""V"",""W"",""X"",""Y"",""Z"",""a"",""b"",""c"",""d"",""e"",""f"",""g"",""h"",""i"",""j"",""k"",""l"",""m"",""n"",""o"",""p"",""q"",""r"",""s"",""t"",""u"",""v"",""w"",""x"",""y"",""z""],""Min"":3,""Max"":3},""/^API - "":{""Kind"":""prefix"",""Lower"":false,""Words"":[""API - ""]},""/^API\\b"":{""Kind"":""walk"",""Lower"":false,""Starts"":[""API""]},""i/[\\s_-]*BA\\s*$"":{""Kind"":""walk"",""Lower"":true},""i/\\(Auto generated\\)"":{""Kind"":""contains"",""Lower"":true,""Words"":[""(auto generated)""]},""i/\\b(prod|production|prd|preprod|pre-prod|pre-production|non-prod|nonprod|non-production|acc|acceptance|uat|test|tst|dev|development|dr|disaster recovery)\\)?\\s*$"":{""Kind"":""walk"",""Lower"":true},""i/^(acc|acceptance)$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""acc"",""acceptance""]},""i/^(dev|development)$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""dev"",""development""]},""i/^(dr|disaster recovery)$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""disaster recovery"",""dr""]},""i/^(non-prod|nonprod|non-production)$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""non-prod"",""non-production"",""nonprod""]},""i/^(preprod|pre-prod|pre-production)$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""pre-prod"",""pre-production"",""preprod""]},""i/^(prod|production|prd)$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""prd"",""prod"",""production""]},""i/^(test|tst)$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""test"",""tst""]},""i/^[-.?x]+$"":{""Kind"":""only"",""Lower"":false,""Chars"":[""-"",""."",""?"",""X"",""x""],""Min"":1,""Max"":-1},""i/^n/?a$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""n/a"",""na""]},""i/^none$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""none""]},""i/^tbd$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""tbd""]},""i/^test(ing)?$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""test"",""testing""]},""i/^to ?do$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""to do"",""todo""]},""i/^unknown$"":{""Kind"":""exact"",""Lower"":true,""Words"":[""unknown""]},""i/to be deleted"":{""Kind"":""contains"",""Lower"":true,""Words"":[""to be deleted""]}}")
+	queryGroup: Packed
+
 /// GENERATED from the check files and the reference files (tools/powerbi/regex.ts). Every regular expression the checks test, compiled for fnRegexTest, by flags and text.
 expression Patterns = Json.Document("{""/ - (PROD|TEST)$"":[""s"",[[""c"",[32,32],0],[""c"",[45,45],0],[""c"",[32,32],0],[""a"",[[""s"",[[""c"",[80,80],0],[""c"",[82,82],0],[""c"",[79,79],0],[""c"",[68,68],0]]],[""s"",[[""c"",[84,84],0],[""c"",[69,69],0],[""c"",[83,83],0],[""c"",[84,84],0]]]]],[""$""]]],""/_BA$"":[""s"",[[""c"",[95,95],0],[""c"",[66,66],0],[""c"",[65,65],0],[""$""]]],""/_BS$"":[""s"",[[""c"",[95,95],0],[""c"",[66,66],0],[""c"",[83,83],0],[""$""]]],""/\\s+-\\s+(PROD|TEST)$"":[""s"",[[""r"",1,-1,[""c"",[9,13,32,32,160,160,5760,5760,8192,8202,8232,8233,8239,8239,8287,8287,12288,12288,65279,65279],0]],[""c"",[45,45],0],[""r"",1,-1,[""c"",[9,13,32,32,160,160,5760,5760,8192,8202,8232,8233,8239,8239,8287,8287,12288,12288,65279,65279],0]],[""a"",[[""s"",[[""c"",[80,80],0],[""c"",[82,82],0],[""c"",[79,79],0],[""c"",[68,68],0]]],[""s"",[[""c"",[84,84],0],[""c"",[69,69],0],[""c"",[83,83],0],[""c"",[84,84],0]]]]],[""$""]]],""/^[a-z]+(_[a-z]+)*(\\.[a-zA-Z]+)*$"":[""s"",[[""^""],[""r"",1,-1,[""c"",[97,122],0]],[""r"",0,-1,[""s"",[[""c"",[95,95],0],[""r"",1,-1,[""c"",[97,122],0]]]]],[""r"",0,-1,[""s"",[[""c"",[46,46],0],[""r"",1,-1,[""c"",[65,90,97,122],0]]]]],[""$""]]],""/^[A-Za-z0-9]{3}$"":[""s"",[[""^""],[""r"",3,3,[""c"",[48,57,65,90,97,122],0]],[""$""]]],""/^API - "":[""s"",[[""^""],[""c"",[65,65],0],[""c"",[80,80],0],[""c"",[73,73],0],[""c"",[32,32],0],[""c"",[45,45],0],[""c"",[32,32],0]]],""/^API\\b"":[""s"",[[""^""],[""c"",[65,65],0],[""c"",[80,80],0],[""c"",[73,73],0],[""b""]]],""i/[\\s_-]*BA\\s*$"":[""s"",[[""r"",0,-1,[""c"",[9,13,32,32,45,45,95,95,160,160,5760,5760,8192,8202,8232,8233,8239,8239,8287,8287,12288,12288,65279,65279],0]],[""c"",[66,66,98,98],0],[""c"",[65,65,97,97],0],[""r"",0,-1,[""c"",[9,13,32,32,160,160,5760,5760,8192,8202,8232,8233,8239,8239,8287,8287,12288,12288,65279,65279],0]],[""$""]]],""i/\\(Auto generated\\)"":[""s"",[[""c"",[40,40],0],[""c"",[65,65,97,97],0],[""c"",[85,85,117,117],0],[""c"",[84,84,116,116],0],[""c"",[79,79,111,111],0],[""c"",[32,32],0],[""c"",[71,71,103,103],0],[""c"",[69,69,101,101],0],[""c"",[78,78,110,110],0],[""c"",[69,69,101,101],0],[""c"",[82,82,114,114],0],[""c"",[65,65,97,97],0],[""c"",[84,84,116,116],0],[""c"",[69,69,101,101],0],[""c"",[68,68,100,100],0],[""c"",[41,41],0]]],""i/\\b(prod|production|prd|preprod|pre-prod|pre-production|non-prod|nonprod|non-production|acc|acceptance|uat|test|tst|dev|development|dr|disaster recovery)\\)?\\s*$"":[""s"",[[""b""],[""a"",[[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0],[""c"",[85,85,117,117],0],[""c"",[67,67,99,99],0],[""c"",[84,84,116,116],0],[""c"",[73,73,105,105],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0],[""c"",[85,85,117,117],0],[""c"",[67,67,99,99],0],[""c"",[84,84,116,116],0],[""c"",[73,73,105,105],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0]]],[""s"",[[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0],[""c"",[85,85,117,117],0],[""c"",[67,67,99,99],0],[""c"",[84,84,116,116],0],[""c"",[73,73,105,105],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0]]],[""s"",[[""c"",[65,65,97,97],0],[""c"",[67,67,99,99],0],[""c"",[67,67,99,99],0]]],[""s"",[[""c"",[65,65,97,97],0],[""c"",[67,67,99,99],0],[""c"",[67,67,99,99],0],[""c"",[69,69,101,101],0],[""c"",[80,80,112,112],0],[""c"",[84,84,116,116],0],[""c"",[65,65,97,97],0],[""c"",[78,78,110,110],0],[""c"",[67,67,99,99],0],[""c"",[69,69,101,101],0]]],[""s"",[[""c"",[85,85,117,117],0],[""c"",[65,65,97,97],0],[""c"",[84,84,116,116],0]]],[""s"",[[""c"",[84,84,116,116],0],[""c"",[69,69,101,101],0],[""c"",[83,83,115,115],0],[""c"",[84,84,116,116],0]]],[""s"",[[""c"",[84,84,116,116],0],[""c"",[83,83,115,115],0],[""c"",[84,84,116,116],0]]],[""s"",[[""c"",[68,68,100,100],0],[""c"",[69,69,101,101],0],[""c"",[86,86,118,118],0]]],[""s"",[[""c"",[68,68,100,100],0],[""c"",[69,69,101,101],0],[""c"",[86,86,118,118],0],[""c"",[69,69,101,101],0],[""c"",[76,76,108,108],0],[""c"",[79,79,111,111],0],[""c"",[80,80,112,112],0],[""c"",[77,77,109,109],0],[""c"",[69,69,101,101],0],[""c"",[78,78,110,110],0],[""c"",[84,84,116,116],0]]],[""s"",[[""c"",[68,68,100,100],0],[""c"",[82,82,114,114],0]]],[""s"",[[""c"",[68,68,100,100],0],[""c"",[73,73,105,105],0],[""c"",[83,83,115,115],0],[""c"",[65,65,97,97],0],[""c"",[83,83,115,115],0],[""c"",[84,84,116,116],0],[""c"",[69,69,101,101],0],[""c"",[82,82,114,114],0],[""c"",[32,32],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[67,67,99,99],0],[""c"",[79,79,111,111],0],[""c"",[86,86,118,118],0],[""c"",[69,69,101,101],0],[""c"",[82,82,114,114],0],[""c"",[89,89,121,121],0]]]]],[""r"",0,1,[""c"",[41,41],0]],[""r"",0,-1,[""c"",[9,13,32,32,160,160,5760,5760,8192,8202,8232,8233,8239,8239,8287,8287,12288,12288,65279,65279],0]],[""$""]]],""i/^(acc|acceptance)$"":[""s"",[[""^""],[""a"",[[""s"",[[""c"",[65,65,97,97],0],[""c"",[67,67,99,99],0],[""c"",[67,67,99,99],0]]],[""s"",[[""c"",[65,65,97,97],0],[""c"",[67,67,99,99],0],[""c"",[67,67,99,99],0],[""c"",[69,69,101,101],0],[""c"",[80,80,112,112],0],[""c"",[84,84,116,116],0],[""c"",[65,65,97,97],0],[""c"",[78,78,110,110],0],[""c"",[67,67,99,99],0],[""c"",[69,69,101,101],0]]]]],[""$""]]],""i/^(dev|development)$"":[""s"",[[""^""],[""a"",[[""s"",[[""c"",[68,68,100,100],0],[""c"",[69,69,101,101],0],[""c"",[86,86,118,118],0]]],[""s"",[[""c"",[68,68,100,100],0],[""c"",[69,69,101,101],0],[""c"",[86,86,118,118],0],[""c"",[69,69,101,101],0],[""c"",[76,76,108,108],0],[""c"",[79,79,111,111],0],[""c"",[80,80,112,112],0],[""c"",[77,77,109,109],0],[""c"",[69,69,101,101],0],[""c"",[78,78,110,110],0],[""c"",[84,84,116,116],0]]]]],[""$""]]],""i/^(dr|disaster recovery)$"":[""s"",[[""^""],[""a"",[[""s"",[[""c"",[68,68,100,100],0],[""c"",[82,82,114,114],0]]],[""s"",[[""c"",[68,68,100,100],0],[""c"",[73,73,105,105],0],[""c"",[83,83,115,115],0],[""c"",[65,65,97,97],0],[""c"",[83,83,115,115],0],[""c"",[84,84,116,116],0],[""c"",[69,69,101,101],0],[""c"",[82,82,114,114],0],[""c"",[32,32],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[67,67,99,99],0],[""c"",[79,79,111,111],0],[""c"",[86,86,118,118],0],[""c"",[69,69,101,101],0],[""c"",[82,82,114,114],0],[""c"",[89,89,121,121],0]]]]],[""$""]]],""i/^(non-prod|nonprod|non-production)$"":[""s"",[[""^""],[""a"",[[""s"",[[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0],[""c"",[85,85,117,117],0],[""c"",[67,67,99,99],0],[""c"",[84,84,116,116],0],[""c"",[73,73,105,105],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0]]]]],[""$""]]],""i/^(preprod|pre-prod|pre-production)$"":[""s"",[[""^""],[""a"",[[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[69,69,101,101],0],[""c"",[45,45],0],[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0],[""c"",[85,85,117,117],0],[""c"",[67,67,99,99],0],[""c"",[84,84,116,116],0],[""c"",[73,73,105,105],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0]]]]],[""$""]]],""i/^(prod|production|prd)$"":[""s"",[[""^""],[""a"",[[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[79,79,111,111],0],[""c"",[68,68,100,100],0],[""c"",[85,85,117,117],0],[""c"",[67,67,99,99],0],[""c"",[84,84,116,116],0],[""c"",[73,73,105,105],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0]]],[""s"",[[""c"",[80,80,112,112],0],[""c"",[82,82,114,114],0],[""c"",[68,68,100,100],0]]]]],[""$""]]],""i/^(test|tst)$"":[""s"",[[""^""],[""a"",[[""s"",[[""c"",[84,84,116,116],0],[""c"",[69,69,101,101],0],[""c"",[83,83,115,115],0],[""c"",[84,84,116,116],0]]],[""s"",[[""c"",[84,84,116,116],0],[""c"",[83,83,115,115],0],[""c"",[84,84,116,116],0]]]]],[""$""]]],""i/^[-.?x]+$"":[""s"",[[""^""],[""r"",1,-1,[""c"",[45,46,63,63,88,88,120,120],0]],[""$""]]],""i/^n/?a$"":[""s"",[[""^""],[""c"",[78,78,110,110],0],[""r"",0,1,[""c"",[47,47],0]],[""c"",[65,65,97,97],0],[""$""]]],""i/^none$"":[""s"",[[""^""],[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[78,78,110,110],0],[""c"",[69,69,101,101],0],[""$""]]],""i/^tbd$"":[""s"",[[""^""],[""c"",[84,84,116,116],0],[""c"",[66,66,98,98],0],[""c"",[68,68,100,100],0],[""$""]]],""i/^test(ing)?$"":[""s"",[[""^""],[""c"",[84,84,116,116],0],[""c"",[69,69,101,101],0],[""c"",[83,83,115,115],0],[""c"",[84,84,116,116],0],[""r"",0,1,[""s"",[[""c"",[73,73,105,105],0],[""c"",[78,78,110,110],0],[""c"",[71,71,103,103],0]]]],[""$""]]],""i/^to ?do$"":[""s"",[[""^""],[""c"",[84,84,116,116],0],[""c"",[79,79,111,111],0],[""r"",0,1,[""c"",[32,32],0]],[""c"",[68,68,100,100],0],[""c"",[79,79,111,111],0],[""$""]]],""i/^unknown$"":[""s"",[[""^""],[""c"",[85,85,117,117],0],[""c"",[78,78,110,110],0],[""c"",[75,75,107,107],0],[""c"",[78,78,110,110],0],[""c"",[79,79,111,111],0],[""c"",[87,87,119,119],0],[""c"",[78,78,110,110],0],[""$""]]],""i/to be deleted"":[""s"",[[""c"",[84,84,116,116],0],[""c"",[79,79,111,111],0],[""c"",[32,32],0],[""c"",[66,66,98,98],0],[""c"",[69,69,101,101],0],[""c"",[32,32],0],[""c"",[68,68,100,100],0],[""c"",[69,69,101,101],0],[""c"",[76,76,108,108],0],[""c"",[69,69,101,101],0],[""c"",[84,84,116,116],0],[""c"",[69,69,101,101],0],[""c"",[68,68,100,100],0]]]}")
 	queryGroup: Packed
@@ -32,6 +36,122 @@ expression ReadingRules = Json.Document("{""reportTypes"":[{""kind"":""ci"",""la
 
 /// GENERATED from checks/reference/. Every reference file, by its name.
 expression ReferenceFiles = Json.Document("{""contract-reports"":{""note"":""The two contract files (piece 5C, procedure 2.8): the Solusi contract file (Excel, every Monday; row 1 field names, row 2 labels) and the ServiceNow contract report (ast_contract). They are matched by the Solusi contract number, which ServiceNow keeps in Vendor contract. Procurement owns the data: a wrong value is corrected in Solusi, because the next import writes over ServiceNow. The problems of the contract data ('problems') are split over two cards: For Procurement raises the problems of Solusi itself, Contracts to fix in ServiceNow the ones SACM corrects in ServiceNow ('change' and 'set' are the words of its fix list). An inactive contract owner or Procurement partner: when the loaded reports know an active account with the same name, the upload picked the wrong account and SACM sets the active one ('ownerInactive', 'partnerInactive'); when they know none, the person left and Procurement names a new person in Solusi ('ownerLeft', 'partnerLeft')."",""solusi"":{""columns"":{""number"":[""contract_no""],""status"":[""contract_status""],""name"":[""contract_name""],""vendor"":[""partner_name""],""vendorNumber"":[""partner_no""],""category"":[""contract_category""],""start"":[""contract_start""],""end"":[""contract_end""],""duration"":[""map_duration_type""],""owner"":[""clm_contract_owner""],""dailyResponsible"":[""clm_contract_daily_responsible""],""procurementPartner"":[""clm_contract_supporter""],""epoId"":[""clm_contract_epo_id""],""terminated"":[""termination_date""]},""labelRow"":[""contract no."",""contract no"",""contract""],""terminatedSheet"":""The tab with a termination date column holds the contracts terminated in the last 7 days.""},""servicenow"":{""columns"":{""number"":[""number""],""vendorContract"":[""vendor_contract""],""state"":[""state""],""name"":[""short_description""],""vendor"":[""vendor""],""category"":[""u_contract_category""],""start"":[""starts""],""end"":[""ends""],""owner"":[""business_owner""],""ownerActive"":[""business_owner.active""],""ownerUserId"":[""business_owner.user_name""],""ownerEmail"":[""business_owner.email""],""dailyResponsible"":[""u_point_of_contact""],""procurementPartner"":[""contract_administrator""],""procurementPartnerActive"":[""contract_administrator.active""],""procurementPartnerUserId"":[""contract_administrator.user_name""],""procurementPartnerEmail"":[""contract_administrator.email""],""tags"":[""sys_tags""],""criticality"":[""u_inherited_confidentiality"",""u_inherited_integrity"",""u_inherited_availability"",""u_inherited_authenticity""]}},""fields"":[{""field"":""name"",""label"":""Name"",""kind"":""text""},{""field"":""vendor"",""label"":""Vendor"",""kind"":""text""},{""field"":""category"",""label"":""Category"",""kind"":""text""},{""field"":""start"",""label"":""Start date"",""kind"":""date""},{""field"":""end"",""label"":""End date"",""kind"":""date""},{""field"":""owner"",""label"":""Contract owner"",""kind"":""person""},{""field"":""dailyResponsible"",""label"":""Daily responsible"",""kind"":""person""},{""field"":""procurementPartner"",""label"":""Procurement partner"",""kind"":""person""}],""autoStates"":[""Expired""],""draftStates"":[""Draft""],""statusTag"":""\\b[ESTN]\\s*-\\s*(Ended|Terminated|Concluded|In negotiation)\\b"",""runningStatuses"":[""S - Concluded"",""N - In negotiation""],""targetTag"":""target\\s*bc\\s*=\\s*[1-4]"",""concludedStatuses"":[""S - Concluded""],""fixedTermWords"":[""Fixed-term""],""epo"":{""classes"":[""service_instance""],""retiredStatuses"":[""Retired""],""minDigits"":3},""endsWithinDays"":[30,90],""problems"":[{""id"":""ownerInactive"",""label"":""Contract owner: an inactive account was picked"",""change"":""Contract owner: set the active account with the same name"",""set"":""the active account""},{""id"":""partnerInactive"",""label"":""Procurement partner: an inactive account was picked"",""change"":""Procurement partner: set the active account with the same name"",""set"":""the active account""},{""id"":""noOwner"",""label"":""No contract owner""},{""id"":""ownerLeft"",""label"":""Contract owner left""},{""id"":""partnerLeft"",""label"":""Procurement partner left""},{""id"":""personName"",""label"":""A name ServiceNow does not show the same"",""change"":""set the person Solusi names""},{""id"":""endPassed"",""label"":""Concluded, but the end date has passed"",""change"":""End date: correct it, or set the status Ended"",""set"":""the right end date, or Ended""},{""id"":""noEnd"",""label"":""Fixed-term, but no end date"",""change"":""End date: add it, or correct the duration type"",""set"":""the end date""},{""id"":""noVendorNumber"",""label"":""No vendor number""},{""id"":""epoRetired"",""label"":""The EPO ID names a Retired system""},{""id"":""epoUnknown"",""label"":""The EPO ID is not a known EPO ID""}]},""criticality"":{""note"":""Criticality (CIA-A) flows down from the Business Process (BIA). Each parent passes its values to its children's Inherited fields; the highest value per dimension wins. A relationship 'Excluded for calculation' in the Relationship report passes nothing (D131). ServiceNow copies Inherited to Target after two weeks, unless an exception applies: a CI with Inherited set and Target empty waits 'waitDays' days after the last change of its record (D132)."",""waitDays"":14},""epo-id"":{""note"":""The EPO ID is the asset tag. 'required': a missing EPO ID is to solve (the known cases of section 3.1 of the instruction are marked Not followed up once, by a manager). 'unique': two live CIs must not share an EPO ID. Service Offerings are ServiceNow records and are not checked (D128). Business Application, Business Process and Business Capability have no EPO ID: not checked."",""required"":[""business_service"",""service_instance""],""unique"":true},""epo-synced-classes"":{""note"":""Where a fix is made (decisions D122 and D123). On a CI of 'classes' the fix is made in EPO, by the person the check asks, and ServiceNow receives it from EPO. A Service Offering is a ServiceNow record: it comes from EPO only when the EPO integration created it, that is when its Created by is not a person's user ID ('personUserId'); then it is fixed in EPO, on its Business Service. An offering made by a person, and every other class, is fixed in ServiceNow with the request the message names. Without the Created by column, every offering counts as made by a person. The service mapped flag plays no part here: only the card EPO ≠ ServiceNow reads it. On an offering the integration created, only Owned by follows its Business Service in EPO; Managed by, Supported by and the Support group are changed in ServiceNow with the request \""Add or modify a Service (CI)\"", action \""Modify service offering\"" ('inServiceNow': the fields, and the checks whose finding is about one of them; decision D187)."",""classes"":[""business_service"",""service_instance""],""offerings"":{""classes"":[""service_offering""],""personUserId"":""^[A-Za-z0-9]{3}$"",""inServiceNow"":{""fields"":[""managed_by"",""supported_by""],""checks"":[""RESP-SAME-PERSON"",""SUPPORT-GROUP-MISSING"",""SUPPORT-GROUP-INACTIVE""]}}},""epo-systems-report"":{""note"":""The EPO systems report (piece 5A): one line per EPO system. How its columns are called, what its status words mean, and how a system matches a CI. A system matches the Service Instance whose Asset tag is its EPO ID. The fix is always made in EPO; a service mapped CI is then updated in ServiceNow by SACM by hand."",""columns"":{""epoId"":[""epoid"",""epo_id""],""name"":[""systemname"",""system_name""],""description"":[""systemdescription"",""system_description""],""status"":[""systemstatus"",""system_status""],""department"":[""ownerdepartment"",""owner_department""],""owner"":[""owner""],""responsible1"":[""responsible1"",""responsible_1""],""responsible2"":[""responsible2"",""responsible_2""],""changed"":[""ajour_tms"",""last_change"",""changed""]},""statuses"":{""Kørende"":""Operational"",""Nedlagt"":""Retired"",""Konstruktion"":""Ready"",""Udgående"":""Under retirement""},""classes"":[""service_instance""],""nameSuffix"":"" - PROD"",""retiredStatuses"":[""Retired""],""roles"":[{""role"":""owned_by"",""column"":""owner"",""label"":""Owned by"",""epoLabel"":""System Owner""},{""role"":""managed_by"",""column"":""responsible1"",""label"":""Managed by"",""epoLabel"":""Primary Responsible""},{""role"":""supported_by"",""column"":""responsible2"",""label"":""Supported by"",""epoLabel"":""Secondary Responsible""}],""sourceFirst"":{""note"":""The source first: a people line of these checks on a CI that pairs with an EPO system is compared with EPO before anybody is asked. EPO already names another person: the line waits (SACM copies it, or the sync brings it). EPO is wrong or empty too: the owner is asked, and the line says what EPO holds. A leftover (empty in EPO, a person still in ServiceNow) is asked of the owner; when its person is still active, the line is made on the check named in 'leftover'."",""checks"":[""RESP-MISSING"",""RESP-INACTIVE"",""SUPPORTED-BY""],""samePerson"":[""RESP-SAME-PERSON""],""leftover"":{""owned_by"":""RESP-MISSING"",""managed_by"":""RESP-MISSING"",""supported_by"":""SUPPORTED-BY""},""cards"":{""mapped"":""EPO-DIFF"",""notMapped"":""EPO-NOT-ARRIVED""}},""waitDays"":2,""descriptionStart"":40,""notCompared"":""The two EPO criticality numbers (scale 1 to 5, ServiceNow uses another scale) and the GDPR marks are not compared.""},""known-tags"":{""note"":""Tags of the team that explain a finding. A finding of a listed check on a CI with one of the tags is listed under Known: not to solve, no message. Remove the tag in ServiceNow and the finding is to solve at the next report. Tags are compared ignoring case and spaces."",""rules"":[{""checks"":[""CRIT-TARGET-MISSING"",""CRIT-NONE-REACHES""],""tags"":[""BIA is pending"",""BIA N/A""],""why"":""The BIA that gives the values is pending, or does not apply.""},{""checks"":[""RESP-SAME-PERSON""],""tags"":[""Owned by is interim managed by""],""why"":""The manager holds the owner role for a while, on purpose.""},{""checks"":[""REL-MISSING"",""MAPPING""],""tags"":[""To Be Mapped"",""Descoped"",""Process is missing or unknown""],""why"":""Mapping is planned (To Be Mapped, Descoped), or the process is not known yet.""}]},""lifecycle"":{""note"":""Lifecycle rules (Operational Activities Instruction 2.13). 'rules': a CI sits in a status for more than 'days' days, counted from the day the record was created or last changed, to the date of the report. 'days' is the value proposed; the team sets its own number in Settings ('setting'). 'fix': the line of the fix list when SACM changes the status itself (Business Capabilities in Ready). 'review': the sample of the lifecycle review, drawn only from the classes EPO holds (Business Service, Service Offering, Service Instance), so every CI of the sample can be compared with EPO; drawn once on a button press and saved in data/reviews/ of the team folder."",""rules"":[{""id"":""under-retirement"",""status"":""Under retirement"",""from"":""updated"",""days"":90,""setting"":""underRetirementDays"",""say"":""Status {status}, and the record did not change since {date} ({age} days)""},{""id"":""ready"",""status"":""Ready"",""from"":""created"",""days"":90,""setting"":""readyDays"",""say"":""Status {status} since it was created on {date} ({age} days)"",""fix"":{""change"":""Operational status: make it Operational"",""set"":""Operational""}}],""review"":{""sample"":50,""classes"":[""business_service"",""service_offering"",""service_instance""],""underRetirement"":20,""underRetirementStatus"":""Under retirement"",""retiredStatuses"":[""Retired""],""results"":[{""id"":""same"",""label"":""Same in EPO""},{""id"":""different"",""label"":""Not the same""},{""id"":""not-in-epo"",""label"":""Not in EPO""}],""opensCase"":[""different""]},""processStages"":{""note"":""The stages of a Business Process in Ready (D197). Waits for the BIA: no CIA value (Target) yet, no line, only a note. To map: CIA values and nothing live linked below of the classes in below: no line here, the process is a case of the Mapping backlog (D200), and a note says how many. Mapped: CIA values and something linked below: SACM makes it Operational."",""status"":""Ready"",""below"":[""business_application"",""business_service""],""waits"":{""one"":""1 Business Process in Ready waits for the BIA (no CIA values yet): nothing to do."",""many"":""{n} Business Processes in Ready wait for the BIA (no CIA values yet): nothing to do.""},""toMap"":{""one"":""1 Business Process in Ready is to map (CIA values set, nothing linked below): it is on the Mapping backlog."",""many"":""{n} Business Processes in Ready are to map (CIA values set, nothing linked below): they are on the Mapping backlog.""},""mapped"":{""say"":""Mapped: the CIA values are set and {below} linked below. Make it Operational"",""change"":""Operational status: make it Operational"",""current"":""Ready, mapped"",""set"":""Operational""}}},""mandatory-tags"":{""business_process"":[{""label"":""process type (customer facing or internal)"",""oneOf"":[""Internal process"",""Internal BP""],""endsWith"":[""facing"",""facing process""]}]},""mapping-backlog"":{""note"":""The mapping backlog (D200): one case per CI that must be mapped, SACM's work with the owner in a mapping session. 'rules' are the rules of reference/relationship-model that make a CI a mapping case; they are not on Relationship missing. A Business Process in 'readyStatus' is a case only when it has CIA values (a Target value): before that it waits for the BIA. 'tagged': a CI of 'classes' with a tag that matches one of 'tags' (a regular expression, ignoring case) and in 'status' is a case too: its future is decided in the session. 'stages': the steps of a case, in order; 'classStages': the steps each class goes through (D201). 'processMissing': the classes whose case can be marked 'The process does not exist' when one of 'rules' is the reason; 'team' is the team of reference/record-teams that is told (D203). 'criticality': the checks whose lines of the same CI are shown in the case (D204)."",""rules"":[""si-business-application"",""bs-business-process"",""ba-business-process"",""ba-service-instance"",""bp-application-or-service""],""readyStatus"":""Ready"",""tagged"":{""id"":""tagged-to-delete"",""classes"":[""business_application""],""tags"":[""to be deleted""],""status"":""Operational"",""say"":""Tagged To be deleted and still Operational: decide in the session whether it is retired, or was never a Business Application""},""stages"":[{""id"":""to-plan"",""label"":""To plan""},{""id"":""session-held"",""label"":""Session held""},{""id"":""classified"",""label"":""Classified""},{""id"":""application-linked"",""label"":""Application linked""},{""id"":""process-linked"",""label"":""Process linked""}],""classStages"":{""service_instance"":[""to-plan"",""session-held"",""classified"",""application-linked"",""process-linked""],""business_application"":[""to-plan"",""session-held"",""process-linked""],""business_service"":[""to-plan"",""session-held"",""process-linked""],""business_process"":[""to-plan"",""session-held"",""application-linked""]},""stageWords"":{""business_process"":{""application-linked"":""Applications linked""}},""processMissing"":{""classes"":[""business_service"",""business_application""],""rules"":[""bs-business-process"",""ba-business-process""],""team"":""process-management""},""criticality"":[""CRIT-ABOVE-PARENT"",""CRIT-NONE-REACHES""]},""name-rules"":{""note"":""The naming rules of the SACM instruction, as data. Patterns are regular expressions; upper and lower case count. 'when': only names that match it are tested. The check packs name the rules they apply (detector.rules). Decision of 11 Nov 2026, to confirm: the instruction writes \""API-\"", but the API offerings in ServiceNow are written \""API - \"" with spaces, so the rule follows the data."",""rules"":[{""id"":""ba-suffix"",""classes"":[""business_application""],""pattern"":""_BA$"",""say"":""The name does not end with _BA""},{""id"":""bs-suffix"",""classes"":[""business_service""],""pattern"":""_BS$"",""say"":""The name does not end with _BS""},{""id"":""si-suffix"",""classes"":[""service_instance""],""pattern"":"" - (PROD|TEST)$"",""say"":""The name does not end with \"" - PROD\"" or \"" - TEST\""""},{""id"":""api-prefix"",""classes"":[""service_offering""],""when"":""^API\\b"",""pattern"":""^API - "",""say"":""The name of an API offering does not start with \""API - \"""",""set"":""Start the name with \""API - \"" (API, space, hyphen, space)""},{""id"":""outer-space"",""classes"":[""*""],""noOuterSpaces"":true,""say"":""The name has a space at its start or its end"",""set"":""Remove the space""}]},""not-live-statuses"":{""note"":""Operational statuses of a CI that is not live yet. A CI is created in Ready and becomes Operational after sign-off; criticality comes after the BIA (Operational Activities Instruction 2.14). Findings on these CIs are listed under Waiting: not to solve, no message. They move to to solve at the first report that shows the CI live."",""statuses"":[""Ready""],""exceptChecks"":[""NAME-HIDDEN-CHAR"",""REL-WRONG-TYPE"",""REL-RETIRED"",""REL-TWICE"",""APP-INSTANCE-MATCH"",""OFFERING-PARENT"",""OFFERING-OWNER"",""NAME-FORMAT"",""READY-TOO-LONG"",""READY-TOO-LONG-BC"",""LIFECYCLE-REVIEW"",""EPO-DIFF"",""EPO-NOT-ARRIVED"",""TAG-MISSING"",""PROCESS-STAGE"",""MAPPING""],""exceptNote"":""Checks that SACM fixes itself, with no question to anybody, do not wait: they stay to solve on a CI that is not live yet. Ready too long is about the status Ready itself, and the lifecycle review compares the status with EPO: they do not wait either. The EPO checks compare ServiceNow with EPO, which has its own status for a system in construction: they do not wait either. The mapping backlog decides itself (D200): a CI in Ready waits, except a Business Process with CIA values, which is the one to map now.""},""parked-classes"":{""note"":""Parked classes (decision D179): CIs that are not checked yet. A parked CI stays in the report, so relationships to it count, but no check tests it, it has no line on any card and it is not counted as tested. The first screen, the load message and the verification record show one grey line per rule instead, so nothing is hidden silently. 'statuses': only CIs in these statuses are parked (empty: every status); a Retired CI is never counted. 'one', 'many' ({n} is the number) and 'none' are the words of the line; 'none' empty: no line. 'fields': parts of checks (check:field) that are parked with the rule on every CI. A capability that is Operational or Under retirement is checked as before; its own rules wait for the round with Enterprise Architecture (OPEN-QUESTIONS)."",""rules"":[{""id"":""capability-ready"",""classes"":[""business_capability""],""statuses"":[""Ready""],""one"":""1 Business Capability in Ready is not checked yet"",""many"":""{n} Business Capabilities in Ready are not checked yet"",""none"":"""",""fields"":[""REL-MISSING:bp-business-capability""]},{""id"":""api-application"",""classes"":[""api"",""application""],""one"":""1 API or Application CI is not checked yet: the class is not used yet"",""many"":""{n} API or Application CIs are not checked yet: the classes are not used yet"",""none"":""No API or Application CIs in this report""},{""id"":""technology-management-service"",""classes"":[""technology_management_service""],""one"":""1 Technology Management Service is not checked yet: the class is not used yet"",""many"":""{n} Technology Management Services are not checked yet: the class is not used yet"",""none"":""No Technology Management Service in this report""}]},""record-teams"":{""note"":""Teams that are the contact for the record of a class (D195). A line of one of the 'checks' on a CI of one of the 'classes' goes to the team, never to the people of the CI: one message to every person of the team (Settings, Requests and mailboxes), nobody copied. Process Management is responsible for the record of a Business Process; its mapping is SACM's work with the process owner (Relationship missing), and SACM does not chase the BIA (the criticality cards)."",""teams"":[{""id"":""process-management"",""name"":""Process Management"",""classes"":[""business_process""],""checks"":[""RESP-MISSING"",""RESP-INACTIVE"",""RESP-SAME-PERSON"",""DESC-QUALITY"",""NAME-DUPLICATE"",""TAG-MISSING"",""TAG-STATUS-CONFLICT"",""UNDER-RETIREMENT-LONG""]}]},""relationship-model"":{""note"":""The relationship model of the Service Mapping Workspace (dictionary and mandatory relationships), as data. Relationships are written parent -> child: the parent is the upstream CI. Only the classes the reports hold today; more can be added. Rule ids are the ones of the Workspace, so both projects can be compared. A Service Instance with Platform ticked (u_platform) is the class 'platform'. A relationship counts only when neither end is Retired."",""retiredStatuses"":[""Retired""],""environments"":{""note"":""The environment of a Service Instance: its Environment field, else a trailing word of its name ('- TEST'), else production. Synonyms count as one."",""suffix"":""\\b(prod|production|prd|preprod|pre-prod|pre-production|non-prod|nonprod|non-production|acc|acceptance|uat|test|tst|dev|development|dr|disaster recovery)\\)?\\s*$"",""aliases"":[{""pattern"":""^(prod|production|prd)$"",""name"":""PROD""},{""pattern"":""^(preprod|pre-prod|pre-production)$"",""name"":""PREPROD""},{""pattern"":""^(acc|acceptance)$"",""name"":""ACC""},{""pattern"":""^(test|tst)$"",""name"":""TEST""},{""pattern"":""^(dev|development)$"",""name"":""DEV""},{""pattern"":""^(dr|disaster recovery)$"",""name"":""DR""},{""pattern"":""^(non-prod|nonprod|non-production)$"",""name"":""NONPROD""}]},""applicationCopy"":{""descriptions"":""poor"",""descriptionMin"":30,""descriptionStart"":40,""instanceSuffix"":""\\s+-\\s+(PROD|TEST)$"",""applicationSuffix"":""_BA""},""dictionary"":[{""parents"":[""business_capability""],""children"":[""business_capability""],""status"":""allowed"",""types"":[""Provided by::Provides""],""note"":""Capability hierarchy.""},{""parents"":[""business_capability""],""children"":[""business_process""],""status"":""allowed"",""types"":[""Provided by::Provides""],""note"":""The process carries out the capability.""},{""parents"":[""business_capability""],""children"":[""business_application""],""status"":""unconfirmed"",""types"":[""Provided by::Provides""],""note"":""Type not agreed yet: not checked.""},{""parents"":[""business_process""],""children"":[""business_application""],""status"":""allowed"",""types"":[""Provided by::Provides""],""note"":""A process can use several applications, and the other way round.""},{""parents"":[""business_process""],""children"":[""business_service""],""status"":""allowed"",""types"":[""Provided by::Provides""],""note"":""The process is delivered through the Business Service.""},{""parents"":[""business_process""],""children"":[""service_instance"",""platform"",""application"",""api""],""status"":""blocked"",""note"":""Go through the Business Service and the Business Application."",""advice"":""Link the process to a Business Service or a Business Application instead.""},{""parents"":[""business_application""],""children"":[""service_instance"",""platform""],""status"":""allowed"",""types"":[""Consumes::Consumed by""],""note"":""One Service Instance or Platform per environment.""},{""parents"":[""business_application""],""children"":[""business_service"",""service_offering""],""status"":""blocked"",""note"":""A Business Application's only children are Service Instances."",""advice"":""Link it through the Service Instance.""},{""parents"":[""business_service"",""service_offering""],""children"":[""business_application""],""status"":""blocked"",""note"":""Services and offerings reach a Business Application through the Service Instance."",""advice"":""Link it through the Service Instance.""},{""parents"":[""business_service""],""children"":[""service_offering""],""status"":""allowed"",""types"":[""Provided by::Provides"",""Provides::Provided by""],""note"":""A Business Service has at least one offering; each offering has exactly one Business Service.""},{""parents"":[""business_service""],""children"":[""business_service""],""status"":""blocked"",""note"":""A Business Service is never the parent of another Business Service.""},{""parents"":[""service_offering""],""children"":[""service_instance"",""platform""],""status"":""allowed"",""types"":[""Depends on::Used by""],""note"":""The offering depends on the Service Instances that deliver it.""},{""parents"":[""service_instance""],""children"":[""platform""],""status"":""allowed"",""types"":[""Depends on::Used by""],""note"":""The Service Instance uses the Platform's data or technology: the Service Instance is the parent.""},{""parents"":[""platform""],""children"":[""platform""],""status"":""allowed"",""types"":[""Depends on::Used by""],""note"":""A Platform that depends on another Platform.""},{""parents"":[""service_instance""],""children"":[""service_instance""],""status"":""allowed"",""types"":[""Depends on::Used by""],""note"":""A runtime dependency between Service Instances.""},{""parents"":[""platform""],""children"":[""service_instance""],""status"":""direction"",""review"":true,""note"":""A Platform is the child of the Service Instance that uses it. Confirm with the criticality owner before changing production, because criticality flows down."",""advice"":""Swap the direction: the Service Instance is the parent of the Platform.""},{""parents"":[""service_instance"",""platform""],""children"":[""application"",""api""],""status"":""allowed"",""types"":[""Depends on::Used by""],""note"":""The Service Instance depends on its Application CIs and APIs.""}],""expectations"":[{""id"":""bc-below"",""classes"":[""business_capability""],""direction"":""child"",""related"":[""business_process"",""business_capability""],""min"":1,""title"":""Business Capability with nothing below"",""todo"":""Add at least one Business Process or Business Capability as child, with Provided by::Provides.""},{""id"":""bp-business-capability"",""classes"":[""business_process""],""direction"":""parent"",""related"":[""business_capability""],""min"":1,""title"":""Business Process without a Business Capability above"",""todo"":""Add its Business Capability as parent, with Provided by::Provides.""},{""id"":""bp-application-or-service"",""classes"":[""business_process""],""direction"":""child"",""related"":[""business_application"",""business_service""],""min"":1,""title"":""Business Process without a Business Application or Business Service below"",""todo"":""Add one as child, with Provided by::Provides.""},{""id"":""ba-business-process"",""classes"":[""business_application""],""direction"":""parent"",""related"":[""business_process""],""min"":1,""title"":""Business Application without a Business Process above"",""todo"":""Add a Business Process as parent, with Provided by::Provides.""},{""id"":""ba-service-instance"",""classes"":[""business_application""],""direction"":""child"",""related"":[""service_instance"",""platform""],""min"":1,""max"":1,""maxPerEnvironment"":true,""title"":""Business Application without a Service Instance"",""tooManyTitle"":""Business Application with more than one Service Instance in one environment"",""todo"":""Add its Service Instance or Platform as child, with Consumes::Consumed by."",""tooManyTodo"":""Keep one per environment: which one is right?""},{""id"":""bs-offering"",""classes"":[""business_service""],""direction"":""child"",""related"":[""service_offering""],""min"":1,""title"":""Business Service without a Service Offering"",""todo"":""Add its Service Offering as child, with Provided by::Provides.""},{""id"":""bso-business-service"",""parentField"":true,""classes"":[""service_offering""],""direction"":""parent"",""related"":[""business_service""],""min"":1,""max"":1,""title"":""Service Offering without a Business Service"",""tooManyTitle"":""Service Offering with more than one Business Service"",""todo"":""Add its Business Service as parent."",""tooManyTodo"":""An offering has exactly one Business Service: which one is right?""},{""id"":""si-business-application"",""classes"":[""service_instance"",""platform""],""direction"":""parent"",""related"":[""business_application""],""min"":1,""max"":1,""inServiceNow"":true,""title"":""Service Instance without a Business Application"",""tooManyTitle"":""Service Instance with more than one Business Application"",""todo"":""SACM maps it in ServiceNow with the owner: add its Business Application as parent, with Consumes::Consumed by."",""tooManyTodo"":""A Service Instance has exactly one Business Application: which one is right?""},{""id"":""bso-service-instance"",""review"":true,""classes"":[""service_offering""],""direction"":""child"",""related"":[""service_instance"",""platform""],""min"":1,""title"":""Service Offering without a Service Instance"",""todo"":""Review: the Workspace documents disagree on this rule."",""reviewWhy"":""Review only: the rule is not agreed.""},{""id"":""bs-business-process"",""review"":true,""classes"":[""business_service""],""direction"":""parent"",""related"":[""business_process""],""min"":1,""title"":""Business Service without a Business Process above"",""todo"":""Review: the instruction says a Business Service should relate to a Business Process."",""reviewWhy"":""Review only: the instruction says \""should\"".""}],""notRaised"":[""A Service Instance that no offering uses."",""A Service Instance with nothing below it.""]},""tag-chips"":{""note"":""A short word shown next to a CI that carries a tag."",""chips"":[{""tag"":""Descoped"",""chip"":""to map"",""why"":""Descoped from service mapping earlier; now to be mapped. It does not mean deleted.""}]}}")
+	queryGroup: Packed
+
+/// GENERATED from the calculated tables (D284). The type of every column of Run that a part gives, for RunRows: the data type of the column of the calculated table.
+expression RunColumnTypes =
+		{
+		    {"CapabilitySheet.Name", type nullable text},
+		    {"CapabilitySheet.Status", type nullable text},
+		    {"CapabilitySheet.CapabilitiesAbove", type nullable text},
+		    {"CapabilitySheet.CapabilitiesBelow", type nullable text},
+		    {"CapabilitySheet.ProcessesBelow", type nullable text},
+		    {"CapabilitySheet.Description", type nullable text},
+		    {"CapabilitySheet.Tags", type nullable text},
+		    {"CapabilitySheet.OwnedBy", type nullable text},
+		    {"CapabilitySheet.ManagedBy", type nullable text},
+		    {"CapabilitySheet.HiddenCharacters", type nullable text},
+		    {"CapabilitySheet.Order", Int64.Type},
+		    {"Findings.ReportDate", type nullable date},
+		    {"Findings.Key", type nullable text},
+		    {"Findings.CheckId", type nullable text},
+		    {"Findings.CiKey", type nullable text},
+		    {"Findings.CiName", type nullable text},
+		    {"Findings.Class", type nullable text},
+		    {"Findings.ClassLabel", type nullable text},
+		    {"Findings.Field", type nullable text},
+		    {"Findings.Severity", type nullable text},
+		    {"Findings.Detail", type nullable text},
+		    {"Findings.Module", type nullable text},
+		    {"Findings.Route", type nullable text},
+		    {"Findings.State", type nullable text},
+		    {"Findings.StateLabel", type nullable text},
+		    {"Findings.StateWhy", type nullable text},
+		    {"Findings.Source", type nullable text},
+		    {"Findings.Wait", type nullable text},
+		    {"Findings.Review", type nullable text},
+		    {"Findings.ContactId", type nullable text},
+		    {"Findings.ContactName", type nullable text},
+		    {"Findings.ContactEmail", type nullable text},
+		    {"Findings.ContactVia", type nullable text},
+		    {"Findings.AskWho", type nullable text},
+		    {"Findings.Cc", type nullable text},
+		    {"Findings.EscalateName", type nullable text},
+		    {"Findings.EscalateEmail", type nullable text},
+		    {"Findings.EscalateVia", type nullable text},
+		    {"Findings.FixChange", type nullable text},
+		    {"Findings.FixCurrent", type nullable text},
+		    {"Findings.FixSet", type nullable text},
+		    {"Findings.FixValue", type nullable text},
+		    {"Findings.FixRelatedTo", type nullable text},
+		    {"Findings.Group", type nullable text},
+		    {"Findings.EpoId", type nullable text},
+		    {"Findings.Status", type nullable text},
+		    {"Findings.SupportGroup", type nullable text},
+		    {"Findings.OwnedBy", type nullable text},
+		    {"Findings.ManagedBy", type nullable text},
+		    {"Findings.SupportedBy", type nullable text},
+		    {"Findings.Chips", type nullable text},
+		    {"Findings.Tags", type nullable text},
+		    {"Findings.ServiceNowLink", type nullable text},
+		    {"Findings.Mapping", type nullable text},
+		    {"Findings.EpoCorrection", type nullable text},
+		    {"MappingBacklog.Key", type nullable text},
+		    {"MappingBacklog.CiKey", type nullable text},
+		    {"MappingBacklog.CiName", type nullable text},
+		    {"MappingBacklog.ClassLabel", type nullable text},
+		    {"MappingBacklog.Owner", type nullable text},
+		    {"MappingBacklog.Reasons", type nullable text},
+		    {"MappingBacklog.StateOrder", Int64.Type},
+		    {"MappingBacklog.ReasonIds", type nullable text},
+		    {"MappingBacklog.Stage", type nullable text},
+		    {"MappingBacklog.StageNumber", Int64.Type},
+		    {"MappingBacklog.Steps", type nullable text},
+		    {"MappingBacklog.State", type nullable text},
+		    {"MappingBacklog.StateLabel", type nullable text},
+		    {"MappingBacklog.StateWhy", type nullable text},
+		    {"MappingBacklog.Criticality", type nullable text},
+		    {"MappingBacklog.CanMarkProcessMissing", type nullable logical},
+		    {"MappingBacklog.NextStep", type nullable text},
+		    {"MappingBacklog.Order", Int64.Type},
+		    {"Notes.CheckId", type nullable text},
+		    {"Notes.ReportDate", type nullable date},
+		    {"Notes.Reason", type nullable text},
+		    {"Notes.Order", Int64.Type},
+		    {"Parked.Line", type nullable text},
+		    {"Parked.Order", Int64.Type},
+		    {"RelationshipLinks.CiKey", type nullable text},
+		    {"RelationshipLinks.Relation", type nullable text},
+		    {"RelationshipLinks.Other", type nullable text},
+		    {"RelationshipLinks.OtherClass", type nullable text},
+		    {"RelationshipLinks.OtherStatus", type nullable text},
+		    {"RelationshipLinks.Type", type nullable text},
+		    {"RelationshipLinks.Counts", type nullable text},
+		    {"RelationshipLinks.Excluded", type nullable text},
+		    {"RelationshipLinks.Order", Int64.Type},
+		    {"SelfCheck.CheckId", type nullable text},
+		    {"SelfCheck.ExpectedState", type nullable text},
+		    {"SelfCheck.ExpectedTested", type nullable logical},
+		    {"SelfCheck.ExpectedToSolve", Int64.Type},
+		    {"SelfCheck.ExpectedToCheck", Int64.Type},
+		    {"SelfCheck.ExpectedWaiting", Int64.Type},
+		    {"SelfCheck.ExpectedKnown", Int64.Type},
+		    {"SelfCheck.ExpectedCis", Int64.Type},
+		    {"SelfCheck.Found", type nullable text},
+		    {"SelfCheck.FoundState", type nullable text},
+		    {"SelfCheck.FoundTested", type nullable logical},
+		    {"SelfCheck.FoundToSolve", Int64.Type},
+		    {"SelfCheck.FoundToCheck", Int64.Type},
+		    {"SelfCheck.FoundWaiting", Int64.Type},
+		    {"SelfCheck.FoundKnown", Int64.Type},
+		    {"SelfCheck.FoundCis", Int64.Type},
+		    {"SelfCheck.Match", type nullable logical},
+		    {"SelfCheck.Why", type nullable text},
+		    {"Tested.CheckId", type nullable text},
+		    {"Tested.Part", type nullable text},
+		    {"Tested.ReportDate", type nullable date},
+		    {"Tested.Evaluated", Int64.Type}
+		}
 	queryGroup: Packed
 
 /// GENERATED from tests/sample-record.ts. The day the samples were recorded.
@@ -51,8 +171,12 @@ expression SampleFiles =
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.39.0"
+expression WorkbenchVersion = "0.40.0"
 	queryGroup: Packed
+
+/// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
+expression AsciiCharacters = List.Buffer(List.Transform(List.Numbers(0, 128), Character.FromNumber))
+	queryGroup: Reading
 
 /// A report with no header and no row: the readers turn it into an empty table with all their columns.
 expression EmptyRead =
@@ -71,6 +195,37 @@ expression fnCanonicalClass =
 		        found = List.Select(Record.FieldNames(aliases), (id) => List.Contains(Record.Field(aliases, id), text))
 		    in
 		        if List.IsEmpty(found) then Text.Combine(List.Select(Text.SplitAny(text, " #(tab)#(cr)#(lf)"), each _ <> ""), "_") else found{0}
+	queryGroup: Reading
+
+/// Table CapabilitySheet (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and hidden characters, sorted by name. For the talks with Enterprise Architecture and Process Management: the table's Export data gives the file. Empty without a Relationship report (the page says so). `run` is CheckRun (null when no CI report is loaded).
+expression fnCapabilitySheetPart =
+		(run as nullable record) as table =>
+		    let
+		        graph = if run = null then null else run[Graph],
+		        columns = if run = null then {} else run[Columns],
+		        culture = Comparer.FromCulture("en-US"),
+		        namesOf = (nodes as list) as text => Text.Combine(List.Sort(List.Distinct(List.Transform(nodes, (node) => node[Name])), culture), ", "),
+		        linked = (ci as record, direction as text, cls as text) as list =>
+		            let edges = Record.FieldOrDefault(if direction = "up" then graph[Up] else graph[Down], ci[Key], {}) in
+		            List.Select(List.Transform(edges, (edge) => if direction = "up" then edge[Parent] else edge[Child]), (other) => other[Cls] = cls),
+		        personOf = (ci as record, role as text) as text =>
+		            let person = fnPerson(ci, role, columns), shown = if person = null then "" else if person[Name] <> "" then person[Name] else person[Email] in
+		            if shown = "" then "" else shown & (if person[Active] = false then " (inactive)" else ""),
+		        capabilities = if graph = null then {} else List.Select(run[Cis], (ci) => ci[Class] = "business_capability"),
+		        // Buffered: each row reads it by position, and a lazy sorted list would be sorted again for each row.
+		        sorted = List.Buffer(List.Sort(capabilities, (a, b) => let byName = culture(a[Name], b[Name]) in if byName <> 0 then byName else culture(a[Key], b[Key]))),
+		        row = (position as number) as list =>
+		            let ci = sorted{position} in
+		            {
+		                ci[Name], ci[Status], namesOf(linked(ci, "up", "business_capability")), namesOf(linked(ci, "down", "business_capability")),
+		                namesOf(linked(ci, "down", "business_process")), ci[Description], Text.Combine(ci[TagList], ", "), personOf(ci, "owned_by"), personOf(ci, "managed_by"),
+		                Text.Combine(ci[HiddenCharacters], ", "), position + 1
+		            }
+		    in
+		        #table(
+		            type table [Name = text, Status = text, CapabilitiesAbove = text, CapabilitiesBelow = text, ProcessesBelow = text, Description = text, Tags = text,
+		                OwnedBy = text, ManagedBy = text, HiddenCharacters = text, Order = Int64.Type],
+		            List.Transform(List.Positions(sorted), row))
 	queryGroup: Reading
 
 /// The text with its first character in upper case (as the details of a finding are shown).
@@ -104,6 +259,18 @@ expression fnCiColumns =
 		        found = fnPickColumns(read, specs)[Found]
 		    in
 		        List.Transform(List.Select(specs, (spec) => List.Contains(found, spec[column])), (spec) => spec[field])
+	queryGroup: Reading
+
+/// How many CIs a CI report has, without reading it all: the rows whose name cell is not empty after trimming, the rule of fnReadCiReport (a row without a name is left out). For the table Runs.
+expression fnCiCount =
+		(read as record) as number =>
+		    let
+		        nameSpec = List.First(List.Select(ReadingRules[ciColumns], (spec) => spec[column] = "Name")),
+		        nameAt = fnColumnIndex(read[Headers], nameSpec[any], Record.FieldOrDefault(nameSpec, "suffix", false)),
+		        sourceColumns = Table.ColumnNames(read[Rows])
+		    in
+		        if nameAt < 0 or nameAt >= List.Count(sourceColumns) then 0
+		        else List.Count(List.Select(Table.Column(read[Rows], sourceColumns{nameAt}), (cell) => Text.Trim(cell) <> ""))
 	queryGroup: Reading
 
 /// The text of a CI field a rule reads by its check-file name (src/core/checks/engine.ts, text); "" for any other field.
@@ -166,6 +333,15 @@ expression fnCombineOutputs =
 		    ]
 	queryGroup: Reading
 
+/// How often each text is in a list, as a record: the text as the field name, its count as the value (one pass of Table.Group, no list searched per item).
+expression fnCountBy =
+		(values as list) as record =>
+		    let
+		        grouped = Table.Group(Table.FromColumns({values}, {"Value"}), {"Value"}, {{"Count", Table.RowCount, Int64.Type}})
+		    in
+		        Record.FromList(grouped[Count], grouped[Value])
+	queryGroup: Reading
+
 /// The text of a report file: UTF-8, else Windows-1252 (as ServiceNow CSV exports can be). A byte order mark is removed.
 expression fnDecodeText =
 		(content as binary) as text =>
@@ -201,6 +377,68 @@ expression fnEnvironment =
 		        if alias <> null then alias[name] else Text.Upper(raw, "en-US")
 	queryGroup: Reading
 
+/// Does the text match the pattern, decided by its fast form (the query PatternForms, D285) when it can, else by the walk (fnRegexTest)? exact, prefix, suffix, contains: the text is one of the words, starts, ends with or holds one of them. only: the length is in range and every character is one of Chars. walk: a quick "no" when the text holds a character a match cannot (Allowed), or does not start or end with a word a match needs (Starts, Ends); then the walk. Lower: the words are lower case, so the text is compared in lower case, and only an ASCII text is decided so (JavaScript's "i" never matches a non-ASCII character to an ASCII one); any other text goes to the walk.
+expression fnFastMatch =
+		(form as record, tree as list, value as text) as logical =>
+		    let
+		        kind = form[Kind],
+		        lower = form[Lower],
+		        usable = not lower or Text.Remove(value, AsciiCharacters) = "",
+		        text = if lower then Text.Lower(value, "en-US") else value,
+		        oneOf = (words as nullable list, test as function) as logical => words = null or List.AnyTrue(List.Transform(words, test)),
+		        words = Record.FieldOrDefault(form, "Words", null),
+		        allowed = Record.FieldOrDefault(form, "Allowed", null)
+		    in
+		        if kind = "only" then
+		            Text.Length(value) >= form[Min] and (form[Max] < 0 or Text.Length(value) <= form[Max]) and Text.Remove(value, form[Chars]) = ""
+		        else if kind = "walk" then
+		            if allowed <> null and Text.Remove(value, allowed) <> "" then false
+		            else if usable and not oneOf(Record.FieldOrDefault(form, "Starts", null), (word) => Text.StartsWith(text, word)) then false
+		            else if usable and not oneOf(Record.FieldOrDefault(form, "Ends", null), (word) => Text.EndsWith(text, word)) then false
+		            else fnRegexTest(tree, value)
+		        else if not usable then fnRegexTest(tree, value)
+		        else if kind = "exact" then List.Contains(words, text)
+		        else if kind = "prefix" then oneOf(words, (word) => Text.StartsWith(text, word))
+		        else if kind = "suffix" then oneOf(words, (word) => Text.EndsWith(text, word))
+		        else oneOf(words, (word) => Text.Contains(text, word))
+	queryGroup: Reading
+
+/// The part Findings of the table Run (D284), which the DAX table Findings shows: one row per finding of the newest CI report (fnCheckRun), with who is asked, how it is listed, where it is fixed and the CI as the message table shows it (DATA-MODEL §3, a fact). Key never changes: <check>:<CI key>:<field>. Group: the findings of one check that go to the same person by the same route, in the same state (one piece of work). Mapping: the reasons of a case of the mapping backlog, by id. EpoCorrection: what EPO already says (fnEpoCorrections). `run` is CheckRun (null when no CI report is loaded).
+expression fnFindingsPart =
+		(run as nullable record) as table =>
+		    let
+		        facts = if run = null then {} else run[Facts],
+		        words = [open = "To solve", review = "To check", waiting = "Waiting", known = "Known"],
+		        address = fnServiceNowAddress(ServiceNowAddress),
+		        corrections = List.Buffer(if run = null then {} else fnEpoCorrections(facts, run)),
+		        fix = (fact as record, part as text) as text => if fact[Fix] = null then "" else Record.FieldOrDefault(fact[Fix], part, ""),
+		        row = (fact as record, correction as text) as list =>
+		            let
+		                person = if fact[ContactId] <> "" then fact[ContactId] else if fact[ContactEmail] <> "" then Text.Lower(fact[ContactEmail], "en-US") else "nobody"
+		            in
+		                {
+		                    run[Date], fact[Key], fact[CheckId], fact[CiKey], fact[CiName], fact[Class], fact[ClassLabel], fact[Field], fact[Severity], fact[Detail],
+		                    fact[Module], fact[Route], fact[State], Record.Field(words, fact[State]), fact[StateWhy], fact[Source], fact[Wait], fact[Review],
+		                    fact[ContactId], fact[ContactName], fact[ContactEmail], fact[ContactVia],
+		                    if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else "Nobody to ask",
+		                    Text.Combine(fact[Cc], "; "), fact[EscalateName], fact[EscalateEmail], fact[EscalateVia],
+		                    fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"),
+		                    fact[CheckId] & "|" & fact[Route] & "|" & person & (if fact[State] = "open" then "" else "|" & fact[State]),
+		                    fact[EpoId], fact[Status], fact[SupportGroup], fact[OwnedBy], fact[ManagedBy], fact[SupportedBy], Text.Combine(fact[Chips], ", "), Text.Combine(fact[Tags], ", "),
+		                    fnServiceNowLink(address, fact[CiName], fact[Class], fix(fact, "RelatedTo")),
+		                    Text.Combine(fact[Mapping], ", "), correction
+		                }
+		    in
+		        #table(
+		            type table [ReportDate = date, Key = text, CheckId = text, CiKey = text, CiName = text, Class = text, ClassLabel = text, Field = text,
+		                Severity = text, Detail = text, Module = text, Route = text, State = text, StateLabel = text, StateWhy = text, Source = text, Wait = text,
+		                Review = text, ContactId = text, ContactName = text, ContactEmail = text, ContactVia = text, AskWho = text, Cc = text, EscalateName = text,
+		                EscalateEmail = text, EscalateVia = text, FixChange = text, FixCurrent = text, FixSet = text, FixValue = text, FixRelatedTo = text,
+		                Group = text, EpoId = text, Status = text, SupportGroup = text, OwnedBy = text, ManagedBy = text, SupportedBy = text, Chips = text, Tags = text,
+		                ServiceNowLink = text, Mapping = text, EpoCorrection = text],
+		            List.Transform(List.Positions(facts), (at) => row(facts{at}, corrections{at})))
+	queryGroup: Reading
+
 /// Is the fix of a finding on this CI made in EPO (src/core/cases/fix-place.ts, fixedInEpo, D122, D123, D187)? A class EPO feeds, or a Service Offering the EPO integration created (fnOfferingOrigin), except the fields and checks that are changed in ServiceNow on such an offering.
 expression fnFixedInEpo =
 		(ci as record, checkId as text, field as text) as logical =>
@@ -232,33 +470,37 @@ expression fnGroupBy =
 		    if List.IsEmpty(items) then []
 		    else
 		        let
-		            table = Table.FromColumns({List.Transform(items, keyOf), items}, {"Key", "Item"}),
+		            // Both columns buffered: a table made of lazy lists is computed again each time it is read (the speed build).
+		            buffered = List.Buffer(items),
+		            table = Table.FromColumns({List.Buffer(List.Transform(buffered, keyOf)), buffered}, {"Key", "Item"}),
 		            grouped = Table.Group(table, {"Key"}, {{"Items", (rows) => rows[Item], type list}})
 		        in
 		            Record.FromList(grouped[Items], grouped[Key])
 	queryGroup: Reading
 
-/// The hidden characters in a name, as readable labels ("zero-width space (U+200B)"), each once, in the order they come (src/core/shared/names.ts, hiddenCharacters).
+/// The hidden characters in a name, as readable labels ("zero-width space (U+200B)"), each once, in the order they come (src/core/shared/names.ts, hiddenCharacters). Most names hold none: one native test says so, without a loop.
 expression fnHiddenCharacters =
 		(name as text) as list =>
 		    let
 		        entries = ReadingRules[hiddenCharacters],
-		        found = List.Select(Text.ToList(name), (char) => List.Contains(List.Transform(entries, (entry) => entry[code]), Character.ToNumber(char))),
+		        codes = List.Buffer(List.Transform(entries, (entry) => entry[code])),
+		        chars = List.Transform(codes, Character.FromNumber),
+		        found = List.Select(Text.ToList(name), (char) => List.Contains(codes, Character.ToNumber(char))),
 		        labelOf = (char as text) as text =>
 		            let entry = List.First(List.Select(entries, (item) => item[code] = Character.ToNumber(char))) in
 		            entry[label] & " (U+" & Text.PadStart(Number.ToText(entry[code], "X"), 4, "0") & ")"
 		    in
-		        List.Distinct(List.Transform(found, labelOf))
+		        if Text.Remove(name, chars) = name then {} else List.Distinct(List.Transform(found, labelOf))
 	queryGroup: Reading
 
-/// Is the CI in the scope of a check (src/core/checks/engine.ts, runChecks)? Its class is one of scope.classes ("*": every class), and its status is not one of scope.exclude.operational_status. Parked CIs are left out before (fnCheckRun).
+/// Is the CI in the scope of a check (src/core/checks/engine.ts, runChecks)? Its class is one of scope.classes ("*": every class), and its status is not one of scope.exclude.operational_status. Parked CIs are left out before (fnCheckRun, which tests the scope of each check itself, with the words in compared form once). `ci` has its StatusKey.
 expression fnInScope =
 		(pack as record, ci as record) as logical =>
 		    let
 		        scope = pack[scope],
 		        excluded = List.Transform(Record.FieldOrDefault(Record.FieldOrDefault(scope, "exclude", []), "operational_status", {}), (word) => fnNameKey(word, ""))
 		    in
-		        (List.Contains(scope[classes], "*") or List.Contains(scope[classes], ci[Class])) and not List.Contains(excluded, fnNameKey(ci[Status], ""))
+		        (List.Contains(scope[classes], "*") or List.Contains(scope[classes], ci[Class])) and not List.Contains(excluded, ci[StatusKey])
 	queryGroup: Reading
 
 /// Report files: .csv, .xlsx and .txt (the EPO report can come as text), not the lock files Office leaves next to an open file ("~$name.xlsx").
@@ -266,6 +508,13 @@ expression fnIsReportFile =
 		(name as text) as logical =>
 		    let lower = Text.Lower(name, "en-US") in
 		    (Text.EndsWith(lower, ".csv") or Text.EndsWith(lower, ".xlsx") or Text.EndsWith(lower, ".txt")) and not Text.StartsWith(name, "~$")
+	queryGroup: Reading
+
+/// A key set: a record with one field per distinct key, to test "is this key in there?" fast with Record.HasFields(set, key), instead of List.Contains against a long list, which reads the whole list for every key (and builds a lazy list again each time). Made once, then tested many times (ARCHITECTURE §12, the speed rules).
+expression fnKeySet =
+		(keys as list) as record =>
+		    let distinct = List.Buffer(List.Distinct(keys)) in
+		    Record.FromList(List.Repeat({true}, List.Count(distinct)), distinct)
 	queryGroup: Reading
 
 /// A text as its letters and digits only, lower case (src/core/sources/epo/epo-report.ts, lettersOf): EPO keeps formatting, ServiceNow plain text, so only the words are compared. M knows no Unicode classes: a letter is a character with an upper and a lower case, a digit is 0 to 9 (letters without case, such as Chinese, are left out).
@@ -301,12 +550,8 @@ expression fnLevel =
 /// A criticality value of a CI by its check-file name ("target.availability"); null when not set or not such a name.
 expression fnLevelAt =
 		(ci as record, field as text) as nullable number =>
-		    let
-		        parts = Text.Split(field, ".")
-		    in
-		        if List.Count(parts) = 2 and List.Contains({"target", "inherited"}, parts{0}) and List.Contains(ReadingRules[dimensions], parts{1})
-		        then Record.FieldOrDefault(ci, fnPascal(parts{0}) & fnPascal(parts{1}), null)
-		        else null
+		    let column = Record.FieldOrDefault(LevelColumns, field, null) in
+		    if column = null then null else Record.FieldOrDefault(ci, column, null)
 	queryGroup: Reading
 
 /// A criticality level in the words of ServiceNow, never as a bare number (src/core/model/model.ts, levelWords).
@@ -315,6 +560,60 @@ expression fnLevelWords = (value as number) as text => Record.FieldOrDefault(Rea
 
 /// A date as the message texts write it: 12 November 2026 (src/core/shared/dates.ts, longDate).
 expression fnLongDate = (value as date) as text => Date.ToText(value, [Format = "d MMMM yyyy", Culture = "en-US"])
+	queryGroup: Reading
+
+/// Table MappingBacklog (src/app/view/backlog.ts, D200 to D204): one line per CI to map, from the findings of the mapping backlog: its owner (Owned by, else who is asked), why it is on the list, its stage and the steps of its class (reference/mapping-backlog), the criticality lines of the same CI, and whether it can be marked "The process does not exist". Until the team's journal is read (build B5) every case is at the first stage of its class. Order: to solve first, then by name (by stage too from build B5, when a case can be past its first stage). `run` is CheckRun (null when no CI report is loaded).
+expression fnMappingBacklogPart =
+		(run as nullable record) as table =>
+		    let
+		        config = fnReference("reference/mapping-backlog"),
+		        facts = if run = null or config = null then {} else run[Facts],
+		        columns = if run = null then {} else run[Columns],
+		        ciByKey = if run = null then [] else Record.FromList(run[Cis], List.Transform(run[Cis], (ci) => ci[Key])),
+		        packs = List.Buffer(List.Transform(Json.Document(CheckFiles), (file) => file[pack])),
+		        labelOf = (id as text) as text => let pack = List.First(List.Select(packs, (candidate) => candidate[id] = id), null) in
+		            if pack = null then id else Record.FieldOrDefault(pack, "cardLabel", id),
+		        mappingChecks = List.Transform(List.Select(packs, (pack) => Record.FieldOrDefault(pack[detector], "module", "") = "mapping/backlog"), (pack) => pack[id]),
+		        critical = Record.FieldOrDefault(config, "criticality", {}),
+		        // The criticality lines by CI, grouped once (not looked for again for each line).
+		        criticalByCi = fnGroupBy(List.Select(facts, (fact) => List.Contains(critical, fact[CheckId])), (fact) => fact[CiKey]),
+		        stagesFor = (cls as text) as list =>
+		            let
+		                ids = Record.FieldOrDefault(config[classStages], cls, null),
+		                words = Record.FieldOrDefault(Record.FieldOrDefault(config, "stageWords", []), cls, []),
+		                list = if ids = null then config[stages] else List.RemoveNulls(List.Transform(ids, (id) => List.First(List.Select(config[stages], (stage) => stage[id] = id), null)))
+		            in
+		                List.Transform(list, (stage) => Record.FieldOrDefault(words, stage[id], stage[label])),
+		        rule = Record.FieldOrDefault(config, "processMissing", null),
+		        order = {"open", "review", "waiting", "known"},
+		        stateWords = [open = "To solve", review = "To check", waiting = "Waiting", known = "Planned"],
+		        lines = List.Select(facts, (fact) => List.Contains(mappingChecks, fact[CheckId])),
+		        // Buffered: each row reads it by position, and a lazy sorted list would be sorted again for each row.
+		        sorted = List.Buffer(List.Sort(lines, (a, b) =>
+		            let byState = List.PositionOf(order, a[State]) - List.PositionOf(order, b[State]) in
+		            if byState <> 0 then byState else Comparer.FromCulture("en-US")(a[CiName], b[CiName]))),
+		        row = (position as number) as list =>
+		            let
+		                fact = sorted{position},
+		                ci = Record.Field(ciByKey, fact[CiKey]),
+		                owner = fnPerson(ci, "owned_by", columns),
+		                ownerName = if owner = null then "" else if owner[Name] <> "" then owner[Name] else owner[Email],
+		                stages = stagesFor(fact[Class]),
+		                sameCi = List.Distinct(List.Transform(Record.FieldOrDefault(criticalByCi, fact[CiKey], {}), (other) => labelOf(other[CheckId]))),
+		                canMark = rule <> null and List.Contains(rule[classes], fact[Class]) and List.AnyTrue(List.Transform(fact[Mapping], (reason) => List.Contains(rule[rules], reason)))
+		            in
+		                {
+		                    fact[Key], fact[CiKey], fact[CiName], fact[ClassLabel], if ownerName <> "" then ownerName else fact[ContactName], Text.Replace(fact[Detail], "; ", "#(lf)"),
+		                    Text.Combine(fact[Mapping], ", "), if List.IsEmpty(stages) then "" else stages{0}, 1, Text.Combine(stages, " → "),
+		                    fact[State], Record.Field(stateWords, fact[State]), List.PositionOf(order, fact[State]) + 1, fact[StateWhy], Text.Combine(sameCi, ", "), canMark,
+		                    if fact[State] <> "open" then Record.Field(stateWords, fact[State]) & ": " & fact[StateWhy] else "Invite the owner to a mapping session",
+		                    position + 1
+		                }
+		    in
+		        #table(
+		            type table [Key = text, CiKey = text, CiName = text, ClassLabel = text, Owner = text, Reasons = text, ReasonIds = text, Stage = text, StageNumber = Int64.Type,
+		                Steps = text, State = text, StateLabel = text, StateOrder = Int64.Type, StateWhy = text, Criticality = text, CanMarkProcessMissing = logical, NextStep = text, Order = Int64.Type],
+		            List.Transform(List.Positions(sorted), row))
 	queryGroup: Reading
 
 /// "the report has no column "Supported by (active)" (supported_by.active)": the label first, the technical name for whoever builds the report (src/core/shared/text.ts, missingColumns).
@@ -357,6 +656,24 @@ expression fnNormaliseHeader =
 		        if Text.StartsWith(joined, "ci.") then Text.Middle(joined, 3) else joined
 	queryGroup: Reading
 
+/// The part Notes of the table Run (D284), which the DAX table Notes shows: why a check could not be evaluated, or only in part, on the newest report (D15): a detector not built in Power Query yet, a column or reference file missing, a report not loaded. A card with a note and nothing tested is grey, never green. Notes about the run as a whole (RELATIONSHIPS, PARKED, SOURCE-FIRST, Routing, Listing) have no card. `run` is CheckRun (null when no CI report is loaded).
+expression fnNotesPart =
+		(run as nullable record) as table =>
+		    let
+		        date = if run = null then null else run[Date],
+		        notBuilt = Table.SelectRows(ChecksRows, each not [Built]),
+		        reasons = Table.AddColumn(notBuilt, "Reason", each
+		            if [DetectorType] = "manual" then "Not tested: its lines come from the lifecycle review, which the Power BI version reads from stage 2."
+		            else "Not tested: this check is not built in the Power BI version yet.", type text),
+		        built = Table.SelectColumns(reasons, {"CheckId", "Reason"}),
+		        found = #table(type table [CheckId = text, Reason = text], List.Transform(if run = null then {} else run[Notes], (note) => {note[CheckId], note[Note]})),
+		        all = Table.Combine({built, found}),
+		        withDate = Table.AddColumn(all, "ReportDate", each date, type nullable date),
+		        numbered = Table.AddIndexColumn(withDate, "Order", 1, 1, Int64.Type)
+		    in
+		        Table.SelectColumns(numbered, {"CheckId", "ReportDate", "Reason", "Order"})
+	queryGroup: Reading
+
 /// Who made a Service Offering (src/core/cases/fix-place.ts, offeringOrigin, D137, D187): "epo" when the EPO integration created it (Created by is not a person's user ID), "person" when a person did (or the report does not say), "" for a CI that is no offering of reference/epo-synced-classes.
 expression fnOfferingOrigin =
 		(ci as record) as text =>
@@ -391,6 +708,15 @@ expression fnPairedFile =
 		            FileName = newest{0}[FileName], ReportDate = newest{0}[ReportDate], Rows = Table.ToRecords(fnReadKind(kind, newest{0}[Read])),
 		            PreviousDate = List.Max(earlier, null)
 		        ]
+	queryGroup: Reading
+
+/// The part Parked of the table Run (D284), which the DAX table Parked shows: the grey lines of the Cards page for the classes that are not checked yet (reference/parked-classes, D179), so nothing is hidden silently: "1 Business Capability in Ready is not checked yet". `run` is CheckRun (null when no CI report is loaded).
+expression fnParkedPart =
+		(run as nullable record) as table =>
+		    let
+		        lines = if run = null or run[Parked] = null then {} else run[Parked][Lines]
+		    in
+		        #table(type table [Line = text, Order = Int64.Type], List.Transform(List.Positions(lines), (position) => {lines{position}, position + 1}))
 	queryGroup: Reading
 
 /// A date of a report: "2026-06-10 10:35:59", "10-06-2026", "10/06/2026 10:35" (day first), or the serial number Excel keeps. null when empty or not a date, so a check can say what it could not read (src/core/shared/dates.ts, reportDate).
@@ -436,11 +762,11 @@ expression fnPascal =
 expression fnPerson =
 		(ci as record, role as text, columns as list) as nullable record =>
 		    let
-		        prefix = fnPascal(role),
+		        prefix = Record.FieldOrDefault(RolePrefixes, role, ""),
 		        get = (part as text) as any => Record.FieldOrDefault(ci, prefix & part, null),
 		        text = (part as text) as text => let value = get(part) in if value = null then "" else value
 		    in
-		        if not List.Contains(ReadingRules[roles], role) or not List.Contains(columns, role) then null
+		        if not Record.HasFields(RolePrefixes, role) or not List.Contains(columns, role) then null
 		        else [
 		            Name = text(""), Email = text("Email"), UserId = text("UserId"), Active = get("Active"),
 		            Manager = text("Manager"), ManagerEmail = text("ManagerEmail"), ManagerUserId = text("ManagerUserId"), ManagerActive = get("ManagerActive"),
@@ -464,17 +790,24 @@ expression fnPersonWords =
 		        if userId = "" then "nobody" else if name <> null then name & " (" & id & ")" else id
 	queryGroup: Reading
 
-/// The columns a reader needs, by header form, as a table of trimmed text with one column per spec (named spec[column]). A column the report does not have is "" on every row; Found lists the specs that were found, Missing the others.
+/// The columns a reader needs, by header form, as a table of trimmed text with one column per spec (named spec[column]). A column the report does not have is "" on every row; Found lists the specs that were found, Missing the others. Columns: the same columns as buffered lists, in the order of the specs. Column by column (one Text.Trim per cell, no list per row).
 expression fnPickColumns =
 		(sheet as record, specs as list) as record =>
 		    let
 		        positions = List.Transform(specs, (spec) => fnColumnIndex(sheet[Headers], spec[any], Record.FieldOrDefault(spec, "suffix", false))),
 		        names = List.Transform(specs, (spec) => spec[column]),
-		        rows = List.Transform(Table.ToRows(sheet[Rows]), (row) =>
-		            List.Transform(positions, (position) => if position < 0 or position >= List.Count(row) then "" else Text.Trim(row{position}))),
-		        table = Table.FromRows(rows, names)
+		        rows = sheet[Rows],
+		        sourceColumns = Table.ColumnNames(rows),
+		        count = Table.RowCount(rows),
+		        // Each column buffered: a table made of lazy lists and taken apart again with Table.ToColumns took 39 s for
+		        // 760 CIs (measured in the speed build).
+		        columns = List.Buffer(List.Transform(positions, (position) =>
+		            if position < 0 or position >= List.Count(sourceColumns) then List.Repeat({""}, count)
+		            else List.Buffer(List.Transform(Table.Column(rows, sourceColumns{position}), Text.Trim)))),
+		        table = Table.FromColumns(columns, names)
 		    in
 		        [
+		            Columns = columns,
 		            Table = table,
 		            Found = List.Select(names, (name) => positions{List.PositionOf(names, name)} >= 0),
 		            Missing = List.Select(names, (name) => positions{List.PositionOf(names, name)} < 0)
@@ -574,17 +907,23 @@ expression fnPlural =
 		    Number.ToText(count, "#,0", "en-GB") & " " & (if count = 1 then word else if many = null then word & "s" else many)
 	queryGroup: Reading
 
-/// The CI report as one row per CI with the canonical columns of ReadingRules[ciColumns] (src/core/sources/ci/ci-report.ts, readCiReport). A row without a name is left out. Key is the SACM identity: the name; the asset tag is added only when two CIs share a name, and the order in the report when that does not separate them either. NameSpaces: the name in the file starts or ends with a space, a tab or a no-break space (the rule "outer-space" of reference/name-rules).
+/// The CI report as one row per CI with the canonical columns of ReadingRules[ciColumns] (src/core/sources/ci/ci-report.ts, readCiReport). A row without a name is left out. Key is the SACM identity: the name; the asset tag is added only when two CIs share a name, and the order in the report when that does not separate them either. NameSpaces: the name in the file starts or ends with a space, a tab or a no-break space (the rule "outer-space" of reference/name-rules). Speed (ARCHITECTURE §12, the speed rules): column by column, every column a buffered list read by position; a flag, level or status column and the class have few distinct values, so each distinct value is converted once; only the rows whose Key1 is shared are numbered. The table is made once, at the end.
 expression fnReadCiReport =
 		(read as record) as table =>
 		    let
-		        specs = ReadingRules[ciColumns],
+		        specs = List.Buffer(ReadingRules[ciColumns]),
+		        names = List.Buffer(List.Transform(specs, (spec) => spec[column])),
 		        nameSpec = List.First(List.Select(specs, (spec) => spec[column] = "Name")),
 		        nameAt = fnColumnIndex(read[Headers], nameSpec[any]),
-		        rawNames = List.Transform(Table.ToRows(read[Rows]), (row) => if nameAt < 0 or nameAt >= List.Count(row) then "" else row{nameAt}),
-		        pickedOnly = fnPickColumns(read, specs)[Table],
-		        picked = Table.FromColumns(Table.ToColumns(pickedOnly) & {rawNames}, Table.ColumnNames(pickedOnly) & {"RawName"}),
-		        named = Table.SelectRows(picked, each [Name] <> ""),
+		        sourceColumns = Table.ColumnNames(read[Rows]),
+		        count = Table.RowCount(read[Rows]),
+		        rawNames = List.Buffer(if nameAt < 0 or nameAt >= List.Count(sourceColumns) then List.Repeat({""}, count) else Table.Column(read[Rows], sourceColumns{nameAt})),
+		        picked = fnPickColumns(read, specs)[Columns],
+		        columnOf = (name as text) as list => picked{List.PositionOf(names, name)},
+		        // The rows with a name, by their place in the report.
+		        nameColumn = columnOf("Name"),
+		        kept = List.Buffer(List.Select(List.Positions(nameColumn), (at) => nameColumn{at} <> "")),
+		        keep = (column as list) as list => List.Buffer(List.Transform(kept, (at) => column{at})),
 		        convert = (kind as text) as function =>
 		            if kind = "flag" then (value) => fnFlag(value)
 		            else if kind = "level" then (value) => fnLevel(value)
@@ -597,24 +936,49 @@ expression fnReadCiReport =
 		            else if kind = "level" then Int64.Type
 		            else if kind = "date" then type nullable date
 		            else type text,
-		        typed = Table.TransformColumns(named, List.Transform(specs, (spec) => {spec[column], convert(spec[kind]), typeOf(spec[kind])})),
-		        withClass = Table.AddColumn(typed, "Class", each fnCanonicalClass([SourceClass]), type text),
+		        // A column of few distinct values: each value converted once, then looked up.
+		        byValue = (column as list, change as function) as list =>
+		            let
+		                distinct = List.Buffer(List.Distinct(column)),
+		                converted = Record.FromList(List.Transform(distinct, change), distinct)
+		            in
+		                List.Buffer(List.Transform(column, (value) => Record.Field(converted, value))),
+		        few = {"flag", "level", "status"},
+		        values = List.Buffer(List.Transform(List.Positions(specs), (position) =>
+		            let
+		                spec = specs{position},
+		                column = keep(picked{position})
+		            in
+		                if List.Contains(few, spec[kind]) then byValue(column, convert(spec[kind]))
+		                else if spec[kind] = "text" then column
+		                else List.Buffer(List.Transform(column, convert(spec[kind]))))),
+		        valueOf = (name as text) as list => values{List.PositionOf(names, name)},
+		        classes = byValue(valueOf("SourceClass"), fnCanonicalClass),
 		        outer = {" ", "#(tab)", "#(00A0)"},
-		        withSpaces = Table.AddColumn(withClass, "NameSpaces", each
-		            let raw = if Text.StartsWith([RawName], "#(FEFF)") then Text.Middle([RawName], 1) else [RawName] in
-		            raw <> "" and (List.Contains(outer, Text.Start(raw, 1)) or List.Contains(outer, Text.End(raw, 1))), type logical),
-		        withBase = Table.AddColumn(withSpaces, "BaseKey", each fnNameKey([Name], "?"), type text),
-		        indexed = Table.AddIndexColumn(withBase, "Row", 0, 1, Int64.Type),
-		        counts = Table.Group(indexed, {"BaseKey"}, {{"SameName", each Table.RowCount(_), Int64.Type}}),
-		        joined = Table.Join(indexed, "BaseKey", Table.RenameColumns(counts, {{"BaseKey", "CountKey"}}), "CountKey"),
-		        withKey1 = Table.AddColumn(joined, "Key1", each
-		            if [SameName] > 1 and [AssetTag] <> "" then [BaseKey] & "|" & Text.Lower([AssetTag], "en-US") else [BaseKey], type text),
-		        numbered = Table.Combine(Table.Group(withKey1, {"Key1"}, {{"Rows", each Table.AddIndexColumn(Table.Sort(_, {{"Row", Order.Ascending}}), "Nth", 1, 1, Int64.Type)}})[Rows]),
-		        withKey = Table.AddColumn(numbered, "Key", each if [Nth] = 1 then [Key1] else [Key1] & "#" & Text.From([Nth]), type text),
-		        sorted = Table.Sort(withKey, {{"Row", Order.Ascending}}),
-		        ordered = Table.SelectColumns(sorted, {"Key", "Class"} & List.Transform(specs, (spec) => spec[column]) & {"NameSpaces"})
+		        spaces = List.Buffer(List.Transform(keep(rawNames), (name) =>
+		            let raw = if Text.StartsWith(name, "#(FEFF)") then Text.Middle(name, 1) else name in
+		            raw <> "" and (List.Contains(outer, Text.Start(raw, 1)) or List.Contains(outer, Text.End(raw, 1))))),
+		        baseKeys = List.Buffer(List.Transform(valueOf("Name"), (name) => fnNameKey(name, "?"))),
+		        tags = valueOf("AssetTag"),
+		        rows = List.Buffer(List.Positions(baseKeys)),
+		        // How many CIs have each base key, and then each Key1, as records (fnCountBy).
+		        sameName = fnCountBy(baseKeys),
+		        key1s = List.Buffer(List.Transform(rows, (row) =>
+		            let base = baseKeys{row}, tag = tags{row} in
+		            if Record.Field(sameName, base) > 1 and tag <> "" then base & "|" & Text.Lower(tag, "en-US") else base)),
+		        sameKey1 = fnCountBy(key1s),
+		        // Only a Key1 that several CIs share gets a number: the place of the CI among them, in report order.
+		        sharing = List.Select(rows, (row) => Record.Field(sameKey1, key1s{row}) > 1),
+		        groups = Table.Group(Table.FromColumns({List.Transform(sharing, (row) => key1s{row}), sharing}, {"Key1", "Row"}), {"Key1"}, {{"Rows", each _[Row]}}),
+		        nthOf = Record.Combine({[]} & List.Transform(groups[Rows],
+		            (group) => Record.FromList(List.Numbers(1, List.Count(group)), List.Transform(List.Sort(group), Text.From)))),
+		        keys = List.Transform(rows, (row) =>
+		            let nth = Record.FieldOrDefault(nthOf, Text.From(row), 1) in if nth = 1 then key1s{row} else key1s{row} & "#" & Text.From(nth)),
+		        built = Table.FromColumns({keys, classes} & values & {spaces}, {"Key", "Class"} & names & {"NameSpaces"}),
+		        typed = Table.TransformColumnTypes(built, {{"Key", type text}, {"Class", type text}, {"NameSpaces", type logical}}
+		            & List.Transform(specs, (spec) => {spec[column], typeOf(spec[kind])}))
 		    in
-		        ordered
+		        typed
 	queryGroup: Reading
 
 /// The ServiceNow contract report, one row per contract (src/core/sources/contracts/contract-reports.ts, readContractReport). A row without a number is left out. Criticality is true when any of the criticality columns is filled.
@@ -776,19 +1140,23 @@ expression fnReference =
 		    else Record.FieldOrDefault(ReferenceFiles, Text.Middle(name, 10), null)
 	queryGroup: Reading
 
-/// The relationship graph of a run (src/core/checks/detectors/relationship-detectors.ts, buildGraph): each end of a relationship is matched to a CI of the CI report by its name (identity first), then its class, its asset tag, and the live one; an end that matches no CI keeps its name and class. A node: [Key, Name, Cls, Ci, Retired, Ambiguous, Environment]; Cls is the class the rules use (a Service Instance with Platform ticked is a Platform), Environment is worked out only when a check reads it. Up and Down: for each node key, the live relationships above and below it (neither end Retired). NodeOf: the node of any CI of the report. Unmatched and Ambiguous: the ends that match no CI, or two CIs that nothing tells apart.
+/// The relationship graph of a run (src/core/checks/detectors/relationship-detectors.ts, buildGraph): each end of a relationship is matched to a CI of the CI report by its name (identity first), then its class, its asset tag, and the live one; an end that matches no CI keeps its name and class. A node: [Key, Name, Cls, Ci, Retired, Environment], one per CI (every end that matches the CI is the same node); Cls is the class the rules use (a Service Instance with Platform ticked is a Platform), Environment is worked out only when a check reads it. Up and Down: for each node key, the live relationships above and below it (neither end Retired). NodeOf: the node of any CI of the report. Unmatched and Ambiguous: the ends that match no CI, or two CIs that nothing tells apart. `cis` are the CIs of fnCheckRun, with their normal forms (StatusKey, NameKey).
 expression fnRelationshipGraph =
 		(cis as list, relationships as list, model as record) as record =>
 		    let
 		        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
-		        retiredWords = List.Transform(model[retiredStatuses], (word) => fnNameKey(word, "")),
-		        isRetired = (status as text) as logical => List.Contains(retiredWords, fnNameKey(status, "")),
+		        retiredWords = List.Buffer(List.Transform(model[retiredStatuses], (word) => fnNameKey(word, ""))),
+		        isRetired = (ci as record) as logical => List.Contains(retiredWords, ci[StatusKey]),
 		        ruleClass = (ci as record) as text => if ci[Class] = "service_instance" and ci[Platform] = true then "platform" else ci[Class],
 		        nodeOf = (ci as record) as record =>
-		            [Key = ci[Key], Name = ci[Name], Cls = ruleClass(ci), Ci = ci, Retired = isRetired(ci[Status]), Ambiguous = false,
+		            [Key = ci[Key], Name = ci[Name], Cls = ruleClass(ci), Ci = ci, Retired = isRetired(ci),
 		                Environment = fnEnvironment(ci[Name], if ci[Environment] = null then "" else ci[Environment], model)],
-		        byIdentity = fnGroupBy(cis, (ci) => fnNameKey(ci[Name], "?")),
-		        byName = fnGroupBy(cis, (ci) => fnNameKey(ci[Name], "")),
+		        // One node per CI, made once: every end of a relationship that matches the CI is this node, so its Environment
+		        // is worked out once per CI, the first time a check reads it.
+		        nodes = Record.FromList(List.Transform(cis, nodeOf), List.Transform(cis, (ci) => ci[Key])),
+		        byIdentity = fnGroupBy(cis, (ci) => ci[IdentityKey]),
+		        byName = fnGroupBy(cis, (ci) => ci[NameKey]),
+		        // The node of an end, and whether two CIs that nothing tells apart could be it.
 		        endOf = (name as text, className as text, tag as text) as record =>
 		            let
 		                first = Record.FieldOrDefault(byIdentity, fnNameKey(name, "?"), Record.FieldOrDefault(byName, fnNameKey(name, ""), {})),
@@ -796,26 +1164,49 @@ expression fnRelationshipGraph =
 		                byClass = if List.Count(first) > 1 and className <> "" and not List.IsEmpty(sameClass) then sameClass else first,
 		                sameTag = List.Select(byClass, (ci) => same(ci[AssetTag], tag)),
 		                byTag = if List.Count(byClass) > 1 and tag <> "" and not List.IsEmpty(sameTag) then sameTag else byClass,
-		                live = List.Select(byTag, (ci) => not isRetired(ci[Status])),
+		                live = List.Select(byTag, (ci) => not isRetired(ci)),
 		                found = if List.Count(byTag) > 1 and not List.IsEmpty(live) then live else byTag,
 		                ci = if List.IsEmpty(found) then null else found{0}
 		            in
-		                if ci = null then [Key = "?" & fnNameKey(name, "?") & "|" & className, Name = name, Cls = className, Ci = null, Retired = false, Ambiguous = false,
-		                    Environment = fnEnvironment(name, "", model)]
-		                else nodeOf(ci) & [Ambiguous = List.Count(found) > 1],
+		                if ci = null then [Node = [Key = "?" & fnNameKey(name, "?") & "|" & className, Name = name, Cls = className, Ci = null, Retired = false,
+		                    Environment = fnEnvironment(name, "", model)], Ambiguous = false]
+		                else [Node = Record.Field(nodes, ci[Key]), Ambiguous = List.Count(found) > 1],
 		        edges = List.Buffer(List.Transform(relationships, (row) =>
-		            [Parent = endOf(row[Parent], row[ParentClass], row[ParentTag]), Child = endOf(row[Child], row[ChildClass], row[ChildTag]), Type = row[Type], Excluded = row[Excluded]])),
-		        live = List.Buffer(List.Select(edges, (edge) => not edge[Parent][Retired] and not edge[Child][Retired])),
-		        ends = List.Combine(List.Transform(edges, (edge) => {edge[Parent], edge[Child]}))
+		            let parent = endOf(row[Parent], row[ParentClass], row[ParentTag]), child = endOf(row[Child], row[ChildClass], row[ChildTag]) in
+		            [Parent = parent[Node], Child = child[Node], Type = row[Type], Excluded = row[Excluded],
+		                Ambiguous = (if parent[Ambiguous] then 1 else 0) + (if child[Ambiguous] then 1 else 0)])),
+		        live = List.Buffer(List.Select(edges, (edge) => not edge[Parent][Retired] and not edge[Child][Retired]))
 		    in
 		        [
 		            Edges = edges,
 		            Up = fnGroupBy(live, (edge) => edge[Child][Key]),
 		            Down = fnGroupBy(live, (edge) => edge[Parent][Key]),
-		            NodeOf = nodeOf,
-		            Unmatched = List.Count(List.Select(ends, (node) => node[Ci] = null)),
-		            Ambiguous = List.Count(List.Select(ends, (node) => node[Ambiguous]))
+		            NodeOf = (ci as record) as record => let node = Record.FieldOrDefault(nodes, ci[Key], null) in if node = null then nodeOf(ci) else node,
+		            Unmatched = List.Sum({0} & List.Transform(edges, (edge) => (if edge[Parent][Ci] = null then 1 else 0) + (if edge[Child][Ci] = null then 1 else 0))),
+		            Ambiguous = List.Sum({0} & List.Transform(edges, (edge) => edge[Ambiguous]))
 		        ]
+	queryGroup: Reading
+
+/// The part RelationshipLinks of the table Run (D284), which the DAX table RelationshipLinks shows: the relationships of each CI of the newest CI report, from both ends, for the Case page: the CI above it (Parent) or below it (Child), the relationship type, the other CI's class and status, and whether the relationship counts (a Retired end does not; one excluded from calculation passes no criticality). From the relationship graph of the checks (fnRelationshipGraph), so a name is matched as the checks match it. `run` is CheckRun (null when no CI report is loaded).
+expression fnRelationshipLinksPart =
+		(run as nullable record) as table =>
+		    let
+		        graph = if run = null then null else run[Graph],
+		        edges = if graph = null then {} else graph[Edges],
+		        rowOf = (edge as record, position as number, mine as record, other as record, relation as text) as list =>
+		            {
+		                mine[Key], relation, other[Name], fnClassWord(other[Cls]), if other[Ci] = null then "Not in the CI report" else other[Ci][Status], edge[Type],
+		                if edge[Parent][Retired] or edge[Child][Retired] then "No: a Retired end" else "Yes",
+		                if edge[Excluded] = true then "Yes" else "", position + 1
+		            },
+		        rows = List.Combine(List.Transform(List.Positions(edges), (position) =>
+		            let edge = edges{position} in
+		            (if edge[Parent][Ci] = null then {} else {rowOf(edge, position, edge[Parent], edge[Child], "Child")})
+		            & (if edge[Child][Ci] = null then {} else {rowOf(edge, position, edge[Child], edge[Parent], "Parent")})))
+		    in
+		        #table(
+		            type table [CiKey = text, Relation = text, Other = text, OtherClass = text, OtherStatus = text, Type = text, Counts = text, Excluded = text, Order = Int64.Type],
+		            rows)
 	queryGroup: Reading
 
 /// The text with the first `old` replaced by `new` (String.replace of JavaScript with a text, not a pattern).
@@ -884,6 +1275,66 @@ expression fnSamePerson =
 expression fnScopeKeys = (inScope as list) as record => Record.FromList(List.Repeat({true}, List.Count(inScope)), List.Transform(inScope, (ci) => ci[Key]))
 	queryGroup: Reading
 
+/// The part SelfCheck of the table Run (D284), which the DAX table SelfCheck shows: per check, what the HTML app's logic finds on the samples (tests/recorded/cards.json, packed by the generator as ExpectedResult) and what this model finds on the newest report (§9.4 of the plan). A check matches when it is built and gives the same state, the same tested flag, the same CIs and the same finding keys in each state. The page shows it only for the sample data. `findings` and `testedPart` are the parts Findings and Tested already made, so the checks are not run again.
+expression fnSelfCheckPart =
+		(findings as table, testedPart as table) as table =>
+		    let
+		        expected = Json.Document(ExpectedResult)[cards],
+		        words = ReadingRules[stateWords],
+		        built = Table.SelectRows(ChecksRows, each [Built])[CheckId],
+		        tested = List.Buffer(testedPart[CheckId]),
+		        sorted = (keys as list) as list => List.Sort(keys, Comparer.Ordinal),
+		        // The findings by check and state, grouped once (not selected again for each card and state).
+		        byCard = fnGroupBy(Table.ToRecords(findings), (finding) => finding[CheckId] & "|" & finding[State]),
+		        of = (id as text, state as text) as list => Record.FieldOrDefault(byCard, id & "|" & state, {}),
+		        keysOf = (id as text, state as text) as list => sorted(List.Transform(of(id, state), (finding) => finding[Key])),
+		        strip = (cases as list) as list => sorted(List.Transform(cases, (entry) => if Text.StartsWith(entry, "case ") then Text.Middle(entry, 5) else entry)),
+		        states = {"open", "review", "waiting", "known"},
+		        row = (card as record) as list =>
+		            let
+		                id = card[id],
+		                isBuilt = List.Contains(built, id),
+		                found = List.Transform(states, (state) => keysOf(id, state)),
+		                want = List.Transform(states, (state) => strip(Record.Field(card, state))),
+		                isTested = List.Contains(tested, id),
+		                shown = if not List.IsEmpty(found{0}) then "open" else "review",
+		                cis = List.Count(List.Distinct(List.Transform(of(id, shown), (finding) => finding[CiKey]))),
+		                light = if not isTested then "grey" else if not List.IsEmpty(found{0}) then "red" else if not List.IsEmpty(found{1}) then "review" else "green",
+		                differ = List.Select(List.Positions(states), (position) => found{position} <> want{position}),
+		                keyWhy = List.Transform(differ, (position) =>
+		                    let
+		                        missing = List.Difference(want{position}, found{position}),
+		                        extra = List.Difference(found{position}, want{position}),
+		                        show = (keys as list) as text => Text.Combine(List.FirstN(keys, 3), ", ") & (if List.Count(keys) > 3 then " and " & Text.From(List.Count(keys) - 3) & " more" else "")
+		                    in
+		                        {"To solve", "To check", "Waiting", "Known"}{position} & ": "
+		                            & Text.Combine(List.Select({if List.IsEmpty(missing) then "" else "missing " & show(missing), if List.IsEmpty(extra) then "" else "not expected " & show(extra)}, (text) => text <> ""), "; ")),
+		                why = List.Select({
+		                    if light <> card[light] then "Expected " & Record.FieldOrDefault(words, card[light], card[light]) & ", found " & Record.FieldOrDefault(words, light, light) & "." else "",
+		                    if isTested <> card[tested] then (if card[tested] then "Expected tested, found not tested." else "Expected not tested, found tested.") else "",
+		                    if cis <> card[cis] then "Expected " & Text.From(card[cis]) & " CIs, found " & Text.From(cis) & "." else ""
+		                } & List.Transform(keyWhy, (text) => text & "."), (text) => text <> ""),
+		                match = isBuilt and List.IsEmpty(why)
+		            in
+		                {
+		                    id, Record.FieldOrDefault(words, card[light], card[light]), card[tested],
+		                    List.Count(want{0}), List.Count(want{1}), List.Count(want{2}), List.Count(want{3}), card[cis],
+		                    if isBuilt then "Built" else "Not built",
+		                    if isBuilt then Record.FieldOrDefault(words, light, light) else "", isBuilt and isTested,
+		                    if isBuilt then List.Count(found{0}) else 0, if isBuilt then List.Count(found{1}) else 0,
+		                    if isBuilt then List.Count(found{2}) else 0, if isBuilt then List.Count(found{3}) else 0, if isBuilt then cis else 0,
+		                    match,
+		                    if not isBuilt then "The check is not built in the Power BI version yet." else if match then "Same result." else Text.Combine(why, " ")
+		                }
+		    in
+		        #table(
+		            type table [CheckId = text, ExpectedState = text, ExpectedTested = logical, ExpectedToSolve = Int64.Type, ExpectedToCheck = Int64.Type,
+		                ExpectedWaiting = Int64.Type, ExpectedKnown = Int64.Type, ExpectedCis = Int64.Type, Found = text, FoundState = text, FoundTested = logical,
+		                FoundToSolve = Int64.Type, FoundToCheck = Int64.Type, FoundWaiting = Int64.Type, FoundKnown = Int64.Type, FoundCis = Int64.Type,
+		                Match = logical, Why = text],
+		            List.Transform(expected, row))
+	queryGroup: Reading
+
 /// The ServiceNow address as typed, made safe (src/core/cases/record-search.ts, serviceNowAddress): "https://" and the host only, in lower case; "" when it is not such a link, so no link is built.
 expression fnServiceNowAddress =
 		(typed as text) as text =>
@@ -930,13 +1381,15 @@ expression fnSharePointFiles =
 		        Table.TransformColumnTypes(renamed, {{"FileName", type text}, {"Modified", type nullable datetime}, {"Content", type binary}})
 	queryGroup: Reading
 
-/// One sheet as the readers use it: the normalised headers, the headers as written, and the rows after the header row as text (Column1 ... ColumnN). Rows where every cell is empty are left out, as the HTML app does.
+/// One sheet as the readers use it: the normalised headers, the headers as written, and the rows after the header row as text (Column1 ... ColumnN). Rows where every cell is empty are left out, as the HTML app does. `isText`: every cell is text already, or null for a missing cell (a CSV), so null becomes "" and no cell goes through fnCellText (an .xlsx does). A row is empty when its cells joined trim to "": the same as every cell trimming to "", in one call per row.
 expression fnSheet =
-		(name as text, data as table) as record =>
+		(name as text, data as table, optional isText as nullable logical) as record =>
 		    let
 		        columns = Table.ColumnNames(data),
-		        asText = Table.TransformColumns(data, List.Transform(columns, (column) => {column, fnCellText, type text})),
-		        rows = Table.SelectRows(asText, each List.MatchesAny(Record.FieldValues(_), (cell) => Text.Trim(cell) <> "")),
+		        asText =
+		            if isText = true then Table.ReplaceValue(data, null, "", Replacer.ReplaceValue, columns)
+		            else Table.TransformColumns(data, List.Transform(columns, (column) => {column, fnCellText, type text})),
+		        rows = Table.SelectRows(asText, each Text.Trim(Text.Combine(Record.FieldValues(_))) <> ""),
 		        header = if Table.IsEmpty(rows) then {} else Record.FieldValues(rows{0}),
 		        body = Table.Buffer(Table.Skip(rows, 1))
 		    in
@@ -956,7 +1409,7 @@ expression fnSheetFromCsv =
 		        width = Table.ColumnCount(Csv.Document(firstLine, [Delimiter = delimiter, QuoteStyle = QuoteStyle.Csv])),
 		        table = Csv.Document(text, [Delimiter = delimiter, Columns = width, QuoteStyle = QuoteStyle.Csv, ExtraValues = ExtraValues.Ignore])
 		    in
-		        fnSheet("", table)
+		        fnSheet("", table, true)
 	queryGroup: Reading
 
 /// The CI a finding about a relationship is shown on (relationship-detectors.ts, shownOn): the parent when it is in the scope of the check, else the child; null when neither is. `scope`: a record with a field per CI key in scope. Returns [Ci, Other] (Other: the node at the other end).
@@ -980,6 +1433,21 @@ expression fnSingleSpaces =
 
 /// The names of nodes, sorted, joined with ", " (src/core/checks/detectors/relationship-detectors.ts, names): a name two nodes share is listed twice, as there.
 expression fnSortedNames = (nodes as list) as text => Text.Combine(List.Sort(List.Transform(nodes, (node) => node[Name]), Comparer.FromCulture("en-US")), ", ")
+	queryGroup: Reading
+
+/// The part Tested of the table Run (D284), which the DAX table Tested shows: each part of a check the newest CI report could test, with the CIs it evaluated (D15). A card with no row here is grey, never green. Part: the field or rule ("owned_by", "outer-space"), as the HTML app's run says it; "" for a check tested as a whole (Process stage). `run` is CheckRun (null when no CI report is loaded).
+expression fnTestedPart =
+		(run as nullable record) as table =>
+		    let
+		        evaluated = if run = null then {} else run[Evaluated],
+		        tested = if run = null then {} else run[Tested],
+		        countOf = (part as text) as nullable number => List.First(List.Transform(List.Select(evaluated, (entry) => entry[Part] = part), (entry) => entry[Count]), null)
+		    in
+		        #table(
+		            type table [CheckId = text, Part = text, ReportDate = date, Evaluated = Int64.Type],
+		            List.Transform(tested, (part) =>
+		                let at = Text.PositionOf(part, ":") in
+		                {if at < 0 then part else Text.Start(part, at), if at < 0 then "" else Text.Middle(part, at + 1), run[Date], countOf(part)}))
 	queryGroup: Reading
 
 /// A relationship type as it is compared: without any space, lower case ("Provided By::Provides" = "Provided by::Provides"; relationship-detectors.ts, sameType).
@@ -1006,6 +1474,28 @@ expression fnVisibleName = (name as text) as text => List.Accumulate(ReadingRule
 
 /// The name without its hidden characters: the name to type in ServiceNow (src/core/shared/names.ts, withoutHidden).
 expression fnWithoutHidden = (name as text) as text => List.Accumulate(ReadingRules[hiddenCharacters], name, (text, entry) => Text.Replace(text, Character.FromNumber(entry[code]), ""))
+	queryGroup: Reading
+
+/// The column of the model for each criticality name of the check files ("target.availability" -> TargetAvailability), made once, so fnLevelAt only looks a name up.
+expression LevelColumns =
+		let
+		    names = List.Combine(List.Transform({"target", "inherited"}, (kind) => List.Transform(ReadingRules[dimensions], (dimension) => kind & "." & dimension)))
+		in
+		    Record.FromList(List.Transform(names, fnPascal), names)
+	queryGroup: Reading
+
+/// The reference files that decide how a finding is listed (fnListing), with their words in compared form, made once: reference/not-live-statuses (NotLive: null when missing) and the rules of reference/known-tags.
+expression ListingRules =
+		let
+		    notLive = Record.FieldOrDefault(ReferenceFiles, "not-live-statuses", null),
+		    known = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "known-tags", []), "rules", {})
+		in
+		    [
+		        NotLive = notLive,
+		        NotLiveKeys = if notLive = null then {} else List.Buffer(List.Transform(notLive[statuses], (status) => fnNameKey(status, ""))),
+		        ExceptChecks = if notLive = null then {} else Record.FieldOrDefault(notLive, "exceptChecks", {}),
+		        Known = List.Buffer(List.Transform(known, (rule) => rule & [TagKeys = List.Buffer(List.Transform(rule[tags], (word) => fnNameKey(word, "")))]))
+		    ]
 	queryGroup: Reading
 
 /// Every report file read once: its sheets (Read), its type by its columns (Kind, TypeLabel) and why it was not read (Message). A file that cannot be opened is not read, with the reason, and the refresh goes on.
@@ -1036,6 +1526,10 @@ expression ReportSourceFiles =
 		    Table.Sort(dated, {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})
 	queryGroup: Reading
 
+/// The column prefix of the model for each role of the CI report (owned_by -> OwnedBy), made once, so fnPerson only looks a role up.
+expression RolePrefixes = Record.FromList(List.Transform(ReadingRules[roles], fnPascal), ReadingRules[roles])
+	queryGroup: Reading
+
 /// The detectors of checks/packs that are built in Power Query. A check whose detector is not in this list is grey with the note "not built" (D15), so each build can port a part. Build B2: the rule checks and the CI code detectors. Build B3: the relationship checks, the EPO checks, the stages of a Business Process and the mapping backlog.
 expression BuiltDetectors =
 		{
@@ -1054,7 +1548,7 @@ expression CheckRun =
 		    if Table.IsEmpty(newest) then null else fnCheckRun(newest{0})
 	queryGroup: Checks
 
-/// The checks on one CI report (src/core/checks/engine.ts, runChecks, then src/core/cases/cases.ts, buildRun): the reports of the other types that go with it (fnPaired), the scope of each check, the built detectors, the source first (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles. Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo]; Notes are [CheckId, Note].
+/// The checks on one CI report (src/core/checks/engine.ts, runChecks, then src/core/cases/cases.ts, buildRun): the reports of the other types that go with it (fnPaired), the scope of each check, the built detectors, the source first (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles. Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo]; Notes are [CheckId, Note]. Outputs (one lazy field per built check), RunContext and Stages are read only by the probes of the refresh time. Each CI gets its normal forms once (StatusKey, NameKey, IdentityKey, TagKeys, Squashed: the compared text of the six fields a rule counts), so no check normalises a CI field again (ARCHITECTURE §12, the speed rules).
 expression fnCheckRun =
 		(file as record) as record =>
 		    let
@@ -1070,18 +1564,29 @@ expression fnCheckRun =
 		        known = if read[Lossless] or relationships = null then [] else
 		            let
 		                ends = List.Combine(List.Transform(relationships, (item) => {item[Parent], item[Child]})),
-		                hidden = List.Select(List.Transform(ends, (name) => [Key = fnNameKey(name, "?"), Chars = fnHiddenCharacters(name)]), (entry) => not List.IsEmpty(entry[Chars])),
-		                grouped = fnGroupBy(hidden, (entry) => entry[Key])
+		                // Most names hold no hidden character: fnHiddenCharacters says so with one native test.
+		                hidden = List.Select(List.Transform(ends, (name) => [Name = name, Chars = fnHiddenCharacters(name)]), (entry) => not List.IsEmpty(entry[Chars])),
+		                keyed = List.Transform(hidden, (entry) => entry & [Key = fnNameKey(entry[Name], "?")]),
+		                grouped = fnGroupBy(keyed, (entry) => entry[Key])
 		            in
 		                Record.FromList(List.Transform(Record.FieldValues(grouped), (entries) => List.Last(entries)[Chars]), Record.FieldNames(grouped)),
+		        createdBy = List.Contains(found, "createdBy"),
+		        squash = (row as record, field as text) as text => fnNameKey(fnCiText(row, field), ""),
 		        cis = List.Buffer(List.Transform(rows, (row) =>
-		            let own = fnHiddenCharacters(row[Name]) in
+		            let own = fnHiddenCharacters(row[Name]), tags = if row[Tags] = "" then {} else Text.Split(row[Tags], ", "), status = fnNameKey(row[Status], ""), name = fnNameKey(row[Name], "") in
 		            row & [
-		                TagList = if row[Tags] = "" then {} else Text.Split(row[Tags], ", "),
+		                TagList = tags,
+		                TagKeys = List.Transform(tags, (tag) => fnNameKey(tag, "")),
+		                OwnHidden = own,
 		                HiddenCharacters = if not List.IsEmpty(own) then own else Record.FieldOrDefault(known, row[Key], {}),
-		                CreatedBy = if List.Contains(found, "createdBy") then row[CreatedBy] else null
+		                CreatedBy = if createdBy then row[CreatedBy] else null,
+		                StatusKey = status, NameKey = name, IdentityKey = fnNameKey(row[Name], "?"),
+		                Squashed = [
+		                    description = squash(row, "description"), name = name, exception_justification = squash(row, "exception_justification"),
+		                    exception_status = squash(row, "exception_status"), support_group = squash(row, "support_group"), operational_status = status
+		                ]
 		            ])),
-		        inFile = List.AnyTrue(List.Transform(cis, (ci) => not List.IsEmpty(fnHiddenCharacters(ci[Name])))),
+		        inFile = List.AnyTrue(List.Transform(cis, (ci) => not List.IsEmpty(ci[OwnHidden]))),
 		        hiddenFrom = if read[Lossless] or inFile then "file" else if Record.FieldCount(known) > 0 then "relationships" else "",
 		        columns = List.Buffer(found & (if hiddenFrom <> "" then {"name.hidden"} else {})),
 		        questionMarks = List.Count(List.Select(cis, (ci) => Text.Contains(ci[Name], "?"))),
@@ -1094,20 +1599,42 @@ expression fnCheckRun =
 		        graph = if relationships = null or model = null then null else fnRelationshipGraph(cis, relationships, model),
 		        epoConfig = let config = fnReference("reference/epo-systems-report") in
 		            if config <> null and Record.HasFields(config, {"columns", "statuses", "roles"}) then config else null,
+		        // How many CIs of the whole report share each value (compared form), per field of a rule; the same for the live
+		        // CIs per class (the operators duplicatedMoreThan and duplicatedInClass of fnDetectRule).
+		        textFields = {"description", "name", "exception_justification", "exception_status", "support_group", "operational_status"},
+		        countOf = (keys as list) as record =>
+		            let
+		                kept = List.Select(keys, (key) => key <> ""),
+		                grouped = Table.Group(Table.FromColumns({kept}, {"Value"}), {"Value"}, {{"Count", Table.RowCount, Int64.Type}})
+		            in
+		                Record.FromList(grouped[Count], grouped[Value]),
+		        live = List.Buffer(List.Select(cis, (ci) => ci[StatusKey] <> "retired")),
 		        // Worked out once, when a check reads it (a field of a record is worked out only when it is read).
 		        run = [
-		            Cis = cis, Columns = columns, Date = date, Graph = graph, EpoSystems = epo,
+		            Cis = cis, Columns = columns, Date = date, Graph = graph, EpoSystems = epo, CheckableKeys = checkableKeys,
+		            Counts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(cis, (ci) => Record.Field(ci[Squashed], field)))), textFields),
+		            ClassCounts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(live, (ci) =>
+		                let key = Record.Field(ci[Squashed], field) in if key = "" then "" else ci[Class] & "|" & key))), textFields),
 		            Epo = if epoFile = null then null else [Systems = epo, Date = epoFile[ReportDate], Report = epoFile[FileName], PreviousDate = epoFile[PreviousDate]],
 		            EpoComparison = if epo = null or epoConfig = null then null else fnEpoCompare(cis, epo, columns, epoConfig)
 		        ],
 
 		        parked = fnParked(cis),
-		        parkedKeys = if parked = null then {} else parked[Keys],
-		        checkable = List.Buffer(List.Select(cis, (ci) => not List.Contains(parkedKeys, ci[Key]))),
-		        packs = List.Select(List.Transform(Json.Document(CheckFiles), (entry) => entry[pack]), (pack) => pack[status] <> "off"),
+		        parkedSet = if parked = null then [] else parked[KeySet],
+		        checkable = List.Buffer(List.Select(cis, (ci) => not Record.HasFields(parkedSet, ci[Key]))),
+		        checkableKeys = fnKeySet(List.Transform(checkable, (ci) => ci[Key])),
+		        packs = List.Buffer(List.Select(List.Transform(Json.Document(CheckFiles), (entry) => entry[pack]), (pack) => pack[status] <> "off")),
 		        moduleOf = (pack as record) as text => if pack[detector][type] = "rule" then "rule" else Record.FieldOrDefault(pack[detector], "module", pack[detector][type]),
-		        built = List.Select(packs, (pack) => List.Contains(BuiltDetectors, moduleOf(pack))),
-		        scopeOf = (pack as record) as list => List.Buffer(List.Select(checkable, (ci) => fnInScope(pack, ci))),
+		        built = List.Buffer(List.Select(packs, (pack) => List.Contains(BuiltDetectors, moduleOf(pack)))),
+		        // The scope of a check (fnInScope), with its words in compared form once: the class, and the status of the CI.
+		        scopeOf = (pack as record) as list =>
+		            let
+		                scope = pack[scope],
+		                all = List.Contains(scope[classes], "*"),
+		                classes = List.Buffer(scope[classes]),
+		                excluded = List.Buffer(List.Transform(Record.FieldOrDefault(Record.FieldOrDefault(scope, "exclude", []), "operational_status", {}), (word) => fnNameKey(word, "")))
+		            in
+		                List.Buffer(List.Select(checkable, (ci) => (all or List.Contains(classes, ci[Class])) and not List.Contains(excluded, ci[StatusKey]))),
 		        skipped = (ref as text) as record => [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Skipped: reference data missing (" & ref & ")."}],
 		        noRelationships = [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Not tested: no Relationship report. Load the Relationship report with the CI report."}],
 		        relationshipDetectors = [
@@ -1154,7 +1681,10 @@ expression fnCheckRun =
 		                else if module = "criticality/none-reaches" then (if not criticality then skipped(ref) else fnDetectCriticalityNoneReaches(pack, run, inScope, reference))
 		                // A module listed in BuiltDetectors that has no branch here: never a silent pass (D15).
 		                else [Findings = {}, Tested = {}, Evaluated = {}, Notes = {"Not tested: the detector " & module & " is listed as built, but fnCheckRun does not run it."}],
-		        outputs = List.Buffer(List.Transform(built, (pack) => let out = detect(pack) in out & [Notes = List.Transform(out[Notes], (note) => [CheckId = pack[id], Note = note])])),
+		        // One field per built check, worked out only when it is read (so a check can be timed alone: tools/powerbi/probes.ts).
+		        noted = (pack as record) as record => let out = detect(pack) in out & [Notes = List.Transform(out[Notes], (note) => [CheckId = pack[id], Note = note])],
+		        Outputs = List.Accumulate(built, [], (record, pack) => Record.AddField(record, pack[id], () => noted(pack), true)),
+		        outputs = List.Buffer(List.Transform(built, (pack) => Record.Field(Outputs, pack[id]))),
 		        combined = fnCombineOutputs(outputs),
 
 		        // The relationship graph says once what it could not match (as the first check that builds it).
@@ -1166,14 +1696,14 @@ expression fnCheckRun =
 		            & (if graph[Ambiguous] > 0 then {[CheckId = "RELATIONSHIPS", Note = Text.From(graph[Ambiguous]) & " relationship ends name a CI that two CIs share, and neither class nor asset tag told them apart. The first was used."]} else {}),
 
 		        source = fnSourceFirst(combined[Findings], run, packs),
-		        parkedFields = if parked = null then {} else parked[Fields],
-		        kept = List.Buffer(List.Select(source[Findings], (finding) => not List.Contains(parkedFields, finding[CheckId] & ":" & finding[Field]) and not List.Contains(parkedKeys, finding[CiKey]))),
+		        parkedFields = if parked = null then [] else parked[FieldSet],
+		        kept = List.Buffer(List.Select(source[Findings], (finding) => not Record.HasFields(parkedFields, finding[CheckId] & ":" & finding[Field]) and not Record.HasFields(parkedSet, finding[CiKey]))),
 		        parkedNotes = if parked = null then {[CheckId = "PARKED", Note = "Parked classes: reference data missing (reference/parked-classes), so every class is checked."]} else {},
 
 		        // Where the fix is made and how findings are listed: never silent when the reference data is missing.
 		        synced = fnReference("reference/epo-synced-classes"),
 		        offeringClasses = if synced = null then {} else Record.FieldOrDefault(Record.FieldOrDefault(synced, "offerings", []), "classes", {}),
-		        blind = if List.Contains(found, "createdBy") then 0 else List.Count(List.Select(cis, (ci) => List.Contains(offeringClasses, ci[Class]))),
+		        blind = if createdBy then 0 else List.Count(List.Select(cis, (ci) => List.Contains(offeringClasses, ci[Class]))),
 		        routingNotes =
 		            if synced = null then {[CheckId = "Routing", Note = "reference data missing (reference/epo-synced-classes), so no finding is routed to EPO."]}
 		            else if blind > 0 then {[CheckId = "Routing", Note = "the report has no Created by column (sys_created_by), so " & Text.From(blind)
@@ -1188,7 +1718,9 @@ expression fnCheckRun =
 		            Facts = List.Buffer(fnFacts(kept, run, packs)),
 		            Tested = combined[Tested], Evaluated = combined[Evaluated],
 		            Notes = graphNotes & combined[Notes] & source[Notes] & parkedNotes & routingNotes & listingNotes & hiddenNotes,
-		            Parked = parked, Graph = graph, Epo = run[Epo]
+		            Parked = parked, Graph = graph, Epo = run[Epo], CheckableKeys = checkableKeys,
+		            // Never loaded into a table: for the probes of the refresh time (tools/powerbi/probes.ts).
+		            Outputs = Outputs, RunContext = run, Stages = [Combined = combined, SourceFirst = source, Kept = kept]
 		        ]
 	queryGroup: Checks
 
@@ -1275,10 +1807,13 @@ expression fnDetectCiEpoId =
 		        byTag = fnGroupBy(tagged, (ci) => Text.Lower(ci[AssetTag], "en-US")),
 		        repeated = List.Select(Record.FieldValues(byTag), (list) => List.Count(list) > 1),
 		        duplicate = if Record.FieldOrDefault(reference, "unique", false) <> true then [Findings = {}, Tested = {}, Evaluated = {}, Notes = {}] else [
-		            Findings = List.Combine(List.Transform(repeated, (list) => List.Transform(List.Positions(list), (at) =>
+		            // The names of a group sorted once; each finding leaves out its own name (the first place it is in).
+		            Findings = List.Combine(List.Transform(repeated, (list) =>
+		                let sortedNames = List.Buffer(List.Sort(List.Transform(list, (other) => other[Name]), Comparer.FromCulture("en-US"))) in
+		                List.Transform(List.Positions(list), (at) =>
 		                let
 		                    ci = list{at},
-		                    others = List.Sort(List.Transform(List.RemoveRange(list, at, 1), (other) => other[Name]), Comparer.FromCulture("en-US"))
+		                    others = List.RemoveRange(sortedNames, List.PositionOf(sortedNames, ci[Name]), 1)
 		                in
 		                    fnFinding(pack, ci, "duplicate", "EPO ID " & ci[AssetTag] & " is also on " & Text.Combine(others, ", "))))),
 		            Tested = {pack[id] & ":duplicate"}, Evaluated = {[Part = pack[id] & ":duplicate", Count = List.Count(tagged)]}, Notes = {}
@@ -1329,7 +1864,8 @@ expression fnDetectCiStatusAge =
 		                column = if rule[from] = "created" then "createdOn" else "updatedOn",
 		                word = if rule[from] = "created" then "Created (sys_created_on)" else "Updated (sys_updated_on)",
 		                sinceOf = (ci as record) as nullable date => if rule[from] = "created" then ci[CreatedOn] else ci[UpdatedOn],
-		                inStatus = List.Select(inScope, (ci) => fnNameKey(ci[Status], "") = fnNameKey(rule[status], "")),
+		                status = fnNameKey(rule[status], ""),
+		                inStatus = List.Buffer(List.Select(inScope, (ci) => ci[StatusKey] = status)),
 		                unread = List.Count(List.Select(inStatus, (ci) => sinceOf(ci) = null)),
 		                over = List.Select(inStatus, (ci) => sinceOf(ci) <> null and Duration.Days(date - sinceOf(ci)) > rule[days]),
 		                fill = (ci as record) as text =>
@@ -1508,19 +2044,20 @@ expression fnDetectMappingBacklog =
 		    let
 		        graph = run[Graph],
 		        columns = run[Columns],
-		        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
+		        readyStatus = fnNameKey(config[readyStatus], ""),
+		        taggedStatus = if tagged = null then "" else fnNameKey(tagged[status], ""),
 		        rules = List.Select(model[expectations], (rule) => List.Contains(config[rules], rule[id]) and Record.HasFields(rule, "min")),
 		        tagged = Record.FieldOrDefault(config, "tagged", null),
 		        hasCia = (ci as record) as logical => List.AnyTrue(List.Transform(ReadingRules[dimensions], (dimension) => fnLevelAt(ci, "target." & dimension) <> null)),
 		        lineOf = (ci as record) as nullable record =>
 		            let
 		                node = graph[NodeOf](ci),
-		                ready = same(ci[Status], config[readyStatus]),
+		                ready = ci[StatusKey] = readyStatus,
 		                missed = List.Select(rules, (rule) => List.Contains(rule[classes], node[Cls])
 		                    and List.Count(fnPartners(graph, node, rule[direction], rule[related])) < rule[min]
 		                    and not (Record.FieldOrDefault(rule, "parentField", false) = true and List.Contains(columns, "parentService")
 		                        and Text.Trim(if ci[ParentService] = null then "" else ci[ParentService]) <> "")),
-		                isTagged = tagged <> null and List.Contains(tagged[classes], ci[Class]) and same(ci[Status], tagged[status])
+		                isTagged = tagged <> null and List.Contains(tagged[classes], ci[Class]) and ci[StatusKey] = taggedStatus
 		                    and List.AnyTrue(List.Transform(ci[TagList], (tag) => List.AnyTrue(List.Transform(tagged[tags], (pattern) => fnMatches(pattern, "i", tag))))),
 		                ids = List.Transform(missed, (rule) => rule[id]) & (if isTagged then {tagged[id]} else {}),
 		                words = List.Transform(missed, (rule) => fnReplaceFirst(rule[title], "Service Instance", if node[Cls] = "platform" then "Platform" else "Service Instance"))
@@ -1546,7 +2083,8 @@ expression fnDetectProcessStage =
 		        graph = run[Graph],
 		        columns = run[Columns],
 		        target = List.Transform(ReadingRules[dimensions], (dimension) => "target." & dimension),
-		        inStatus = List.Buffer(List.Select(inScope, (ci) => fnNameKey(ci[Status], "") = fnNameKey(stages[status], ""))),
+		        status = fnNameKey(stages[status], ""),
+		        inStatus = List.Buffer(List.Select(inScope, (ci) => ci[StatusKey] = status)),
 		        hasCia = (ci as record) as logical => List.AnyTrue(List.Transform(ReadingRules[dimensions], (dimension) => fnLevelAt(ci, "target." & dimension) <> null)),
 		        below = (ci as record) as list =>
 		            let edges = Record.FieldOrDefault(graph[Down], ci[Key], {}) in
@@ -1864,12 +2402,13 @@ expression fnDetectRule =
 		        playbook = Record.FieldOrDefault(pack, "playbook", []),
 		        rules = ReadingRules,
 		        columns = run[Columns],
-		        allCis = run[Cis],
 		        squash = (value as text) as text => fnNameKey(value, ""),
+		        // The compared form of a CI field a rule reads (made once per CI by fnCheckRun; "" for any other field, as fnCiText).
+		        squashed = (ci as record, field as text) as text => Record.FieldOrDefault(ci[Squashed], field, ""),
 		        fill = (value as any, part as text) as any => if value is text then Text.Replace(value, "{each}", part) else value,
 		        isRole = (field as text) as logical => List.Contains(rules[roles], field),
 		        labelOf = (field as text) as text => Text.Replace(Text.Replace(field, "_", " "), ".", " "),
-		        isRetired = (ci as record) as logical => squash(ci[Status]) = "retired",
+		        isRetired = (ci as record) as logical => ci[StatusKey] = "retired",
 		        listOf = (value as any) as list => if value is list then value else {Text.From(value)},
 		        entriesOf = (value as text) as list => List.Transform(Text.SplitAny(value, ",;#(lf)"), Text.Trim),
 		        leaves = (condition as record) as list =>
@@ -1877,17 +2416,22 @@ expression fnDetectRule =
 		            else if Record.HasFields(condition, "any") then List.Combine(List.Transform(condition[any], @leaves))
 		            else {condition},
 
-		        // How many CIs of the whole report share each value (normalised), per field; the same for live CIs per class.
-		        countOf = (keys as list) as record =>
-		            let
-		                kept = List.Select(keys, (key) => key <> ""),
-		                grouped = Table.Group(Table.FromColumns({kept}, {"Value"}), {"Value"}, {{"Count", Table.RowCount, Int64.Type}})
-		            in
-		                Record.FromList(grouped[Count], grouped[Value]),
-		        textFields = {"description", "name", "exception_justification", "exception_status", "support_group", "operational_status"},
-		        counts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(allCis, (ci) => squash(fnCiText(ci, field))))), textFields),
-		        classCounts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(List.Select(allCis, (ci) => not isRetired(ci)), (ci) =>
-		            let key = squash(fnCiText(ci, field)) in if key = "" then "" else ci[Class] & "|" & key))), textFields),
+		        // How many CIs of the whole report share each value (compared form), per field; the same for live CIs per class.
+		        // Worked out once per run (fnCheckRun), not once per check.
+		        counts = run[Counts],
+		        classCounts = run[ClassCounts],
+		        // A tag as its words (a hyphen counts as a space): a mandatory-tag rule is met by one of its tags, or by a tag that ends
+		        // with one of its endings after a first word (src/core/checks/engine.ts, meetsTagRule).
+		        tagWords = (tag as text) as text => squash(Text.Replace(tag, "-", " ")),
+		        // The tags of a reference file in compared form, made once per check (not once per CI): by the name of the file.
+		        refs = List.Distinct(List.Transform(List.Select(leaves(when), (item) => Record.HasFields(item, "ref") and List.Contains({"missingTags", "tagsNotIn"}, item[op])), (item) => item[ref])),
+		        tagRefs = List.Accumulate(refs, [], (record, name) => Record.AddField(record, name, () =>
+		            let value = fnReference(name) in
+		            if value = null then null
+		            else if value is list then fnKeySet(List.Transform(value, (tag) => squash(Text.From(tag))))
+		            else Record.FromList(List.Transform(Record.FieldValues(value), (rules) => if rules is list
+		                then List.Buffer(List.Transform(rules, (rule) => rule & [Keys = List.Buffer(List.Transform(rule[oneOf], tagWords)),
+		                    Endings = List.Buffer(List.Transform(Record.FieldOrDefault(rule, "endsWith", {}), (ending) => " " & tagWords(ending)))])) else rules), Record.FieldNames(value)), true)),
 
 		        samePerson = (a as nullable record, b as nullable record) as logical =>
 		            if a = null or b = null then false
@@ -1916,21 +2460,21 @@ expression fnDetectRule =
 		                else if op = "shorterThan" then
 		                    (if trimmed <> "" and Text.Length(trimmed) < Number.From(value) then label & " has only " & Text.From(Text.Length(trimmed)) & " characters" else "")
 		                else if op = "equalsField" then
-		                    (let own = squash(current) in if own <> "" and own = squash(fnCiText(ci, Text.From(value))) then label & " repeats the " & Text.From(value) else "")
+		                    (let own = squashed(ci, field) in if own <> "" and own = squashed(ci, Text.From(value)) then label & " repeats the " & Text.From(value) else "")
 		                else if op = "matchesAny" then
 		                    (if trimmed <> "" and List.AnyTrue(List.Transform(listOf(value), (pattern) => fnMatches(pattern, "i", trimmed)))
 		                    then label & " is a placeholder: """ & trimmed & """" else "")
 		                else if op = "duplicatedMoreThan" then
-		                    (let count = Record.FieldOrDefault(Record.FieldOrDefault(counts, field, []), squash(current), 0) in
+		                    (let count = Record.FieldOrDefault(Record.FieldOrDefault(counts, field, []), squashed(ci, field), 0) in
 		                    if trimmed <> "" and count > Number.From(value) then "the same " & label & " is used on " & Text.From(count) & " CIs" else "")
 		                else if op = "duplicatedInClass" then
 		                    (if isRetired(ci) or trimmed = "" then ""
-		                    else let count = Record.FieldOrDefault(Record.FieldOrDefault(classCounts, field, []), ci[Class] & "|" & squash(current), 0) in
+		                    else let count = Record.FieldOrDefault(Record.FieldOrDefault(classCounts, field, []), ci[Class] & "|" & squashed(ci, field), 0) in
 		                    if count > Number.From(value) then "the same " & label & " is used on " & Text.From(count) & " live CIs of this class" else "")
 		                else if op = "hasDoubleSpaces" then
 		                    (if Text.Contains(current, "  ") then label & " has two or more spaces in a row" else "")
 		                else if op = "equals" then
-		                    (if squash(current) = squash(Text.From(value)) then label & " is " & current else "")
+		                    (if squashed(ci, field) = squash(Text.From(value)) then label & " is " & current else "")
 		                else if op = "samePersonAs" then
 		                    (let other = Text.From(value) in
 		                    if isRole(other) and samePerson(person, fnPerson(ci, other, columns))
@@ -1975,23 +2519,21 @@ expression fnDetectRule =
 		                    (if List.IsEmpty(ci[HiddenCharacters]) then "" else "the name holds a hidden character: " & Text.Combine(ci[HiddenCharacters], ", "))
 		                else if op = "missingTags" then
 		                    (let
-		                        byClass = fnReference(Record.FieldOrDefault(condition, "ref", null)),
-		                        // A tag as its words (a hyphen counts as a space); a rule is met by one of its tags, or by a tag that ends with
-		                        // one of its endings after a first word (src/core/checks/engine.ts, meetsTagRule).
-		                        tagWords = (tag as text) as text => squash(Text.Replace(tag, "-", " ")),
+		                        ref = Record.FieldOrDefault(condition, "ref", null),
+		                        byClass = if ref = null then null else Record.FieldOrDefault(tagRefs, ref, null),
 		                        own = List.Transform(tags, tagWords),
 		                        wanted = if byClass = null then {} else Record.FieldOrDefault(byClass, ci[Class], {}),
 		                        meets = (rule as record, tag as text) as logical =>
-		                            List.Contains(List.Transform(rule[oneOf], tagWords), tag)
-		                            or List.AnyTrue(List.Transform(Record.FieldOrDefault(rule, "endsWith", {}), (ending) => Text.EndsWith(tag, " " & tagWords(ending)))),
+		                            List.Contains(rule[Keys], tag) or List.AnyTrue(List.Transform(rule[Endings], (ending) => Text.EndsWith(tag, ending))),
 		                        missing = List.Select(wanted, (rule) => not List.AnyTrue(List.Transform(own, (tag) => meets(rule, tag))))
 		                    in
 		                        if List.IsEmpty(missing) then "" else "missing tag: " & Text.Combine(List.Transform(missing, (rule) => rule[label]), ", "))
 		                else if op = "tagsNotIn" then
 		                    (let
-		                        allowedList = fnReference(Record.FieldOrDefault(condition, "ref", null)),
-		                        allowed = List.Transform(if allowedList = null then {} else allowedList, squash),
-		                        unknown = List.Select(tags, (tag) => not List.Contains(allowed, squash(tag)))
+		                        ref = Record.FieldOrDefault(condition, "ref", null),
+		                        allowed = if ref = null then null else Record.FieldOrDefault(tagRefs, ref, null),
+		                        keys = ci[TagKeys],
+		                        unknown = List.Transform(List.Select(List.Positions(tags), (at) => allowed = null or not Record.HasFields(allowed, keys{at})), (at) => tags{at})
 		                    in
 		                        if List.IsEmpty(unknown) then "" else "tag not in the allowed list: " & Text.Combine(unknown, ", "))
 		                else error Error.Record("SACM.Rule", "Unknown operator """ & op & """ in " & pack[id]),
@@ -2086,8 +2628,9 @@ expression fnDetectRule =
 expression fnEpoCompare =
 		(cis as list, systems as list, columns as list, config as record) as record =>
 		    let
-		        retiredWords = List.Transform(config[retiredStatuses], (word) => fnNameKey(word, "")),
+		        retiredWords = List.Buffer(List.Transform(config[retiredStatuses], (word) => fnNameKey(word, ""))),
 		        isRetired = (status as text) as logical => List.Contains(retiredWords, fnNameKey(status, "")),
+		        isRetiredCi = (ci as record) as logical => List.Contains(retiredWords, ci[StatusKey]),
 		        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
 		        byTag = fnGroupBy(List.Select(cis, (ci) => List.Contains(config[classes], ci[Class]) and ci[AssetTag] <> ""), (ci) => Text.Lower(Text.Trim(ci[AssetTag]), "en-US")),
 		        names = fnUserNames(cis, columns),
@@ -2121,7 +2664,7 @@ expression fnEpoCompare =
 		        pairOf = (system as record) as nullable record =>
 		            let
 		                first = Record.FieldOrDefault(byTag, Text.Lower(Text.Trim(system[EpoId]), "en-US"), {}),
-		                live = List.Select(first, (ci) => not isRetired(ci[Status])),
+		                live = List.Select(first, (ci) => not isRetiredCi(ci)),
 		                found = if List.Count(first) > 1 and not List.IsEmpty(live) then live else first,
 		                ci = if List.IsEmpty(found) then null else found{0},
 		                epoRetired = system[Status] <> "" and isRetired(system[Status]),
@@ -2151,7 +2694,7 @@ expression fnEpoCompare =
 		                differences = status & name & people & description
 		            in
 		                if ci = null then [Kind = if epoRetired then "none" else "without", System = system]
-		                else if epoRetired and isRetired(ci[Status]) then [Kind = "retired"]
+		                else if epoRetired and isRetiredCi(ci) then [Kind = "retired"]
 		                else [Kind = "pair", Pair = [Ci = ci, System = system, Mapped = ci[ServiceMapped], Differences = differences,
 		                    Leftovers = List.Select(differences, (difference) => difference[Leftover])]],
 		        results = List.Buffer(List.Transform(systems, pairOf))
@@ -2184,10 +2727,10 @@ expression fnEpoCorrections =
 		                if person = null or (person[Name] = "" and person[Email] = "") then null
 		                else [Id = if id <> "" then id else Text.Lower(person[Name], "en-US"), Name = if person[Name] <> "" then person[Name] else person[Email]],
 		        // The people the app keeps with the run: of every CI with a finding and of every CI of the inventory (not parked).
-		        parkedKeys = if Record.FieldOrDefault(run, "Parked", null) = null then {} else run[Parked][Keys],
-		        kept = List.Transform(List.Select(run[Cis], (ci) => not List.Contains(parkedKeys, ci[Key])), (ci) => ci[Key]),
-		        withFinding = List.Transform(facts, (fact) => fact[CiKey]),
-		        withPeople = List.Distinct(List.Select(List.Transform(run[Cis], (ci) => ci[Key]), (key) => List.Contains(withFinding, key) or List.Contains(kept, key))),
+		        // Both as key sets (fnKeySet), made once: the CIs that are not parked (fnCheckRun) and the CIs with a finding.
+		        kept = run[CheckableKeys],
+		        withFinding = fnKeySet(List.Transform(facts, (fact) => fact[CiKey])),
+		        withPeople = List.Distinct(List.Select(List.Transform(run[Cis], (ci) => ci[Key]), (key) => Record.HasFields(withFinding, key) or Record.HasFields(kept, key))),
 		        named = List.Combine(List.Transform(withPeople, (key) => List.RemoveNulls(List.Transform(roles, (role) => personOf(Record.Field(ciByKey, key), role))))),
 		        grouped = fnGroupBy(named, (person) => person[Id]),
 		        names = Record.FromList(List.Transform(Record.FieldValues(grouped), (list) => list{0}[Name]), Record.FieldNames(grouped)),
@@ -2240,11 +2783,10 @@ expression fnFacts =
 		        columns = run[Columns],
 		        ciByKey = Record.FromList(cis, List.Transform(cis, (ci) => ci[Key])),
 		        packById = Record.FromList(packs, List.Transform(packs, (pack) => pack[id])),
-		        chipRules = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "tag-chips", []), "chips", {}),
+		        chipRules = List.Buffer(List.Transform(Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "tag-chips", []), "chips", {}), (rule) => rule & [TagKey = fnNameKey(rule[tag], "")])),
 		        teams = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "record-teams", []), "teams", {}),
-		        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
 		        chipsOf = (ci as record) as list =>
-		            List.Distinct(List.Transform(List.Select(chipRules, (rule) => List.AnyTrue(List.Transform(ci[TagList], (tag) => same(tag, rule[tag])))), (rule) => rule[chip])),
+		            List.Distinct(List.Transform(List.Select(chipRules, (rule) => List.Contains(ci[TagKeys], rule[TagKey])), (rule) => rule[chip])),
 		        nameOf = (ci as record, role as text) as text =>
 		            let person = fnPerson(ci, role, columns), shown = if person = null then "" else if person[Name] <> "" then person[Name] else person[Email] in
 		            if shown = "" then "" else shown & (if person[Active] = false then " (inactive)" else ""),
@@ -2316,16 +2858,16 @@ expression fnFinding =
 expression fnListing =
 		(ci as record, pack as nullable record, review as text, wait as text) as record =>
 		    let
-		        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
-		        notLive = Record.FieldOrDefault(ReferenceFiles, "not-live-statuses", null),
-		        known = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "known-tags", []), "rules", {}),
+		        rules = ListingRules,
 		        id = if pack = null then "" else pack[id],
-		        waits = pack = null or not List.Contains(if notLive = null then {} else Record.FieldOrDefault(notLive, "exceptChecks", {}), id),
-		        liveStatus = waits and List.AnyTrue(List.Transform(if notLive = null then {} else notLive[statuses], (status) => same(status, ci[Status]))),
+		        waits = pack = null or not List.Contains(rules[ExceptChecks], id),
+		        liveStatus = waits and List.Contains(rules[NotLiveKeys], ci[StatusKey]),
 		        // The first rule of the file that has a tag of the CI, and its first such tag (as finding-states.ts loops).
-		        tag = List.First(List.Transform(List.Select(known, (rule) => pack <> null and List.Contains(rule[checks], id)
-		            and List.AnyTrue(List.Transform(ci[TagList], (candidate) => List.AnyTrue(List.Transform(rule[tags], (word) => same(word, candidate)))))), (rule) =>
-		            List.First(List.Select(ci[TagList], (candidate) => List.AnyTrue(List.Transform(rule[tags], (word) => same(word, candidate)))))), null),
+		        tags = ci[TagList],
+		        keys = ci[TagKeys],
+		        first = (entry as record) as nullable number => List.First(List.Select(List.Positions(keys), (at) => List.Contains(entry[TagKeys], keys{at})), null),
+		        rule = if pack = null then null else List.First(List.Select(rules[Known], (candidate) => List.Contains(candidate[checks], id) and first(candidate) <> null), null),
+		        tag = if rule = null then null else tags{first(rule)},
 		        reviewWhy = if pack = null then "" else Record.FieldOrDefault(pack, "reviewWhy", "")
 		    in
 		        if wait <> "" then [State = "waiting", Why = wait]
@@ -2336,42 +2878,45 @@ expression fnListing =
 		        else [State = "open", Why = ""]
 	queryGroup: Checks
 
-/// Does the text match the pattern (a regular expression of a check file or a reference file)? `flags` is "i" to ignore case, else "". The pattern must be one the generator compiled (the query Patterns): an unknown one stops the refresh with its name, so a check never passes silently on a pattern Power Query does not know.
+/// Does the text match the pattern (a regular expression of a check file or a reference file)? `flags` is "i" to ignore case, else "". The pattern must be one the generator compiled (the query Patterns): an unknown one stops the refresh with its name, so a check never passes silently on a pattern Power Query does not know. Its fast form (PatternForms, fnFastMatch) decides most texts without the walk.
 expression fnMatches =
 		(pattern as text, flags as text, value as text) as logical =>
 		    let
 		        key = flags & "/" & pattern,
-		        tree = Record.FieldOrDefault(Patterns, key, null)
+		        tree = Record.FieldOrDefault(Patterns, key, null),
+		        form = Record.FieldOrDefault(PatternForms, key, null)
 		    in
 		        if tree = null then error Error.Record("SACM.Pattern", "The pattern /" & pattern & "/" & flags & " is not compiled. Run npm run powerbi:generate.")
-		        else fnRegexTest(tree, value)
+		        else if form = null then fnRegexTest(tree, value)
+		        else fnFastMatch(form, tree, value)
 	queryGroup: Checks
 
-/// The parked CIs of a report (src/core/checks/parked.ts, D179): the CIs of a class that is not checked yet. They give no line on any card and are not counted as tested; each rule of reference/parked-classes gives one grey line. Returns [Keys, Fields, Lines], or null when the reference file is missing (then nothing is parked, and a note says so).
+/// The parked CIs of a report (src/core/checks/parked.ts, D179): the CIs of a class that is not checked yet. They give no line on any card and are not counted as tested; each rule of reference/parked-classes gives one grey line. Returns [Keys, Fields, Lines, KeySet, FieldSet] (the two sets: fnKeySet, made once), or null when the reference file is missing (then nothing is parked, and a note says so). `cis` are the CIs of fnCheckRun, with their StatusKey.
 expression fnParked =
 		(cis as list) as nullable record =>
 		    let
 		        reference = Record.FieldOrDefault(ReferenceFiles, "parked-classes", null),
-		        same = (a as text, b as text) as logical => fnNameKey(a, "") = fnNameKey(b, ""),
-		        parkedBy = (rule as record, ci as record) as logical =>
-		            let statuses = Record.FieldOrDefault(rule, "statuses", {}) in
-		            List.Contains(rule[classes], ci[Class]) and not same(ci[Status], "Retired")
-		                and (List.IsEmpty(statuses) or List.AnyTrue(List.Transform(statuses, (status) => same(status, ci[Status])))),
+		        retired = fnNameKey("Retired", ""),
+		        parkedBy = (classes as list, statuses as list, ci as record) as logical =>
+		            List.Contains(classes, ci[Class]) and ci[StatusKey] <> retired and (List.IsEmpty(statuses) or List.Contains(statuses, ci[StatusKey])),
 		        rules = if reference = null then {} else Record.FieldOrDefault(reference, "rules", {}),
-		        perRule = List.Transform(rules, (rule) =>
+		        perRule = List.Buffer(List.Transform(rules, (rule) =>
 		            let
-		                found = List.Select(cis, (ci) => parkedBy(rule, ci)),
+		                classes = List.Buffer(rule[classes]),
+		                statuses = List.Buffer(List.Transform(Record.FieldOrDefault(rule, "statuses", {}), (status) => fnNameKey(status, ""))),
+		                found = List.Buffer(List.Select(cis, (ci) => parkedBy(classes, statuses, ci))),
 		                count = List.Count(found),
 		                line = if count = 0 then Record.FieldOrDefault(rule, "none", "")
 		                    else if count = 1 then rule[one]
 		                    else Text.Replace(rule[many], "{n}", Number.ToText(count, "#,0", "en-GB"))
 		            in
-		                [Keys = List.Transform(found, (ci) => ci[Key]), Fields = Record.FieldOrDefault(rule, "fields", {}), Line = if line = null then "" else line])
+		                [Keys = List.Transform(found, (ci) => ci[Key]), Fields = Record.FieldOrDefault(rule, "fields", {}), Line = if line = null then "" else line])),
+		        keys = List.Buffer(List.Distinct(List.Combine(List.Transform(perRule, (rule) => rule[Keys])))),
+		        fields = List.Buffer(List.Distinct(List.Combine(List.Transform(perRule, (rule) => rule[Fields]))))
 		    in
 		        if reference = null then null
 		        else [
-		            Keys = List.Distinct(List.Combine(List.Transform(perRule, (rule) => rule[Keys]))),
-		            Fields = List.Distinct(List.Combine(List.Transform(perRule, (rule) => rule[Fields]))),
+		            Keys = keys, Fields = fields, KeySet = fnKeySet(keys), FieldSet = fnKeySet(fields),
 		            Lines = List.Select(List.Transform(perRule, (rule) => rule[Line]), (line) => line <> "")
 		        ]
 	queryGroup: Checks
@@ -2437,7 +2982,7 @@ expression fnSearch =
 		        key = flags & "/" & pattern,
 		        tree = Record.FieldOrDefault(Patterns, key, null),
 		        ends = (at as number) as list => fnRegexWalk(tree, value, {at}),
-		        index = if not fnRegexTest(tree, value) then -1
+		        index = if not fnMatches(pattern, flags, value) then -1
 		            else List.First(List.Select(List.Numbers(0, Text.Length(value) + 1), (at) => not List.IsEmpty(ends(at))), -1)
 		    in
 		        if tree = null then error Error.Record("SACM.Pattern", "The pattern /" & pattern & "/" & flags & " is not compiled. Run npm run powerbi:generate.")
@@ -2467,7 +3012,8 @@ expression fnSourceFirst =
 		        pairsByCi = fnGroupBy(pairs, (pair) => pair[Ci][Key]),
 		        pairByCi = Record.FromList(List.Transform(Record.FieldValues(pairsByCi), List.Last), Record.FieldNames(pairsByCi)),
 		        names = fnUserNames(cis, columns),
-		        inactive = List.Distinct(List.Combine(List.Transform(cis, (ci) => List.Combine(List.Transform(ReadingRules[roles], (role) =>
+		        // The user IDs of people marked inactive, as a key set (fnKeySet), made once.
+		        inactive = fnKeySet(List.Combine(List.Transform(cis, (ci) => List.Combine(List.Transform(ReadingRules[roles], (role) =>
 		            let person = fnPerson(ci, role, columns) in
 		            if person = null then {}
 		            else (if person[UserId] <> "" and person[Active] = false then {Text.Lower(Text.Trim(person[UserId]), "en-US")} else {})
@@ -2513,7 +3059,7 @@ expression fnSourceFirst =
 		                            then entry[epoLabel] & " is empty in EPO; ServiceNow still shows the old person, because the sync never clears a field"
 		                            else entry[epoLabel] & " is empty in EPO too")
 		                        else if epo = own then said(finding, "EPO names the same person as " & entry[epoLabel])
-		                        else if List.Contains(inactive, epo) then said(finding, "EPO names " & fnPersonWords(epo, names) & " as " & entry[epoLabel] & ", who is not active either")
+		                        else if Record.HasFields(inactive, epo) then said(finding, "EPO names " & fnPersonWords(epo, names) & " as " & entry[epoLabel] & ", who is not active either")
 		                        else finding & [Wait = "EPO already names " & fnPersonWords(epo, names) & " as " & entry[epoLabel] & ": " & follows(pair)])),
 
 		        // A leftover whose old person is still active has no line of its own: the role is empty in EPO, so the owner is asked.
@@ -2525,20 +3071,27 @@ expression fnSourceFirst =
 		                fnInScope(pack, ci) and detector[type] = "rule" and List.Contains(Record.FieldOrDefault(detector, "forEach", {}), role)
 		                and (classes = null or List.Contains(classes, ci[Class])),
 		        candidates = List.Combine(List.Transform(pairs, (pair) => List.Transform(pair[Leftovers], (difference) => [Pair = pair, Difference = difference]))),
-		        added = List.Accumulate(candidates, [Keys = List.Transform(compared, (finding) => finding[Key]), Out = {}], (state, candidate) =>
+		        // Taken: a key of a finding already there, or a people line of the same CI and role of the checks compared first.
+		        // Both as key sets (fnKeySet), made once.
+		        keys = fnKeySet(List.Transform(compared, (finding) => finding[Key])),
+		        lined = fnKeySet(List.Transform(List.Select(compared, (finding) => List.Contains(rules[checks], finding[CheckId])), (finding) => finding[CiKey] & "|" & finding[Field])),
+		        packById = Record.FromList(packs, List.Transform(packs, (pack) => pack[id])),
+		        leftovers = List.Transform(candidates, (candidate) =>
 		            let
 		                pair = candidate[Pair],
 		                difference = candidate[Difference],
 		                entry = roleOf(difference[Field]),
 		                checkId = if entry = null then null else Record.FieldOrDefault(rules[leftover], entry[role], null),
-		                pack = if checkId = null then null else List.First(List.Select(packs, (candidate) => candidate[id] = checkId), null),
+		                pack = if checkId = null then null else Record.FieldOrDefault(packById, checkId, null),
 		                key = if pack = null then "" else pack[id] & ":" & pair[Ci][Key] & ":" & entry[role],
-		                taken = List.Contains(state[Keys], key) or List.AnyTrue(List.Transform(compared, (finding) =>
-		                    finding[CiKey] = pair[Ci][Key] and finding[Field] = entry[role] and List.Contains(rules[checks], finding[CheckId]))),
+		                taken = Record.HasFields(keys, key) or Record.HasFields(lined, pair[Ci][Key] & "|" & entry[role]),
 		                source = entry[label] & " is empty in EPO (" & entry[epoLabel] & "); ServiceNow still shows " & difference[Current] & ", because the sync never clears a field"
 		            in
-		                if entry = null or pack = null or not inScope(pack, pair[Ci], entry[role]) or taken then state
-		                else [Keys = state[Keys] & {key}, Out = state[Out] & {fnFinding(pack, pair[Ci], entry[role], source, [Source = source])}])
+		                if entry = null or pack = null or not inScope(pack, pair[Ci], entry[role]) or taken then null
+		                else [Key = key, Finding = fnFinding(pack, pair[Ci], entry[role], source, [Source = source])]),
+		        // A key added once: the first candidate with it, in the order of the candidates (what a loop that remembers the keys
+		        // it added does: it reads no other state).
+		        added = [Out = List.Transform(Record.FieldValues(fnGroupBy(List.RemoveNulls(leftovers), (line) => line[Key])), (group) => group{0}[Finding])]
 		    in
 		        if rules = null then [Findings = findings, Notes = {}]
 		        else if why <> "" then [Findings = findings, Notes = notCompared]
@@ -2552,36 +3105,6 @@ expression AboutRows =
 		    {{WorkbenchVersion, SourceMode,
 		        if SourceMode = "SharePoint" then "Reports from the SharePoint folder" else "Invented sample data, packed in this file",
 		        SampleDate, DateTime.LocalNow()}})
-	queryGroup: Tables
-
-/// Table CapabilitySheet (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and hidden characters, sorted by name. For the talks with Enterprise Architecture and Process Management: the table's Export data gives the file. Empty without a Relationship report (the page says so).
-expression CapabilitySheetRows =
-		let
-		    run = CheckRun,
-		    graph = if run = null then null else run[Graph],
-		    columns = if run = null then {} else run[Columns],
-		    culture = Comparer.FromCulture("en-US"),
-		    namesOf = (nodes as list) as text => Text.Combine(List.Sort(List.Distinct(List.Transform(nodes, (node) => node[Name])), culture), ", "),
-		    linked = (ci as record, direction as text, cls as text) as list =>
-		        let edges = Record.FieldOrDefault(if direction = "up" then graph[Up] else graph[Down], ci[Key], {}) in
-		        List.Select(List.Transform(edges, (edge) => if direction = "up" then edge[Parent] else edge[Child]), (other) => other[Cls] = cls),
-		    personOf = (ci as record, role as text) as text =>
-		        let person = fnPerson(ci, role, columns), shown = if person = null then "" else if person[Name] <> "" then person[Name] else person[Email] in
-		        if shown = "" then "" else shown & (if person[Active] = false then " (inactive)" else ""),
-		    capabilities = if graph = null then {} else List.Select(run[Cis], (ci) => ci[Class] = "business_capability"),
-		    sorted = List.Sort(capabilities, (a, b) => let byName = culture(a[Name], b[Name]) in if byName <> 0 then byName else culture(a[Key], b[Key])),
-		    row = (position as number) as list =>
-		        let ci = sorted{position} in
-		        {
-		            ci[Name], ci[Status], namesOf(linked(ci, "up", "business_capability")), namesOf(linked(ci, "down", "business_capability")),
-		            namesOf(linked(ci, "down", "business_process")), ci[Description], Text.Combine(ci[TagList], ", "), personOf(ci, "owned_by"), personOf(ci, "managed_by"),
-		            Text.Combine(ci[HiddenCharacters], ", "), position + 1
-		        }
-		in
-		    #table(
-		        type table [Name = text, Status = text, CapabilitiesAbove = text, CapabilitiesBelow = text, ProcessesBelow = text, Description = text, Tags = text,
-		            OwnedBy = text, ManagedBy = text, HiddenCharacters = text, Order = Int64.Type],
-		        List.Transform(List.Positions(sorted), row))
 	queryGroup: Tables
 
 /// Table Checks: one row per check file that is not "off" (D141), from the check files packed by the generator (CheckFiles). The check files stay the one place where a check is described (D16).
@@ -2653,42 +3176,6 @@ expression DateRows =
 expression EpoSystemsRows = fnNewestRows("epo")
 	queryGroup: Tables
 
-/// Table Findings: one row per finding of the newest CI report (fnCheckRun), with who is asked, how it is listed, where it is fixed and the CI as the message table shows it (DATA-MODEL §3, a fact). Key never changes: <check>:<CI key>:<field>. Group: the findings of one check that go to the same person by the same route, in the same state (one piece of work). Mapping: the reasons of a case of the mapping backlog, by id. EpoCorrection: what EPO already says (fnEpoCorrections).
-expression FindingsRows =
-		let
-		    run = CheckRun,
-		    facts = if run = null then {} else run[Facts],
-		    words = [open = "To solve", review = "To check", waiting = "Waiting", known = "Known"],
-		    address = fnServiceNowAddress(ServiceNowAddress),
-		    corrections = List.Buffer(if run = null then {} else fnEpoCorrections(facts, run)),
-		    fix = (fact as record, part as text) as text => if fact[Fix] = null then "" else Record.FieldOrDefault(fact[Fix], part, ""),
-		    row = (fact as record, correction as text) as list =>
-		        let
-		            person = if fact[ContactId] <> "" then fact[ContactId] else if fact[ContactEmail] <> "" then Text.Lower(fact[ContactEmail], "en-US") else "nobody"
-		        in
-		            {
-		                run[Date], fact[Key], fact[CheckId], fact[CiKey], fact[CiName], fact[Class], fact[ClassLabel], fact[Field], fact[Severity], fact[Detail],
-		                fact[Module], fact[Route], fact[State], Record.Field(words, fact[State]), fact[StateWhy], fact[Source], fact[Wait], fact[Review],
-		                fact[ContactId], fact[ContactName], fact[ContactEmail], fact[ContactVia],
-		                if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else "Nobody to ask",
-		                Text.Combine(fact[Cc], "; "), fact[EscalateName], fact[EscalateEmail], fact[EscalateVia],
-		                fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"),
-		                fact[CheckId] & "|" & fact[Route] & "|" & person & (if fact[State] = "open" then "" else "|" & fact[State]),
-		                fact[EpoId], fact[Status], fact[SupportGroup], fact[OwnedBy], fact[ManagedBy], fact[SupportedBy], Text.Combine(fact[Chips], ", "), Text.Combine(fact[Tags], ", "),
-		                fnServiceNowLink(address, fact[CiName], fact[Class], fix(fact, "RelatedTo")),
-		                Text.Combine(fact[Mapping], ", "), correction
-		            }
-		in
-		    #table(
-		        type table [ReportDate = date, Key = text, CheckId = text, CiKey = text, CiName = text, Class = text, ClassLabel = text, Field = text,
-		            Severity = text, Detail = text, Module = text, Route = text, State = text, StateLabel = text, StateWhy = text, Source = text, Wait = text,
-		            Review = text, ContactId = text, ContactName = text, ContactEmail = text, ContactVia = text, AskWho = text, Cc = text, EscalateName = text,
-		            EscalateEmail = text, EscalateVia = text, FixChange = text, FixCurrent = text, FixSet = text, FixValue = text, FixRelatedTo = text,
-		            Group = text, EpoId = text, Status = text, SupportGroup = text, OwnedBy = text, ManagedBy = text, SupportedBy = text, Chips = text, Tags = text,
-		            ServiceNowLink = text, Mapping = text, EpoCorrection = text],
-		        List.Transform(List.Positions(facts), (at) => row(facts{at}, corrections{at})))
-	queryGroup: Tables
-
 /// The rows of the newest report of a type, read by its reader, with ReportDate and FileName in front. When no report of the type is there: an empty table with the same columns.
 expression fnNewestRows =
 		(kind as text) as table =>
@@ -2706,109 +3193,8 @@ expression fnNewestRows =
 expression InventoryRows = fnNewestRows("ci")
 	queryGroup: Tables
 
-/// Table MappingBacklog (src/app/view/backlog.ts, D200 to D204): one line per CI to map, from the findings of the mapping backlog: its owner (Owned by, else who is asked), why it is on the list, its stage and the steps of its class (reference/mapping-backlog), the criticality lines of the same CI, and whether it can be marked "The process does not exist". Until the team's journal is read (build B5) every case is at the first stage of its class. Order: to solve first, then by name (by stage too from build B5, when a case can be past its first stage).
-expression MappingBacklogRows =
-		let
-		    run = CheckRun,
-		    config = fnReference("reference/mapping-backlog"),
-		    facts = if run = null or config = null then {} else run[Facts],
-		    columns = if run = null then {} else run[Columns],
-		    ciByKey = if run = null then [] else Record.FromList(run[Cis], List.Transform(run[Cis], (ci) => ci[Key])),
-		    packs = List.Transform(Json.Document(CheckFiles), (file) => file[pack]),
-		    labelOf = (id as text) as text => let pack = List.First(List.Select(packs, (candidate) => candidate[id] = id), null) in
-		        if pack = null then id else Record.FieldOrDefault(pack, "cardLabel", id),
-		    mappingChecks = List.Transform(List.Select(packs, (pack) => Record.FieldOrDefault(pack[detector], "module", "") = "mapping/backlog"), (pack) => pack[id]),
-		    critical = Record.FieldOrDefault(config, "criticality", {}),
-		    criticalFacts = List.Select(facts, (fact) => List.Contains(critical, fact[CheckId])),
-		    stagesFor = (cls as text) as list =>
-		        let
-		            ids = Record.FieldOrDefault(config[classStages], cls, null),
-		            words = Record.FieldOrDefault(Record.FieldOrDefault(config, "stageWords", []), cls, []),
-		            list = if ids = null then config[stages] else List.RemoveNulls(List.Transform(ids, (id) => List.First(List.Select(config[stages], (stage) => stage[id] = id), null)))
-		        in
-		            List.Transform(list, (stage) => Record.FieldOrDefault(words, stage[id], stage[label])),
-		    rule = Record.FieldOrDefault(config, "processMissing", null),
-		    order = {"open", "review", "waiting", "known"},
-		    stateWords = [open = "To solve", review = "To check", waiting = "Waiting", known = "Planned"],
-		    lines = List.Select(facts, (fact) => List.Contains(mappingChecks, fact[CheckId])),
-		    sorted = List.Sort(lines, (a, b) =>
-		        let byState = List.PositionOf(order, a[State]) - List.PositionOf(order, b[State]) in
-		        if byState <> 0 then byState else Comparer.FromCulture("en-US")(a[CiName], b[CiName])),
-		    row = (position as number) as list =>
-		        let
-		            fact = sorted{position},
-		            ci = Record.Field(ciByKey, fact[CiKey]),
-		            owner = fnPerson(ci, "owned_by", columns),
-		            ownerName = if owner = null then "" else if owner[Name] <> "" then owner[Name] else owner[Email],
-		            stages = stagesFor(fact[Class]),
-		            sameCi = List.Distinct(List.Transform(List.Select(criticalFacts, (other) => other[CiKey] = fact[CiKey]), (other) => labelOf(other[CheckId]))),
-		            canMark = rule <> null and List.Contains(rule[classes], fact[Class]) and List.AnyTrue(List.Transform(fact[Mapping], (reason) => List.Contains(rule[rules], reason)))
-		        in
-		            {
-		                fact[Key], fact[CiKey], fact[CiName], fact[ClassLabel], if ownerName <> "" then ownerName else fact[ContactName], Text.Replace(fact[Detail], "; ", "#(lf)"),
-		                Text.Combine(fact[Mapping], ", "), if List.IsEmpty(stages) then "" else stages{0}, 1, Text.Combine(stages, " → "),
-		                fact[State], Record.Field(stateWords, fact[State]), List.PositionOf(order, fact[State]) + 1, fact[StateWhy], Text.Combine(sameCi, ", "), canMark,
-		                if fact[State] <> "open" then Record.Field(stateWords, fact[State]) & ": " & fact[StateWhy] else "Invite the owner to a mapping session",
-		                position + 1
-		            }
-		in
-		    #table(
-		        type table [Key = text, CiKey = text, CiName = text, ClassLabel = text, Owner = text, Reasons = text, ReasonIds = text, Stage = text, StageNumber = Int64.Type,
-		            Steps = text, State = text, StateLabel = text, StateOrder = Int64.Type, StateWhy = text, Criticality = text, CanMarkProcessMissing = logical, NextStep = text, Order = Int64.Type],
-		        List.Transform(List.Positions(sorted), row))
-	queryGroup: Tables
-
-/// Table Notes: why a check could not be evaluated, or only in part, on the newest report (D15): a detector not built in Power Query yet, a column or reference file missing, a report not loaded. A card with a note and nothing tested is grey, never green. Notes about the run as a whole (RELATIONSHIPS, PARKED, SOURCE-FIRST, Routing, Listing) have no card.
-expression NotesRows =
-		let
-		    run = CheckRun,
-		    date = if run = null then null else run[Date],
-		    notBuilt = Table.SelectRows(ChecksRows, each not [Built]),
-		    reasons = Table.AddColumn(notBuilt, "Reason", each
-		        if [DetectorType] = "manual" then "Not tested: its lines come from the lifecycle review, which the Power BI version reads from stage 2."
-		        else "Not tested: this check is not built in the Power BI version yet.", type text),
-		    built = Table.SelectColumns(reasons, {"CheckId", "Reason"}),
-		    found = #table(type table [CheckId = text, Reason = text], List.Transform(if run = null then {} else run[Notes], (note) => {note[CheckId], note[Note]})),
-		    all = Table.Combine({built, found}),
-		    withDate = Table.AddColumn(all, "ReportDate", each date, type nullable date),
-		    numbered = Table.AddIndexColumn(withDate, "Order", 1, 1, Int64.Type)
-		in
-		    Table.SelectColumns(numbered, {"CheckId", "ReportDate", "Reason", "Order"})
-	queryGroup: Tables
-
 /// Table NotRead: the files of no known type, with what each type is missing (the Reports page).
 expression NotReadRows = Table.SelectColumns(Table.SelectRows(ReportFilesRows, each not [IsRead]), {"FileName", "ReportDate", "Message"})
-	queryGroup: Tables
-
-/// Table Parked: the grey lines of the Cards page for the classes that are not checked yet (reference/parked-classes, D179), so nothing is hidden silently: "1 Business Capability in Ready is not checked yet".
-expression ParkedRows =
-		let
-		    run = CheckRun,
-		    lines = if run = null or run[Parked] = null then {} else run[Parked][Lines]
-		in
-		    #table(type table [Line = text, Order = Int64.Type], List.Transform(List.Positions(lines), (position) => {lines{position}, position + 1}))
-	queryGroup: Tables
-
-/// Table RelationshipLinks: the relationships of each CI of the newest CI report, from both ends, for the Case page: the CI above it (Parent) or below it (Child), the relationship type, the other CI's class and status, and whether the relationship counts (a Retired end does not; one excluded from calculation passes no criticality). From the relationship graph of the checks (fnRelationshipGraph), so a name is matched as the checks match it.
-expression RelationshipLinksRows =
-		let
-		    run = CheckRun,
-		    graph = if run = null then null else run[Graph],
-		    edges = if graph = null then {} else graph[Edges],
-		    rowOf = (edge as record, position as number, mine as record, other as record, relation as text) as list =>
-		        {
-		            mine[Key], relation, other[Name], fnClassWord(other[Cls]), if other[Ci] = null then "Not in the CI report" else other[Ci][Status], edge[Type],
-		            if edge[Parent][Retired] or edge[Child][Retired] then "No: a Retired end" else "Yes",
-		            if edge[Excluded] = true then "Yes" else "", position + 1
-		        },
-		    rows = List.Combine(List.Transform(List.Positions(edges), (position) =>
-		        let edge = edges{position} in
-		        (if edge[Parent][Ci] = null then {} else {rowOf(edge, position, edge[Parent], edge[Child], "Child")})
-		        & (if edge[Child][Ci] = null then {} else {rowOf(edge, position, edge[Child], edge[Parent], "Parent")})))
-		in
-		    #table(
-		        type table [CiKey = text, Relation = text, Other = text, OtherClass = text, OtherStatus = text, Type = text, Counts = text, Excluded = text, Order = Int64.Type],
-		        rows)
 	queryGroup: Tables
 
 /// Table Relationships: the relationships of the newest Relationship report.
@@ -2852,6 +3238,32 @@ expression ReportTypesRows =
 		        List.Transform(List.Positions(types), row))
 	queryGroup: Tables
 
+/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of eight parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row (the column incremental refresh will use, build B5). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules).
+expression RunRows =
+		let
+		    run = CheckRun,
+		    findings = Table.Buffer(fnFindingsPart(run)),
+		    tested = Table.Buffer(fnTestedPart(run)),
+		    parts = {
+		        {"Findings", findings}, {"Tested", tested}, {"Notes", fnNotesPart(run)}, {"Parked", fnParkedPart(run)},
+		        {"MappingBacklog", fnMappingBacklogPart(run)}, {"RelationshipLinks", fnRelationshipLinksPart(run)},
+		        {"CapabilitySheet", fnCapabilitySheetPart(run)}, {"SelfCheck", fnSelfCheckPart(findings, tested)}
+		    },
+		    // Each part with its columns named <Part>.<Column> and a column Part. The type of each column is the data type of the
+		    // calculated table that shows it (RunColumnTypes, generated), so Run and the calculated tables never differ.
+		    prefixed = List.Transform(parts, (part) =>
+		        let
+		            name = part{0},
+		            rows = part{1}
+		        in
+		            Table.AddColumn(Table.RenameColumns(rows, List.Transform(Table.ColumnNames(rows), (column) => {column, name & "." & column})), "Part", each name, type text)),
+		    combined = Table.Combine(prefixed),
+		    typed = Table.TransformColumnTypes(combined, RunColumnTypes),
+		    withDate = Table.AddColumn(typed, "ReportDate", each if run = null then null else run[Date], type nullable date)
+		in
+		    Table.ReorderColumns(withDate, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(withDate), (column) => column <> "Part" and column <> "ReportDate"))
+	queryGroup: Tables
+
 /// Table Runs: one row per CI report, with the other reports its checks use: for each type the newest report at or before the CI report's date (as the HTML app pairs them).
 expression RunsRows =
 		let
@@ -2862,7 +3274,7 @@ expression RunsRows =
 		            sorted = Table.Sort(candidates, {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})
 		        in
 		            if Table.IsEmpty(sorted) then null else Table.Last(sorted)[FileName],
-		    withCis = Table.AddColumn(cis, "CIs", each Table.RowCount(fnReadCiReport([Read])), Int64.Type),
+		    withCis = Table.AddColumn(cis, "CIs", each fnCiCount([Read]), Int64.Type),
 		    withRelationship = Table.AddColumn(withCis, "RelationshipFile", each pick("relationship", [ReportDate]), type nullable text),
 		    withEpo = Table.AddColumn(withRelationship, "EpoFile", each pick("epo", [ReportDate]), type nullable text),
 		    withSolusi = Table.AddColumn(withEpo, "SolusiFile", each pick("solusi", [ReportDate]), type nullable text),
@@ -2873,82 +3285,10 @@ expression RunsRows =
 		        {{"FileName", type text}})
 	queryGroup: Tables
 
-/// Table SelfCheck: per check, what the HTML app's logic finds on the samples (tests/recorded/cards.json, packed by the generator as ExpectedResult) and what this model finds on the newest report (§9.4 of the plan). A check matches when it is built and gives the same state, the same tested flag, the same CIs and the same finding keys in each state. The page shows it only for the sample data.
-expression SelfCheckRows =
-		let
-		    expected = Json.Document(ExpectedResult)[cards],
-		    words = ReadingRules[stateWords],
-		    built = Table.SelectRows(ChecksRows, each [Built])[CheckId],
-		    findings = Table.Buffer(FindingsRows),
-		    tested = List.Buffer(TestedRows[CheckId]),
-		    sorted = (keys as list) as list => List.Sort(keys, Comparer.Ordinal),
-		    keysOf = (id as text, state as text) as list => sorted(Table.SelectRows(findings, each [CheckId] = id and [State] = state)[Key]),
-		    strip = (cases as list) as list => sorted(List.Transform(cases, (entry) => if Text.StartsWith(entry, "case ") then Text.Middle(entry, 5) else entry)),
-		    states = {"open", "review", "waiting", "known"},
-		    row = (card as record) as list =>
-		        let
-		            id = card[id],
-		            isBuilt = List.Contains(built, id),
-		            found = List.Transform(states, (state) => keysOf(id, state)),
-		            want = List.Transform(states, (state) => strip(Record.Field(card, state))),
-		            isTested = List.Contains(tested, id),
-		            shown = if not List.IsEmpty(found{0}) then "open" else "review",
-		            cis = List.Count(List.Distinct(Table.SelectRows(findings, each [CheckId] = id and [State] = shown)[CiKey])),
-		            light = if not isTested then "grey" else if not List.IsEmpty(found{0}) then "red" else if not List.IsEmpty(found{1}) then "review" else "green",
-		            differ = List.Select(List.Positions(states), (position) => found{position} <> want{position}),
-		            keyWhy = List.Transform(differ, (position) =>
-		                let
-		                    missing = List.Difference(want{position}, found{position}),
-		                    extra = List.Difference(found{position}, want{position}),
-		                    show = (keys as list) as text => Text.Combine(List.FirstN(keys, 3), ", ") & (if List.Count(keys) > 3 then " and " & Text.From(List.Count(keys) - 3) & " more" else "")
-		                in
-		                    {"To solve", "To check", "Waiting", "Known"}{position} & ": "
-		                        & Text.Combine(List.Select({if List.IsEmpty(missing) then "" else "missing " & show(missing), if List.IsEmpty(extra) then "" else "not expected " & show(extra)}, (text) => text <> ""), "; ")),
-		            why = List.Select({
-		                if light <> card[light] then "Expected " & Record.FieldOrDefault(words, card[light], card[light]) & ", found " & Record.FieldOrDefault(words, light, light) & "." else "",
-		                if isTested <> card[tested] then (if card[tested] then "Expected tested, found not tested." else "Expected not tested, found tested.") else "",
-		                if cis <> card[cis] then "Expected " & Text.From(card[cis]) & " CIs, found " & Text.From(cis) & "." else ""
-		            } & List.Transform(keyWhy, (text) => text & "."), (text) => text <> ""),
-		            match = isBuilt and List.IsEmpty(why)
-		        in
-		            {
-		                id, Record.FieldOrDefault(words, card[light], card[light]), card[tested],
-		                List.Count(want{0}), List.Count(want{1}), List.Count(want{2}), List.Count(want{3}), card[cis],
-		                if isBuilt then "Built" else "Not built",
-		                if isBuilt then Record.FieldOrDefault(words, light, light) else "", isBuilt and isTested,
-		                if isBuilt then List.Count(found{0}) else 0, if isBuilt then List.Count(found{1}) else 0,
-		                if isBuilt then List.Count(found{2}) else 0, if isBuilt then List.Count(found{3}) else 0, if isBuilt then cis else 0,
-		                match,
-		                if not isBuilt then "The check is not built in the Power BI version yet." else if match then "Same result." else Text.Combine(why, " ")
-		            }
-		in
-		    #table(
-		        type table [CheckId = text, ExpectedState = text, ExpectedTested = logical, ExpectedToSolve = Int64.Type, ExpectedToCheck = Int64.Type,
-		            ExpectedWaiting = Int64.Type, ExpectedKnown = Int64.Type, ExpectedCis = Int64.Type, Found = text, FoundState = text, FoundTested = logical,
-		            FoundToSolve = Int64.Type, FoundToCheck = Int64.Type, FoundWaiting = Int64.Type, FoundKnown = Int64.Type, FoundCis = Int64.Type,
-		            Match = logical, Why = text],
-		        List.Transform(expected, row))
-	queryGroup: Tables
-
 /// Table ServiceNowContracts: the contracts of the newest ServiceNow contract report.
 expression ServiceNowContractsRows = fnNewestRows("contract")
 	queryGroup: Tables
 
 /// Table SolusiContracts: the contracts of the newest Solusi contract file.
 expression SolusiContractsRows = fnNewestRows("solusi")
-	queryGroup: Tables
-
-/// Table Tested: each part of a check the newest CI report could test, with the CIs it evaluated (D15). A card with no row here is grey, never green. Part: the field or rule ("owned_by", "outer-space"), as the HTML app's run says it; "" for a check tested as a whole (Process stage).
-expression TestedRows =
-		let
-		    run = CheckRun,
-		    evaluated = if run = null then {} else run[Evaluated],
-		    tested = if run = null then {} else run[Tested],
-		    countOf = (part as text) as nullable number => List.First(List.Transform(List.Select(evaluated, (entry) => entry[Part] = part), (entry) => entry[Count]), null)
-		in
-		    #table(
-		        type table [CheckId = text, Part = text, ReportDate = date, Evaluated = Int64.Type],
-		        List.Transform(tested, (part) =>
-		            let at = Text.PositionOf(part, ":") in
-		            {if at < 0 then part else Text.Start(part, at), if at < 0 then "" else Text.Middle(part, at + 1), run[Date], countOf(part)}))
 	queryGroup: Tables

@@ -8,12 +8,13 @@
         playbook = Record.FieldOrDefault(pack, "playbook", []),
         rules = ReadingRules,
         columns = run[Columns],
-        allCis = run[Cis],
         squash = (value as text) as text => fnNameKey(value, ""),
+        // The compared form of a CI field a rule reads (made once per CI by fnCheckRun; "" for any other field, as fnCiText).
+        squashed = (ci as record, field as text) as text => Record.FieldOrDefault(ci[Squashed], field, ""),
         fill = (value as any, part as text) as any => if value is text then Text.Replace(value, "{each}", part) else value,
         isRole = (field as text) as logical => List.Contains(rules[roles], field),
         labelOf = (field as text) as text => Text.Replace(Text.Replace(field, "_", " "), ".", " "),
-        isRetired = (ci as record) as logical => squash(ci[Status]) = "retired",
+        isRetired = (ci as record) as logical => ci[StatusKey] = "retired",
         listOf = (value as any) as list => if value is list then value else {Text.From(value)},
         entriesOf = (value as text) as list => List.Transform(Text.SplitAny(value, ",;#(lf)"), Text.Trim),
         leaves = (condition as record) as list =>
@@ -21,17 +22,22 @@
             else if Record.HasFields(condition, "any") then List.Combine(List.Transform(condition[any], @leaves))
             else {condition},
 
-        // How many CIs of the whole report share each value (normalised), per field; the same for live CIs per class.
-        countOf = (keys as list) as record =>
-            let
-                kept = List.Select(keys, (key) => key <> ""),
-                grouped = Table.Group(Table.FromColumns({kept}, {"Value"}), {"Value"}, {{"Count", Table.RowCount, Int64.Type}})
-            in
-                Record.FromList(grouped[Count], grouped[Value]),
-        textFields = {"description", "name", "exception_justification", "exception_status", "support_group", "operational_status"},
-        counts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(allCis, (ci) => squash(fnCiText(ci, field))))), textFields),
-        classCounts = Record.FromList(List.Transform(textFields, (field) => countOf(List.Transform(List.Select(allCis, (ci) => not isRetired(ci)), (ci) =>
-            let key = squash(fnCiText(ci, field)) in if key = "" then "" else ci[Class] & "|" & key))), textFields),
+        // How many CIs of the whole report share each value (compared form), per field; the same for live CIs per class.
+        // Worked out once per run (fnCheckRun), not once per check.
+        counts = run[Counts],
+        classCounts = run[ClassCounts],
+        // A tag as its words (a hyphen counts as a space): a mandatory-tag rule is met by one of its tags, or by a tag that ends
+        // with one of its endings after a first word (src/core/checks/engine.ts, meetsTagRule).
+        tagWords = (tag as text) as text => squash(Text.Replace(tag, "-", " ")),
+        // The tags of a reference file in compared form, made once per check (not once per CI): by the name of the file.
+        refs = List.Distinct(List.Transform(List.Select(leaves(when), (item) => Record.HasFields(item, "ref") and List.Contains({"missingTags", "tagsNotIn"}, item[op])), (item) => item[ref])),
+        tagRefs = List.Accumulate(refs, [], (record, name) => Record.AddField(record, name, () =>
+            let value = fnReference(name) in
+            if value = null then null
+            else if value is list then fnKeySet(List.Transform(value, (tag) => squash(Text.From(tag))))
+            else Record.FromList(List.Transform(Record.FieldValues(value), (rules) => if rules is list
+                then List.Buffer(List.Transform(rules, (rule) => rule & [Keys = List.Buffer(List.Transform(rule[oneOf], tagWords)),
+                    Endings = List.Buffer(List.Transform(Record.FieldOrDefault(rule, "endsWith", {}), (ending) => " " & tagWords(ending)))])) else rules), Record.FieldNames(value)), true)),
 
         samePerson = (a as nullable record, b as nullable record) as logical =>
             if a = null or b = null then false
@@ -60,21 +66,21 @@
                 else if op = "shorterThan" then
                     (if trimmed <> "" and Text.Length(trimmed) < Number.From(value) then label & " has only " & Text.From(Text.Length(trimmed)) & " characters" else "")
                 else if op = "equalsField" then
-                    (let own = squash(current) in if own <> "" and own = squash(fnCiText(ci, Text.From(value))) then label & " repeats the " & Text.From(value) else "")
+                    (let own = squashed(ci, field) in if own <> "" and own = squashed(ci, Text.From(value)) then label & " repeats the " & Text.From(value) else "")
                 else if op = "matchesAny" then
                     (if trimmed <> "" and List.AnyTrue(List.Transform(listOf(value), (pattern) => fnMatches(pattern, "i", trimmed)))
                     then label & " is a placeholder: """ & trimmed & """" else "")
                 else if op = "duplicatedMoreThan" then
-                    (let count = Record.FieldOrDefault(Record.FieldOrDefault(counts, field, []), squash(current), 0) in
+                    (let count = Record.FieldOrDefault(Record.FieldOrDefault(counts, field, []), squashed(ci, field), 0) in
                     if trimmed <> "" and count > Number.From(value) then "the same " & label & " is used on " & Text.From(count) & " CIs" else "")
                 else if op = "duplicatedInClass" then
                     (if isRetired(ci) or trimmed = "" then ""
-                    else let count = Record.FieldOrDefault(Record.FieldOrDefault(classCounts, field, []), ci[Class] & "|" & squash(current), 0) in
+                    else let count = Record.FieldOrDefault(Record.FieldOrDefault(classCounts, field, []), ci[Class] & "|" & squashed(ci, field), 0) in
                     if count > Number.From(value) then "the same " & label & " is used on " & Text.From(count) & " live CIs of this class" else "")
                 else if op = "hasDoubleSpaces" then
                     (if Text.Contains(current, "  ") then label & " has two or more spaces in a row" else "")
                 else if op = "equals" then
-                    (if squash(current) = squash(Text.From(value)) then label & " is " & current else "")
+                    (if squashed(ci, field) = squash(Text.From(value)) then label & " is " & current else "")
                 else if op = "samePersonAs" then
                     (let other = Text.From(value) in
                     if isRole(other) and samePerson(person, fnPerson(ci, other, columns))
@@ -119,23 +125,21 @@
                     (if List.IsEmpty(ci[HiddenCharacters]) then "" else "the name holds a hidden character: " & Text.Combine(ci[HiddenCharacters], ", "))
                 else if op = "missingTags" then
                     (let
-                        byClass = fnReference(Record.FieldOrDefault(condition, "ref", null)),
-                        // A tag as its words (a hyphen counts as a space); a rule is met by one of its tags, or by a tag that ends with
-                        // one of its endings after a first word (src/core/checks/engine.ts, meetsTagRule).
-                        tagWords = (tag as text) as text => squash(Text.Replace(tag, "-", " ")),
+                        ref = Record.FieldOrDefault(condition, "ref", null),
+                        byClass = if ref = null then null else Record.FieldOrDefault(tagRefs, ref, null),
                         own = List.Transform(tags, tagWords),
                         wanted = if byClass = null then {} else Record.FieldOrDefault(byClass, ci[Class], {}),
                         meets = (rule as record, tag as text) as logical =>
-                            List.Contains(List.Transform(rule[oneOf], tagWords), tag)
-                            or List.AnyTrue(List.Transform(Record.FieldOrDefault(rule, "endsWith", {}), (ending) => Text.EndsWith(tag, " " & tagWords(ending)))),
+                            List.Contains(rule[Keys], tag) or List.AnyTrue(List.Transform(rule[Endings], (ending) => Text.EndsWith(tag, ending))),
                         missing = List.Select(wanted, (rule) => not List.AnyTrue(List.Transform(own, (tag) => meets(rule, tag))))
                     in
                         if List.IsEmpty(missing) then "" else "missing tag: " & Text.Combine(List.Transform(missing, (rule) => rule[label]), ", "))
                 else if op = "tagsNotIn" then
                     (let
-                        allowedList = fnReference(Record.FieldOrDefault(condition, "ref", null)),
-                        allowed = List.Transform(if allowedList = null then {} else allowedList, squash),
-                        unknown = List.Select(tags, (tag) => not List.Contains(allowed, squash(tag)))
+                        ref = Record.FieldOrDefault(condition, "ref", null),
+                        allowed = if ref = null then null else Record.FieldOrDefault(tagRefs, ref, null),
+                        keys = ci[TagKeys],
+                        unknown = List.Transform(List.Select(List.Positions(tags), (at) => allowed = null or not Record.HasFields(allowed, keys{at})), (at) => tags{at})
                     in
                         if List.IsEmpty(unknown) then "" else "tag not in the allowed list: " & Text.Combine(unknown, ", "))
                 else error Error.Record("SACM.Rule", "Unknown operator """ & op & """ in " & pack[id]),

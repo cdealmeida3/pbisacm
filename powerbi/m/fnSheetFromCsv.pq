@@ -11,4 +11,4 @@
         width = Table.ColumnCount(Csv.Document(firstLine, [Delimiter = delimiter, QuoteStyle = QuoteStyle.Csv])),
         table = Csv.Document(text, [Delimiter = delimiter, Columns = width, QuoteStyle = QuoteStyle.Csv, ExtraValues = ExtraValues.Ignore])
     in
-        fnSheet("", table)
+        fnSheet("", table, true)

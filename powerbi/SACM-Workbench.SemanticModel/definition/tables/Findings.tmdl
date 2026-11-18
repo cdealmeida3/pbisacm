@@ -26,185 +26,320 @@ table Findings
 
 	column ReportDate
 		dataType: dateTime
+		isDataTypeInferred
 		formatString: d mmm yyyy
 		summarizeBy: none
-		sourceColumn: ReportDate
+		isNameInferred
+		sourceColumn: [ReportDate]
 
 	column Key
 		dataType: string
-		sourceColumn: Key
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Key]
 
 	column CheckId
 		dataType: string
-		sourceColumn: CheckId
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
 
 	column CiKey
 		dataType: string
-		sourceColumn: CiKey
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiKey]
 
 	column CiName
 		dataType: string
-		sourceColumn: CiName
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiName]
 
 	column Class
 		dataType: string
-		sourceColumn: Class
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Class]
 
 	column ClassLabel
 		dataType: string
-		sourceColumn: ClassLabel
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ClassLabel]
 
 	column Field
 		dataType: string
-		sourceColumn: Field
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Field]
 
 	column Severity
 		dataType: string
-		sourceColumn: Severity
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Severity]
 
 	column Detail
 		dataType: string
-		sourceColumn: Detail
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Detail]
 
 	column Module
 		dataType: string
-		sourceColumn: Module
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Module]
 
 	column Route
 		dataType: string
-		sourceColumn: Route
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Route]
 
 	column State
 		dataType: string
-		sourceColumn: State
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [State]
 
 	column StateLabel
 		dataType: string
-		sourceColumn: StateLabel
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [StateLabel]
 
 	column StateWhy
 		dataType: string
-		sourceColumn: StateWhy
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [StateWhy]
 
 	column Source
 		dataType: string
-		sourceColumn: Source
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Source]
 
 	column Wait
 		dataType: string
-		sourceColumn: Wait
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Wait]
 
 	column Review
 		dataType: string
-		sourceColumn: Review
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Review]
 
 	column ContactId
 		dataType: string
-		sourceColumn: ContactId
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ContactId]
 
 	column ContactName
 		dataType: string
-		sourceColumn: ContactName
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ContactName]
 
 	column ContactEmail
 		dataType: string
-		sourceColumn: ContactEmail
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ContactEmail]
 
 	column ContactVia
 		dataType: string
-		sourceColumn: ContactVia
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ContactVia]
 
 	column AskWho
 		dataType: string
-		sourceColumn: AskWho
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AskWho]
 
 	column Cc
 		dataType: string
-		sourceColumn: Cc
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Cc]
 
 	column EscalateName
 		dataType: string
-		sourceColumn: EscalateName
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EscalateName]
 
 	column EscalateEmail
 		dataType: string
-		sourceColumn: EscalateEmail
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EscalateEmail]
 
 	column EscalateVia
 		dataType: string
-		sourceColumn: EscalateVia
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EscalateVia]
 
 	column FixChange
 		dataType: string
-		sourceColumn: FixChange
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixChange]
 
 	column FixCurrent
 		dataType: string
-		sourceColumn: FixCurrent
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixCurrent]
 
 	column FixSet
 		dataType: string
-		sourceColumn: FixSet
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixSet]
 
 	column FixValue
 		dataType: string
-		sourceColumn: FixValue
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixValue]
 
 	column FixRelatedTo
 		dataType: string
-		sourceColumn: FixRelatedTo
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixRelatedTo]
 
 	column Group
 		dataType: string
-		sourceColumn: Group
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Group]
 
 	column EpoId
 		dataType: string
-		sourceColumn: EpoId
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EpoId]
 
 	column Status
 		dataType: string
-		sourceColumn: Status
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Status]
 
 	column SupportGroup
 		dataType: string
-		sourceColumn: SupportGroup
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [SupportGroup]
 
 	column OwnedBy
 		dataType: string
-		sourceColumn: OwnedBy
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [OwnedBy]
 
 	column ManagedBy
 		dataType: string
-		sourceColumn: ManagedBy
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ManagedBy]
 
 	column SupportedBy
 		dataType: string
-		sourceColumn: SupportedBy
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [SupportedBy]
 
 	column Chips
 		dataType: string
-		sourceColumn: Chips
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Chips]
 
 	column Tags
 		dataType: string
-		sourceColumn: Tags
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Tags]
 
 	column ServiceNowLink
 		dataType: string
+		isDataTypeInferred
 		dataCategory: WebUrl
-		sourceColumn: ServiceNowLink
+		isNameInferred
+		sourceColumn: [ServiceNowLink]
 
 	/// The reasons of a case of the mapping backlog, by id of the rule (D200).
 	column Mapping
 		dataType: string
-		sourceColumn: Mapping
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Mapping]
 
 	/// "EPO already has …": EPO names another person than ServiceNow for a fix made in EPO, so nobody needs to be asked.
 	column EpoCorrection
 		dataType: string
-		sourceColumn: EpoCorrection
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EpoCorrection]
 
-	partition Findings = m
+	partition Findings = calculated
 		mode: import
-		source = FindingsRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "Findings" ),
+					"ReportDate", Run[Findings.ReportDate],
+					"Key", Run[Findings.Key],
+					"CheckId", Run[Findings.CheckId],
+					"CiKey", Run[Findings.CiKey],
+					"CiName", Run[Findings.CiName],
+					"Class", Run[Findings.Class],
+					"ClassLabel", Run[Findings.ClassLabel],
+					"Field", Run[Findings.Field],
+					"Severity", Run[Findings.Severity],
+					"Detail", Run[Findings.Detail],
+					"Module", Run[Findings.Module],
+					"Route", Run[Findings.Route],
+					"State", Run[Findings.State],
+					"StateLabel", Run[Findings.StateLabel],
+					"StateWhy", Run[Findings.StateWhy],
+					"Source", Run[Findings.Source],
+					"Wait", Run[Findings.Wait],
+					"Review", Run[Findings.Review],
+					"ContactId", Run[Findings.ContactId],
+					"ContactName", Run[Findings.ContactName],
+					"ContactEmail", Run[Findings.ContactEmail],
+					"ContactVia", Run[Findings.ContactVia],
+					"AskWho", Run[Findings.AskWho],
+					"Cc", Run[Findings.Cc],
+					"EscalateName", Run[Findings.EscalateName],
+					"EscalateEmail", Run[Findings.EscalateEmail],
+					"EscalateVia", Run[Findings.EscalateVia],
+					"FixChange", Run[Findings.FixChange],
+					"FixCurrent", Run[Findings.FixCurrent],
+					"FixSet", Run[Findings.FixSet],
+					"FixValue", Run[Findings.FixValue],
+					"FixRelatedTo", Run[Findings.FixRelatedTo],
+					"Group", Run[Findings.Group],
+					"EpoId", Run[Findings.EpoId],
+					"Status", Run[Findings.Status],
+					"SupportGroup", Run[Findings.SupportGroup],
+					"OwnedBy", Run[Findings.OwnedBy],
+					"ManagedBy", Run[Findings.ManagedBy],
+					"SupportedBy", Run[Findings.SupportedBy],
+					"Chips", Run[Findings.Chips],
+					"Tags", Run[Findings.Tags],
+					"ServiceNowLink", Run[Findings.ServiceNowLink],
+					"Mapping", Run[Findings.Mapping],
+					"EpoCorrection", Run[Findings.EpoCorrection]
+				)

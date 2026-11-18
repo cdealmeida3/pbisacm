@@ -123,3 +123,11 @@ The parts and the commands are in [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md
   and compares the result with the TypeScript logic of `src/core/`.
 - If you change a query in Power BI Desktop, copy the change into `powerbi/m/` and run `npm run powerbi:generate`:
   `expressions.tmdl` is generated.
+- The refresh must stay under 2 minutes at the size of the real reports (D283). The job *powerbi-time* of the workflow
+  "Power BI" measures it on invented reports of that size on every pull request, and fails above it. To see where the
+  time goes, start the workflow by hand (Actions → Power BI → Run workflow) with `sizes` (copies of the samples, for
+  example `42,85,170`; 170 is the real size), `stages` (also time each stage of the checks) and `cap` (seconds per
+  query). The job summary has one line per table and stage, the growth when the data doubles, and T1, the sum of the
+  tables. The rules that keep it fast are in [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) §12.
+- To try the real size in Power BI Desktop: `node tools/powerbi/scaled.ts --write <folder>` writes the invented reports
+  at that size; put them in a SharePoint test folder and switch `SourceMode` to SharePoint (§3).

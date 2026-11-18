@@ -22,10 +22,13 @@
         byTag = fnGroupBy(tagged, (ci) => Text.Lower(ci[AssetTag], "en-US")),
         repeated = List.Select(Record.FieldValues(byTag), (list) => List.Count(list) > 1),
         duplicate = if Record.FieldOrDefault(reference, "unique", false) <> true then [Findings = {}, Tested = {}, Evaluated = {}, Notes = {}] else [
-            Findings = List.Combine(List.Transform(repeated, (list) => List.Transform(List.Positions(list), (at) =>
+            // The names of a group sorted once; each finding leaves out its own name (the first place it is in).
+            Findings = List.Combine(List.Transform(repeated, (list) =>
+                let sortedNames = List.Buffer(List.Sort(List.Transform(list, (other) => other[Name]), Comparer.FromCulture("en-US"))) in
+                List.Transform(List.Positions(list), (at) =>
                 let
                     ci = list{at},
-                    others = List.Sort(List.Transform(List.RemoveRange(list, at, 1), (other) => other[Name]), Comparer.FromCulture("en-US"))
+                    others = List.RemoveRange(sortedNames, List.PositionOf(sortedNames, ci[Name]), 1)
                 in
                     fnFinding(pack, ci, "duplicate", "EPO ID " & ci[AssetTag] & " is also on " & Text.Combine(others, ", "))))),
             Tested = {pack[id] & ":duplicate"}, Evaluated = {[Part = pack[id] & ":duplicate", Count = List.Count(tagged)]}, Notes = {}

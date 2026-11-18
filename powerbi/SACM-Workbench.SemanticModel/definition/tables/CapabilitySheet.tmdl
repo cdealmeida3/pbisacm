@@ -6,49 +6,85 @@ table CapabilitySheet
 
 	column Name
 		dataType: string
-		sourceColumn: Name
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Name]
 
 	column Status
 		dataType: string
-		sourceColumn: Status
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Status]
 
 	column CapabilitiesAbove
 		dataType: string
-		sourceColumn: CapabilitiesAbove
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CapabilitiesAbove]
 
 	column CapabilitiesBelow
 		dataType: string
-		sourceColumn: CapabilitiesBelow
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CapabilitiesBelow]
 
 	column ProcessesBelow
 		dataType: string
-		sourceColumn: ProcessesBelow
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ProcessesBelow]
 
 	column Description
 		dataType: string
-		sourceColumn: Description
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Description]
 
 	column Tags
 		dataType: string
-		sourceColumn: Tags
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Tags]
 
 	column OwnedBy
 		dataType: string
-		sourceColumn: OwnedBy
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [OwnedBy]
 
 	column ManagedBy
 		dataType: string
-		sourceColumn: ManagedBy
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ManagedBy]
 
 	column HiddenCharacters
 		dataType: string
-		sourceColumn: HiddenCharacters
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [HiddenCharacters]
 
 	column Order
 		dataType: int64
+		isDataTypeInferred
 		summarizeBy: none
-		sourceColumn: Order
+		isNameInferred
+		sourceColumn: [Order]
 
-	partition CapabilitySheet = m
+	partition CapabilitySheet = calculated
 		mode: import
-		source = CapabilitySheetRows
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "CapabilitySheet" ),
+					"Name", Run[CapabilitySheet.Name],
+					"Status", Run[CapabilitySheet.Status],
+					"CapabilitiesAbove", Run[CapabilitySheet.CapabilitiesAbove],
+					"CapabilitiesBelow", Run[CapabilitySheet.CapabilitiesBelow],
+					"ProcessesBelow", Run[CapabilitySheet.ProcessesBelow],
+					"Description", Run[CapabilitySheet.Description],
+					"Tags", Run[CapabilitySheet.Tags],
+					"OwnedBy", Run[CapabilitySheet.OwnedBy],
+					"ManagedBy", Run[CapabilitySheet.ManagedBy],
+					"HiddenCharacters", Run[CapabilitySheet.HiddenCharacters],
+					"Order", Run[CapabilitySheet.Order]
+				)

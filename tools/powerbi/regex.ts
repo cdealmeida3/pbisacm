@@ -233,3 +233,172 @@ export function testPattern(node: Node, text: string): boolean {
   const codes = Array.from({ length: text.length }, (_, index) => text.charCodeAt(index));
   return step(node, Array.from({ length: codes.length + 1 }, (_, index) => index), codes).length > 0;
 }
+
+/* ------------------------------------------------------------------ fast forms (D285) */
+
+/**
+ * What lets Power Query decide most texts without the walk (plan of the speed build §4.4). Worked out from the tree:
+ *   exact | prefix | suffix | contains   the pattern is ^W$, ^W, W$ or W for a short list of words W
+ *   only                                 ^[C]{min,max}$: the length, and every character in C
+ *   walk                                 the walk decides, after the quick "no" of Allowed, Starts and Ends:
+ *     Allowed  (^…$ with classes only) the only characters a match can hold
+ *     Starts   (^ then words) the text must start with one of them; Ends (words then $) end with one of them
+ * Lower: the words are in lower case and the text is compared in lower case (flag "i"); then the form is used only for an
+ * ASCII text, so the result stays that of JavaScript (whose "i" never matches a non-ASCII character to an ASCII one).
+ */
+export interface FastForm {
+  Kind: 'exact' | 'prefix' | 'suffix' | 'contains' | 'only' | 'walk';
+  Lower: boolean;
+  Words?: string[];
+  Chars?: string[];
+  Min?: number;
+  Max?: number;
+  Allowed?: string[];
+  Starts?: string[];
+  Ends?: string[];
+}
+
+const MAX_WORDS = 64;
+const MAX_CLASS = 8;
+const MAX_CHARS = 512;
+const isSurrogate = (code: number): boolean => code >= 0xd800 && code <= 0xdfff;
+
+/** The codes of a class, in order; null when there are more than `limit`. */
+function codesOf(ranges: number[], limit: number): number[] | null {
+  const out: number[] = [];
+  for (let i = 0; i < ranges.length; i += 2) {
+    for (let code = ranges[i]!; code <= ranges[i + 1]!; code++) { out.push(code); if (out.length > limit) return null; }
+  }
+  return out;
+}
+
+/** The texts a part matches, when they are few and short (no assertion, no open count); with `lower`, ASCII only, in lower case. */
+function wordsOf(node: Node, lower: boolean): string[] | null {
+  const unique = (list: string[]): string[] | null => { const out = [...new Set(list)].sort(); return out.length > MAX_WORDS || out.some((word) => word.length > 64) ? null : out; };
+  switch (node[0]) {
+    case 'c': {
+      if (node[2] === 1) return null;
+      const codes = codesOf(node[1], lower ? 256 : MAX_CLASS);
+      if (!codes) return null;
+      const chars = (lower ? codes.filter((code) => code < 128) : codes).map((code) => String.fromCharCode(code)).map((char) => (lower ? char.toLowerCase() : char));
+      const out = unique(chars);
+      return out && out.length <= MAX_CLASS ? out : null;
+    }
+    case 's': {
+      let words: string[] = [''];
+      for (const part of node[1]) {
+        const next = wordsOf(part, lower);
+        if (!next) return null;
+        const product = unique(words.flatMap((word) => next.map((tail) => word + tail)));
+        if (!product) return null;
+        words = product;
+      }
+      return words;
+    }
+    case 'a': {
+      const all: string[] = [];
+      for (const part of node[1]) { const next = wordsOf(part, lower); if (!next) return null; all.push(...next); }
+      return unique(all);
+    }
+    case 'r': {
+      const [, min, max, part] = node;
+      if (max < 0 || max > 8) return null;
+      const one = wordsOf(part, lower);
+      if (!one) return null;
+      const all: string[] = [];
+      let current: string[] = [''];
+      for (let count = 0; count <= max; count++) {
+        if (count >= min) all.push(...current);
+        const next = unique(current.flatMap((word) => one.map((tail) => word + tail)));
+        if (!next) return null;
+        current = next;
+      }
+      return unique(all);
+    }
+    default: return null;
+  }
+}
+
+/** Every code a part can consume, when the part has classes only (no negated class); null otherwise. */
+function allowedOf(node: Node): number[] | null {
+  switch (node[0]) {
+    case 'c': return node[2] === 1 ? null : codesOf(node[1], MAX_CHARS);
+    case 's': case 'a': {
+      const all = new Set<number>();
+      for (const part of node[1]) { const codes = allowedOf(part); if (!codes) return null; codes.forEach((code) => all.add(code)); if (all.size > MAX_CHARS) return null; }
+      return [...all].sort((a, b) => a - b);
+    }
+    case 'r': return allowedOf(node[3]);
+    case 'b': case 'B': return [];
+    default: return null;
+  }
+}
+
+const chars = (codes: number[]): string[] => codes.map((code) => String.fromCharCode(code));
+
+/** The fast form of a pattern (see FastForm). */
+export function fastForm(source: string, flags = ''): FastForm {
+  const lower = flags.includes('i');
+  const tree = compilePattern(source, flags);
+  const parts = tree[0] === 's' ? tree[1] : [tree];
+  const starts = parts[0]?.[0] === '^';
+  const ends = parts[parts.length - 1]?.[0] === '$';
+  const body = parts.slice(starts ? 1 : 0, ends ? parts.length - 1 : parts.length);
+  const whole: Node = body.length === 1 ? body[0]! : ['s', body];
+  const words = body.length ? wordsOf(whole, lower) : [''];
+  if (words) return { Kind: starts && ends ? 'exact' : starts ? 'prefix' : ends ? 'suffix' : 'contains', Lower: lower, Words: words };
+  // ^[C]{min,max}$ with no negated class and no surrogate.
+  if (starts && ends && body.length === 1 && whole[0] === 'r' && whole[3][0] === 'c' && whole[3][2] === 0) {
+    const codes = codesOf(whole[3][1], MAX_CHARS);
+    if (codes && !codes.some(isSurrogate)) return { Kind: 'only', Lower: false, Chars: chars(codes), Min: whole[1], Max: whole[2] };
+  }
+  const form: FastForm = { Kind: 'walk', Lower: lower };
+  if (starts && ends && !body.some((part) => part[0] === '^' || part[0] === '$')) {
+    const codes = allowedOf(whole);
+    if (codes && !codes.some(isSurrogate)) form.Allowed = chars(codes);
+  }
+  // The words the text must start with: the parts after ^ as long as each has a few words.
+  const leading = (list: Node[]): string[] | null => {
+    let out: string[] | null = null;
+    for (let count = 1; count <= list.length; count++) {
+      const next = wordsOf(count === 1 ? list[0]! : ['s', list.slice(0, count)], lower);
+      if (!next) break;
+      out = next;
+    }
+    return out && !out.includes('') ? out : null;
+  };
+  if (starts) { const found = leading(body); if (found) form.Starts = found; }
+  if (ends) {
+    let found: string[] | null = null;
+    for (let count = 1; count <= body.length; count++) {
+      const next = wordsOf(count === 1 ? body[body.length - 1]! : ['s', body.slice(body.length - count)], lower);
+      if (!next) break;
+      found = next;
+    }
+    if (found && !found.includes('')) form.Ends = found;
+  }
+  return form;
+}
+
+/** The fast form decided in TypeScript as fnFastMatch does in M, for the tests: true, false, or null (the walk decides). */
+export function fastTest(form: FastForm, text: string): boolean | null {
+  const ascii = !/[^\x00-\x7f]/.test(text);
+  const value = form.Lower ? text.toLowerCase() : text;
+  const usable = !form.Lower || ascii;
+  const has = (list: string[] | undefined, test: (word: string) => boolean): boolean => !list || list.some(test);
+  // Text.Remove(text, chars) = "" in M: every UTF-16 unit of the text is one of the characters.
+  const only = (allowed: string[]): boolean => text.split('').every((char) => allowed.includes(char));
+  if (form.Kind === 'only') return text.length >= form.Min! && (form.Max! < 0 || text.length <= form.Max!) && only(form.Chars!);
+  if (form.Kind === 'walk') {
+    if (form.Allowed && !only(form.Allowed)) return false;
+    if (usable && !has(form.Starts, (word) => value.startsWith(word))) return false;
+    if (usable && !has(form.Ends, (word) => value.endsWith(word))) return false;
+    return null;
+  }
+  if (!usable) return null;
+  const words = form.Words!;
+  if (form.Kind === 'exact') return words.includes(value);
+  if (form.Kind === 'prefix') return words.some((word) => value.startsWith(word));
+  if (form.Kind === 'suffix') return words.some((word) => value.endsWith(word));
+  return words.some((word) => value.includes(word));
+}
