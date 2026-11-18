@@ -302,7 +302,7 @@ expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"","
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.42.0"
+expression WorkbenchVersion = "0.42.1"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
@@ -4278,10 +4278,6 @@ expression HistoryExpectedRows =
 		in
 		    #table(type table [Metric = text, Expected = Int64.Type, Order = Int64.Type],
 		        List.Transform(List.Positions(items), (at) => {items{at}[metric], items{at}[expected], at + 1}))
-	queryGroup: Tables
-
-/// Table HistoryRun (hidden, D290): the checks on every CI report dated from RangeStart to RangeEnd (fnHistoryRun). In the workspace the incremental refresh sets the two dates for each part of the history, so an old report date is computed once; in Power BI Desktop the dates of the parameters count.
-expression HistoryRunRows = fnHistoryRun(RangeStart, RangeEnd)
 	queryGroup: Tables
 
 /// Table Inventory: the CIs of the newest CI report, one row each, with every column the checks read.

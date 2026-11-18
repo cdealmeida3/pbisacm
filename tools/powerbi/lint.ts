@@ -221,6 +221,10 @@ for (const source of SOURCE_TABLES) {
   if (!/^\tisHidden$/m.test(text)) problems.push(`Run: the table ${source} is not hidden`);
   if (new RegExp(`\\b(?:fromColumn|toColumn):\\s*'?${source}'?\\.`).test(relationshipsText)) problems.push(`Run: the table ${source} has a relationship; the calculated tables have them`);
   if (source === 'HistoryRun' && !/^\trefreshPolicy$/m.test(text)) problems.push('Run: the table HistoryRun has no incremental refresh (refreshPolicy)');
+  // Power BI Desktop refuses to open the project when the source of a refresh policy does not name both parameters itself.
+  for (const line of text.split('\n').filter((item) => /^\t\t(sourceExpression|pollingExpression) =/.test(item))) {
+    if (!/\bRangeStart\b/.test(line) || !/\bRangeEnd\b/.test(line)) problems.push(`Run: the refresh policy of ${source} must name RangeStart and RangeEnd in "${line.trim()}" (Power BI Desktop refuses it otherwise)`);
+  }
 }
 // The Self-check page compares each metric of ExpectedHistory with the measure History found: each needs its branch.
 const found = tables.find((table) => table.name === 'HistoryExpected')?.measures.find((measure) => measure.name === 'History found')?.dax ?? '';

@@ -2,6 +2,10 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.42.1 — The Power BI report opens again
+
+- Power BI Desktop refused to open the project of 0.42.0: "RefreshPolicy source expression of table 'HistoryRun' has an invalid value". The history table now names RangeStart and RangeEnd in its refresh policy, as Desktop requires, and the check of every pull request looks for it. Nothing else changes.
+
 ## 0.42.0 — The Power BI report, the history and the team's lists (B5)
 
 - **The history of every report date** (D290). The report runs the checks on every CI report of the last 24 months, not only the newest. In the workspace an old date is computed once and kept (incremental refresh), so a refresh after a new report stays fast.

@@ -160,7 +160,7 @@ table HistoryRun
 
 	partition HistoryRun = m
 		mode: import
-		source = HistoryRunRows
+		source = fnHistoryRun(RangeStart, RangeEnd)
 
 	refreshPolicy
 		policyType: basic
@@ -169,4 +169,4 @@ table HistoryRun
 		incrementalGranularity: day
 		incrementalPeriods: 7
 		pollingExpression = fnHistoryPolling(RangeStart, RangeEnd)
-		sourceExpression = HistoryRunRows
+		sourceExpression = fnHistoryRun(RangeStart, RangeEnd)
