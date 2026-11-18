@@ -1,0 +1,142 @@
+{
+  "taken": true,
+  "minutes": 10.8,
+  "pages": [
+    {
+      "page": "myday",
+      "displayName": "My day",
+      "found": true,
+      "seconds": 1.0,
+      "file": "01-myday.png",
+      "broken": []
+    },
+    {
+      "page": "mywork",
+      "displayName": "My work",
+      "found": true,
+      "seconds": 1.0,
+      "file": "02-mywork.png",
+      "broken": []
+    },
+    {
+      "page": "messages",
+      "displayName": "Messages",
+      "found": true,
+      "seconds": 1.0,
+      "file": "03-messages.png",
+      "broken": []
+    },
+    {
+      "page": "cards",
+      "displayName": "All cards",
+      "found": true,
+      "seconds": 1.0,
+      "file": "04-cards.png",
+      "broken": []
+    },
+    {
+      "page": "backlog",
+      "displayName": "Mapping backlog",
+      "found": true,
+      "seconds": 1.0,
+      "file": "05-backlog.png",
+      "broken": []
+    },
+    {
+      "page": "contracts",
+      "displayName": "Contract changes",
+      "found": true,
+      "seconds": 1.0,
+      "file": "06-contracts.png",
+      "broken": []
+    },
+    {
+      "page": "activity",
+      "displayName": "Activity",
+      "found": true,
+      "seconds": 1.0,
+      "file": "07-activity.png",
+      "broken": []
+    },
+    {
+      "page": "history",
+      "displayName": "History",
+      "found": true,
+      "seconds": 2.0,
+      "file": "08-history.png",
+      "broken": []
+    },
+    {
+      "page": "audit",
+      "displayName": "Audit",
+      "found": true,
+      "seconds": 1.0,
+      "file": "09-audit.png",
+      "broken": []
+    },
+    {
+      "page": "auditexport",
+      "displayName": "Audit export",
+      "found": true,
+      "seconds": 1.0,
+      "file": "10-auditexport.png",
+      "broken": []
+    },
+    {
+      "page": "auditfollow",
+      "displayName": "Not followed",
+      "found": true,
+      "seconds": 1.0,
+      "file": "11-auditfollow.png",
+      "broken": []
+    },
+    {
+      "page": "auditreview",
+      "displayName": "Lifecycle review",
+      "found": true,
+      "seconds": 1.0,
+      "file": "12-auditreview.png",
+      "broken": []
+    },
+    {
+      "page": "reports",
+      "displayName": "Reports",
+      "found": true,
+      "seconds": 1.0,
+      "file": "13-reports.png",
+      "broken": []
+    },
+    {
+      "page": "card",
+      "displayName": "Card",
+      "found": false,
+      "seconds": null,
+      "file": null,
+      "broken": []
+    },
+    {
+      "page": "case",
+      "displayName": "Case",
+      "found": false,
+      "seconds": null,
+      "file": null,
+      "broken": []
+    },
+    {
+      "page": "person",
+      "displayName": "Person",
+      "found": false,
+      "seconds": null,
+      "file": null,
+      "broken": []
+    },
+    {
+      "page": "selfcheck",
+      "displayName": "Self-check",
+      "found": false,
+      "seconds": null,
+      "file": null,
+      "broken": []
+    }
+  ]
+}
