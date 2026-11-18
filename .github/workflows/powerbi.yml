@@ -7,6 +7,9 @@
 #   4. The job "powerbi-time": the refresh time on invented samples at the size of the real reports (tools/powerbi/time.ps1,
 #      D283), and the counts at that size against src/core. On a pull request it is the gate: it fails over 120 s in all,
 #      or over 60 s for one table. Started by hand, it times the sizes and stages asked for, with no gate.
+#   5. The job "powerbi-desktop" (D309): Power BI Desktop itself, installed on the runner, opens the project, refreshes it on
+#      the samples and runs the query of every visual of every page (tools/powerbi/desktop.ps1); it fails when Desktop
+#      would show a visual broken or empty, a card "(Blank)", a blank line, or a measure or table with an error.
 # Only on pull requests that change the report, the check files, the samples, the readers or the answer key.
 name: Power BI
 
@@ -41,6 +44,9 @@ on:
       only:
         description: Only the probes whose name matches this regular expression (empty for all)
         default: ""
+      jobs:
+        description: Which jobs to run (eval, time, desktop; empty for all)
+        default: ""
 
 permissions:
   contents: read
@@ -52,7 +58,7 @@ concurrency:
 
 jobs:
   powerbi-eval:
-    if: github.event.pull_request.draft != true
+    if: github.event.pull_request.draft != true && (inputs.jobs == '' || inputs.jobs == null || contains(inputs.jobs, 'eval'))
     runs-on: windows-latest
     timeout-minutes: 20
     defaults:
@@ -120,7 +126,7 @@ jobs:
   # On a pull request: the gate of D283 (170 copies, the tables only, 90 s per table at most; fails over the budget).
   # Started by hand: the sizes and stages asked for, no gate.
   powerbi-time:
-    if: github.event.pull_request.draft != true
+    if: github.event.pull_request.draft != true && (inputs.jobs == '' || inputs.jobs == null || contains(inputs.jobs, 'time'))
     runs-on: windows-latest
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 90 || 20 }}
     defaults:
@@ -159,3 +165,34 @@ jobs:
           $stages = $env:STAGES -eq "true"
           $gate = $env:GATE -eq "true"
           ./tools/powerbi/time.ps1 -Sizes $env:SIZES -History ([int]$env:HISTORY) -Stages:$stages -Cap ([int]$env:CAP) -Gate:$gate -Only "$env:ONLY"
+
+  # D309: every visual in the engine of Power BI Desktop, as Carlos opens the report (tools/powerbi/desktop.ps1).
+  powerbi-desktop:
+    if: github.event.pull_request.draft != true && (inputs.jobs == '' || inputs.jobs == null || contains(inputs.jobs, 'desktop'))
+    runs-on: windows-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm ci
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build the runner
+        run: dotnet build tools/powerbi/desktop-check -c Release
+      - name: Open the report in Power BI Desktop and run every visual
+        run: ./tools/powerbi/desktop.ps1 -Out .build/desktop
+      - name: What Desktop would show wrong
+        run: node tools/powerbi/desktop.ts judge .build/desktop/results.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: powerbi-desktop
+          path: .build/desktop/
+          retention-days: 7

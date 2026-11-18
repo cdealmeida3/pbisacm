@@ -22,49 +22,49 @@ table History
 	/// The findings of the CI report before the newest.
 	measure 'Findings at the report before' =
 			VAR d = [Newest report date]
-			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
-			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = before ) + 0
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = priorDate ) + 0
 		formatString: #,0
 
 	/// New since the report before (D172): findings to solve of the report date in view (the newest when none is chosen) that the CI report before did not show. Blank for the first report date.
 	measure New =
 			VAR d = MAX ( Runs[ReportDate] )
-			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
 			VAR shown = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open" )
-			VAR shownBefore = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = before )
-			RETURN IF ( NOT ISBLANK ( before ), COUNTROWS ( EXCEPT ( shown, shownBefore ) ) + 0 )
+			VAR shownBefore = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = priorDate )
+			RETURN IF ( NOT ISBLANK ( priorDate ), COUNTROWS ( EXCEPT ( shown, shownBefore ) ) + 0 )
 		formatString: #,0
 
 	/// Solved since the report before (D59, D174): findings of the CI report before that the report date in view (the newest when none is chosen) no longer shows, where it contains the CI and tested that part of the check. Blank for the first report date.
 	measure Solved =
 			VAR d = MAX ( Runs[ReportDate] )
-			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
 			VAR shown = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d )
 			VAR parts = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part" )
 			VAR cis = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "ci" )
 			VAR solved =
 			    FILTER (
-			        CALCULATETABLE ( History, REMOVEFILTERS ( Runs ), Runs[ReportDate] = before ),
+			        CALCULATETABLE ( History, REMOVEFILTERS ( Runs ), Runs[ReportDate] = priorDate ),
 			        NOT ( History[Key] IN shown ) && ( History[CheckId] & ":" & History[Field] ) IN parts && History[CiKey] IN cis
 			    )
-			RETURN IF ( NOT ISBLANK ( before ), COUNTROWS ( solved ) + 0 )
+			RETURN IF ( NOT ISBLANK ( priorDate ), COUNTROWS ( solved ) + 0 )
 		formatString: #,0
 
 	/// The average days from the first report that showed a finding to the report that solved it, for the findings solved at the report date in view.
 	measure 'Days to fix' =
 			VAR d = MAX ( Runs[ReportDate] )
-			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
 			VAR shown = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d )
 			VAR parts = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part" )
 			VAR cis = CALCULATETABLE ( VALUES ( HistoryChecked[Id] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "ci" )
 			VAR solved =
 			    FILTER (
-			        CALCULATETABLE ( History, REMOVEFILTERS ( Runs ), Runs[ReportDate] = before ),
+			        CALCULATETABLE ( History, REMOVEFILTERS ( Runs ), Runs[ReportDate] = priorDate ),
 			        NOT ( History[Key] IN shown ) && ( History[CheckId] & ":" & History[Field] ) IN parts && History[CiKey] IN cis
 			    )
 			RETURN
 			    IF (
-			        NOT ISBLANK ( before ),
+			        NOT ISBLANK ( priorDate ),
 			        AVERAGEX ( solved, DATEDIFF ( CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( Runs ), ALLEXCEPT ( History, History[Key] ) ), d, DAY ) )
 			    )
 		formatString: 0
@@ -84,12 +84,12 @@ table History
 	/// The line of My day: "Since the report of 4 Nov: 23 new, 2 solved."
 	measure 'Since line' =
 			VAR d = [Newest report date]
-			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
 			RETURN
 			    IF (
-			        ISBLANK ( before ),
+			        ISBLANK ( priorDate ),
 			        "One CI report so far: new and solved show from the second report.",
-			        "Since the report of " & FORMAT ( before, "d mmm" ) & ": " & FORMAT ( CALCULATE ( [New], REMOVEFILTERS ( Runs ) ), "#,0" ) & " new, "
+			        "Since the report of " & FORMAT ( priorDate, "d mmm" ) & ": " & FORMAT ( CALCULATE ( [New], REMOVEFILTERS ( Runs ) ), "#,0" ) & " new, "
 			            & FORMAT ( CALCULATE ( [Solved], REMOVEFILTERS ( Runs ) ), "#,0" ) & " solved."
 			    )
 
@@ -105,9 +105,9 @@ table History
 			VAR ciKey = SELECTEDVALUE ( History[CiKey] )
 			VAR d = CALCULATE ( MIN ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] > shownOn )
 			VAR shownNext = CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), REMOVEFILTERS ( History ), History[Key] = findingKey, Runs[ReportDate] = d )
-			VAR tested = CALCULATE ( COUNTROWS ( HistoryChecked ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part", HistoryChecked[Id] = part )
+			VAR testedRows = CALCULATE ( COUNTROWS ( HistoryChecked ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part", HistoryChecked[Id] = part )
 			VAR checked = CALCULATE ( COUNTROWS ( HistoryChecked ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "ci", HistoryChecked[Id] = ciKey )
-			RETURN IF ( NOT ISBLANK ( findingKey ) && NOT ISBLANK ( d ) && ISBLANK ( shownNext ) && tested > 0 && checked > 0, d )
+			RETURN IF ( NOT ISBLANK ( findingKey ) && NOT ISBLANK ( d ) && ISBLANK ( shownNext ) && testedRows > 0 && checked > 0, d )
 		formatString: d mmm yyyy
 
 	/// The first report date of a finding that a later report verified (the export of the Audit page); blank otherwise.
@@ -149,7 +149,7 @@ table History
 			VAR from = [Period from]
 			VAR to = [Period to]
 			VAR keys = CALCULATETABLE ( VALUES ( History[Key] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= from, Runs[ReportDate] <= to, History[State] = "open" )
-			VAR fresh = FILTER ( keys, VAR first = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( Runs ), ALLEXCEPT ( History, History[Key] ) ) RETURN first >= from && first <= to )
+			VAR fresh = FILTER ( keys, VAR firstSeen = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( Runs ), ALLEXCEPT ( History, History[Key] ) ) RETURN firstSeen >= from && firstSeen <= to )
 			RETURN IF ( NOT ISEMPTY ( keys ), COUNTROWS ( fresh ) + 0 )
 		formatString: #,0
 
@@ -166,8 +166,8 @@ table History
 
 	/// The age in days of a finding open at the end of the period: from its first report to the report of the end.
 	measure 'Open age' =
-			VAR first = [Open first seen]
-			RETURN IF ( NOT ISBLANK ( first ), DATEDIFF ( first, [End report date], DAY ) )
+			VAR firstSeen = [Open first seen]
+			RETURN IF ( NOT ISBLANK ( firstSeen ), DATEDIFF ( firstSeen, [End report date], DAY ) )
 		formatString: 0
 
 	/// On a line of the verified findings: the days from the first report that showed it to the report that verified it (verified.csv, "Days").
@@ -180,8 +180,8 @@ table History
 	measure 'Verified line' =
 			VAR from = [Period from]
 			VAR to = [Period to]
-			VAR before = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < from )
-			VAR candidates = CALCULATETABLE ( SUMMARIZE ( History, History[Key], History[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < to, Runs[ReportDate] >= COALESCE ( before, from ) )
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < from )
+			VAR candidates = CALCULATETABLE ( SUMMARIZE ( History, History[Key], History[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < to, Runs[ReportDate] >= COALESCE ( priorDate, from ) )
 			VAR verified = FILTER ( ADDCOLUMNS ( candidates, "@on", [Verified on], "@days", [Days to verify] ), NOT ISBLANK ( [@on] ) && [@on] >= from && [@on] <= to )
 			VAR n = COUNTROWS ( verified ) + 0
 			RETURN

@@ -20,7 +20,7 @@ table Drafts
 	/// The line at the top of the page Messages: how many messages are ready, of each kind.
 	measure 'Messages line' =
 			VAR n = [Messages ready]
-			VAR first = [Emails ready]
+			VAR firstSeen = [Emails ready]
 			VAR reminders = [Reminders ready]
 			VAR escalations = [Escalations ready]
 			RETURN
@@ -28,7 +28,7 @@ table Drafts
 					n = 0,
 					"No message is ready to send. After the next report, or when a reminder is due, it is listed here.",
 					n & IF ( n = 1, " message", " messages" ) & " ready to send: "
-						& first & IF ( first = 1, " first message, ", " first messages, " )
+						& firstSeen & IF ( firstSeen = 1, " first message, ", " first messages, " )
 						& reminders & IF ( reminders = 1, " reminder and ", " reminders and " )
 						& escalations & IF ( escalations = 1, " escalation.", " escalations." )
 				)
@@ -37,7 +37,13 @@ table Drafts
 	measure 'Draft who' =
 			VAR me = [Me]
 			VAR who = SELECTEDVALUE ( Drafts[AssignedTo] )
-			RETURN IF ( NOT ISBLANK ( me ) && who = me, "Mine", IF ( who = "", "Free", who ) )
+			RETURN IF ( HASONEVALUE ( Drafts[DraftId] ), IF ( NOT ISBLANK ( me ) && who = me, "Mine", IF ( who = "", "Free", who ) ) )
+
+	/// The subject on a line of the page Messages: a reminder shows the reference it answers; a new message gets its reference when a manager opens it in the app SACM messages, so the line says so instead of the token %%REF%%.
+	measure 'Subject line' =
+			VAR subjectText = SELECTEDVALUE ( Drafts[Subject] )
+			VAR ref = SELECTEDVALUE ( Drafts[Ref] )
+			RETURN IF ( HASONEVALUE ( Drafts[DraftId] ), SUBSTITUTE ( subjectText, "%%REF%%", IF ( ref <> "", ref, "reference given at Send" ) ) )
 
 	/// The draft, D0001 first: by person in the order the newest report first names them (one refresh only: the next refresh numbers them again).
 	column DraftId

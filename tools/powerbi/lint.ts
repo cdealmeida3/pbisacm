@@ -154,6 +154,25 @@ for (const table of tables) {
 }
 done.push('References: every field of the visuals and the measures is in the model');
 
+/* 4b. DAX variable names */
+// Desktop drops a measure whose variable is a word DAX keeps for itself, and every visual that shows it is empty
+// ("Select or drag fields"): in 0.44.0 the variables before, day and all emptied My day, History and Self-check. No
+// variable may be a DAX function (the list of the copied skill dax-reference), a keyword or a table of the model.
+const DAX_KEYWORDS = ['define', 'evaluate', 'order', 'by', 'start', 'at', 'return', 'var', 'measure', 'column', 'table', 'function', 'in', 'not',
+  'true', 'false', 'asc', 'desc', 'day', 'month', 'year', 'quarter', 'week', 'hour', 'minute', 'second', 'before', 'after', 'boolean', 'integer',
+  'string', 'double', 'currency', 'datetime', 'variant', 'scalar', 'expr', 'anyval', 'anyref', 'val'];
+const daxCatalog = JSON.parse(readFileSync(join(root, '.claude', 'skills', 'dax-reference', 'generated', 'catalog.json'), 'utf8')) as { functions: Array<{ name: string }> };
+const kept = new Set([...DAX_KEYWORDS, ...daxCatalog.functions.map((entry) => entry.name.toLowerCase()), ...tables.map((table) => table.name.toLowerCase())]);
+for (const table of tables) {
+  for (const measure of table.measures) {
+    const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
+    for (const match of dax.matchAll(/\bVAR\s+([A-Za-z_][A-Za-z0-9_]*)/gi)) {
+      if (kept.has(match[1]!.toLowerCase())) problems.push(`DAX: measure ${table.name}[${measure.name}] has the variable ${match[1]}, a word DAX keeps (a function, a keyword or a table): Desktop drops the measure`);
+    }
+  }
+}
+done.push(`DAX: no variable of a measure is one of the ${kept.size} words DAX keeps`);
+
 /* 5. Generated */
 for (const problem of staleQueries()) problems.push(`Generated: ${problem} (npm run powerbi:generate)`);
 done.push('Generated: expressions.tmdl and the theme are up to date');
