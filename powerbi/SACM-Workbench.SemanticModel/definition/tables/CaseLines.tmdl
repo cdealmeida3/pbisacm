@@ -1,0 +1,319 @@
+/// One line per case of the newest report (D292): its status, how it is listed, who has it, the messages and replies, the decision to stop following it. From the journal and the replies of the team.
+table CaseLines
+
+	/// Every case of the newest report.
+	measure Cases = COUNTROWS ( CaseLines ) + 0
+		formatString: #,0
+
+	/// The cases that are not closed (not Verified, not Not followed up).
+	measure 'Open cases' = CALCULATE ( COUNTROWS ( CaseLines ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+		formatString: #,0
+
+	/// Cases on a daily card that were asked, did not answer, and whose working days to the reminder have passed (D39, D182); counted from Today, so right between two refreshes.
+	measure 'Reminders due' =
+			VAR today = [Today]
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+		formatString: #,0
+
+	/// Cases on a daily card that got every reminder and still no answer (D40).
+	measure 'To escalate' =
+			VAR today = [Today]
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+		formatString: #,0
+
+	/// The open cases assigned to the manager who opens the report (the measure Me).
+	measure Mine =
+			VAR me = [Me]
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[AssignedTo] = me, NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+		formatString: #,0
+
+	/// On a line of the box Reminders due: its CIs with a reminder due; blank hides the line.
+	measure 'Reminder mark' =
+			VAR today = [Today]
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+
+	/// On a line of the box To escalate: its CIs to escalate; blank hides the line.
+	measure 'Escalation mark' =
+			VAR today = [Today]
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= today, KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+
+	/// On a line of My work: the open CIs assigned to me; blank hides the line.
+	measure 'My CIs' =
+			VAR me = [Me]
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[AssignedTo] = me, NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+
+	/// The memory of a line: "Asked 3 times · last 4 Nov · no reply", or "Not asked yet" (D226).
+	measure 'Follow-up' =
+			VAR n = MAX ( CaseLines[Messages] )
+			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "Answered" )
+			RETURN
+			    IF (
+			        n = 0,
+			        "Not asked yet",
+			        "Asked " & n & IF ( n = 1, " time", " times" ) & " · last " & FORMAT ( MAX ( CaseLines[SentOn] ), "d mmm" ) & IF ( answered > 0, " · answered", " · no reply" )
+			    )
+
+	/// The next step of a line of My work, as the group on the card says it: Reply, Escalate, Remind, Wait for the answer, Email. The button comes with build B7.
+	measure 'Next step' =
+			VAR today = [Today]
+			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "Answered" )
+			VAR escalate = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= today )
+			VAR remind = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= today )
+			VAR asked = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "Contacted" )
+			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Status] = "New" )
+			RETURN
+			    IF ( answered > 0, "Reply", IF ( escalate > 0, "Escalate", IF ( remind > 0, "Remind", IF ( asked > 0, "Wait for the answer", IF ( fresh > 0, "Email" ) ) ) ) )
+
+	/// The first report date that showed the finding of a case.
+	measure 'Case first seen' = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( History ), TREATAS ( VALUES ( CaseLines[Key] ), History[Key] ) )
+		formatString: d mmm yyyy
+
+	column Key
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Key]
+
+	column CheckId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
+
+	column CiKey
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiKey]
+
+	column CiName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiName]
+
+	column ClassLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ClassLabel]
+
+	column Field
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Field]
+
+	column ContactName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ContactName]
+
+	column InLatest
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [InLatest]
+
+	column Untested
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Untested]
+
+	column CiMissing
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CiMissing]
+
+	column State
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [State]
+
+	column StateLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [StateLabel]
+
+	column Status
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Status]
+
+	column StatusLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [StatusLabel]
+
+	column AssignedTo
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AssignedTo]
+
+	column HandoverNote
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [HandoverNote]
+
+	column Request
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Request]
+
+	column Messages
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Messages]
+
+	column SentOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SentOn]
+
+	column LastMessageTo
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [LastMessageTo]
+
+	column LastRef
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [LastRef]
+
+	column ReminderFrom
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReminderFrom]
+
+	column Remind
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Remind]
+
+	column Replies
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Replies]
+
+	column LastReplyOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [LastReplyOn]
+
+	column ExceptionReason
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ExceptionReason]
+
+	column ReviewOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReviewOn]
+
+	column ExceptionEnded
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ExceptionEnded]
+
+	column RetireOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [RetireOn]
+
+	column VerifiedOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [VerifiedOn]
+
+	column Events
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Events]
+
+	partition CaseLines = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "CaseLines" ),
+					"Key", Run[CaseLines.Key],
+					"CheckId", Run[CaseLines.CheckId],
+					"CiKey", Run[CaseLines.CiKey],
+					"CiName", Run[CaseLines.CiName],
+					"ClassLabel", Run[CaseLines.ClassLabel],
+					"Field", Run[CaseLines.Field],
+					"ContactName", Run[CaseLines.ContactName],
+					"InLatest", Run[CaseLines.InLatest],
+					"Untested", Run[CaseLines.Untested],
+					"CiMissing", Run[CaseLines.CiMissing],
+					"State", Run[CaseLines.State],
+					"StateLabel", Run[CaseLines.StateLabel],
+					"Status", Run[CaseLines.Status],
+					"StatusLabel", Run[CaseLines.StatusLabel],
+					"AssignedTo", Run[CaseLines.AssignedTo],
+					"HandoverNote", Run[CaseLines.HandoverNote],
+					"Request", Run[CaseLines.Request],
+					"Messages", Run[CaseLines.Messages],
+					"SentOn", Run[CaseLines.SentOn],
+					"LastMessageTo", Run[CaseLines.LastMessageTo],
+					"LastRef", Run[CaseLines.LastRef],
+					"ReminderFrom", Run[CaseLines.ReminderFrom],
+					"Remind", Run[CaseLines.Remind],
+					"Replies", Run[CaseLines.Replies],
+					"LastReplyOn", Run[CaseLines.LastReplyOn],
+					"ExceptionReason", Run[CaseLines.ExceptionReason],
+					"ReviewOn", Run[CaseLines.ReviewOn],
+					"ExceptionEnded", Run[CaseLines.ExceptionEnded],
+					"RetireOn", Run[CaseLines.RetireOn],
+					"VerifiedOn", Run[CaseLines.VerifiedOn],
+					"Events", Run[CaseLines.Events]
+				)

@@ -36,6 +36,7 @@ import { contractChanges, contractInformation } from '../../src/core/sources/con
 import { inList } from '../../src/core/sources/contracts/contract-reports.ts';
 import type { ContractConfig, SolusiContract } from '../../src/core/sources/contracts/contract-reports.ts';
 import { daysBetween, longDate } from '../../src/core/shared/dates.ts';
+import { activityRows, caseLines, checkedOf, exceptionRows, expectedHistory, HISTORY_FILES, historyKey, historyRows, replyLines, stateRows } from './history.ts';
 
 type Row = Record<string, unknown>;
 
@@ -134,7 +135,8 @@ export async function parityProblems(folder: string): Promise<string[]> {
   const contracts = contractConfig(references)!;
   const files = [
     { file: SAMPLE_FILES.ci, date: RECORD_DATE }, { file: SAMPLE_FILES.relationship, date: RECORD_DATE }, { file: SAMPLE_FILES.epo, date: RECORD_DATE },
-    { file: SAMPLE_FILES.solusi, date: RECORD_DATE }, { file: SAMPLE_FILES.contracts, date: RECORD_DATE }, { file: SAMPLE_FILES.solusiEarlier, date: EARLIER }
+    { file: SAMPLE_FILES.solusi, date: RECORD_DATE }, { file: SAMPLE_FILES.contracts, date: RECORD_DATE }, { file: SAMPLE_FILES.solusiEarlier, date: EARLIER },
+    ...HISTORY_FILES.map((file) => ({ file, date: file.date }))
   ];
   const expectedFiles: Row[] = [];
   const read: Record<string, Awaited<ReturnType<typeof tableOf>>> = {};
@@ -295,6 +297,57 @@ export async function parityProblems(folder: string): Promise<string[]> {
   }
   const noDaily = changeRows.filter((row) => row.Kind === 'No daily responsible').map((row) => row.Number).join(' ');
   if (noDaily !== information.noDailyResponsible.map((contract) => contract.number).join(' ')) problems.push(`ContractChanges: no daily responsible [${noDaily}], the HTML app [${information.noDailyResponsible.map((contract) => contract.number).join(' ')}]`);
+
+  // 12. The history (D290): every CI report date with the reports it used, its findings, what it tested and could
+  // verify, the notes; the answer key runs the checks of src/core on each date (tools/powerbi/history.ts).
+  const key = await historyKey();
+  const time = (value: unknown): string => norm(value).slice(0, 19);
+  const withTimes = (list: Row[], fields: string[]): Row[] => list.map((row) => ({ ...row, ...Object.fromEntries(fields.map((field) => [field, time(row[field])])) }));
+  // The files each run used, as the folder names them: the earlier CI report had no EPO systems report and no ServiceNow contract report on or before it.
+  const named = (file: { name: string }, date: string): string => `${date}_${file.name}`;
+  const [earlierCi, earlierRelationship] = HISTORY_FILES;
+  const runRows = [
+    { ReportDate: earlierCi.date, FileName: named(earlierCi, earlierCi.date), CIs: key.runs[0]!.cis, RelationshipFile: named(earlierRelationship, earlierRelationship.date),
+      EpoFile: '', SolusiFile: named(SAMPLE_FILES.solusiEarlier, EARLIER), ContractFile: '' },
+    { ReportDate: RECORD_DATE, FileName: named(SAMPLE_FILES.ci, RECORD_DATE), CIs: key.runs[1]!.cis, RelationshipFile: named(SAMPLE_FILES.relationship, RECORD_DATE),
+      EpoFile: named(SAMPLE_FILES.epo, RECORD_DATE), SolusiFile: named(SAMPLE_FILES.solusi, RECORD_DATE), ContractFile: named(SAMPLE_FILES.contracts, RECORD_DATE) }
+  ];
+  problems.push(...compare('Runs', rows('Runs'), runRows, 'ReportDate', ['FileName', 'CIs', 'RelationshipFile', 'EpoFile', 'SolusiFile', 'ContractFile']));
+  const dated = (list: Row[], field: string): Row[] => list.map((row) => ({ ...row, Line: `${norm(row.ReportDate)}|${norm(row[field])}` }));
+  const history = historyRows(key).filter((row) => built.has(row.CheckId ?? ""));
+  problems.push(...compare('History', dated(rows('History'), 'Key'), dated(history, 'Key'), 'Line', ['CheckId', 'CiKey', 'CiName', 'Class', 'ClassLabel', 'Field', 'State', 'SupportGroup', 'ContactName']));
+  const checked = key.runs.flatMap((item) => checkedOf(item).filter((entry) => entry.Kind === 'ci' || built.has(entry.Id.split(':')[0]!)).map((entry) => ({ ReportDate: item.date, Id: `${entry.Kind}|${entry.Id}` })));
+  problems.push(...compare('HistoryChecked', dated(rows('HistoryChecked').map((row) => ({ ...row, Id: `${norm(row.Kind)}|${norm(row.Id)}` })), 'Id'), dated(checked, 'Id'), 'Line', []));
+  const historyTested = key.runs.flatMap((item) => item.tested.filter((part) => built.has(part.split(':')[0]!)).map((part) => ({ ReportDate: item.date, Part: part, Evaluated: item.evaluated?.[part] })));
+  const foundHistoryTested = rows('HistoryTested').map((row) => ({ ...row, Part: norm(row.Part) ? `${norm(row.CheckId)}:${norm(row.Part)}` : norm(row.CheckId) }));
+  problems.push(...compare('HistoryTested', dated(foundHistoryTested, 'Part'), dated(historyTested, 'Part'), 'Line', ['Evaluated']));
+  for (const item of key.runs) {
+    const want = item.notes.map((note) => `${note.slice(0, note.indexOf(':'))}: ${note.slice(note.indexOf(':') + 1).trim()}`).filter((note) => ofRun(note.slice(0, note.indexOf(':')))).sort();
+    const found = rows('HistoryNotes').filter((row) => norm(row.ReportDate) === item.date && ofRun(norm(row.CheckId))).map((row) => `${norm(row.CheckId)}: ${norm(row.Reason)}`).sort();
+    for (const note of want.filter((line) => !found.includes(line))) problems.push(`HistoryNotes ${item.date}: missing "${note}"`);
+    for (const note of found.filter((line) => !want.includes(line))) problems.push(`HistoryNotes ${item.date}: not expected "${note}"`);
+  }
+
+  // 13. The team's state (D291) and the cases (D292): the lists as the app reads its journal and replies, every case of
+  // buildCases, the replies to read, the decisions to stop following, the activity in words.
+  const lines = caseLines(key).filter((line) => built.has(String(line.CheckId)));
+  problems.push(...compare('CaseLines', rows('CaseLines'), lines, 'Key', Object.keys(lines[0] ?? {}).filter((field) => field !== 'Key')));
+  problems.push(...compare('RepliesToRead', withTimes(rows('RepliesToRead'), ['Received']), replyLines(key), 'File', ['Ref', 'From', 'Received', 'FirstLine', 'Cases', 'CIs', 'AssignedTo', 'Checks', 'Daily']));
+  const exceptions = exceptionRows(key);
+  problems.push(...compare('Exceptions', withTimes(rows('Exceptions'), ['At']), exceptions, 'Order', Object.keys(exceptions[0] ?? {}).filter((field) => field !== 'Order')));
+  const activity = activityRows();
+  problems.push(...compare('Activity', withTimes(rows('Activity'), ['At']), activity, 'Id', ['At', 'Type', 'Icon', 'What', 'By', 'Text', 'Cards', 'CIs', 'Keys']));
+  const journal = stateRows('journal');
+  problems.push(...compare('Journal', withTimes(rows('Journal'), ['At']), journal.map((row) => ({ Id: row.Title, At: row.At, Type: row.Type, KeyCount: (row.Keys ?? '').split(/\r?\n/).filter((line) => line.trim()).length, ReviewOn: row.ReviewOn })), 'Id', ['At', 'Type', 'KeyCount', 'ReviewOn']));
+  const keyCount = journal.reduce((sum, row) => sum + (row.Keys ?? '').split(/\r?\n/).filter((line) => line.trim()).length, 0);
+  if (rows('JournalKeys').length !== keyCount) problems.push(`JournalKeys: ${rows('JournalKeys').length} rows, expected ${keyCount}`);
+  const refs = new Set(journal.filter((row) => row.Type === 'message').map((row) => row.Ref));
+  problems.push(...compare('Replies', withTimes(rows('Replies'), ['Received']), stateRows('replies').map((row) => ({ Ref: row.Title, Received: row.Received, Matched: refs.has(row.Title) })), 'Ref', ['Received', 'Matched']));
+  problems.push(...compare('Team', rows('Team'), stateRows('team').map((row, at) => ({ Name: row.Title, Email: row.Email!.toLowerCase(), Active: !/^(no|false|0)$/i.test(row.Active!.trim()), SampleMe: at === 0 })), 'Name', ['Email', 'Active', 'SampleMe']));
+  problems.push(...compare('Settings', rows('Settings'), stateRows('settings').map((row) => ({ Key: row.Title, Used: String(key.rules[row.Title as keyof typeof key.rules] ?? row.Value) })), 'Key', ['Used']));
+  if (rows('Reviews').length !== stateRows('reviews').length) problems.push(`Reviews: ${rows('Reviews').length} rows, expected ${stateRows('reviews').length}`);
+  const expected = (await expectedHistory()).map((item, at) => ({ Metric: item.metric, Expected: item.expected, Order: at + 1 }));
+  problems.push(...compare('HistoryExpected', rows('HistoryExpected'), expected, 'Metric', ['Expected', 'Order']));
 
   for (const row of rows('SelfCheck')) {
     const id = norm(row.CheckId);

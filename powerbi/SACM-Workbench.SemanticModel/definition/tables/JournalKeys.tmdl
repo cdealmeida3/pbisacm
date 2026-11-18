@@ -1,0 +1,28 @@
+/// One row per finding key of each journal event (D291).
+table JournalKeys
+
+	column EventId
+		dataType: string
+		sourceColumn: EventId
+
+	column Key
+		dataType: string
+		sourceColumn: Key
+
+	column CheckId
+		dataType: string
+		sourceColumn: CheckId
+
+	column Type
+		dataType: string
+		sourceColumn: Type
+
+	column At
+		dataType: dateTime
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		sourceColumn: At
+
+	partition JournalKeys = m
+		mode: import
+		source = JournalKeysRows

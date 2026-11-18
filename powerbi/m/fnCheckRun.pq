@@ -1,22 +1,25 @@
 // The checks on one CI report (src/core/checks/engine.ts, runChecks, then src/core/cases/cases.ts, buildRun): the
-// reports of the other types that go with it (fnPaired), the scope of each check, the built detectors, the source first
-// (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles.
-// Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo, Subjects]; Notes are
-// [CheckId, Note]; Subjects are the contracts findings are about (fnContractSubject).
+// reports of the other types that go with it (fnPairedFile), the scope of each check, the built detectors, the source first
+// (D190), the parked CIs (D179), then who is asked and how each finding is listed. `file` is a row of ReadFiles, `files`
+// the files it is paired from (ReadFiles for the newest report, fnReadFiles of the window for the history, D290).
+// Returns [Date, FileName, Cis, Columns, Facts, Tested, Evaluated, Notes, Parked, Graph, Epo, Subjects, Paired]; Notes are
+// [CheckId, Note]; Subjects are the contracts findings are about (fnContractSubject); Paired the file names of the other
+// reports used (Relationship, Epo, Solusi, Contract; null when none).
 // Outputs (one lazy field per built check), RunContext and Stages are read only by the probes of the refresh time.
 // Each CI gets its normal forms once (StatusKey, NameKey, IdentityKey, TagKeys, Squashed: the compared text of the six
 // fields a rule counts), so no check normalises a CI field again (ARCHITECTURE §12, the speed rules).
-(file as record) as record =>
+(file as record, files as table) as record =>
     let
         date = file[ReportDate],
         read = file[Read],
         rows = Table.ToRecords(fnReadCiReport(read)),
         found = fnCiColumns(read),
-        relationships = fnPaired("relationship", date),
-        epoFile = fnPairedFile("epo", date),
+        relationshipFile = fnPairedFile(files, "relationship", date),
+        relationships = if relationshipFile = null then null else relationshipFile[Rows],
+        epoFile = fnPairedFile(files, "epo", date),
         epo = if epoFile = null then null else epoFile[Rows],
-        solusiFile = fnPairedFile("solusi", date),
-        contractFile = fnPairedFile("contract", date),
+        solusiFile = fnPairedFile(files, "solusi", date),
+        contractFile = fnPairedFile(files, "contract", date),
 
         // Hidden characters: the name itself, else the name as the Relationship report holds it (a CSV writes "?").
         known = if read[Lossless] or relationships = null then [] else
@@ -196,6 +199,10 @@
             Tested = combined[Tested], Evaluated = combined[Evaluated],
             Notes = graphNotes & combined[Notes] & source[Notes] & parkedNotes & routingNotes & listingNotes & hiddenNotes,
             Parked = parked, Graph = graph, Epo = run[Epo], CheckableKeys = checkableKeys,
+            Paired = [
+                Relationship = if relationshipFile = null then null else relationshipFile[FileName], Epo = if epoFile = null then null else epoFile[FileName],
+                Solusi = if solusiFile = null then null else solusiFile[FileName], Contract = if contractFile = null then null else contractFile[FileName]
+            ],
             // Never loaded into a table: for the probes of the refresh time (tools/powerbi/probes.ts).
             Outputs = Outputs, RunContext = run, Stages = [Combined = combined, SourceFirst = source, Kept = kept]
         ]

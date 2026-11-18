@@ -1,0 +1,3 @@
+ReviewDate,CiKey,CiName,Class,StatusInEpo,Answer,Note,By,At
+2026-11-02,event desk,Event Desk,business_application,Kørende,same,,Sam Example,2026-11-02T13:00:00
+2026-11-02,fines hub - prod,Fines Hub - PROD,service_instance,Nedlagt,different,EPO says retired; ServiceNow says operational,Sam Example,2026-11-02T13:10:00

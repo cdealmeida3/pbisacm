@@ -1,0 +1,33 @@
+/// The SACM managers of the list SACM Team (D291).
+table Team
+
+	/// The manager who opens the report: the name on the SACM Team list of the email they sign in with; in Sample mode the first active manager.
+	measure Me =
+			VAR login = LOWER ( USERPRINCIPALNAME () )
+			VAR byLogin = CALCULATE ( MAX ( Team[Name] ), REMOVEFILTERS ( Team ), Team[Email] = login )
+			RETURN IF ( NOT ISBLANK ( byLogin ), byLogin, CALCULATE ( MAX ( Team[Name] ), REMOVEFILTERS ( Team ), Team[SampleMe] = TRUE () ) )
+
+	/// The line under the title of My work.
+	measure 'My work line' = IF ( ISBLANK ( [Me] ), "You are not on the SACM Team list, so nothing is assigned to you.", "The work of " & [Me] & ": the replies to read, then the people to contact." )
+
+	column Name
+		dataType: string
+		sourceColumn: Name
+
+	column Email
+		dataType: string
+		sourceColumn: Email
+
+	column Active
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: Active
+
+	column SampleMe
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: SampleMe
+
+	partition Team = m
+		mode: import
+		source = TeamRows

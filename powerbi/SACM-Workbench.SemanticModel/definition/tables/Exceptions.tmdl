@@ -1,0 +1,118 @@
+/// Every decision to stop following a finding (D292, the tab Not followed of the Audit page): one line per case, and one per standing exception for a check and a CI. Newest first.
+table Exceptions
+
+	/// The decisions to stop following that are still in force.
+	measure 'Not followed up' = CALCULATE ( COUNTROWS ( Exceptions ), Exceptions[State] = "running" ) + 0
+		formatString: #,0
+
+	column Target
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Target]
+
+	column CheckId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
+
+	column CiKey
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiKey]
+
+	column CiName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CiName]
+
+	column Reason
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Reason]
+
+	column Note
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Note]
+
+	column ReviewOn
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReviewOn]
+
+	column ByName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ByName]
+
+	column At
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [At]
+
+	column State
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [State]
+
+	column StateLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [StateLabel]
+
+	column Standing
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Standing]
+
+	column Legacy
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Legacy]
+
+	column Order
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Order]
+
+	partition Exceptions = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "Exceptions" ),
+					"Target", Run[Exceptions.Target],
+					"CheckId", Run[Exceptions.CheckId],
+					"CiKey", Run[Exceptions.CiKey],
+					"CiName", Run[Exceptions.CiName],
+					"Reason", Run[Exceptions.Reason],
+					"Note", Run[Exceptions.Note],
+					"ReviewOn", Run[Exceptions.ReviewOn],
+					"ByName", Run[Exceptions.ByName],
+					"At", Run[Exceptions.At],
+					"State", Run[Exceptions.State],
+					"StateLabel", Run[Exceptions.StateLabel],
+					"Standing", Run[Exceptions.Standing],
+					"Legacy", Run[Exceptions.Legacy],
+					"Order", Run[Exceptions.Order]
+				)

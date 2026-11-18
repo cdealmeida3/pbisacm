@@ -1,0 +1,47 @@
+/// The Self-check of the history and the team's state (D293): what the HTML app counts on the samples (ExpectedHistory, generated), and what the measures count.
+table HistoryExpected
+
+	/// What the measure of each metric counts in the model.
+	measure 'History found' =
+			SWITCH (
+			    SELECTEDVALUE ( HistoryExpected[Metric] ),
+			    "Report dates", [Report dates],
+			    "Findings in the newest report", [Findings at the newest report],
+			    "Findings in the report before", [Findings at the report before],
+			    "New since the last report", CALCULATE ( [New], REMOVEFILTERS ( Runs ) ),
+			    "Solved since the last report", CALCULATE ( [Solved], REMOVEFILTERS ( Runs ) ),
+			    "Days to fix", ROUND ( CALCULATE ( [Days to fix], REMOVEFILTERS ( Runs ) ), 0 ),
+			    "Open cases", [Open cases],
+			    "Reminders due", [Reminders due],
+			    "To escalate", [To escalate],
+			    "Replies to read", [Replies to read],
+			    "Mine", [Mine],
+			    "Not followed up", [Not followed up]
+			)
+		formatString: #,0
+
+	/// Yes when the model counts what the HTML app counts.
+	measure 'History match' = IF ( HASONEVALUE ( HistoryExpected[Metric] ), IF ( [History found] = MAX ( HistoryExpected[Expected] ), "Yes", "No" ) )
+
+	/// The line of the Self-check page.
+	measure 'History self-check' =
+			VAR ok = COUNTROWS ( FILTER ( VALUES ( HistoryExpected[Metric] ), [History match] = "Yes" ) ) + 0
+			RETURN ok & " of " & COUNTROWS ( HistoryExpected ) & " history counts match"
+
+	column Metric
+		dataType: string
+		sourceColumn: Metric
+
+	column Expected
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Expected
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition HistoryExpected = m
+		mode: import
+		source = HistoryExpectedRows

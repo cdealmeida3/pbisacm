@@ -1,0 +1,22 @@
+/// The rows of the list SACM Settings (D291), and the value that counts for the numbers the cases use.
+table Settings
+
+	column Key
+		dataType: string
+		sourceColumn: Key
+
+	column Value
+		dataType: string
+		sourceColumn: Value
+
+	column Used
+		dataType: string
+		sourceColumn: Used
+
+	column Note
+		dataType: string
+		sourceColumn: Note
+
+	partition Settings = m
+		mode: import
+		source = SettingsRows

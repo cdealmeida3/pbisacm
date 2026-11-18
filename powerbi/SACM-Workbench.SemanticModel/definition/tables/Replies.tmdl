@@ -1,0 +1,33 @@
+/// Every reply of the list SACM Replies (D291), newest first. Matched: a message of the journal has its reference.
+table Replies
+
+	column Ref
+		dataType: string
+		sourceColumn: Ref
+
+	column From
+		dataType: string
+		sourceColumn: From
+
+	column Received
+		dataType: dateTime
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		sourceColumn: Received
+
+	column Subject
+		dataType: string
+		sourceColumn: Subject
+
+	column Body
+		dataType: string
+		sourceColumn: Body
+
+	column Matched
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: Matched
+
+	partition Replies = m
+		mode: import
+		source = RepliesRows

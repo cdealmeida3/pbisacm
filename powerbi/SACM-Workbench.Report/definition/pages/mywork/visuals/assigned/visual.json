@@ -1,0 +1,196 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "assigned",
+  "position": {
+    "x": 24,
+    "y": 332,
+    "z": 2100,
+    "height": 336,
+    "width": 1232,
+    "tabOrder": 2100
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "ContactName"
+                }
+              },
+              "queryRef": "CaseLines.ContactName",
+              "nativeQueryRef": "ContactName",
+              "displayName": "Asked"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
+                    }
+                  },
+                  "Property": "CardLabel"
+                }
+              },
+              "queryRef": "Checks.CardLabel",
+              "nativeQueryRef": "CardLabel",
+              "displayName": "Card"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "My CIs"
+                }
+              },
+              "queryRef": "CaseLines.My CIs",
+              "nativeQueryRef": "My CIs",
+              "displayName": "CIs"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Follow-up"
+                }
+              },
+              "queryRef": "CaseLines.Follow-up",
+              "nativeQueryRef": "Follow-up",
+              "displayName": "Follow-up"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "StatusLabel"
+                }
+              },
+              "queryRef": "CaseLines.StatusLabel",
+              "nativeQueryRef": "StatusLabel",
+              "displayName": "State"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Next step"
+                }
+              },
+              "queryRef": "CaseLines.Next step",
+              "nativeQueryRef": "Next step",
+              "displayName": "Next step"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "CaseLines"
+                  }
+                },
+                "Property": "ContactName"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Assigned to me'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Assigned to me'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

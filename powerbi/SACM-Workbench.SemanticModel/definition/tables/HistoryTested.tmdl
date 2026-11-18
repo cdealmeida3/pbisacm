@@ -1,0 +1,46 @@
+/// Each part of a check that each CI report date could test, and the CIs it evaluated (D15, D290).
+table HistoryTested
+
+	/// The verification record: how many CIs the report date in view tested for a check (the biggest number over its parts); blank when it could not test it.
+	measure 'Record tested' =
+			VAR d = MAX ( Runs[ReportDate] )
+			RETURN CALCULATE ( MAX ( HistoryTested[Evaluated] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d )
+		formatString: #,0
+
+	column CheckId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
+
+	column Part
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Part]
+
+	column ReportDate
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReportDate]
+
+	column Evaluated
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Evaluated]
+
+	partition HistoryTested = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( HistoryRun, HistoryRun[Part] = "HistoryTested" ),
+					"CheckId", HistoryRun[HistoryTested.CheckId],
+					"Part", HistoryRun[HistoryTested.Part],
+					"ReportDate", HistoryRun[HistoryTested.ReportDate],
+					"Evaluated", HistoryRun[HistoryTested.Evaluated]
+				)

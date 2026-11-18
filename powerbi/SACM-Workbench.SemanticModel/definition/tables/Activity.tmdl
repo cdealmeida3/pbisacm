@@ -1,0 +1,55 @@
+/// Every event of the journal in words, newest first (D293): what it did, who, the cards and the CIs it touched.
+table Activity
+
+	/// The line under the title of the Activity page.
+	measure 'Activity line' =
+			VAR n = COUNTROWS ( Activity ) + 0
+			RETURN n & IF ( n = 1, " event", " events" ) & IF ( n = 0, ". The journal is empty: the team records its work in the list SACM Journal.", "" )
+
+	column Id
+		dataType: string
+		sourceColumn: Id
+
+	column At
+		dataType: dateTime
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		sourceColumn: At
+
+	column Type
+		dataType: string
+		sourceColumn: Type
+
+	column Icon
+		dataType: string
+		sourceColumn: Icon
+
+	column What
+		dataType: string
+		sourceColumn: What
+
+	column By
+		dataType: string
+		sourceColumn: By
+
+	column Text
+		dataType: string
+		sourceColumn: Text
+
+	column Cards
+		dataType: string
+		sourceColumn: Cards
+
+	column CIs
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: CIs
+
+	column Keys
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Keys
+
+	partition Activity = m
+		mode: import
+		source = ActivityRows

@@ -1,0 +1,45 @@
+/// Why a check could not be evaluated, or only in part, on each CI report date (D15, D290).
+table HistoryNotes
+
+	/// The verification record: what the report date in view could not test, and why.
+	measure 'Record not tested' =
+			VAR d = MAX ( Runs[ReportDate] )
+			RETURN CALCULATE ( CONCATENATEX ( HistoryNotes, HistoryNotes[Reason], " | ", HistoryNotes[Order], ASC ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d )
+
+	column CheckId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckId]
+
+	column ReportDate
+		dataType: dateTime
+		isDataTypeInferred
+		formatString: d mmm yyyy
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ReportDate]
+
+	column Reason
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Reason]
+
+	column Order
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Order]
+
+	partition HistoryNotes = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( HistoryRun, HistoryRun[Part] = "HistoryNotes" ),
+					"CheckId", HistoryRun[HistoryNotes.CheckId],
+					"ReportDate", HistoryRun[HistoryNotes.ReportDate],
+					"Reason", HistoryRun[HistoryNotes.Reason],
+					"Order", HistoryRun[HistoryNotes.Order]
+				)

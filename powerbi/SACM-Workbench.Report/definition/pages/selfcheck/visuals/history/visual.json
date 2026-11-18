@@ -1,0 +1,166 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "history",
+  "position": {
+    "x": 24,
+    "y": 740,
+    "z": 5100,
+    "height": 312,
+    "width": 1232,
+    "tabOrder": 5100
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HistoryExpected"
+                    }
+                  },
+                  "Property": "Metric"
+                }
+              },
+              "queryRef": "HistoryExpected.Metric",
+              "nativeQueryRef": "Metric",
+              "displayName": "Count"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HistoryExpected"
+                    }
+                  },
+                  "Property": "Expected"
+                }
+              },
+              "queryRef": "HistoryExpected.Expected",
+              "nativeQueryRef": "Expected",
+              "displayName": "HTML app"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HistoryExpected"
+                    }
+                  },
+                  "Property": "History found"
+                }
+              },
+              "queryRef": "HistoryExpected.History found",
+              "nativeQueryRef": "History found",
+              "displayName": "This report"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HistoryExpected"
+                    }
+                  },
+                  "Property": "History match"
+                }
+              },
+              "queryRef": "HistoryExpected.History match",
+              "nativeQueryRef": "History match",
+              "displayName": "Match"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "HistoryExpected"
+                  }
+                },
+                "Property": "Order"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The history and the team''s state (two report dates, the sample lists)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The history and the team''s state (two report dates, the sample lists)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

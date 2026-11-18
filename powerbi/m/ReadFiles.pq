@@ -1,13 +1,7 @@
-// Every report file read once: its sheets (Read), its type by its columns (Kind, TypeLabel) and why it was not read
-// (Message). A file that cannot be opened is not read, with the reason, and the refresh goes on.
+// The report files the pages of the newest report use, each read once (fnReadFiles): every file dated at most ReadDays
+// days before the newest file of the folder. Older files belong to the history, which reads its own days (HistoryRun,
+// D290), so a folder that keeps two years of reports does not slow the refresh.
 let
-    read = Table.AddColumn(ReportSourceFiles, "Read", each
-        let attempt = try fnReadTable([Content]) in
-        if attempt[HasError] then [Format = "", Sheets = {}, Headers = {}, RawHeaders = {}, Rows = #table({}, {}), Error = attempt[Error][Message]]
-        else attempt[Value]),
-    typed = Table.AddColumn(read, "Type", each
-        if Record.HasFields([Read], "Error") then [Kind = "", Label = "Not read", Message = "The file could not be opened: " & [Read][Error]]
-        else fnReportType([Read][Headers])),
-    expanded = Table.ExpandRecordColumn(typed, "Type", {"Kind", "Label", "Message"}, {"Kind", "TypeLabel", "Message"})
+    newest = List.Max(List.RemoveNulls(ReportSourceFiles[ReportDate]), null)
 in
-    Table.Buffer(expanded)
+    fnReadFiles(if newest = null then null else Date.AddDays(newest, -ReadDays), null)

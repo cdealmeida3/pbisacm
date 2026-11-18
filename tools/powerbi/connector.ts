@@ -27,10 +27,10 @@ export function evaluatedNames(): string[] {
   return [...readTables().map((table) => table.name), ...unitQueryNames()];
 }
 
-/** The M a calculated table of the fixed form (D284) gives, from the member Run: its part's rows, its columns renamed. */
-export function calculatedM(table: { name: string; part: string; columns: Array<[string, string]> }): string {
+/** The M a calculated table of the fixed form (D284) gives, from the member Run (or HistoryRun): its part's rows, its columns renamed. */
+export function calculatedM(table: { name: string; source?: string; part: string; columns: Array<[string, string]> }): string {
   const pairs = table.columns.map(([name, source]) => `{${mText(source)}, ${mText(name)}}`).join(', ');
-  return `let\n    rows = Table.SelectRows(Run, each [Part] = ${mText(table.part)}),\n    picked = Table.SelectColumns(rows, {${table.columns.map(([, source]) => mText(source)).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
+  return `let\n    rows = Table.SelectRows(${table.source ?? 'Run'}, each [Part] = ${mText(table.part)}),\n    picked = Table.SelectColumns(rows, {${table.columns.map(([, source]) => mText(source)).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
 }
 
 export interface ConnectorOptions {
@@ -48,7 +48,7 @@ export function connectorMembers(options: ConnectorOptions = {}): Array<{ name: 
   const scaled = (): string => `#table(type table [FileName = text, Base64 = text], {\n${scaledSampleFiles(copies, history).map((file) => `\t{${mText(file.name)}, ${mText(file.base64)}}`).join(',\n')}\n})`;
   for (const expression of readExpressions()) members.push({ name: expression.name, m: realSize && expression.name === 'SampleFiles' ? scaled() : expression.m });
   for (const table of readTables()) {
-    members.push({ name: table.name, m: table.partitionKind === 'calculated' ? calculatedM({ name: table.name, part: table.calculated!.part, columns: table.calculated!.columns }) : table.partitionM });
+    members.push({ name: table.name, m: table.partitionKind === 'calculated' ? calculatedM({ name: table.name, source: table.calculated!.source, part: table.calculated!.part, columns: table.calculated!.columns }) : table.partitionM });
   }
   unitQueryNames().forEach((name, at) => members.push({ name, m: unitQuery(at + 1) }));
   if (realSize) for (const probe of probeMembers(stages)) members.push(probe);

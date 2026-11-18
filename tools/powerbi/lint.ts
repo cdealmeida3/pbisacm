@@ -8,8 +8,10 @@
 //   5. Generated parts up to date (also in npm test).
 //   6. Checks: every built detector is a module of a check in use and has its query fnDetect<Module>; every other check
 //      gets the note "not built" (fnNotesPart); card labels are unique.
-//   8. Run (D284): each calculated table has the fixed form, takes the rows of a part that RunRows makes, and lists its
-//      columns in the order of its TMDL file; Run is hidden and has no relationship; no query of powerbi/m is a probe.
+//   8. Run (D284, D290): each calculated table has the fixed form, takes the rows of a part that RunRows (or fnHistoryRun,
+//      for HistoryRun) makes, and lists its columns in the order of its TMDL file; Run and HistoryRun are hidden and have
+//      no relationship; HistoryRun has its incremental refresh; every metric of the history self-check has its measure;
+//      no query of powerbi/m is a probe.
 //   7. Colours: every colour of the theme and the measures is a colour of LOOK.md, and each state colour reads on its
 //      fill and on the page with a contrast of 4.5:1 or more.
 // --no-dotnet skips step 1 and says so (for a computer without .NET); the CI never uses it.
@@ -19,8 +21,8 @@ import { join, relative } from 'node:path';
 import * as PQP from '@microsoft/powerquery-parser';
 import Ajv from 'ajv';
 import type { AnySchema } from 'ajv';
-import { MODEL, readExpressions, readTables } from './tmdl.ts';
-import { lightColours, staleQueries, THEME_FILE } from './generate.ts';
+import { MODEL, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
+import { EXPECTED_HISTORY, lightColours, staleQueries, THEME_FILE } from './generate.ts';
 import { connectorSource } from './connector.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
 
@@ -138,7 +140,8 @@ for (const table of tables) {
 }
 for (const table of tables) {
   if (table.partitionKind === 'calculated') {
-    for (const [, source] of table.calculated!.columns) if (!columns.get('Run')?.has(source)) problems.push(`References: table ${table.name} takes Run[${source}], which is not in the model`);
+    const from = table.calculated!.source;
+    for (const [, source] of table.calculated!.columns) if (!columns.get(from)?.has(source)) problems.push(`References: table ${table.name} takes ${from}[${source}], which is not in the model`);
   } else if (!table.partitionM) problems.push(`References: table ${table.name} has no M partition`);
 }
 done.push('References: every field of the visuals and the measures is in the model');
@@ -201,21 +204,29 @@ done.push('Colours: all of LOOK.md, every text 4.5:1 or more');
 
 /* 8. Run */
 const calculatedTables = tables.filter((table) => table.partitionKind === 'calculated');
-const runRows = expressions.find((expression) => expression.name === 'RunRows')?.m ?? '';
-const parts = new Set([...runRows.matchAll(/\{"([A-Za-z]+)",\s*[A-Za-z]/g)].map((match) => match[1]!));
+const partsOf = (query: string): Set<string> => new Set([...(expressions.find((expression) => expression.name === query)?.m ?? '').matchAll(/\{"([A-Za-z]+)",\s*[A-Za-z]/g)].map((match) => match[1]!));
+const madeBy: Record<string, string> = { Run: 'RunRows', HistoryRun: 'fnHistoryRun' };
 for (const table of calculatedTables) {
-  const { part, columns: taken } = table.calculated!;
-  if (!parts.has(part)) problems.push(`Run: table ${table.name} takes the part "${part}", which RunRows does not make`);
+  const { source, part, columns: taken } = table.calculated!;
+  if (!partsOf(madeBy[source]!).has(part)) problems.push(`Run: table ${table.name} takes the part "${part}", which ${madeBy[source]} does not make`);
   const want = table.columns.map((column) => column.name).join(', ');
   if (taken.map(([name]) => name).join(', ') !== want) problems.push(`Run: table ${table.name} takes the columns [${taken.map(([name]) => name).join(', ')}], its TMDL file declares [${want}]`);
-  for (const [name, source] of taken) if (source !== `${part}.${name}`) problems.push(`Run: table ${table.name} takes ${name} from Run[${source}], not Run[${part}.${name}]`);
+  for (const [name, column] of taken) if (column !== `${part}.${name}`) problems.push(`Run: table ${table.name} takes ${name} from ${source}[${column}], not ${source}[${part}.${name}]`);
 }
-const runTable = tables.find((table) => table.name === 'Run');
-if (!runTable) problems.push('Run: the table Run is not in the model');
-else if (!/^\tisHidden$/m.test(readFileSync(runTable.file, 'utf8'))) problems.push('Run: the table Run is not hidden');
-if (/\b(?:fromColumn|toColumn):\s*'?Run'?\./.test(readFileSync(join(MODEL, 'relationships.tmdl'), 'utf8'))) problems.push('Run: the table Run has a relationship; the calculated tables have them');
+const relationshipsText = readFileSync(join(MODEL, 'relationships.tmdl'), 'utf8');
+for (const source of SOURCE_TABLES) {
+  const hidden = tables.find((table) => table.name === source);
+  if (!hidden) { problems.push(`Run: the table ${source} is not in the model`); continue; }
+  const text = readFileSync(hidden.file, 'utf8');
+  if (!/^\tisHidden$/m.test(text)) problems.push(`Run: the table ${source} is not hidden`);
+  if (new RegExp(`\\b(?:fromColumn|toColumn):\\s*'?${source}'?\\.`).test(relationshipsText)) problems.push(`Run: the table ${source} has a relationship; the calculated tables have them`);
+  if (source === 'HistoryRun' && !/^\trefreshPolicy$/m.test(text)) problems.push('Run: the table HistoryRun has no incremental refresh (refreshPolicy)');
+}
+// The Self-check page compares each metric of ExpectedHistory with the measure History found: each needs its branch.
+const found = tables.find((table) => table.name === 'HistoryExpected')?.measures.find((measure) => measure.name === 'History found')?.dax ?? '';
+for (const item of EXPECTED_HISTORY) if (!found.includes(`"${item.metric}"`)) problems.push(`Run: the measure HistoryExpected[History found] has no branch for the metric "${item.metric}" of ExpectedHistory`);
 for (const expression of expressions) if (/^(?:Time|RealSize|Probe)/.test(expression.name)) problems.push(`Run: the query ${expression.name} has the name of a probe of tools/powerbi/probes.ts`);
-done.push(`Run: ${calculatedTables.length} calculated tables take their part of Run, Run is hidden`);
+done.push(`Run: ${calculatedTables.length} calculated tables take their part of Run or HistoryRun, both hidden`);
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);

@@ -2,7 +2,8 @@
 //   - powerbi/SACM-Workbench.SemanticModel/definition/expressions.tmdl: every shared query of the model. The hand-written
 //     Power Query files of powerbi/m/ (one query per file), and the packed data: the invented samples, the check files, the
 //     reference files, the reading rules of src/core/sources/ and the recorded result of the samples (tests/recorded/).
-//   - powerbi/SACM-Workbench.SemanticModel/definition/tables/Run.tmdl: the hidden table Run, from the calculated tables.
+//   - powerbi/SACM-Workbench.SemanticModel/definition/tables/Run.tmdl and HistoryRun.tmdl: the hidden tables Run and
+//     HistoryRun (with its incremental refresh, D290), from the calculated tables that split them.
 //   - powerbi/SACM-Workbench.Report/StaticResources/RegisteredResources/sacm-theme.json: the colours of docs/LOOK.md.
 // Same repository, same bytes (no date, no random value).
 //   node tools/powerbi/generate.ts            writes both files (npm run powerbi:generate)
@@ -24,9 +25,11 @@ import { HIDDEN_CHARACTERS } from '../../src/core/shared/names.ts';
 import { EPO_OWNER } from '../../src/core/cases/cases.ts';
 import { TOPICS } from '../../src/app/view/cards.ts';
 import { MODULE_LABEL } from '../../src/app/ui/labels.ts';
-import { DEFAULT_SETTINGS } from '../../src/app/state/store.ts';
+import { DEFAULT_SETTINGS, NUMBER_RANGES } from '../../src/app/state/store.ts';
 import { EARLIER, RECORD_DATE, SAMPLE_FILES } from '../../tests/sample-record.ts';
-import { MODEL, readExpressions, readTables, tmdlName } from './tmdl.ts';
+import { MODEL, readExpressions, readTables, SOURCE_TABLES, tmdlName } from './tmdl.ts';
+import type { SourceTable } from './tmdl.ts';
+import { expectedHistory, HISTORY_FILES, STATE_LISTS } from './history.ts';
 import { compilePattern, fastForm } from './regex.ts';
 import type { FastForm, Node } from './regex.ts';
 
@@ -34,6 +37,11 @@ const root = join(import.meta.dirname, '..', '..');
 const read = (path: string): string => readFileSync(join(root, path), 'utf8');
 export const EXPRESSIONS_FILE = join(MODEL, 'expressions.tmdl');
 export const RUN_FILE = join(MODEL, 'tables', 'Run.tmdl');
+/** The file of each hidden table the calculated tables split. */
+export const SOURCE_FILES: Record<SourceTable, string> = { Run: RUN_FILE, HistoryRun: join(MODEL, 'tables', 'HistoryRun.tmdl') };
+const STATE_FOLDER = join(root, 'powerbi', 'samples', 'state');
+/** What the measures of the history count on the samples (tools/powerbi/history.ts), worked out once. */
+export const EXPECTED_HISTORY = await expectedHistory();
 export const THEME_FILE = join(root, 'powerbi', 'SACM-Workbench.Report', 'StaticResources', 'RegisteredResources', 'sacm-theme.json');
 const M_FOLDER = join(root, 'powerbi', 'm');
 
@@ -42,11 +50,20 @@ const M_FOLDER = join(root, 'powerbi', 'm');
 /** A text as an M text literal. `#(` would start an escape in M, so it is written `#(#)(`. */
 export const mText = (text: string): string => `"${text.replace(/"/g, '""').replace(/#\(/g, '#(#)(')}"`;
 
-/** The invented samples, each with the name it would have in the SharePoint folder: yyyy-MM-dd_<name>. */
+/**
+ * The invented samples, each with the name it would have in the SharePoint folder: yyyy-MM-dd_<name>. With the earlier
+ * CI and Relationship reports of powerbi/samples/ (the history, D290).
+ */
 function sampleFiles(): Array<{ name: string; base64: string }> {
   const dated = (file: { path: string; name: string }, date: string) => ({ name: `${date}_${file.name}`, base64: readFileSync(file.path).toString('base64') });
   const { solusiEarlier, ...rest } = SAMPLE_FILES;
-  return [...Object.values(rest).map((file) => dated(file, RECORD_DATE)), dated(solusiEarlier, EARLIER)].sort((a, b) => a.name.localeCompare(b.name));
+  return [...Object.values(rest).map((file) => dated(file, RECORD_DATE)), dated(solusiEarlier, EARLIER), ...HISTORY_FILES.map((file) => dated(file, file.date))]
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** The invented lists of the team's state (powerbi/samples/state/), by file name (D291). */
+function stateFiles(): Array<{ name: string; base64: string }> {
+  return Object.values(STATE_LISTS).map((list) => ({ name: list.file, base64: readFileSync(join(STATE_FOLDER, list.file)).toString('base64') }));
 }
 
 /** Every check file, in the order of their file names whatever the folder (as the app reads them), with its folder. */
@@ -224,7 +241,7 @@ function expectedResult(): unknown {
 
 interface Query { name: string; m: string; description: string; group: string }
 
-const PARAMETERS = ['SourceMode', 'SharePointSite', 'ReportsFolder', 'ServiceNowAddress'];
+const PARAMETERS = ['SourceMode', 'StateMode', 'SharePointSite', 'ReportsFolder', 'ServiceNowAddress', 'RangeStart', 'RangeEnd'];
 /** The queries of the checks themselves (group Checks), besides the detectors fnDetect…. */
 const CHECK_QUERIES = new Set(['BuiltDetectors', 'CheckRun', 'fnCheckRun', 'fnFacts', 'fnContact', 'fnListing', 'fnSourceFirst', 'fnParked', 'fnFinding', 'fnMatches', 'fnRegexTest', 'fnRegexWalk', 'fnSearch', 'fnEpoCompare', 'fnEpoTested', 'fnEpoNoFlag', 'fnEpoCorrections',
   'fnContractCompare', 'fnContractSubject', 'ContractWords', 'fnEpoIds']);
@@ -252,7 +269,14 @@ function packed(): Query[] {
     { name: 'ReadingRules', group: 'Packed', description: 'GENERATED from src/core/sources/. The report types, the header forms and the words the readers use.', m: json(readingRules()) },
     { name: 'Patterns', group: 'Packed', description: 'GENERATED from the check files and the reference files (tools/powerbi/regex.ts). Every regular expression the checks test, compiled for fnRegexTest, by flags and text.', m: json(compiledPatterns()) },
     { name: 'PatternForms', group: 'Packed', description: 'GENERATED from the check files and the reference files (tools/powerbi/regex.ts, D285). For each pattern of Patterns, the fast form that decides most texts without the walk (fnFastMatch).', m: json(patternForms()) },
-    { name: 'RunColumnTypes', group: 'Packed', description: 'GENERATED from the calculated tables (D284). The type of every column of Run that a part gives, for RunRows: the data type of the column of the calculated table.', m: runColumnTypes() },
+    { name: 'RunColumnTypes', group: 'Packed', description: 'GENERATED from the calculated tables (D284). The type of every column of Run that a part gives, for RunRows: the data type of the column of the calculated table.', m: runColumnTypes('Run') },
+    { name: 'HistoryRunColumnTypes', group: 'Packed', description: 'GENERATED from the calculated tables (D290). The type of every column of HistoryRun that a part gives, for fnHistoryRun.', m: runColumnTypes('HistoryRun') },
+    { name: 'StateFiles', group: 'Packed', description: 'GENERATED from powerbi/samples/state/. The invented lists of the team\'s state (journal, replies, settings, team, reviews), as their bytes in base64, read when StateMode is Sample (D291).',
+      m: `#table(type table [FileName = text, Base64 = text], {\n${stateFiles().map((file) => `\t{${mText(file.name)}, ${mText(file.base64)}}`).join(',\n')}\n})` },
+    { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The five lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
+    { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.',
+      m: json(Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }]))) },
+    { name: 'ExpectedHistory', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team\'s state, for the Self-check page.', m: mText(JSON.stringify(EXPECTED_HISTORY)) },
     { name: 'ExpectedResult', group: 'Packed', description: 'GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.', m: mText(JSON.stringify(expectedResult())) },
     { name: 'WorkbenchVersion', group: 'Packed', description: 'GENERATED from package.json. The version of the Workbench.', m: mText(version) },
     { name: 'SampleDate', group: 'Packed', description: 'GENERATED from tests/sample-record.ts. The day the samples were recorded.', m: `#date(${year}, ${month}, ${day})` }
@@ -279,47 +303,76 @@ export function expressionsTmdl(): string {
 
 /* ------------------------------------------------------------------ tables/Run.tmdl */
 
-/** The M type of a TMDL data type, as the parts give it (a date column of a part is a date). */
-const M_TYPES: Record<string, string> = { string: 'type nullable text', int64: 'Int64.Type', boolean: 'type nullable logical', dateTime: 'type nullable date', double: 'type nullable number' };
+/**
+ * The M type of a TMDL data type, as the parts give it: a date column of a part is a date, unless its format shows the
+ * time (hh), then it is a date and time (the journal, the replies).
+ */
+const M_TYPES: Record<string, string> = { string: 'type nullable text', int64: 'Int64.Type', boolean: 'type nullable logical', dateTime: 'type nullable date', double: 'type nullable number', time: 'type nullable datetime' };
+const mTypeOf = (column: { dataType: string; formatString?: string } | undefined): string | undefined =>
+  M_TYPES[column?.dataType === 'dateTime' && /hh/.test(column.formatString ?? '') ? 'time' : column?.dataType ?? 'string'];
 
-/** The query RunColumnTypes: {"<Part>.<Column>", <type>} for every column a part gives, as Table.TransformColumnTypes takes it. */
-export function runColumnTypes(): string {
+/** The query <Source>ColumnTypes: {"<Part>.<Column>", <type>} for every column a part gives, as Table.TransformColumnTypes takes it. */
+export function runColumnTypes(source: SourceTable = 'Run'): string {
   const pairs: string[] = [];
-  for (const table of readTables().filter((item) => item.calculated)) {
-    const types = new Map(table.columns.map((item) => [item.sourceColumn, item.dataType]));
-    for (const [name, source] of table.calculated!.columns) {
-      const type = M_TYPES[types.get(name) ?? 'string'];
-      if (!type) throw new Error(`${table.file}: the data type ${types.get(name)} of ${name} has no M type in generate.ts`);
-      pairs.push(`{${mText(source)}, ${type}}`);
+  for (const table of readTables().filter((item) => item.calculated?.source === source)) {
+    const types = new Map(table.columns.map((item) => [item.sourceColumn, item]));
+    for (const [name, column] of table.calculated!.columns) {
+      const type = mTypeOf(types.get(name));
+      if (!type) throw new Error(`${table.file}: the data type ${types.get(name)?.dataType} of ${name} has no M type in generate.ts`);
+      pairs.push(`{${mText(column)}, ${type}}`);
     }
   }
   return `{\n${pairs.map((pair) => `    ${pair}`).join(',\n')}\n}`;
 }
 
+/** What each hidden table is, for the first line of its file, and the lines after its partition. */
+const SOURCE_TEXT: Record<SourceTable, { about: string; rows: string; after: string[] }> = {
+  Run: { about: 'The checks on the newest CI report, computed once per refresh', rows: 'RunRows', after: [] },
+  HistoryRun: {
+    about: 'The checks on every CI report date, kept by the incremental refresh (D290): 24 months, the last 7 days looked at, a day computed again only when its files changed',
+    rows: 'HistoryRunRows',
+    // Incremental refresh (Premium Per User): monthly parts for 24 months, daily parts for the last 7 days; a daily part is
+    // computed again only when fnHistoryPolling gives another value (detect data changes).
+    after: [
+      '\trefreshPolicy',
+      '\t\tpolicyType: basic',
+      '\t\trollingWindowGranularity: month',
+      '\t\trollingWindowPeriods: 24',
+      '\t\tincrementalGranularity: day',
+      '\t\tincrementalPeriods: 7',
+      '\t\tpollingExpression = fnHistoryPolling(RangeStart, RangeEnd)',
+      '\t\tsourceExpression = HistoryRunRows',
+      ''
+    ]
+  }
+};
+
 /**
- * The hidden table Run (D284): a column Part, the date of the run, and for each calculated table every column it takes
- * from Run (<Part>.<Column>), with the data type of the calculated table's column. Generated from the calculated tables,
- * so the two never differ. Its rows come from the query RunRows.
+ * A hidden table the calculated tables split (D284, D290): a column Part, the report date, and for each calculated table
+ * of that source every column it takes (<Part>.<Column>), with the data type of the calculated table's column. Generated
+ * from the calculated tables, so the two never differ. Its rows come from the query RunRows or HistoryRunRows.
  */
-export function runTmdl(): string {
-  const calculated = readTables().filter((table) => table.calculated);
+export function runTmdl(source: SourceTable = 'Run'): string {
+  const calculated = readTables().filter((table) => table.calculated?.source === source);
   const column = (name: string, dataType: string, extra: string[] = []): string =>
     [`\tcolumn ${tmdlName(name)}`, `\t\tdataType: ${dataType}`, ...extra.map((line) => `\t\t${line}`), '\t\tsummarizeBy: none', `\t\tsourceColumn: ${name}`, ''].join('\n');
   const columns = [column('Part', 'string'), column('ReportDate', 'dateTime', ['formatString: d mmm yyyy'])];
   for (const table of calculated) {
     const types = new Map(table.columns.map((item) => [item.sourceColumn, item.dataType]));
-    for (const [name, source] of table.calculated!.columns) columns.push(column(source, types.get(name) ?? 'string'));
+    for (const [name, taken] of table.calculated!.columns) columns.push(column(taken, types.get(name) ?? 'string'));
   }
+  const text = SOURCE_TEXT[source];
   return [
-    `/// GENERATED by npm run powerbi:generate from the calculated tables (D284). The checks on the newest CI report, computed once per refresh: the rows of ${calculated.map((table) => table.calculated!.part).join(', ')}. Hidden: the pages show the calculated tables.`,
-    'table Run',
+    `/// GENERATED by npm run powerbi:generate from the calculated tables (D284). ${text.about}: the rows of ${calculated.map((table) => table.calculated!.part).join(', ')}. Hidden: the pages show the calculated tables.`,
+    `table ${source}`,
     '\tisHidden',
     '',
     ...columns,
-    '\tpartition Run = m',
+    `\tpartition ${source} = m`,
     '\t\tmode: import',
-    '\t\tsource = RunRows',
-    ''
+    `\t\tsource = ${text.rows}`,
+    '',
+    ...text.after
   ].join('\n');
 }
 
@@ -371,7 +424,10 @@ export function staleQueries(): string[] {
     else if (found.get(query.name) !== query.m.trim()) problems.push(`${query.name}: its M is not the one of ${query.group === 'Packed' ? 'the repository' : `powerbi/m/${query.name}.pq`}`);
   }
   for (const name of found.keys()) if (!wanted.some((query) => query.name === name)) problems.push(`${name}: not in powerbi/m/ (a query made in Power BI Desktop? move it to powerbi/m/${name}.pq)`);
-  if (!existsSync(RUN_FILE) || readFileSync(RUN_FILE, 'utf8').replace(/\r\n/g, '\n') !== runTmdl()) problems.push(`${relative(root, RUN_FILE)}: not the columns of the calculated tables`);
+  for (const source of SOURCE_TABLES) {
+    const file = SOURCE_FILES[source];
+    if (!existsSync(file) || readFileSync(file, 'utf8').replace(/\r\n/g, '\n') !== runTmdl(source)) problems.push(`${relative(root, file)}: not the columns of the calculated tables`);
+  }
   if (!existsSync(THEME_FILE) || readFileSync(THEME_FILE, 'utf8').replace(/\r\n/g, '\n') !== themeText()) problems.push(`${relative(root, THEME_FILE)}: not the theme of the colours of LOOK.md`);
   return problems;
 }
@@ -385,6 +441,6 @@ if (process.argv[1] === import.meta.filename) {
   }
   writeFileSync(EXPRESSIONS_FILE, expressionsTmdl());
   writeFileSync(THEME_FILE, themeText());
-  writeFileSync(RUN_FILE, runTmdl());
-  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${relative(root, RUN_FILE)} and ${relative(root, THEME_FILE)}.`);
+  for (const source of SOURCE_TABLES) writeFileSync(SOURCE_FILES[source], runTmdl(source));
+  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${SOURCE_TABLES.map((source) => relative(root, SOURCE_FILES[source])).join(', ')} and ${relative(root, THEME_FILE)}.`);
 }

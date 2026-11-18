@@ -1,0 +1,16 @@
+Parent,Type,Child,Connection strength,Updated,Created,Created by,Excluded for calculation,Percent outage,Port,Tags,Updated by,Updates,Class,Asset tag,Class,Asset tag
+Manage Member Records,Provided by::Provides,Register a New Member,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Capability,AST-0001,Business Process,AST-0002
+Manage Member Records,Provided by::Provides,Reconcile Index,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Capability,AST-0001,Business Process,AST-0003
+Register a New Member,Provided by::Provides,Member Engine,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Process,AST-0002,Business Application,AST-0004
+Reconcile Index,Depends on::Used by,Index Tool,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Process,AST-0003,Business Application,AST-0005
+Member Engine,Consumes::Consumed by,Member Engine - PROD,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Application,AST-0004,Service Instance,AST-0006
+Member Engine,Consumes::Consumed by,Member Engine - TEST,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Application,AST-0004,Service Instance,AST-0007
+Index Tool,Consumes::Consumed by,Index Tool - PROD,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,true,,,,demo.user,0,Business Application,AST-0005,Service Instance,AST-0008
+Register a New Member,Provided by::Provides,Members,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Process,AST-0002,Business Service,AST-0010
+Members,Provides::Provided by,Members - Standard,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Service,AST-0010,Service Offering,AST-0011
+Members,Provides::Provided by,Members - Standard,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Service,AST-0010,Service Offering,AST-0011
+Members - Standard,Depends on::Used by,Member Engine - PROD,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Service Offering,AST-0011,Service Instance,AST-0006
+Index Tool - PROD,Depends on::Used by,Old Receipt Printer,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Service Instance,AST-0008,Service Instance,AST-0009
+Manage Fines,Contains::Contained by,Fines  Hub - PROD,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Capability,AST-0013,Service Instance,AST-0012
+Manage Member Records,Provided by::Provides,Close the Month,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Capability,AST-0001,Business Process,AST-0021
+Close the Month,Provided by::Provides,Index Tool,Always,2026-10-01 09:00:00,2026-10-01 09:00:00,demo.user,false,,,,demo.user,0,Business Process,AST-0021,Business Application,AST-0005
