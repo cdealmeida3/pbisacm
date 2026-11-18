@@ -218,6 +218,13 @@ table Findings
 		isNameInferred
 		sourceColumn: [FixRelatedTo]
 
+	/// Why a line of the SACM fix list needs care (Not in Solusi: the contract is still linked). Empty for most lines.
+	column FixNote
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FixNote]
+
 	column Group
 		dataType: string
 		isDataTypeInferred
@@ -337,6 +344,7 @@ table Findings
 					"FixSet", Run[Findings.FixSet],
 					"FixValue", Run[Findings.FixValue],
 					"FixRelatedTo", Run[Findings.FixRelatedTo],
+					"FixNote", Run[Findings.FixNote],
 					"Group", Run[Findings.Group],
 					"EpoId", Run[Findings.EpoId],
 					"Status", Run[Findings.Status],

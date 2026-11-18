@@ -53,6 +53,21 @@
                       "Entity": "Findings"
                     }
                   },
+                  "Property": "OwnedBy"
+                }
+              },
+              "queryRef": "Findings.OwnedBy",
+              "nativeQueryRef": "OwnedBy",
+              "displayName": "Contract owner"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
                   "Property": "Detail"
                 }
               },

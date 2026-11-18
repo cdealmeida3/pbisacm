@@ -28,7 +28,7 @@
                 subject = fnContractSubject(contract, null)
             in
                 fnFinding(pack, subject, "record", if note <> "" then detail & ". " & note else detail, [
-                    Fix = [Change = "Delete the contract in ServiceNow", Current = contract[Number] & ", " & (if contract[State] = "" then "no status" else contract[State]), Set = "Deleted"],
+                    Fix = [Change = "Delete the contract in ServiceNow", Current = contract[Number] & ", " & (if contract[State] = "" then "no status" else contract[State]), Set = "Deleted", Note = note],
                     Subject = subject])
     in
         [

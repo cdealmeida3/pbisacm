@@ -28,7 +28,7 @@ let
                 before = Record.FromList(List.Transform(Record.FieldValues(beforeGroups), List.Last), Record.FieldNames(beforeGroups)),
                 now = fnKeySet(List.Transform(current[Contracts], (contract) => lower(contract[Number]))),
                 fields = List.Buffer(List.Transform(ReadingRules[contractChangeFields], (entry) => entry & [Column = fnPascal(entry[field])])),
-                compared = List.Transform(current[Contracts], (contract) => [Now = contract, Old = Record.FieldOrDefault(before, lower(contract[Number]), null)]),
+                compared = List.Buffer(List.Transform(current[Contracts], (contract) => [Now = contract, Old = Record.FieldOrDefault(before, lower(contract[Number]), null)])),
                 added = List.Transform(List.Select(compared, (item) => item[Old] = null), (item) => lineOf("New contract", item[Now], "", "", whole(item[Now]))),
                 left = List.Transform(List.Select(previous[Contracts], (contract) => not Record.HasFields(now, lower(contract[Number]))),
                     (contract) => lineOf("No longer in the file", contract, "", whole(contract), "")),

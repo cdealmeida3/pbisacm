@@ -1,6 +1,6 @@
 // The problems of the contract data (code detector contracts/problems, src/core/checks/detectors/contract-detectors.ts,
 // contractProblems): the list `problems` of reference/contract-reports; a check raises the ones of its detector.rules (all
-// when it has none). One finding per contract and problem; the field is the id of the problem and Group its label, so
+// when it has none). One finding per contract and problem; the field is the id of the problem and Problem its label, so
 // the message shows one table per problem. "For Procurement" raises the problems of Solusi itself; "Contracts to fix in
 // ServiceNow" the ones SACM corrects in ServiceNow, each with its line of the fix list (D145). An inactive contract owner
 // or Procurement partner is SACM's when the loaded reports know an active account with the same name (the upload picked
@@ -23,7 +23,7 @@
             if not fixList then null
             else [Change = if found = null then id else Record.FieldOrDefault(found, "change", found[label]), Current = current, Set = if found = null then "" else Record.FieldOrDefault(found, "set", "")],
         line = (subject as record, field as text, detail as text, fix as nullable record, group as text) as record =>
-            fnFinding(pack, subject, field, detail, [Fix = fix, Group = group, Subject = subject]),
+            fnFinding(pack, subject, field, detail, [Fix = fix, Problem = group, Subject = subject]),
         // A finding of problem `id` when the check raises it.
         raise = (subject as record, id as text, detail as text, current as text) as list =>
             if wanted(id) then {line(subject, id, detail, fixOf(id, current), label(id))} else {},

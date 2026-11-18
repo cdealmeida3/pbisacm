@@ -167,6 +167,15 @@ for (const pack of packs) {
   labels.set(pack.cardLabel, pack.id);
 }
 done.push(`Checks: ${packs.length} in use, ${built.length} detectors built, card labels unique`);
+// The days of "ends in the next … days" are data (endsWithinDays of contract-reports.json); the page has one measure for each.
+const endsWithin = (JSON.parse(readFileSync(join(root, 'checks', 'reference', 'contract-reports.json'), 'utf8')) as { endsWithinDays: number[] }).endsWithinDays;
+const endMeasures = (tables.find((table) => table.name === 'ContractChanges')?.measures ?? []).map((measure) => measure.name).filter((name) => /^Ends in \d+ days$/.test(name)).sort();
+const wantEnds = endsWithin.map((days) => `Ends in ${days} days`).sort();
+if (endMeasures.join(', ') !== wantEnds.join(', ')) problems.push(`Checks: ContractChanges has the measures [${endMeasures.join(', ')}], endsWithinDays of contract-reports.json asks for [${wantEnds.join(', ')}]`);
+for (const measure of tables.find((table) => table.name === 'ContractChanges')?.measures ?? []) {
+  const days = /^Ends in (\d+) days$/.exec(measure.name)?.[1];
+  if (days && !new RegExp(`<=\\s*${days}\\b`).test(measure.dax)) problems.push(`Checks: the measure ContractChanges[${measure.name}] does not count up to ${days} days`);
+}
 
 /* 7. Colours */
 const look = lightColours();

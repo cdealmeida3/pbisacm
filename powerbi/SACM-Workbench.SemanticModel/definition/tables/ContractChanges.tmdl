@@ -10,14 +10,16 @@ table ContractChanges
 			RETURN
 			    added & " new · " & gone & " no longer in the file · " & status & IF ( status = 1, " status change", " status changes" ) & " · " & fields & IF ( fields = 1, " changed field", " changed fields" )
 
-	/// Which two Solusi contract files are compared, or why nothing is.
+	/// Which two Solusi contract files are compared, or why nothing is. From the files themselves, so it is right when nothing changed.
 	measure 'Changes head' =
-			VAR fileDate = CALCULATE ( MAX ( ReportFiles[ReportDate] ), ReportFiles[Kind] = "solusi" )
-			VAR earlier = MAX ( ContractChanges[EarlierDate] )
+			VAR solusi = FILTER ( ReportFiles, ReportFiles[Kind] = "solusi" && NOT ISBLANK ( ReportFiles[ReportDate] ) )
+			VAR newest = TOPN ( 1, solusi, ReportFiles[ReportDate], DESC, ReportFiles[FileName], DESC )
+			VAR fileDate = MAXX ( newest, ReportFiles[ReportDate] )
+			VAR earlier = MAXX ( EXCEPT ( solusi, newest ), ReportFiles[ReportDate] )
 			RETURN
 			    IF ( ISBLANK ( fileDate ), "No Solusi contract file is loaded yet.",
 			        IF ( ISBLANK ( earlier ), "The Solusi contract file of " & FORMAT ( fileDate, "d mmm yyyy" ) & " is the first one: nothing to compare with yet.",
-			            "The Solusi contract file of " & FORMAT ( MAX ( ContractChanges[FileDate] ), "d mmm yyyy" ) & " against the one of " & FORMAT ( earlier, "d mmm yyyy" ) & "." ) )
+			            "The Solusi contract file of " & FORMAT ( fileDate, "d mmm yyyy" ) & " against the one of " & FORMAT ( earlier, "d mmm yyyy" ) & "." ) )
 
 	/// Days from today (the date of the samples in Sample mode) to the end date of a Concluded contract; empty when it has ended.
 	measure 'Days left' =

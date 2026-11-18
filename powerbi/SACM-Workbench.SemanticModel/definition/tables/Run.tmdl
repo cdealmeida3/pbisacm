@@ -228,6 +228,11 @@ table Run
 		summarizeBy: none
 		sourceColumn: Findings.FixRelatedTo
 
+	column 'Findings.FixNote'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Findings.FixNote
+
 	column 'Findings.Group'
 		dataType: string
 		summarizeBy: none

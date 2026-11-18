@@ -22,7 +22,7 @@
                     fact[ContactId], fact[ContactName], fact[ContactEmail], fact[ContactVia],
                     if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else "Nobody to ask",
                     Text.Combine(fact[Cc], "; "), fact[EscalateName], fact[EscalateEmail], fact[EscalateVia],
-                    fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"),
+                    fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"), fix(fact, "Note"),
                     fact[CheckId] & "|" & fact[Route] & "|" & person & (if fact[State] = "open" then "" else "|" & fact[State]),
                     fact[EpoId], fact[Status], fact[SupportGroup], fact[OwnedBy], fact[ManagedBy], fact[SupportedBy], Text.Combine(fact[Chips], ", "), Text.Combine(fact[Tags], ", "),
                     fnServiceNowLink(address, fact[CiName], fact[Class], fix(fact, "RelatedTo")),
@@ -33,7 +33,7 @@
             type table [ReportDate = date, Key = text, CheckId = text, CiKey = text, CiName = text, Class = text, ClassLabel = text, Field = text,
                 Severity = text, Detail = text, Module = text, Route = text, State = text, StateLabel = text, StateWhy = text, Source = text, Wait = text,
                 Review = text, ContactId = text, ContactName = text, ContactEmail = text, ContactVia = text, AskWho = text, Cc = text, EscalateName = text,
-                EscalateEmail = text, EscalateVia = text, FixChange = text, FixCurrent = text, FixSet = text, FixValue = text, FixRelatedTo = text,
+                EscalateEmail = text, EscalateVia = text, FixChange = text, FixCurrent = text, FixSet = text, FixValue = text, FixRelatedTo = text, FixNote = text,
                 Group = text, EpoId = text, Status = text, SupportGroup = text, OwnedBy = text, ManagedBy = text, SupportedBy = text, Chips = text, Tags = text,
                 ServiceNowLink = text, Mapping = text, EpoCorrection = text, Problem = text],
             List.Transform(List.Positions(facts), (at) => row(facts{at}, corrections{at})))

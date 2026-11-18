@@ -35,7 +35,7 @@ table Checks
 	measure 'Card note' = IF ( HASONEVALUE ( Checks[CheckId] ), CONCATENATEX ( Notes, Notes[Reason], " ", Notes[Order], ASC ) )
 
 	/// The title of the lines by kind of problem on a card page: one email to Procurement, one table per kind of problem (plan §6.1), or a SACM list grouped by problem or field (D146).
-	measure 'Problems title' = IF ( SELECTEDVALUE ( Checks[Kind] ) = "mailbox", "One email to Procurement: one table per kind of problem", "By kind of problem" )
+	measure 'Problems title' = IF ( SELECTEDVALUE ( Checks[Kind] ) = "mailbox", "The one email to the Procurement mailbox, by kind of problem (the email has one table per kind)", "By kind of problem" )
 
 	/// The text colour of the state (LOOK.md, one meaning per colour).
 	measure 'Card colour' = SWITCH ( [Card state], "To solve", "#b42318", "To check", "#175cd3", "OK", "#067647", "#475467" )

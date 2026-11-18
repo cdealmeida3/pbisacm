@@ -84,6 +84,7 @@ expression RunColumnTypes =
 		    {"Findings.FixSet", type nullable text},
 		    {"Findings.FixValue", type nullable text},
 		    {"Findings.FixRelatedTo", type nullable text},
+		    {"Findings.FixNote", type nullable text},
 		    {"Findings.Group", type nullable text},
 		    {"Findings.EpoId", type nullable text},
 		    {"Findings.Status", type nullable text},
@@ -423,7 +424,7 @@ expression fnFindingsPart =
 		                    fact[ContactId], fact[ContactName], fact[ContactEmail], fact[ContactVia],
 		                    if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else "Nobody to ask",
 		                    Text.Combine(fact[Cc], "; "), fact[EscalateName], fact[EscalateEmail], fact[EscalateVia],
-		                    fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"),
+		                    fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"), fix(fact, "Note"),
 		                    fact[CheckId] & "|" & fact[Route] & "|" & person & (if fact[State] = "open" then "" else "|" & fact[State]),
 		                    fact[EpoId], fact[Status], fact[SupportGroup], fact[OwnedBy], fact[ManagedBy], fact[SupportedBy], Text.Combine(fact[Chips], ", "), Text.Combine(fact[Tags], ", "),
 		                    fnServiceNowLink(address, fact[CiName], fact[Class], fix(fact, "RelatedTo")),
@@ -434,7 +435,7 @@ expression fnFindingsPart =
 		            type table [ReportDate = date, Key = text, CheckId = text, CiKey = text, CiName = text, Class = text, ClassLabel = text, Field = text,
 		                Severity = text, Detail = text, Module = text, Route = text, State = text, StateLabel = text, StateWhy = text, Source = text, Wait = text,
 		                Review = text, ContactId = text, ContactName = text, ContactEmail = text, ContactVia = text, AskWho = text, Cc = text, EscalateName = text,
-		                EscalateEmail = text, EscalateVia = text, FixChange = text, FixCurrent = text, FixSet = text, FixValue = text, FixRelatedTo = text,
+		                EscalateEmail = text, EscalateVia = text, FixChange = text, FixCurrent = text, FixSet = text, FixValue = text, FixRelatedTo = text, FixNote = text,
 		                Group = text, EpoId = text, Status = text, SupportGroup = text, OwnedBy = text, ManagedBy = text, SupportedBy = text, Chips = text, Tags = text,
 		                ServiceNowLink = text, Mapping = text, EpoCorrection = text, Problem = text],
 		            List.Transform(List.Positions(facts), (at) => row(facts{at}, corrections{at})))
@@ -1099,10 +1100,12 @@ expression fnReadSolusiFile =
 		        all = if List.IsEmpty(tables) then #table(names & {"sheet"}, {}) else Table.Combine(tables),
 		        indexed = Table.AddIndexColumn(all, "Row", 0, 1, Int64.Type),
 		        withKey = Table.AddColumn(indexed, "NumberKey", each Text.Lower([number], "en-US"), type text),
-		        // The last terminated row of a number wins, else the first row of the number.
+		        // The last terminated row of a number wins, else the first row of the number. It keeps the place of the first row
+		        // of its number, as a JavaScript Map does in src/core.
 		        ranked = Table.AddColumn(withKey, "Rank", each if [sheet] = "terminated" then 1000000000 + [Row] else -[Row], type number),
-		        best = Table.Combine(Table.Group(ranked, {"NumberKey"}, {{"Rows", each Table.FirstN(Table.Sort(_, {{"Rank", Order.Descending}}), 1)}})[Rows]),
-		        sorted = Table.Sort(best, {{"Row", Order.Ascending}}),
+		        best = Table.Combine(Table.Group(ranked, {"NumberKey"}, {{"Rows", (group) => let place = List.Min(group[Row]) in
+		            Table.AddColumn(Table.FirstN(Table.Sort(group, {{"Rank", Order.Descending}}), 1), "Place", each place, Int64.Type)}})[Rows]),
+		        sorted = Table.Sort(best, {{"Place", Order.Ascending}}),
 		        dates = Table.TransformColumns(sorted, {{"start", fnParseDate, type nullable date}, {"end", fnParseDate, type nullable date}, {"terminated", fnParseDate, type nullable date}}),
 		        renamed = Table.RenameColumns(dates, {
 		            {"number", "Number"}, {"status", "Status"}, {"name", "Name"}, {"vendor", "Vendor"}, {"vendorNumber", "VendorNumber"},
@@ -2020,7 +2023,7 @@ expression fnDetectContractsNotInSolusi =
 		                subject = fnContractSubject(contract, null)
 		            in
 		                fnFinding(pack, subject, "record", if note <> "" then detail & ". " & note else detail, [
-		                    Fix = [Change = "Delete the contract in ServiceNow", Current = contract[Number] & ", " & (if contract[State] = "" then "no status" else contract[State]), Set = "Deleted"],
+		                    Fix = [Change = "Delete the contract in ServiceNow", Current = contract[Number] & ", " & (if contract[State] = "" then "no status" else contract[State]), Set = "Deleted", Note = note],
 		                    Subject = subject])
 		    in
 		        [
@@ -2031,7 +2034,7 @@ expression fnDetectContractsNotInSolusi =
 		        ]
 	queryGroup: Checks
 
-/// The problems of the contract data (code detector contracts/problems, src/core/checks/detectors/contract-detectors.ts, contractProblems): the list `problems` of reference/contract-reports; a check raises the ones of its detector.rules (all when it has none). One finding per contract and problem; the field is the id of the problem and Group its label, so the message shows one table per problem. "For Procurement" raises the problems of Solusi itself; "Contracts to fix in ServiceNow" the ones SACM corrects in ServiceNow, each with its line of the fix list (D145). An inactive contract owner or Procurement partner is SACM's when the loaded reports know an active account with the same name (the upload picked the wrong account), and Procurement's when they know none (the person left, D193). Every problem is marked as tested, also the ones a check does not raise, so a problem that moved to the other card closes on this one.
+/// The problems of the contract data (code detector contracts/problems, src/core/checks/detectors/contract-detectors.ts, contractProblems): the list `problems` of reference/contract-reports; a check raises the ones of its detector.rules (all when it has none). One finding per contract and problem; the field is the id of the problem and Problem its label, so the message shows one table per problem. "For Procurement" raises the problems of Solusi itself; "Contracts to fix in ServiceNow" the ones SACM corrects in ServiceNow, each with its line of the fix list (D145). An inactive contract owner or Procurement partner is SACM's when the loaded reports know an active account with the same name (the upload picked the wrong account), and Procurement's when they know none (the person left, D193). Every problem is marked as tested, also the ones a check does not raise, so a problem that moved to the other card closes on this one.
 expression fnDetectContractsProblems =
 		(pack as record, run as record, config as record) as record =>
 		    let
@@ -2050,7 +2053,7 @@ expression fnDetectContractsProblems =
 		            if not fixList then null
 		            else [Change = if found = null then id else Record.FieldOrDefault(found, "change", found[label]), Current = current, Set = if found = null then "" else Record.FieldOrDefault(found, "set", "")],
 		        line = (subject as record, field as text, detail as text, fix as nullable record, group as text) as record =>
-		            fnFinding(pack, subject, field, detail, [Fix = fix, Group = group, Subject = subject]),
+		            fnFinding(pack, subject, field, detail, [Fix = fix, Problem = group, Subject = subject]),
 		        // A finding of problem `id` when the check raises it.
 		        raise = (subject as record, id as text, detail as text, current as text) as list =>
 		            if wanted(id) then {line(subject, id, detail, fixOf(id, current), label(id))} else {},
@@ -2251,10 +2254,10 @@ expression fnDetectContractsUploadCheck =
 		                    in
 		                        fnFinding(pack, pair[Subject], difference[Field], difference[Label] & ": Solusi has " & value & ", ServiceNow has " & now, [
 		                            Fix = [Change = difference[Label] & ": set the value of Solusi", Current = now, Set = value, Value = if difference[Kind] = "text" then difference[Solusi] else ""],
-		                            Group = difference[Label], Subject = pair[Subject]])),
+		                            Problem = difference[Label], Subject = pair[Subject]])),
 		                status = if solusi[Status] <> "" and state <> "" and not words[InList](config[autoStates], state) and not words[SameWord](state, solusi[Status]) then
 		                    {fnFinding(pack, pair[Subject], "status", "Status: Solusi has " & solusi[Status] & ", ServiceNow has " & state, [
-		                        Fix = [Change = "Status: set the status of Solusi", Current = state, Set = solusi[Status]], Group = "Status", Subject = pair[Subject]])}
+		                        Fix = [Change = "Status: set the status of Solusi", Current = state, Set = solusi[Status]], Problem = "Status", Subject = pair[Subject]])}
 		                    else {}
 		            in
 		                fields & status,
@@ -2263,7 +2266,7 @@ expression fnDetectContractsUploadCheck =
 		            fnFinding(pack, subject, "record",
 		                "In the Solusi contract file (" & (if contract[Status] = "" then "no status" else contract[Status]) & (if contract[Start] <> null then ", starts " & fnLongDate(contract[Start]) else "") & "), not in ServiceNow yet",
 		                [Fix = [Change = "Bring the contract into ServiceNow (upload the Solusi contract file again, or create it)", Current = "not in ServiceNow", Set = "in ServiceNow"],
-		                    Group = "Not in ServiceNow yet", Subject = subject]))
+		                    Problem = "Not in ServiceNow yet", Subject = subject]))
 		    in
 		        [
 		            Findings = List.Buffer(List.Combine(List.Transform(pairs, lines)) & missing),
@@ -3258,7 +3261,7 @@ expression fnFacts =
 		        List.Transform(findings, factOf)
 	queryGroup: Checks
 
-/// One finding of a check on a CI (src/core/model/model.ts, Finding). The key never changes: <check>:<CI key>:<field>, and ":<suffix>" for a finding about one relationship. `extra` may give Suffix, Review (listed for a review, why), Wait (waits, why), Source (what the source says), Fix (the line of a SACM fix list: Change, Current, Set, Value, RelatedTo), Chips, ContactCi, InServiceNow, Mapping (the reasons of a case of the mapping backlog, by id), Group (the kind of problem a line is listed under: a problem of the contract data, a field of the upload check; D146) and Subject (the record a finding is about when it is not a CI of the report: a contract, fnContractSubject).
+/// One finding of a check on a CI (src/core/model/model.ts, Finding). The key never changes: <check>:<CI key>:<field>, and ":<suffix>" for a finding about one relationship. `extra` may give Suffix, Review (listed for a review, why), Wait (waits, why), Source (what the source says), Fix (the line of a SACM fix list: Change, Current, Set, Value, RelatedTo, Note), Chips, ContactCi, InServiceNow, Mapping (the reasons of a case of the mapping backlog, by id), Problem (the kind of problem a line is listed under: a problem of the contract data, a field of the upload check; D146) and Subject (the record a finding is about when it is not a CI of the report: a contract, fnContractSubject).
 expression fnFinding =
 		(pack as record, ci as record, field as text, detail as text, optional extra as nullable record) as record =>
 		    let
@@ -3271,7 +3274,7 @@ expression fnFinding =
 		            Review = Record.FieldOrDefault(more, "Review", ""), Wait = Record.FieldOrDefault(more, "Wait", ""), Source = Record.FieldOrDefault(more, "Source", ""),
 		            Fix = Record.FieldOrDefault(more, "Fix", null), Chips = Record.FieldOrDefault(more, "Chips", {}), ContactCi = Record.FieldOrDefault(more, "ContactCi", ""),
 		            InServiceNow = Record.FieldOrDefault(more, "InServiceNow", false), Mapping = Record.FieldOrDefault(more, "Mapping", {}),
-		            Problem = Record.FieldOrDefault(more, "Group", ""), Subject = Record.FieldOrDefault(more, "Subject", null)
+		            Problem = Record.FieldOrDefault(more, "Problem", ""), Subject = Record.FieldOrDefault(more, "Subject", null)
 		        ]
 	queryGroup: Checks
 
@@ -3605,7 +3608,7 @@ expression ContractChangesRows =
 		                before = Record.FromList(List.Transform(Record.FieldValues(beforeGroups), List.Last), Record.FieldNames(beforeGroups)),
 		                now = fnKeySet(List.Transform(current[Contracts], (contract) => lower(contract[Number]))),
 		                fields = List.Buffer(List.Transform(ReadingRules[contractChangeFields], (entry) => entry & [Column = fnPascal(entry[field])])),
-		                compared = List.Transform(current[Contracts], (contract) => [Now = contract, Old = Record.FieldOrDefault(before, lower(contract[Number]), null)]),
+		                compared = List.Buffer(List.Transform(current[Contracts], (contract) => [Now = contract, Old = Record.FieldOrDefault(before, lower(contract[Number]), null)])),
 		                added = List.Transform(List.Select(compared, (item) => item[Old] = null), (item) => lineOf("New contract", item[Now], "", "", whole(item[Now]))),
 		                left = List.Transform(List.Select(previous[Contracts], (contract) => not Record.HasFields(now, lower(contract[Number]))),
 		                    (contract) => lineOf("No longer in the file", contract, "", whole(contract), "")),
