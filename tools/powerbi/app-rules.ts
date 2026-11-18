@@ -1,11 +1,13 @@
-// The rules of the Power App "SACM actions" and of its flows (build B6, D294 to D296), as pure functions: npm test runs
-// them on the catalogue and the flows (tests/tools/powerbi/app-rules.test.ts); npm run powerbi:lint runs them on what
-// Microsoft's Power Fx library reads from the app source too (tools/powerbi/powerfx-check/, needs .NET 8).
-//   - The app only ADDS rows to the list SACM Journal (D272): Patch('SACM Journal', Defaults('SACM Journal'), { … }), with
-//     columns of the list; it never changes, removes or clears a row of any list of the team, and writes no other list.
-//   - The app calls no connector but the flows of powerbi/apps/flows.json with the trigger Power Apps (V2): it sends nothing
-//     (messages come with build B7).
-//   - The flows only refresh, wait or file: no flow sends a message, none runs on a timer (D2, D269).
+// The rules of the Power Apps "SACM actions" and "SACM messages" and of their flows (builds B6 and B7, D294 to D296,
+// D301), as pure functions: npm test runs them on the catalogue and the flows (tests/tools/powerbi/app-rules.test.ts);
+// npm run powerbi:lint runs them on what Microsoft's Power Fx library reads from the app source too
+// (tools/powerbi/powerfx-check/, needs .NET 8).
+//   - The apps only ADD rows to the list SACM Journal (D272): Patch('SACM Journal', Defaults('SACM Journal'), { … }), with
+//     columns of the list; they never change, remove or clear a row of any list of the team, and write no other list.
+//   - The apps call no connector but the flows of powerbi/apps/flows.json with the trigger Power Apps (V2).
+//   - The flows refresh, wait, file a report or a reply, or send exactly what a manager pressed Send or Test on: the
+//     To, Cc, Subject and Body of a sending step are the inputs of its trigger (a test goes to the manager who ran it).
+//     A flow that starts on a new email never sends; none runs on a timer (D2, D269).
 //   - The catalogue (powerbi/apps/actions.json): unique ids, journal types the model reads, scopes and asks the app knows,
 //     labels the column Actions can hold; every action of scope line is one fnCaseActions gives, and the other way round.
 import { readFileSync } from 'node:fs';
@@ -26,7 +28,7 @@ const JOURNAL_COLUMNS = new Set<string>(STATE_LISTS.journal.columns);
 /** Functions that change or remove what a data source holds. Only Patch with Defaults (a new row) is allowed. */
 const WRITERS = new Set(['Patch', 'Collect', 'ClearCollect', 'Clear', 'Remove', 'RemoveIf', 'Update', 'UpdateIf', 'SubmitForm']);
 
-export interface Flow { id: string; name: string; purpose: string; trigger: string; concurrency: number; steps: Array<{ action: string; connector: string; fields: Record<string, string>; runAfter?: string[]; forEach?: string }> }
+export interface Flow { id: string; name: string; purpose: string; trigger: string; inputs?: string[]; triggerFields?: Record<string, string>; concurrency: number; steps: Array<{ action: string; connector: string; fields: Record<string, string>; runAfter?: string[]; forEach?: string }> }
 export const appFlows = (): Flow[] => (JSON.parse(readFileSync(FLOWS_FILE, 'utf8')) as { flows: Flow[] }).flows;
 
 /** One call of a formula, as tools/powerbi/powerfx-check gives it. */
@@ -67,11 +69,13 @@ export function catalogueProblems(actions: AppAction[] = appActions(), fnCaseAct
     ids.add(action.id);
     if (!/^[a-z][a-z-]*$/.test(action.id)) problems.push(`Actions: the id "${action.id}" is not lower-case words with "-"`);
     if (!(JOURNAL_TYPES as string[]).includes(action.type)) problems.push(`Actions: ${action.id} adds the type ${action.type}, which the journal does not know (DATA-MODEL §3)`);
-    if (action.type === 'message' || action.type === 'report' || action.type === 'settings' || action.type === 'review') problems.push(`Actions: ${action.id} adds a ${action.type} event: not an action of build B6`);
-    if (!['line', 'mine', 'person'].includes(action.scope)) problems.push(`Actions: ${action.id} has the scope ${action.scope}`);
+    // A message is recorded by the app SACM messages when it goes (D301), never as an action of SACM actions.
+    if (action.type === 'message' || action.type === 'report' || action.type === 'settings' || action.type === 'review') problems.push(`Actions: ${action.id} adds a ${action.type} event: not an action of the app SACM actions`);
+    if (!['line', 'mine', 'person', 'card'].includes(action.scope)) problems.push(`Actions: ${action.id} has the scope ${action.scope}`);
+    if (action.scope === 'card' && action.type !== 'assign') problems.push(`Actions: ${action.id} has the scope card: only share out (assign events) gives each line its own member`);
     for (const ask of action.asks) if (!(ASKS as readonly string[]).includes(ask)) problems.push(`Actions: ${action.id} asks for ${ask}, which the app does not know`);
     if (/[|=]/.test(action.label)) problems.push(`Actions: the label of ${action.id} holds | or =, which the column Actions uses`);
-    if (!action.text && !action.asks.length) problems.push(`Actions: ${action.id} has no text and asks for nothing`);
+    if (!action.text && !action.asks.length && action.scope !== 'card') problems.push(`Actions: ${action.id} has no text and asks for nothing`);
   }
   if (fnCaseActions) {
     const known = new Set([...fnCaseActions.matchAll(/^\s*(?:#"([a-z-]+)"|([a-z]+))\s*=\s/gm)].map((match) => match[1] ?? match[2]!));
@@ -87,7 +91,17 @@ export function catalogueProblems(actions: AppAction[] = appActions(), fnCaseAct
 }
 
 const TRIGGERS = new Set(['Power Apps (V2)', 'Power BI button clicked', 'When a new email arrives in a shared mailbox (V2)']);
-const STEPS = new Set(['Refresh a dataset', 'Delay', 'Create file']);
+const MAILBOX_TRIGGER = 'When a new email arrives in a shared mailbox (V2)';
+const SEND = 'Send an email from a shared mailbox (V2)';
+const STEPS = new Set(['Refresh a dataset', 'Delay', 'Create file', 'Html to text', 'Create item', SEND]);
+/** The fields of a sending step and the input of the trigger each must be. To of a test: the manager who ran the flow. */
+const SEND_FIELDS: Record<string, { input: string; or?: string; optional?: boolean }> = {
+  To: { input: 'To', or: '=the user who ran it' }, CC: { input: 'Cc', optional: true }, BCC: { input: 'Bcc', optional: true },
+  Subject: { input: 'Subject' }, Body: { input: 'Body' }
+};
+/** The other fields a sending step may set: the shared mailbox it sends from, and the importance. */
+const SEND_OTHER = new Set(['Original Mailbox Address', 'Importance']);
+const REPLIES = STATE_LISTS.replies.list as string;
 
 /** The problems of the flows: what triggers them and what they do. */
 export function flowProblems(flows: Flow[] = appFlows()): string[] {
@@ -98,14 +112,37 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
     names.add(flow.name);
     if (!TRIGGERS.has(flow.trigger)) problems.push(`Flows: ${flow.id} starts on "${flow.trigger}": a flow starts on a button, the app or a new email, never on a timer (D2, D269)`);
     if (flow.concurrency !== 1) problems.push(`Flows: ${flow.id} must run one at a time (concurrency 1), so two refreshes never overlap`);
+    if (flow.inputs?.length && flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} has inputs, but only a flow the app calls (Power Apps (V2)) gets them`);
+    const sends = flow.steps.filter((step) => step.action === SEND);
     for (const step of flow.steps) {
-      if (!STEPS.has(step.action)) problems.push(`Flows: ${flow.id} has the step "${step.action}": the flows of build B6 only refresh, wait or file a report (no sending)`);
-      if (/send|mail|post|message/i.test(step.action)) problems.push(`Flows: ${flow.id} sends something ("${step.action}")`);
+      if (!STEPS.has(step.action)) problems.push(`Flows: ${flow.id} has the step "${step.action}": a flow refreshes, waits, files a report or a reply, or sends what a manager pressed Send on`);
+      else if (step.action !== SEND && /send|post|message|reply|forward/i.test(step.action)) problems.push(`Flows: ${flow.id} sends something ("${step.action}")`);
+      if (step.action === 'Create item' && step.fields['List Name'] !== REPLIES) problems.push(`Flows: ${flow.id} adds an item to ${step.fields['List Name'] ?? 'a list'}: a flow only files replies in ${REPLIES} (the journal is the managers' own, D272)`);
+      if (step.action === 'Create item' && flow.trigger !== MAILBOX_TRIGGER) problems.push(`Flows: ${flow.id} files a reply, but does not start on a new email`);
+    }
+    if (sends.length) {
+      // Sending: only what a manager pressed in the app, one message a run, exactly as the app gives it (D2, D301).
+      if (flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} sends, but does not start when a manager presses a button in the app (Power Apps (V2)): nothing is sent on its own (D2)`);
+      if (sends.length > 1 || sends.some((step) => step.forEach)) problems.push(`Flows: ${flow.id} must send one message a run`);
+      const inputs = new Set(flow.inputs ?? []);
+      for (const step of sends) {
+        for (const [field, rule] of Object.entries(SEND_FIELDS)) {
+          const value = step.fields[field];
+          if (value === undefined) { if (!rule.optional) problems.push(`Flows: ${flow.id} sends with no ${field}`); continue; }
+          // A test goes to the manager who ran the flow: only a flow that is given no To may send there.
+          if (value === rule.or && !inputs.has(rule.input)) continue;
+          if (value !== `=input ${rule.input}` || !inputs.has(rule.input)) problems.push(`Flows: ${flow.id} sends with ${field} "${value}": it must be the input ${rule.input} of the trigger, exactly what the manager sends`);
+        }
+        for (const field of Object.keys(step.fields)) {
+          if (!(field in SEND_FIELDS) && !SEND_OTHER.has(field)) problems.push(`Flows: ${flow.id} sends with the field ${field}: a message of the app has only To, Cc, Subject and Body`);
+        }
+      }
+      continue;
     }
     const refresh = flow.steps.findIndex((step) => step.action === 'Refresh a dataset');
     if (refresh < 0) problems.push(`Flows: ${flow.id} does not refresh the report`);
     // A refresh started by the app or a button waits two minutes before the next run may start one.
-    if (refresh >= 0 && flow.trigger !== 'When a new email arrives in a shared mailbox (V2)' && flow.steps[refresh + 1]?.action !== 'Delay') problems.push(`Flows: ${flow.id} must wait (Delay) after the refresh, so the next run does not start one while it runs`);
+    if (refresh >= 0 && flow.trigger !== MAILBOX_TRIGGER && flow.steps[refresh + 1]?.action !== 'Delay') problems.push(`Flows: ${flow.id} must wait (Delay) after the refresh, so the next run does not start one while it runs`);
   }
   return problems;
 }

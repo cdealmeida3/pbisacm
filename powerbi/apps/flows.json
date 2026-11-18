@@ -1,5 +1,5 @@
 {
-  "note": "The Power Automate flows of build B6 (D295), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power App calls a flow by it), the trigger, the concurrency of the trigger (1: one run at a time; the others wait) and the steps in order. A flow only reads, files or refreshes: none sends a message and none runs on a timer (D2, D269). npm run powerbi:lint checks these rules and that the app calls only flows of this file. The workspace and the semantic model are picked from a list in the step: the workspace is the one Carlos made (README section 4), the semantic model has the name of the .pbip.",
+  "note": "The Power Automate flows of builds B6 and B7 (D295, D301), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power Apps call a flow by it), the trigger, the inputs a Power App gives it, the concurrency of the trigger (1: one run at a time; the others wait) and the steps in order. A flow refreshes, waits, files a report or a reply, or sends exactly the message a manager pressed Send or Test on: its To, Cc, Subject and Body are the inputs of the trigger, never made by the flow (D2, D301). None runs on a timer (D269). npm run powerbi:lint checks these rules and that the apps call only flows of this file. The workspace and the semantic model are picked from a list in the step: the workspace is the one Carlos made (README section 4), the semantic model has the name of the .pbip.",
   "flows": [
     {
       "id": "F5",
@@ -10,6 +10,28 @@
       "steps": [
         { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "the workspace of README section 4", "Dataset": "SACM-Workbench" } },
         { "action": "Delay", "connector": "Schedule", "fields": { "Count": "2", "Unit": "Minute" }, "runAfter": ["Succeeded", "Failed"] }
+      ]
+    },
+    {
+      "id": "F2",
+      "name": "SACMSend",
+      "purpose": "Send the message a manager pressed Send on in the Power App SACM messages, from the shared mailbox, exactly as the app gives it. The app records it in the journal after the flow answers.",
+      "trigger": "Power Apps (V2)",
+      "inputs": ["To", "Cc", "Subject", "Body"],
+      "concurrency": 1,
+      "steps": [
+        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=input To", "CC": "=input Cc", "Subject": "=input Subject", "Body": "=input Body", "Importance": "Normal" } }
+      ]
+    },
+    {
+      "id": "F4",
+      "name": "SACMTest",
+      "purpose": "Send a test of a message to the manager who pressed Test, from the shared mailbox. Nobody else gets it, and the cases are not changed.",
+      "trigger": "Power Apps (V2)",
+      "inputs": ["Subject", "Body"],
+      "concurrency": 1,
+      "steps": [
+        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=the user who ran it", "Subject": "=input Subject", "Body": "=input Body", "Importance": "Normal" } }
       ]
     },
     {
@@ -31,6 +53,19 @@
       "concurrency": 1,
       "steps": [
         { "action": "Create file", "connector": "SharePoint", "fields": { "Folder Path": "the folder of ReportsFolder", "File Name": "the date of today, an underscore and the name of the attachment" }, "forEach": "Attachments" },
+        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "the workspace of README section 4", "Dataset": "SACM-Workbench" } }
+      ]
+    },
+    {
+      "id": "F3",
+      "name": "SACM - File replies",
+      "purpose": "File each reply to a SACM message that comes to the shared mailbox (its subject holds [SACM-…]) in the list SACM Replies, then refresh the report.",
+      "trigger": "When a new email arrives in a shared mailbox (V2)",
+      "triggerFields": { "Subject Filter": "[SACM-", "Include Attachments": "No" },
+      "concurrency": 1,
+      "steps": [
+        { "action": "Html to text", "connector": "Content Conversion", "fields": { "Content": "the Body of the email" } },
+        { "action": "Create item", "connector": "SharePoint", "fields": { "List Name": "SACM Replies", "Title": "the reference in the subject: the text from [SACM- to the next ]", "From": "the From of the email", "Received": "the Received Time of the email", "Subject": "the Subject of the email", "Body": "the text of the step Html to text", "ConversationId": "the Conversation Id of the email" } },
         { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "the workspace of README section 4", "Dataset": "SACM-Workbench" } }
       ]
     }

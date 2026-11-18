@@ -31,10 +31,11 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES, tmdlName } from './t
 import type { SourceTable } from './tmdl.ts';
 import { expectedHistory, HISTORY_FILES, STATE_LISTS } from './history.ts';
 import { compilePattern, fastForm } from './regex.ts';
-import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml } from './actions.ts';
+import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml, MESSAGES_APP_FORMULAS_FILE, MESSAGES_APP_YAML_FILE, messagesFormulas } from './actions.ts';
 import { STATUSES } from '../../src/core/cases/cases.ts';
 import { EXCEPTION_REASONS } from '../../src/core/audit/audit.ts';
 import { statusWord } from '../../src/app/view/cases.ts';
+import { COLUMNS, CONTRACT_COLUMNS, EPO_ROLE, MAX_CIS_PER_MESSAGE, REQUESTS, ROLE_LABEL, ROLE_REQUEST, ROLE_WORD } from '../../src/core/messages/messages.ts';
 import type { FastForm, Node } from './regex.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -280,6 +281,8 @@ function packed(): Query[] {
     { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The five lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
     { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.',
       m: json(Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }]))) },
+    { name: 'MessageWords', group: 'Packed', description: 'GENERATED from src/core/messages/messages.ts (build B7, D300). The words of the messages: the requests of the Service Portal (id, name, the action inside its form, the name before 0.14.1), the words of the roles, EPO\'s names for them, the request that changes each role, the columns of the tables and the most CIs in one message.',
+      m: json({ requests: REQUESTS, roleLabel: ROLE_LABEL, roleWord: ROLE_WORD, epoRole: EPO_ROLE, roleRequest: ROLE_REQUEST, columns: COLUMNS, contractColumns: CONTRACT_COLUMNS, maxCis: MAX_CIS_PER_MESSAGE }) },
     { name: 'AppActions', group: 'Packed', description: 'GENERATED from powerbi/apps/actions.json (D294). The actions of the Power App SACM actions: id, label, the journal event, its scope and what the manager types; fnCaseActions gives each case the actions of scope line that apply.',
       m: json(JSON.parse(readFileSync(ACTIONS_FILE, 'utf8'))) },
     { name: 'ExpectedHistory', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team\'s state, for the Self-check page.', m: mText(JSON.stringify(EXPECTED_HISTORY)) },
@@ -422,10 +425,15 @@ const themeText = (): string => `${JSON.stringify(theme(), null, 2)}\n`;
 
 /* ------------------------------------------------------------------ the Power App (build B6) */
 
-/** The generated files of the Power App SACM actions, by path: its named formulas and its App (D294). */
+/** The generated files of the Power Apps SACM actions (D294) and SACM messages (D301), by path: their named formulas and their App. */
 export function appFiles(): Array<{ file: string; text: string }> {
   const formulas = appFormulas(STATUSES, statusWord, EXCEPTION_REASONS, DEFAULT_SETTINGS.exceptionMonths);
-  return [{ file: APP_FORMULAS_FILE, text: formulas }, { file: APP_YAML_FILE, text: appYaml(formulas) }];
+  const messages = messagesFormulas();
+  return [
+    { file: APP_FORMULAS_FILE, text: formulas }, { file: APP_YAML_FILE, text: appYaml(formulas) },
+    { file: MESSAGES_APP_FORMULAS_FILE, text: messages },
+    { file: MESSAGES_APP_YAML_FILE, text: appYaml(messages, 'SACM messages', 'MessagesScreen', 'powerbi/apps/sacm-messages/formulas.fx') }
+  ];
 }
 
 /* ------------------------------------------------------------------ write or check */

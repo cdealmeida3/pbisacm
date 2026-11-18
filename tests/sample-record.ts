@@ -44,7 +44,7 @@ export const EARLIER = '2026-11-04';
 
 /** The team settings of a new team folder that matter for the result (src/app/state/store.ts). */
 const RULES = { reminderDays: 3, maxReminders: 2 };
-const SETTINGS: MessageSettings = {
+export const SETTINGS: MessageSettings = {
   portalLink: 'https://portal.example.com/sacm', signature: 'SACM team', senderName: 'Demo User',
   epoOwnerName: 'Eve Inventory', epoOwnerEmail: 'eve.inventory@example.com',
   procurementName: 'Procurement', procurementEmail: 'procurement@example.com',

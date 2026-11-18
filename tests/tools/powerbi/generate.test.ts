@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { loadPackFiles } from '../../../src/hosts/cli.ts';
 import { lightColours, mText, queries, readingRules, staleQueries, theme, THEME_FILE } from '../../../tools/powerbi/generate.ts';
 import { readExpressions, readTables } from '../../../tools/powerbi/tmdl.ts';
-import { evaluatedNames } from '../../../tools/powerbi/connector.ts';
+import { evaluatedNames, PARITY_QUERIES } from '../../../tools/powerbi/connector.ts';
 import { UNIT_PAGE_SIZE, unitCases, unitQuery, unitQueryNames } from '../../../tools/powerbi/units.ts';
 
 /*
@@ -38,7 +38,7 @@ test('every query of expressions.tmdl has a group, and every query the generator
   assert.deepEqual(queries().map((query) => query.name), names);
 });
 
-test('every table reads from its own query <Table>Rows or is a part of Run, and the evaluation runs every table and the unit cases', () => {
+test('every table reads from its own query <Table>Rows or is a part of Run, and the evaluation runs every table, the unit cases and the queries of the answer key', () => {
   const names = new Set(readExpressions().map((expression) => expression.name));
   const tables = readTables();
   for (const table of tables) {
@@ -55,7 +55,9 @@ test('every table reads from its own query <Table>Rows or is a part of Run, and 
     assert.ok(names.has(table.partitionM), `${table.partitionM} is not in expressions.tmdl`);
     assert.ok(table.columns.length > 0, `${table.name} has no column`);
   }
-  assert.deepEqual(evaluatedNames(), [...tables.map((table) => table.name), ...unitQueryNames()]);
+  assert.deepEqual(evaluatedNames(), [...tables.map((table) => table.name), ...unitQueryNames(), ...PARITY_QUERIES]);
+  // The queries of the answer key are queries of the model that no table reads (build B7).
+  for (const name of PARITY_QUERIES) assert.ok(names.has(name), `${name} is not in expressions.tmdl`);
 });
 
 test('each unit query has at most 1,000 rows (PQTest returns no more), and the pages hold every case once', () => {

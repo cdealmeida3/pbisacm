@@ -27,7 +27,7 @@ expression StateMode = "Sample" meta [IsParameterQuery = true, List = {"Sample",
 	queryGroup: Parameters
 
 /// GENERATED from powerbi/apps/actions.json (D294). The actions of the Power App SACM actions: id, label, the journal event, its scope and what the manager types; fnCaseActions gives each case the actions of scope line that apply.
-expression AppActions = Json.Document("{""note"":""The actions of the Power App SACM actions (build B6, D294). One entry per action: what it is called, the journal event it adds to the list SACM Journal (type and fixed text; DATA-MODEL §3) and what the manager types or picks (asks). scope 'line': the model gives the action to each case it applies to (the column Actions of CaseLines, fnCaseActions); the app offers it when every selected line has it. scope 'mine': on the open lines assigned to the manager. scope 'person': when every selected line is about one person. The app only adds rows, never changes or removes one (D272). The words of the buttons are those of the HTML app; a check file can give its own (playbook askAfterReview, askWhenUnsure, markWord)."",""actions"":[{""id"":""note"",""label"":""Note"",""type"":""note"",""scope"":""line"",""asks"":[""text""]},{""id"":""status"",""label"":""Status"",""type"":""status"",""scope"":""line"",""asks"":[""status""]},{""id"":""request"",""label"":""Request number"",""type"":""request"",""scope"":""line"",""asks"":[""request""]},{""id"":""assign"",""label"":""Assign"",""type"":""assign"",""scope"":""line"",""asks"":[""member""]},{""id"":""stop"",""label"":""Stop following"",""type"":""exception"",""scope"":""line"",""asks"":[""reason"",""reviewOn"",""text""]},{""id"":""follow-again"",""label"":""Follow again"",""type"":""exception"",""scope"":""line"",""text"":""Ended by hand"",""asks"":[]},{""id"":""fixed"",""label"":""Fixed"",""type"":""status"",""scope"":""line"",""text"":""Fixed"",""asks"":[]},{""id"":""undo-fixed"",""label"":""Undo the mark"",""type"":""status"",""scope"":""line"",""text"":""New"",""asks"":[]},{""id"":""ask-owner"",""label"":""Ask the owner"",""type"":""reviewed"",""scope"":""line"",""text"":""Ask the owner"",""asks"":[]},{""id"":""back-to-sacm"",""label"":""Back to SACM"",""type"":""reviewed"",""scope"":""line"",""text"":""Back to review"",""asks"":[]},{""id"":""retirement"",""label"":""Retirement date"",""type"":""retirement"",""scope"":""line"",""asks"":[""retireOn""]},{""id"":""stage"",""label"":""Stage"",""type"":""stage"",""scope"":""line"",""asks"":[""stage""]},{""id"":""no-process"",""label"":""The process does not exist"",""type"":""no-process"",""scope"":""line"",""text"":""yes"",""asks"":[]},{""id"":""no-process-undo"",""label"":""Undo: the process does not exist"",""type"":""no-process"",""scope"":""line"",""text"":""no"",""asks"":[]},{""id"":""handover"",""label"":""Hand over my work"",""type"":""handover"",""scope"":""mine"",""asks"":[""member"",""text""]},{""id"":""person-note"",""label"":""Note about the person"",""type"":""person-note"",""scope"":""person"",""asks"":[""text""]}]}")
+expression AppActions = Json.Document("{""note"":""The actions of the Power App SACM actions (build B6, D294). One entry per action: what it is called, the journal event it adds to the list SACM Journal (type and fixed text; DATA-MODEL §3) and what the manager types or picks (asks). scope 'line': the model gives the action to each case it applies to (the column Actions of CaseLines, fnCaseActions); the app offers it when every selected line has it. scope 'mine': on the open lines assigned to the manager. scope 'person': when every selected line is about one person. scope 'card': share out (D24, build B7): the free groups of a card go to the active members of SACM Team, each line to the member of its column ShareTo, worked out at the refresh. The app only adds rows, never changes or removes one (D272). The words of the buttons are those of the HTML app; a check file can give its own (playbook askAfterReview, askWhenUnsure, markWord)."",""actions"":[{""id"":""note"",""label"":""Note"",""type"":""note"",""scope"":""line"",""asks"":[""text""]},{""id"":""status"",""label"":""Status"",""type"":""status"",""scope"":""line"",""asks"":[""status""]},{""id"":""request"",""label"":""Request number"",""type"":""request"",""scope"":""line"",""asks"":[""request""]},{""id"":""assign"",""label"":""Assign"",""type"":""assign"",""scope"":""line"",""asks"":[""member""]},{""id"":""stop"",""label"":""Stop following"",""type"":""exception"",""scope"":""line"",""asks"":[""reason"",""reviewOn"",""text""]},{""id"":""follow-again"",""label"":""Follow again"",""type"":""exception"",""scope"":""line"",""text"":""Ended by hand"",""asks"":[]},{""id"":""fixed"",""label"":""Fixed"",""type"":""status"",""scope"":""line"",""text"":""Fixed"",""asks"":[]},{""id"":""undo-fixed"",""label"":""Undo the mark"",""type"":""status"",""scope"":""line"",""text"":""New"",""asks"":[]},{""id"":""ask-owner"",""label"":""Ask the owner"",""type"":""reviewed"",""scope"":""line"",""text"":""Ask the owner"",""asks"":[]},{""id"":""back-to-sacm"",""label"":""Back to SACM"",""type"":""reviewed"",""scope"":""line"",""text"":""Back to review"",""asks"":[]},{""id"":""retirement"",""label"":""Retirement date"",""type"":""retirement"",""scope"":""line"",""asks"":[""retireOn""]},{""id"":""stage"",""label"":""Stage"",""type"":""stage"",""scope"":""line"",""asks"":[""stage""]},{""id"":""no-process"",""label"":""The process does not exist"",""type"":""no-process"",""scope"":""line"",""text"":""yes"",""asks"":[]},{""id"":""no-process-undo"",""label"":""Undo: the process does not exist"",""type"":""no-process"",""scope"":""line"",""text"":""no"",""asks"":[]},{""id"":""handover"",""label"":""Hand over my work"",""type"":""handover"",""scope"":""mine"",""asks"":[""member"",""text""]},{""id"":""person-note"",""label"":""Note about the person"",""type"":""person-note"",""scope"":""person"",""asks"":[""text""]},{""id"":""share-out"",""label"":""Share out"",""type"":""assign"",""scope"":""card"",""asks"":[]}]}")
 	queryGroup: Packed
 
 /// GENERATED from checks/packs/. Every check file, in the order of the file names, with its folder.
@@ -75,6 +75,10 @@ expression HistoryRunColumnTypes =
 		    {"Runs.SolusiFile", type nullable text},
 		    {"Runs.ContractFile", type nullable text}
 		}
+	queryGroup: Packed
+
+/// GENERATED from src/core/messages/messages.ts (build B7, D300). The words of the messages: the requests of the Service Portal (id, name, the action inside its form, the name before 0.14.1), the words of the roles, EPO's names for them, the request that changes each role, the columns of the tables and the most CIs in one message.
+expression MessageWords = Json.Document("{""requests"":[{""id"":""owned-by-update"",""name"":""Owned by - update""},{""id"":""managed-by-update"",""name"":""Managed by – update"",""was"":""Managed by - update""},{""id"":""support-group-update"",""name"":""Support group update""},{""id"":""modify-service-offering"",""name"":""Add or modify a Service (CI)"",""action"":""Modify service offering"",""was"":""Modify service offering""},{""id"":""criticality"",""name"":""Criticality - change CIAA values""},{""id"":""service-mapping"",""name"":""Service Mapping""}],""roleLabel"":{""owned_by"":""Owned by"",""managed_by"":""Managed by"",""supported_by"":""Supported by"",""assigned_to"":""Assigned to""},""roleWord"":{""owned_by"":""owner"",""managed_by"":""manager"",""supported_by"":""support person"",""assigned_to"":""assignee""},""epoRole"":{""owned_by"":""System Owner"",""managed_by"":""Primary Responsible"",""supported_by"":""Secondary Responsible""},""roleRequest"":{""owned_by"":""owned-by-update"",""managed_by"":""managed-by-update""},""columns"":[""Name"",""EPO ID"",""Class"",""Owned by"",""Managed by"",""Status"",""Support group""],""contractColumns"":[""Contract number"",""Name"",""Vendor"",""What we found""],""maxCis"":25}")
 	queryGroup: Packed
 
 /// GENERATED from the check files and the reference files (tools/powerbi/regex.ts, D285). For each pattern of Patterns, the fast form that decides most texts without the walk (fnFastMatch).
@@ -145,6 +149,31 @@ expression RunColumnTypes =
 		    {"CaseLines.ActionWords", type nullable text},
 		    {"CaseLines.Stages", type nullable text},
 		    {"CaseLines.StageId", type nullable text},
+		    {"CaseLines.ShareTo", type nullable text},
+		    {"Drafts.DraftId", type nullable text},
+		    {"Drafts.Ref", type nullable text},
+		    {"Drafts.Kind", type nullable text},
+		    {"Drafts.KindLabel", type nullable text},
+		    {"Drafts.To", type nullable text},
+		    {"Drafts.ToName", type nullable text},
+		    {"Drafts.Cc", type nullable text},
+		    {"Drafts.Subject", type nullable text},
+		    {"Drafts.Body", type nullable text},
+		    {"Drafts.Plain", type nullable text},
+		    {"Drafts.Chat", type nullable text},
+		    {"Drafts.Keys", type nullable text},
+		    {"Drafts.NewKeys", type nullable text},
+		    {"Drafts.CheckIds", type nullable text},
+		    {"Drafts.CiCount", Int64.Type},
+		    {"Drafts.PartIndex", Int64.Type},
+		    {"Drafts.PartCount", Int64.Type},
+		    {"Drafts.About", type nullable text},
+		    {"Drafts.NobodyAbove", type nullable logical},
+		    {"Drafts.Mailbox", type nullable logical},
+		    {"Drafts.Team", type nullable logical},
+		    {"Drafts.Person", type nullable text},
+		    {"Drafts.AssignedTo", type nullable text},
+		    {"Drafts.FreeKeys", type nullable text},
 		    {"Exceptions.Target", type nullable text},
 		    {"Exceptions.CheckId", type nullable text},
 		    {"Exceptions.CiKey", type nullable text},
@@ -300,7 +329,7 @@ expression StateFiles =
 		#table(type table [FileName = text, Base64 = text], {
 			{"journal.csv", "VGl0bGUsQXQsQnksQnlOYW1lLFR5cGUsS2V5cyxUZXh0LFJlZixUbyxDYyxTdWJqZWN0LEtpbmQsQ2hhbm5lbCxQZXJzb24sUmVhc29uLFJldmlld09uLFJldGlyZU9uLENoZWNrSWQsQ2lLZXksQ2lOYW1lCkowMDAxLDIwMjYtMTAtMjZUMDk6MzA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiREVTQy1RVUFMSVRZOm1lbWJlcnM6ZGVzY3JpcHRpb24KUkVTUC1NSVNTSU5HOm1lbWJlcnM6bWFuYWdlZF9ieQpOQU1FLVNUQU5EQVJEOm1lbWJlcnM6YnMtc3VmZml4IiwyMDI2LTEwLTI2X1NBQ00tRUY1NkdILmVtbCxTQUNNLUVGNTZHSCxhZGFAZXhhbXBsZS5jb20sLE1lbWJlcnM6IDMgcG9pbnRzIHRvIGZpeCBbU0FDTS1FRjU2R0hdLGZpcnN0LG1haWxib3gsLCwsLCwsCkowMDAyLDIwMjYtMTAtMzBUMTA6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiREVTQy1RVUFMSVRZOm1lbWJlcnM6ZGVzY3JpcHRpb24KUkVTUC1NSVNTSU5HOm1lbWJlcnM6bWFuYWdlZF9ieQpOQU1FLVNUQU5EQVJEOm1lbWJlcnM6YnMtc3VmZml4IiwyMDI2LTEwLTMwX1NBQ00tRUY1NkdILmVtbCxTQUNNLUVGNTZHSCxhZGFAZXhhbXBsZS5jb20sLFN0aWxsIG9wZW46IE1lbWJlcnMgW1NBQ00tRUY1NkdIXSxyZW1pbmRlcixtYWlsYm94LCwsLCwsLApKMDAwMywyMDI2LTExLTAyVDExOjE1OjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxtZXNzYWdlLFRBRy1TVEFUVVMtQ09ORkxJQ1Q6bWVtYmVyIGVuZ2luZSAtIHRlc3Q6dGFncywsU0FDTS1HSDc4SUosY3lAZXhhbXBsZS5jb20sLE1lbWJlciBFbmdpbmUgLSBURVNUOiB0YWdzIHRvIGNoZWNrIFtTQUNNLUdINzhJSl0sZmlyc3Qsb3V0bG9vaywsLCwsLCwKSjAwMDQsMjAyNi0xMS0wNFQwOTowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxtZXNzYWdlLCJERVNDLVFVQUxJVFk6bWVtYmVyczpkZXNjcmlwdGlvbgpSRVNQLU1JU1NJTkc6bWVtYmVyczptYW5hZ2VkX2J5Ck5BTUUtU1RBTkRBUkQ6bWVtYmVyczpicy1zdWZmaXgiLDIwMjYtMTEtMDRfU0FDTS1FRjU2R0guZW1sLFNBQ00tRUY1NkdILGFkYUBleGFtcGxlLmNvbSwsU3RpbGwgb3BlbjogTWVtYmVycyBbU0FDTS1FRjU2R0hdLHJlbWluZGVyLG1haWxib3gsLCwsLCwsCkowMDA1LDIwMjYtMTEtMDVUMTA6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiQ1JJVC1BVVRPLUpVU1RJRklDQVRJT046bWVtYmVyIGVuZ2luZSAtIHByb2Q6YXZhaWxhYmlsaXR5CkNSSVQtTk8tSlVTVElGSUNBVElPTjppbmRleCB0b29sOmNvbmZpZGVudGlhbGl0eSIsMjAyNi0xMS0wNV9TQUNNLUFCMTJDRC5lbWwsU0FDTS1BQjEyQ0QsZGVlQGV4YW1wbGUuY29tLCxDcml0aWNhbGl0eTogMiBqdXN0aWZpY2F0aW9ucyB0byB3cml0ZSBbU0FDTS1BQjEyQ0RdLGZpcnN0LG1haWxib3gsLCwsLCwsCkowMDA2LDIwMjYtMTEtMDVUMTA6MDU6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUsbWVzc2FnZSwiU1VQUE9SVC1HUk9VUC1NSVNTSU5HOm1lbWJlcnMgLSBzdGFuZGFyZDpzdXBwb3J0X2dyb3VwClNVUFBPUlRFRC1CWTptZW1iZXJzIC0gc3RhbmRhcmQ6c3VwcG9ydGVkX2J5IiwyMDI2LTExLTA1X1NBQ00tQ0QzNEVGLmVtbCxTQUNNLUNEMzRFRixjeUBleGFtcGxlLmNvbSwsTWVtYmVycyAtIFN0YW5kYXJkOiAyIHBvaW50cyB0byBmaXggW1NBQ00tQ0QzNEVGXSxmaXJzdCxtYWlsYm94LCwsLCwsLApKMDAwNywyMDI2LTExLTA2VDA4OjQwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLHN0YXR1cyxSRVNQLU1JU1NJTkc6cmVnaXN0ZXIgYSBuZXcgbWVtYmVyOm93bmVkX2J5LEZpeGVkLCwsLCwsLCwsLCwsLApKMDAwOCwyMDI2LTExLTA2VDA5OjEwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxzdGF0dXMsIlNVUFBPUlRFRC1CWTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0ZWRfYnkKU1VQUE9SVC1HUk9VUC1JTkFDVElWRTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0X2dyb3VwIixGaXggaW4gcHJvZ3Jlc3MsLCwsLCwsLCwsLCwsCkowMDA5LDIwMjYtMTEtMDZUMDk6MTE6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLHJlcXVlc3QsIlNVUFBPUlRFRC1CWTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0ZWRfYnkKU1VQUE9SVC1HUk9VUC1JTkFDVElWRTppbmRleCB0b29sIC0gcHJvZDpzdXBwb3J0X2dyb3VwIixSSVRNMDAwMTIzNCwsLCwsLCwsLCwsLCwKSjAwMTAsMjAyNi0xMS0wOVQxNDowMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxzdGF0dXMsUkVTUC1NSVNTSU5HOm1hbmFnZSBtZW1iZXIgcmVjb3Jkczpvd25lZF9ieSxGaXhlZCwsLCwsLCwsLCwsLCwKSjAwMTEsMjAyNi0xMS0wOVQxNDozMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsZXhjZXB0aW9uLFRBRy1NSVNTSU5HOnJlY29uY2lsZSBpbmRleDp0YWdzLFRoZSBvd25lciBrZWVwcyBpdCB1bnRpbCB0aGUgbmV4dCByZXZpZXcsLCwsLCwsLEFncmVlZCB3aXRoIHRoZSBvd25lciwyMDI3LTA1LTEwLCwsLApKMDAxMiwyMDI2LTA1LTA4VDEwOjAwOjAwLG1heEBleGFtcGxlLmNvbSxNYXggTWFuYWdlcixleGNlcHRpb24sUkVTUC1JTkFDVElWRTpyZWNvbmNpbGUgaW5kZXg6b3duZWRfYnksVGhlIG93bmVyIGxlYXZlcyBpbiBhdXR1bW4sLCwsLCwsLEFncmVlZCB3aXRoIHRoZSBvd25lciwyMDI2LTExLTEwLCwsLApKMDAxMywyMDI2LTExLTA5VDE1OjAwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxleGNlcHRpb24sLFR3byByZWNvcmRzIG9uIHB1cnBvc2UgdW50aWwgdGhlIG1vdmUsLCwsLCwsLER1cGxpY2F0ZSByZWNvcmQsMjAyNy0wMS0zMSwsTkFNRS1EVVBMSUNBVEUsbWFuYWdlIGZpbmVzLE1hbmFnZSBGaW5lcwpKMDAxNCwyMDI2LTExLTEwVDA4OjMwOjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLGFzc2lnbiwiTUFQUElORzpldmVudCBlbmdpbmU6bWFwcGluZwpNQVBQSU5HOmV2ZW50IGRlc2s6bWFwcGluZyIsU2FtIEV4YW1wbGUsLCwsLCwsLCwsLCwsCkowMDE1LDIwMjYtMTEtMTBUMDg6NDU6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLGhhbmRvdmVyLCJERVNDLVFVQUxJVFk6cmVjb25jaWxlIGluZGV4OmRlc2NyaXB0aW9uCkRFU0MtUVVBTElUWTpjbG9zZSB0aGUgbW9udGg6ZGVzY3JpcHRpb24iLEJhY2sgZnJvbSBob2xpZGF5OiBwbGVhc2UgdGFrZSB0aGVzZSB0d28sLEFsZXggRXhhbXBsZSwsLCwsLCwsLCwsCkowMDE2LDIwMjYtMTEtMTBUMDk6MDA6MDAsYWxleEBleGFtcGxlLmNvbSxBbGV4IEV4YW1wbGUscmV0aXJlbWVudCxTVVBQT1JURUQtQlk6bWVtYmVyIGVuZ2luZSAtIHRlc3Q6c3VwcG9ydGVkX2J5LFRoZSBvd25lciByZXRpcmVzIGl0IGF0IHRoZSBlbmQgb2YgdGhlIHllYXIsLCwsLCwsLCwsMjAyNi0xMi0zMSwsLApKMDAxNywyMDI2LTExLTEwVDA5OjIwOjAwLHNhbUBleGFtcGxlLmNvbSxTYW0gRXhhbXBsZSxyZXZpZXdlZCxDUklULUFCT1ZFLVBBUkVOVDptZW1iZXIgZW5naW5lIC0gcHJvZDppbnRlZ3JpdHksQXNrIHRoZSBvd25lciwsLCwsLCwsLCwsLCwKSjAwMTgsMjAyNi0xMS0xMFQxMTowMDowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsbWVzc2FnZSxNQVBQSU5HOmV2ZW50IGdhdGV3YXkgLSBwcm9kOm1hcHBpbmcsLFNBQ00tSks5MExNLERlZSBPd25lciwsRXZlbnQgR2F0ZXdheSAtIFBST0Q6IG1hcHBpbmcgc2Vzc2lvbixmaXJzdCx0ZWFtcywsLCwsLCwKSjAwMTksMjAyNi0xMS0xMFQxMTozMDowMCxhbGV4QGV4YW1wbGUuY29tLEFsZXggRXhhbXBsZSxwZXJzb24tbm90ZSwsUHJlZmVycyBhIFRlYW1zIGNoYXQgdG8gYW4gZW1haWwsLCwsLCwsY3kwMSwsLCwsLApKMDAyMCwyMDI2LTExLTExVDA4OjA1OjAwLGFsZXhAZXhhbXBsZS5jb20sQWxleCBFeGFtcGxlLG5vdGUsUkVTUC1NSVNTSU5HOmNsb3NlIHRoZSBtb250aDptYW5hZ2VkX2J5LEFza2VkIHRoZSBQcm9jZXNzIE1hbmFnZW1lbnQgdGVhbSBpbiB0aGUgd2Vla2x5IG1lZXRpbmcsLCwsLCwsLCwsLCwsCkowMDIxLDIwMjYtMTEtMTBUMTM6MDA6MDAsc2FtQGV4YW1wbGUuY29tLFNhbSBFeGFtcGxlLHN0YWdlLE1BUFBJTkc6ZXZlbnQgZGVzazptYXBwaW5nLHNlc3Npb24taGVsZCwsLCwsLCwsLCwsLCwKSjAwMjIsMjAyNi0xMS0xMFQxMzowNTowMCxzYW1AZXhhbXBsZS5jb20sU2FtIEV4YW1wbGUsbm8tcHJvY2VzcyxNQVBQSU5HOmV2ZW50IGRlc2s6bWFwcGluZyx5ZXMsLCwsLCwsLCwsLCwsCg=="},
 			{"replies.csv", "VGl0bGUsRnJvbSxSZWNlaXZlZCxTdWJqZWN0LEJvZHkKU0FDTS1FRjU2R0gsYWRhQGV4YW1wbGUuY29tLDIwMjYtMTAtMjdUMDk6MDA6MDAsUkU6IE1lbWJlcnM6IDMgcG9pbnRzIHRvIGZpeCBbU0FDTS1FRjU2R0hdLEkgYW0gb24gaG9saWRheSB1bnRpbCAzIE5vdmVtYmVyLgpTQUNNLUFCMTJDRCxkZWVAZXhhbXBsZS5jb20sMjAyNi0xMS0wNlQxNDowMDowMCxSRTogQ3JpdGljYWxpdHk6IDIganVzdGlmaWNhdGlvbnMgdG8gd3JpdGUgW1NBQ00tQUIxMkNEXSwiSSB3aWxsIHdyaXRlIGJvdGgganVzdGlmaWNhdGlvbnMgdGhpcyB3ZWVrLgpEZWUiClNBQ00tWlowMFpaLHNvbWVvbmVAZXhhbXBsZS5jb20sMjAyNi0xMS0wOVQxNjoyMDowMCxSRTogQW4gb2xkIG1lc3NhZ2UgW1NBQ00tWlowMFpaXSxJcyB0aGlzIHN0aWxsIG5lZWRlZD8K"},
-			{"settings.csv", "VGl0bGUsVmFsdWUKcmVtaW5kZXJEYXlzLDMKbWF4UmVtaW5kZXJzLDk5Cg=="},
+			{"settings.csv", "VGl0bGUsVmFsdWUKcmVtaW5kZXJEYXlzLDMKbWF4UmVtaW5kZXJzLDk5CnBvcnRhbExpbmssaHR0cHM6Ly9wb3J0YWwuZXhhbXBsZS5jb20vc2FjbQpzaWduYXR1cmUsU0FDTSB0ZWFtCmVwb093bmVyTmFtZSxFdmUgSW52ZW50b3J5CmVwb093bmVyRW1haWwsZXZlLmludmVudG9yeUBleGFtcGxlLmNvbQpwcm9jdXJlbWVudE5hbWUsUHJvY3VyZW1lbnQKcHJvY3VyZW1lbnRFbWFpbCxwcm9jdXJlbWVudEBleGFtcGxlLmNvbQp0ZWFtLnByb2Nlc3MtbWFuYWdlbWVudC5uYW1lLFByb2Nlc3MgTWFuYWdlbWVudAp0ZWFtLnByb2Nlc3MtbWFuYWdlbWVudC5wZW9wbGUsUGF0IFByb2Nlc3MgPHBhdC5wcm9jZXNzQGV4YW1wbGUuY29tPjsgUXVpbm4gUHJvY2VzcyA8cXVpbm4ucHJvY2Vzc0BleGFtcGxlLmNvbT4K"},
 			{"team.csv", "VGl0bGUsRW1haWwsQWN0aXZlCkFsZXggRXhhbXBsZSxhbGV4QGV4YW1wbGUuY29tLFllcwpTYW0gRXhhbXBsZSxzYW1AZXhhbXBsZS5jb20sWWVzCk1heCBNYW5hZ2VyLG1heEBleGFtcGxlLmNvbSxObwo="},
 			{"reviews.csv", "UmV2aWV3RGF0ZSxDaUtleSxDaU5hbWUsQ2xhc3MsU3RhdHVzSW5FcG8sQW5zd2VyLE5vdGUsQnksQXQKMjAyNi0xMS0wMixldmVudCBkZXNrLEV2ZW50IERlc2ssYnVzaW5lc3NfYXBwbGljYXRpb24sS8O4cmVuZGUsc2FtZSwsU2FtIEV4YW1wbGUsMjAyNi0xMS0wMlQxMzowMDowMAoyMDI2LTExLTAyLGZpbmVzIGh1YiAtIHByb2QsRmluZXMgSHViIC0gUFJPRCxzZXJ2aWNlX2luc3RhbmNlLE5lZGxhZ3QsZGlmZmVyZW50LEVQTyBzYXlzIHJldGlyZWQ7IFNlcnZpY2VOb3cgc2F5cyBvcGVyYXRpb25hbCxTYW0gRXhhbXBsZSwyMDI2LTExLTAyVDEzOjEwOjAwCg=="}
 		})
@@ -311,7 +340,7 @@ expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"","
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.43.0"
+expression WorkbenchVersion = "0.44.0"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
@@ -339,6 +368,16 @@ expression CaseRules =
 expression CaseToday = if SourceMode = "Sample" then SampleDate else DateTime.Date(DateTime.LocalNow())
 	queryGroup: Reading
 
+/// For the answer key only (tools/powerbi/parity.ts; build B7): the first message of a Teams chat about every open case of each card, as tests/recorded/teams-messages.txt records them (no journal, no person chosen, the reference SACM-CHAT-<check>). No table reads it; the workflow Power BI evaluates it.
+expression ChatsRecorded =
+		let
+		    cases = List.Select(fnCases(CheckRun, [Events = {}, Replies = {}]), (item) => item[State] = "open"),
+		    byCheck = fnGroupBy(cases, (item) => item[CheckId])
+		in
+		    #table(type table [CheckId = text, Chat = text],
+		        List.Transform(Record.FieldNames(byCheck), (id) => {id, fnChatMessage(Record.Field(byCheck, id), MessageSettings, "SACM-CHAT-" & id, "")}))
+	queryGroup: Reading
+
 /// What the cases of each check offer (build B6, D294), by check id: the kind of its card page (src/app/view/cards.ts, cardKind; plan §6.1) and the words and marks of its playbook that change the actions of the Power App: askAfterReview (a line to check that SACM can hand to the owner), askWhenUnsure (a fix list line SACM cannot fix alone), markWord ("deleted": the line is marked deleted, not fixed) and retirementDate (the owner can give a planned retirement date).
 expression CheckPlaybooks =
 		let
@@ -360,6 +399,18 @@ expression CheckPlaybooks =
 		    Record.FromList(List.Transform(packs, entry), List.Transform(packs, (pack) => pack[id]))
 	queryGroup: Reading
 
+/// For the answer key only (tools/powerbi/parity.ts; build B7): the drafts of the samples as tests/recorded/messages.txt records them, with no journal and no replies, every open case written about (tests/sample-record.ts). No table reads it; the workflow Power BI evaluates it and compares it with the recorded messages byte for byte, the references and the name of the manager put in.
+expression DraftsRecorded =
+		let
+		    run = CheckRun,
+		    cases = List.Select(fnCases(run, [Events = {}, Replies = {}]), (item) => item[State] = "open"),
+		    drafts = fnDrafts(cases, MessageSettings)
+		in
+		    #table(type table [Ref = text, Kind = text, To = text, Cc = text, Subject = text, Keys = text, NewKeys = text, PartIndex = Int64.Type, PartCount = Int64.Type, CiCount = Int64.Type, CheckIds = text, Plain = text, Body = text],
+		        List.Transform(drafts, (draft) => {draft[Ref], draft[Kind], draft[To], draft[Cc], draft[Subject], Text.Combine(draft[Keys], " "), Text.Combine(draft[NewKeys], " "),
+		            draft[PartIndex], draft[PartCount], draft[CiCount], Text.Combine(draft[CheckIds], " "), draft[Plain], draft[Body]}))
+	queryGroup: Reading
+
 /// A report with no header and no row: the readers turn it into an empty table with all their columns.
 expression EmptyRead =
 		let
@@ -374,6 +425,16 @@ expression fnAddBusinessDays =
 		    List.Accumulate(List.Numbers(1, days), start, (day, step) =>
 		        let next = Date.AddDays(day, 1), weekday = Date.DayOfWeek(next, Day.Monday) in
 		        if weekday >= 5 then Date.AddDays(next, 7 - weekday) else next)
+	queryGroup: Reading
+
+/// "the CI below", "the CIs below", "the contract below" (src/core/messages/messages.ts, belowWords; build B7). `items`: the cases of a message or of one of its parts (fnDrafts), each with its Fact.
+expression fnBelowWords =
+		(items as list) as text =>
+		    let
+		        count = List.Count(List.Distinct(List.Transform(items, (item) => item[Fact][CiKey]))),
+		        noun = if List.AllTrue(List.Transform(items, (item) => Record.FieldOrDefault(item[Fact], "Contract", null) <> null)) then "contract" else "CI"
+		    in
+		        "the " & noun & (if count = 1 then "" else "s") & " below"
 	queryGroup: Reading
 
 /// A class as label or table name, as its class id ("Application Service" and cmdb_ci_service_auto are service_instance). Anything else keeps its own name in lower case with "_" for spaces (src/core/sources/ci/ci-report.ts, canonicalClass).
@@ -484,7 +545,7 @@ expression fnCaseActions =
 		        ]
 	queryGroup: Reading
 
-/// The part CaseLines of the table Run (D292), which the DAX table CaseLines shows: one line per case of the newest report (fnCases), with its status (StatusLabel: the word the pages show, "Asked" for Contacted), how it is listed, who has it, the messages, the replies, the decision to stop following it, who marked it fixed and when, when the newest report verified it, and (build B6) who it is about and what the Power App offers on it. `cases` is fnCases(CheckRun).
+/// The part CaseLines of the table Run (D292), which the DAX table CaseLines shows: one line per case of the newest report (fnCases), with its status (StatusLabel: the word the pages show, "Asked" for Contacted), how it is listed, who has it, the messages, the replies, the decision to stop following it, who marked it fixed and when, when the newest report verified it, and (build B6) who it is about and what the Power App offers on it, and (build B7) who it goes to when its card is shared out. `cases` is fnCases(CheckRun).
 expression fnCaseLinesPart =
 		(cases as list) as table =>
 		    #table(
@@ -493,21 +554,21 @@ expression fnCaseLinesPart =
 		            AssignedTo = text, HandoverNote = text, Request = text, Messages = Int64.Type, SentOn = date, LastMessageTo = text, LastRef = text,
 		            ReminderFrom = date, Remind = text, Replies = Int64.Type, LastReplyOn = date, ExceptionReason = text, ReviewOn = date,
 		            ExceptionEnded = date, RetireOn = date, VerifiedOn = date, FixedBy = text, FixedOn = date, Events = Int64.Type,
-		            Person = text, Actions = text, ActionWords = text, Stages = text, StageId = text],
+		            Person = text, Actions = text, ActionWords = text, Stages = text, StageId = text, ShareTo = text],
 		        List.Transform(cases, (item) => {
 		            item[Key], item[CheckId], item[CiKey], item[CiName], item[ClassLabel], item[Field], item[ContactName], item[InLatest], item[Untested], item[CiMissing],
 		            item[State], item[StateLabel], item[Status], item[StatusLabel], item[AssignedTo], item[HandoverNote], item[Request], item[Messages], item[SentOn], item[LastMessageTo],
 		            item[LastRef], item[ReminderFrom], item[Remind], List.Count(item[Replies]), item[LastReplyOn], item[ExceptionReason], item[ReviewOn],
 		            item[ExceptionEnded], item[RetireOn], item[VerifiedOn], item[FixedBy], item[FixedOn], item[Events],
-		            item[Person], item[Actions], item[ActionWords], item[Stages], item[StageId]}))
+		            item[Person], item[Actions], item[ActionWords], item[Stages], item[StageId], item[ShareTo]}))
 	queryGroup: Reading
 
-/// The cases of the newest report (D292), as the app works out its cases (src/core/cases/cases.ts, buildCases), from the findings of the newest report, the journal and the replies. A case is every finding of the newest report that is not parked, and every key the journal names that the newest report no longer shows (the team worked on it). Status (DOMAIN-RULES §17): New, Contacted, Answered (a reply after the last message), Fix in progress, Fixed, Not followed up (until its review date), Verified (the newest report contains the CI, tested the check and no longer shows the finding). State: how the case is listed, from the finding (a planned retirement date after today makes it wait; "Ask the owner" makes a finding to check one to solve); "" for a key the newest report no longer shows. Remind: "reminder" or "escalation" once ReminderFrom comes, for a case that was asked and did not answer (D39, D40); the measures compare ReminderFrom with today, so it is right between two refreshes. Every message counts as sent on the day it was recorded (the outbox is the app's, D162). `run` is CheckRun (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run.
+/// The cases of the newest report (D292), as the app works out its cases (src/core/cases/cases.ts, buildCases), from the findings of the newest report, the journal and the replies. A case is every finding of the newest report that is not parked, and every key the journal names that the newest report no longer shows (the team worked on it). Status (DOMAIN-RULES §17): New, Contacted, Answered (a reply after the last message), Fix in progress, Fixed, Not followed up (until its review date), Verified (the newest report contains the CI, tested the check and no longer shows the finding). State: how the case is listed, from the finding (a planned retirement date after today makes it wait; "Ask the owner" makes a finding to check one to solve); "" for a key the newest report no longer shows. Remind: "reminder" or "escalation" once ReminderFrom comes, for a case that was asked and did not answer (D39, D40); the measures compare ReminderFrom with today, so it is right between two refreshes. Every message counts as sent on the day it was recorded (the outbox is the app's, D162). `run` is CheckRun (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run. `given` (build B7): [Events, Replies] instead of the journal and the replies of the team; the answer key gives none, to compare the drafts with the recorded messages (DraftsRecorded). Each case also keeps, for the drafts (fnDrafts): Fact (its finding), MessageEvents (its messages), ReminderDue and OverLimit (as buildCases: asked, no answer, the working days to the reminder passed by CaseToday, and the reminders used or not) and Askable (a line of a fix list with askWhenUnsure only once SACM handed it to the owner, src/app/view/fix-list.ts).
 expression fnCases =
-		(run as nullable record) as list =>
+		(run as nullable record, optional given as nullable record) as list =>
 		    let
 		        facts = if run = null then {} else run[Facts],
-		        events = JournalEvents,
+		        events = if given = null then JournalEvents else given[Events],
 		        rules = CaseRules,
 		        today = Date.ToText(CaseToday, [Format = "yyyy-MM-dd", Culture = "en-US"]),
 		        date = if run = null then null else run[Date],
@@ -525,7 +586,8 @@ expression fnCases =
 		            (event[CheckId] = "*" or event[CheckId] = checkId)
 		            and (ciKey = event[CiKey] or Text.StartsWith(ciKey, event[CiKey] & "|") or Text.StartsWith(ciKey, event[CiKey] & "#")),
 		        order = (a as record, b as record) as number => let first = Value.Compare(a[At], b[At]) in if first <> 0 then first else Value.Compare(a[Id], b[Id]),
-		        repliesByRef = fnGroupBy(ReplyItems, (reply) => reply[Ref]),
+		        repliesByRef = fnGroupBy(if given = null then ReplyItems else given[Replies], (reply) => reply[Ref]),
+		        todayDate = CaseToday,
 		        // Parts of a key: <check>:<CI key>:<field>; a CI key may hold ":" (a contract), a check id and a field never do.
 		        partsOf = (key as text) as record =>
 		            let first = Text.PositionOf(key, ":"), last = Text.PositionOf(key, ":", Occurrence.Last) in
@@ -584,7 +646,10 @@ expression fnCases =
 		                    Status = status, Timeline = timeline, Stopped = exception <> null, RetireOn = retireOn,
 		                    Class = Record.FieldOrDefault(fact, "Class", ""), Mapping = Record.FieldOrDefault(fact, "Mapping", {})
 		                ]),
-		                contactId = Record.FieldOrDefault(fact, "ContactId", "")
+		                contactId = Record.FieldOrDefault(fact, "ContactId", ""),
+		                reminderFrom = if sentOn = null then null else fnAddBusinessDays(sentOn, rules[ReminderDays]),
+		                waited = reminderFrom <> null and reminderFrom <= todayDate,
+		                book = Record.FieldOrDefault(CheckPlaybooks, fact[CheckId], [AskWhenUnsure = ""])
 		            in
 		                [
 		                    Key = key, CheckId = fact[CheckId], CiKey = fact[CiKey], CiName = fact[CiName], ClassLabel = fact[ClassLabel], Field = fact[Field],
@@ -596,7 +661,7 @@ expression fnCases =
 		                    HandoverNote = if assignment = null or assignment[Type] <> "handover" then "" else assignment[Text],
 		                    Request = lastText(timeline, "request"), Messages = List.Count(messages), SentOn = sentOn,
 		                    LastMessageTo = if lastMessage = null then "" else lastMessage[To], LastRef = if lastMessage = null then "" else lastMessage[Ref],
-		                    ReminderFrom = if sentOn = null then null else fnAddBusinessDays(sentOn, rules[ReminderDays]),
+		                    ReminderFrom = reminderFrom,
 		                    Remind = if due and status = "Contacted" then (if List.Count(messages) <= rules[MaxReminders] then "reminder" else "escalation") else "",
 		                    Replies = replies, LastReplyOn = if List.IsEmpty(replies) then null else dateOf(List.Last(replies)[Received]),
 		                    ExceptionReason = if exception = null then "" else if legacy then "Set before version 0.12 (no reason)" else exception[Reason],
@@ -609,10 +674,18 @@ expression fnCases =
 		                    Closed = closed,
 		                    // Who the case is about: the user ID of the person asked, else the email in lower case (as the HTML app knows a person contacted).
 		                    Person = if not inLatest then "" else if contactId <> "" then contactId else Text.Lower(fact[ContactEmail], "en-US"),
-		                    Actions = actions[Actions], ActionWords = actions[ActionWords], Stages = actions[Stages], StageId = actions[StageId]
-		                ]
+		                    Actions = actions[Actions], ActionWords = actions[ActionWords], Stages = actions[Stages], StageId = actions[StageId],
+		                    // For the drafts (build B7).
+		                    Fact = fact, MessageEvents = messages,
+		                    ReminderDue = due and status = "Contacted" and List.Count(messages) <= rules[MaxReminders] and waited,
+		                    OverLimit = due and status = "Contacted" and List.Count(messages) > rules[MaxReminders] and waited,
+		                    ToSolve = not closed and state = "open", Askable = book[AskWhenUnsure] = "" or ownerAsked
+		                ],
+		        lines = List.Buffer(List.Transform(subjects, line)),
+		        // Share out (build B7, D24): the manager a free group of its card goes to, "" otherwise.
+		        shareTo = fnShareOut(lines)
 		    in
-		        List.Buffer(List.Transform(subjects, line))
+		        List.Buffer(List.Transform(lines, (item) => item & [ShareTo = Record.FieldOrDefault(shareTo, item[Key], "")]))
 	queryGroup: Reading
 
 /// Any cell as text, as the HTML app reads it: dates as yyyy-mm-dd hh:mm:ss, true/false, numbers without a thousands separator. An empty cell is "".
@@ -625,6 +698,31 @@ expression fnCellText =
 		    else if value is logical then (if value then "true" else "false")
 		    else if value is number then Number.ToText(value, "G", "en-US")
 		    else Text.From(value, "en-US")
+	queryGroup: Reading
+
+/// The first message of a Teams chat (src/core/messages/messages.ts, chatMessage; D44, D163; build B7): the same first sentence and ask as the email, written for a chat ({reply} reads "answer in this chat"), with the names of the CIs that `to` (the address of the person asked) is asked about, at most eight and then "and 3 more CIs". With `to` "": every CI. `items`: the cases, each with its Fact; `settings`: MessageSettings; `ref`: the reference, or %%REF%% for the Power App to fill.
+expression fnChatMessage =
+		(items as list, settings as record, ref as text, to as text, optional checkPacks as nullable list) as text =>
+		    let
+		        chat = settings & [Channel = "chat"],
+		        lower = (value as text) as text => Text.Lower(value, "en-US"),
+		        theirs = if to = "" then items else List.Select(items, (item) => lower(fnRecipient(item[Fact], settings)[Email]) = lower(to)),
+		        own = if List.IsEmpty(theirs) then items else theirs,
+		        packs = if checkPacks <> null then checkPacks else List.Transform(Json.Document(CheckFiles), (file) => file[pack]),
+		        pack = if List.IsEmpty(own) then null else List.First(List.Select(packs, (candidate) => candidate[id] = own{0}[Fact][CheckId]), null),
+		        message = if pack = null then null else Record.FieldOrDefault(Record.FieldOrDefault(pack, "playbook", []), "message", null)
+		    in
+		        if message = null then "Hi, this is the SACM team. Reference: " & ref
+		        else
+		            let
+		                mine = List.Select(own, (item) => item[Fact][CheckId] = pack[id]),
+		                texts = fnMessageSection(message, mine{0}[Fact][Route], mine, chat),
+		                names = List.Sort(List.Distinct(List.Transform(mine, (item) => item[Fact][CiName])), Comparer.FromCulture("en-US")),
+		                more = List.Count(names) - 8,
+		                noun = if List.AllTrue(List.Transform(mine, (item) => Record.FieldOrDefault(item[Fact], "Contract", null) <> null)) then "more contract" else "more CI",
+		                shown = List.Transform(List.FirstN(names, 8), (name) => "- " & name) & (if more > 0 then {"- and " & Text.From(more) & " " & noun & (if more = 1 then "" else "s")} else {})
+		            in
+		                Text.Combine({"Hi, this is the SACM team. " & texts[Intro][Text]} & shown & {texts[Ask][Text], "Reference: " & ref}, "#(lf)")
 	queryGroup: Reading
 
 /// The rules of the relationship model a check runs (relationship-detectors.ts, chosen): those its detector names in `rules`, in the order of the model, else every rule.
@@ -739,6 +837,367 @@ expression fnDecodeText =
 expression fnDigits =
 		(text as text) as logical =>
 		    text <> "" and List.AllTrue(List.Transform(Text.ToList(text), (char) => Text.Contains("0123456789", char)))
+	queryGroup: Reading
+
+/// The messages to the people the checks ask (src/core/messages/messages.ts, buildDrafts; build B7, D300): one draft per person, across every card (D34). A person who got a message and did not answer gets a reminder in the thread of the first message (the same reference, D5); their points that were never asked join it as its second part, "New since then" (D161). When the reminders got no answer (OverLimit), the draft goes to the person above: an escalation (D40, D160), with the person asked in copy; when nobody is known, its To is empty and the manager types it in the Power App. A message holds at most MessageWords[maxCis] CIs; a longer one is split into parts (D36). The Procurement mailbox and a team get one message with every table, nobody copied (D98, D195). Building a draft sends nothing. `cases`: the cases to write about, each [Key, Fact (the finding, fnFacts), MessageEvents (its messages, oldest first), OverLimit]; `settings`: MessageSettings. A case nobody can be written to (no address, no message texts) is left out. Each draft: Ref (the reference of the message a reminder answers, "" for a new one), Kind (first, reminder, escalation), To, ToName, Cc ("a; b"), Subject, Body (HTML; every value from a report escaped), Plain (the same as text), Keys and NewKeys (the keys of "New since then"), CheckIds, CiCount, PartIndex, PartCount, About (for an escalation: who did not answer), NobodyAbove, Mailbox, Team, Person (who the draft is about) and Items (its cases). Subject, Body and Plain hold %%REF%% where the reference goes and %%SENDER%% where the name of the manager goes: the Power App fills both when the manager sends (D301). The order of the drafts and of their lines is the one of the HTML app.
+expression fnDrafts =
+		(cases as list, settings as record) as list =>
+		    let
+		        words = MessageWords,
+		        packs = List.Buffer(List.Transform(Json.Document(CheckFiles), (file) => file[pack])),
+		        packById = Record.FromList(packs, List.Transform(packs, (pack) => pack[id])),
+		        orderById = Record.FromList(List.Positions(packs), List.Transform(packs, (pack) => pack[id])),
+		        messageOf = (pack as record) as nullable record => Record.FieldOrDefault(Record.FieldOrDefault(pack, "playbook", []), "message", null),
+		        packOf = (fact as record) as nullable record => Record.FieldOrDefault(packById, fact[CheckId], null),
+		        procurementId = ReadingRules[procurement][id],
+		        compare = Comparer.FromCulture("en-US"),
+		        lower = (value as text) as text => Text.Lower(value, "en-US"),
+		        textOf = (value as any) as text => if value = null then "" else value,
+		        plain = (value as text) as record => [Html = fnHtml(value), Text = value],
+		        join = (parts as list, separator as text) as record => [
+		            Html = Text.Combine(List.Select(List.Transform(parts, (part) => part[Html]), (value) => value <> ""), separator),
+		            Text = Text.Combine(List.Select(List.Transform(parts, (part) => part[Text]), (value) => value <> ""), separator)
+		        ],
+		        p = (rich as record) as record => [Html = if rich[Html] <> "" then "<p>" & rich[Html] & "</p>" else "", Text = rich[Text]],
+		        plural = (count as number, word as text) as text => Text.From(count) & " " & word & (if count = 1 then "" else "s"),
+		        andList = (values as list) as text =>
+		            if List.Count(values) <= 1 then List.First(values, "") else Text.Combine(List.RemoveLastN(values, 1), ", ") & " and " & List.Last(values),
+		        numberWords = {"no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"},
+		        times = (count as number) as text => if count = 1 then "once" else (if count >= 0 and count <= 10 then numberWords{count} else Text.From(count)) & " times",
+		        firstName = (name as text) as text =>
+		            let
+		                base = if Text.Contains(name, ",") then Text.Split(name, ","){1} else name,
+		                trimmed = Text.Trim(base)
+		            in
+		                Text.SplitAny(trimmed, " #(tab)#(cr)#(lf)"){0},
+		        capital = (value as text) as text => Text.Upper(Text.Start(value, 1), "en-US") & Text.Middle(value, 1),
+		        isTeam = (fact as record) as logical => Text.StartsWith(fact[ContactId], "team:"),
+		        toMailbox = (fact as record) as logical => fact[ContactId] = procurementId,
+		        isContract = (item as record) as logical => Record.FieldOrDefault(item[Fact], "Contract", null) <> null,
+		        recipientOf = (fact as record) as record => fnRecipient(fact, settings),
+		        // Who gets the escalation: the person above, or the Procurement lead for the mailbox; null when there is nobody.
+		        escalationOf = (fact as record, recipient as record) as nullable record =>
+		            if toMailbox(fact) then
+		                let email = Text.Trim(settings[ProcurementLeadEmail]) in
+		                if email = "" then null else [Name = if Text.Trim(settings[ProcurementLeadName]) <> "" then Text.Trim(settings[ProcurementLeadName]) else "Procurement lead", Email = email]
+		            else if textOf(fact[EscalateEmail]) = "" or lower(fact[EscalateEmail]) = lower(recipient[Email]) then null
+		            else [Name = textOf(fact[EscalateName]), Email = fact[EscalateEmail]],
+		        // The kind of problem of a finding of a check with byProblem: the first part of its field.
+		        problemOf = (fact as record) as text => Text.Split(fact[Field], "."){0},
+		        byProblem = (pack as record) as nullable record => Record.FieldOrDefault(messageOf(pack), "byProblem", null),
+		        textsOf = (pack as record, problem as nullable text) as record =>
+		            let base = messageOf(pack), own = if problem = null then null else Record.FieldOrDefault(Record.FieldOrDefault(base, "byProblem", []), problem, null) in
+		            if own = null then base else base & own,
+		        problemOrder = (fact as record) as number =>
+		            let kinds = Record.FieldNames(Record.FieldOrDefault(messageOf(packOf(fact)), "byProblem", [])), at = List.PositionOf(kinds, problemOf(fact)) in
+		            if at < 0 then List.Count(kinds) else at,
+		        sectionKey = (fact as record) as text =>
+		            fact[CheckId] & "|" & fact[Route] & "|" & (if byProblem(packOf(fact)) <> null then problemOf(fact) else ""),
+		        // The last message a reminder answers: an email if there is one, else a Teams chat.
+		        previousOf = (item as record) as nullable record =>
+		            let emails = List.Select(item[MessageEvents], (event) => event[Channel] <> "teams") in
+		            if List.IsEmpty(emails) then List.Last(item[MessageEvents], null) else List.Last(emails),
+
+		        /* ---------------------------------------------------------- who gets each case */
+		        entries = List.Buffer(List.RemoveNulls(List.Transform(cases, (item) =>
+		            let
+		                fact = item[Fact],
+		                recipient = recipientOf(fact),
+		                pack = packOf(fact)
+		            in
+		                if recipient[Email] = "" or pack = null or messageOf(pack) = null then null
+		                else
+		                    let
+		                        previous = previousOf(item),
+		                        kind = if previous <> null and previous[Ref] <> "" then "reminder" else "first",
+		                        escalate = kind = "reminder" and item[OverLimit],
+		                        above = if escalate then escalationOf(fact, recipient) else null,
+		                        // The Procurement mailbox without a Procurement lead in Settings: no escalation, the reminder goes again (D147).
+		                        final = if escalate and (above <> null or not toMailbox(fact)) then "escalation" else kind,
+		                        to = if final = "escalation" then (if above <> null then above else [Name = "", Email = ""]) else recipient,
+		                        previousRef = if final = "first" then "" else previous[Ref]
+		                    in
+		                        [
+		                            Item = item, Kind = final, PreviousRef = previousRef, To = to, NobodyAbove = final = "escalation" and above = null,
+		                            GroupKey = final & "|" & previousRef & "|" & lower(to[Email]) & "|" & (if final = "escalation" then lower(recipient[Email]) else "")
+		                        ]))),
+		        grouped = fnGroupBy(entries, (entry) => entry[GroupKey]),
+		        groups = List.Buffer(List.Transform(Record.FieldValues(grouped), (members) =>
+		            let first = members{0} in [Kind = first[Kind], PreviousRef = first[PreviousRef], To = first[To], NobodyAbove = first[NobodyAbove], Items = List.Transform(members, (entry) => entry[Item])])),
+		        // A reminder and the person's new points are one email (D161): a first message joins the person's first reminder.
+		        // The first reminder of each address (its position), and the first messages that join each reminder.
+		        reminderAt = fnGroupBy(List.Select(List.Positions(groups), (at) => groups{at}[Kind] = "reminder"), (at) => lower(groups{at}[To][Email]) & "|"),
+		        reminderFor = (group as record) as number =>
+		            if group[Kind] <> "first" or List.AnyTrue(List.Transform(group[Items], (item) => toMailbox(item[Fact]))) then -1
+		            else List.First(Record.FieldOrDefault(reminderAt, lower(group[To][Email]) & "|", {}), -1),
+		        targets = List.Buffer(List.Transform(groups, reminderFor)),
+		        joiners = fnGroupBy(List.Select(List.Positions(groups), (at) => targets{at} >= 0), (at) => Text.From(targets{at})),
+		        merged = List.Buffer(List.Transform(List.Positions(groups), (at) =>
+		            let
+		                group = groups{at},
+		                joining = List.Combine(List.Transform(Record.FieldOrDefault(joiners, Text.From(at), {}), (other) => groups{other}[Items]))
+		            in
+		                if targets{at} >= 0 then group & [Items = {}, Fresh = []]
+		                else group & [Items = group[Items] & joining, Fresh = Record.FromList(List.Transform(joining, (item) => true), List.Transform(joining, (item) => item[Key]))])),
+
+		        /* ---------------------------------------------------------- the parts of a message */
+		        contractTable = (items as list) as record =>
+		            let
+		                cells = (item as record) as list => let contract = item[Fact][Contract] in {textOf(contract[Number]), textOf(contract[Name]), textOf(contract[Vendor]), textOf(item[Fact][Detail])},
+		                rows = Text.Combine(List.Transform(items, (item) => "<tr>" & Text.Combine(List.Transform(cells(item), (cell) => "<td>" & fnHtml(cell) & "</td>")) & "</tr>"))
+		            in
+		                [
+		                    Html = "<table border=""1"" cellpadding=""6"" cellspacing=""0"" style=""border-collapse:collapse""><tr>"
+		                        & Text.Combine(List.Transform(words[contractColumns], (cell) => "<th align=""left"" style=""white-space:nowrap"">" & cell & "</th>")) & "</tr>" & rows & "</table>",
+		                    Text = Text.Combine(List.Transform(items, (item) => "- " & Text.Combine(List.Select(cells(item), (cell) => cell <> ""), " · ")), "#(lf)")
+		                ],
+		        table = (items as list, found as logical) as record =>
+		            if List.AllTrue(List.Transform(items, isContract)) then contractTable(items)
+		            else
+		                let
+		                    head = words[columns] & (if found then {"What we found"} else {}),
+		                    cells = (item as record) as list =>
+		                        let fact = item[Fact] in
+		                        {textOf(fact[CiName]), textOf(fact[EpoId]), textOf(fact[ClassLabel]), textOf(fact[OwnedBy]), textOf(fact[ManagedBy]), textOf(fact[Status]), textOf(fact[SupportGroup])}
+		                        & (if found then {textOf(fact[Detail])} else {}),
+		                    rows = Text.Combine(List.Transform(items, (item) => "<tr>" & Text.Combine(List.Transform(cells(item), (cell) => "<td>" & fnHtml(cell) & "</td>")) & "</tr>")),
+		                    line = (item as record) as text =>
+		                        let values = cells(item) in
+		                        "- " & Text.Combine(List.Select(List.Transform(List.Positions(values), (at) =>
+		                            let cell = values{at} in if at >= 3 and at <= 6 and cell <> "" then head{at} & ": " & cell else cell), (cell) => cell <> ""), " · ")
+		                in
+		                    [
+		                        Html = "<table border=""1"" cellpadding=""6"" cellspacing=""0"" style=""border-collapse:collapse""><tr>"
+		                            & Text.Combine(List.Transform(head, (cell) => "<th align=""left"" style=""white-space:nowrap"">" & cell & "</th>")) & "</tr>" & rows & "</table>",
+		                        Text = Text.Combine(List.Transform(items, line), "#(lf)")
+		                    ],
+		        // One part per check and route (and kind of problem): its intro, table, ask and why.
+		        sectionsBody = (items as list, kind as text, sameWhy as logical) as list =>
+		            let
+		                bySection = fnGroupBy(items, (item) => sectionKey(item[Fact])),
+		                sections = List.Buffer(List.Transform(Record.FieldValues(bySection), (members) =>
+		                    let
+		                        fact = members{0}[Fact],
+		                        pack = packOf(fact),
+		                        problem = if byProblem(pack) <> null then problemOf(fact) else null
+		                    in
+		                        [PackId = pack[id], Problem = problem, Items = members, Texts = fnMessageSection(textsOf(pack, problem), fact[Route], members, settings)])),
+		                several = List.Count(sections) > 1,
+		                part = (at as number) as list =>
+		                    let
+		                        chosen = sections{at},
+		                        texts = chosen[Texts],
+		                        members = chosen[Items],
+		                        found = several or List.Count(List.Distinct(List.Transform(members, (item) => item[Fact][Detail]))) > 1
+		                            or List.AnyTrue(List.Transform(members, (item) => textOf(item[Fact][Source]) <> "")),
+		                        count = if chosen[Problem] <> null then " (" & Text.From(List.Count(members)) & ")" else "",
+		                        next = if at + 1 < List.Count(sections) then sections{at + 1} else null,
+		                        // The parts of one check with a table per kind of problem share the line "why it matters": it comes once, after the last.
+		                        shareWhy = chosen[Problem] <> null and next <> null and next[PackId] = chosen[PackId] and next[Problem] <> null
+		                    in
+		                        (if several then {[Html = "<h3 style=""margin:18px 0 6px"">" & texts[Heading][Html] & count & "</h3>", Text = "#(lf)" & Text.Upper(texts[Heading][Text], "en-US") & count]} else {})
+		                        & {p(join({if kind <> "escalation" and not sameWhy then plain(texts[WhyYou]) else plain(""), texts[Intro]}, " ")), table(members, found)}
+		                        & (if kind <> "escalation" then {p(texts[Ask])} else {})
+		                        & (if shareWhy then {} else {p(texts[Why])})
+		            in
+		                List.Combine(List.Transform(List.Positions(sections), part)),
+		        // The first contact of these cases, by any channel (F02): its day and whether it was a Teams chat.
+		        firstContact = (items as list) as nullable record =>
+		            let
+		                all = List.Combine(List.Transform(items, (item) => item[MessageEvents])),
+		                numbered = List.Transform(List.Positions(all), (at) => [At = textOf(all{at}[At]), Channel = all{at}[Channel], Order = at]),
+		                first = List.First(List.Sort(numbered, (a, b) => let byAt = Value.Compare(a[At], b[At]) in if byAt <> 0 then byAt else Value.Compare(a[Order], b[Order])), null),
+		                day = if first = null then "" else Text.Start(first[At], 10)
+		            in
+		                if first <> null and Text.Length(day) = 10 and Text.Remove(day, {"0".."9"}) = "--" and Text.At(day, 4) = "-" and Text.At(day, 7) = "-"
+		                then [On = day, Teams = first[Channel] = "teams"] else null,
+		        longDate = (day as text) as text => fnLongDate(Date.FromText(day, [Format = "yyyy-MM-dd", Culture = "en-US"])),
+		        // The opening of an escalation: who is written to, why, and what we ask.
+		        escalationOpening = (items as list, person as record, nobodyAbove as logical) as text =>
+		            let
+		                below = fnBelowWords(items),
+		                fact = items{0}[Fact],
+		                attempts = List.Max(List.Transform(items, (item) => List.Count(item[MessageEvents]))),
+		                ask = "Could you help us to get an answer, or tell us who else to ask?",
+		                asked = if person[Name] <> "" then person[Name] else person[Email],
+		                role = if fact[ContactVia] = "managed by" then ", the Managed by person," else "",
+		                via = textOf(fact[EscalateVia])
+		            in
+		                if toMailbox(fact) then
+		                    let sentOn = List.Sort(List.Distinct(List.Combine(List.Transform(items, (item) => List.Transform(item[MessageEvents], (event) => Text.Start(event[At], 10)))))) in
+		                    "We wrote to the " & (if person[Name] <> "" then person[Name] else "Procurement") & " mailbox (" & person[Email] & ") on "
+		                        & andList(List.Transform(List.LastN(sentOn, 3), longDate)) & " about " & below & ", and we have no answer. "
+		                        & "You are the Procurement lead. Could you help us to get an answer, or tell us who else to ask?"
+		                else if nobodyAbove then "We asked " & asked & " " & times(attempts) & " about " & below & " and got no answer. " & ask
+		                else if via = "owner" then "You are the owner (Owned by) of " & below & ". We asked " & asked & role & " " & times(attempts) & " and got no answer. " & ask
+		                else if via = "manager of owner" or via = "department head of owner" then
+		                    "You are the " & (if via = "manager of owner" then "manager" else "head of the department") & " of the owner (Owned by) of " & below & ". We asked "
+		                        & asked & role & " " & times(attempts) & " and got no answer. " & ask
+		                else "We asked " & asked & role & " " & times(attempts) & " about " & below & " and got no answer. "
+		                    & "You are " & (if via = "department head" then "the head of their department" else "their manager") & " in ServiceNow. " & ask,
+
+		        /* ---------------------------------------------------------- one draft */
+		        draftOf = (items as list, group as record, ref as text, index as number, count as number) as record =>
+		            let
+		                kind = group[Kind],
+		                fresh = group[Fresh],
+		                person = recipientOf(items{0}[Fact]),
+		                to = group[To][Email],
+		                addresses = (if kind = "escalation" then {person[Email]} else {}) & List.Combine(List.Transform(items, (item) => item[Fact][Cc])),
+		                cc = List.Accumulate(addresses, {}, (known, address) =>
+		                    if address = "" or address = null or lower(address) = lower(to) or List.Contains(List.Transform(known, lower), lower(address)) then known else known & {address}),
+		                isFresh = (item as record) as logical => Record.HasFields(fresh, item[Key]),
+		                still = List.Select(items, (item) => not isFresh(item)),
+		                newOnes = List.Select(items, isFresh),
+		                two = not List.IsEmpty(still) and not List.IsEmpty(newOnes),
+		                // The line "why you" comes once at the top when every part says the same; else each part says it.
+		                sameWhy = List.Count(List.Distinct(List.Transform(items, (item) => fnWhyYou(item[Fact][ContactVia], "X")))) = 1,
+		                kinds = List.Count(List.Distinct(List.Transform(items, (item) => sectionKey(item[Fact])))),
+		                ciCount = List.Count(List.Distinct(List.Transform(items, (item) => item[Fact][CiKey]))),
+		                contracts = List.AllTrue(List.Transform(items, isContract)),
+		                noun = if contracts then "contract" else "CI",
+		                allTeam = List.AllTrue(List.Transform(items, (item) => isTeam(item[Fact]))),
+		                // A team is greeted by its name ("Hi Process Management,"), a person by the first name.
+		                greeted = if kind <> "escalation" and allTeam then Text.Trim(group[To][Name]) else firstName(group[To][Name]),
+		                firstOfStill = firstContact(still),
+		                reminderLine =
+		                    let
+		                        what = if firstOfStill <> null then "A short reminder of our " & (if firstOfStill[Teams] then "Teams message" else "message") & " of " & longDate(firstOfStill[On]) & "."
+		                            else "A short reminder.",
+		                        below = fnBelowWords(still)
+		                    in
+		                        if two then what & " The first part below is still open. The second part has new points for you."
+		                        else what & " " & capital(below) & " " & (if List.Count(List.Distinct(List.Transform(still, (item) => item[Fact][CiKey]))) = 1 then "is" else "are") & " still open.",
+		                why = fnWhyYou(items{0}[Fact][ContactVia], fnBelowWords(items)),
+		                opening = {plain("Hi" & (if greeted <> "" then " " & greeted else "") & ",")}
+		                    & (if kind = "reminder" then {plain(reminderLine)} else {})
+		                    & (if kind = "escalation" then {plain(escalationOpening(items, person, group[NobodyAbove]))} else {})
+		                    & (if kind <> "escalation" and sameWhy then {plain(if kinds > 1 then why & " We found " & plural(kinds, "kind") & " of problem." else why)} else {}),
+		                heading = (value as text) as record => [Html = "<h2 style=""margin:22px 0 4px;font-size:16px"">" & fnHtml(value) & "</h2>", Text = "#(lf)== " & Text.Upper(value, "en-US") & " =="],
+		                parts =
+		                    if two then
+		                        {heading(if firstOfStill <> null then "Still open (our message of " & longDate(firstOfStill[On]) & ")" else "Still open")}
+		                        & sectionsBody(still, kind, sameWhy) & {heading("New since then")} & sectionsBody(newOnes, kind, sameWhy)
+		                    else sectionsBody(items, kind, sameWhy),
+		                signature = Text.Trim(if settings[Signature] <> "" then settings[Signature] else "SACM team"),
+		                body = List.Transform(opening, p) & parts
+		                    & {p(plain("When you reply, please keep the reference [" & ref & "] in the subject.")),
+		                       [Html = "<p>Thank you,<br>%%SENDER%%<br>" & fnHtml(signature) & "</p>", Text = "Thank you,#(lf)%%SENDER%%#(lf)" & signature]},
+		                firstFact = items{0}[Fact],
+		                firstPack = packOf(firstFact),
+		                only = if kinds = 1 then fnMessageSection(textsOf(firstPack, if byProblem(firstPack) <> null then problemOf(firstFact) else null), firstFact[Route], items, settings)[Heading][Text] else "",
+		                onWhat = if ciCount = 1 then firstFact[CiName] else plural(ciCount, noun),
+		                topic = if only <> "" then only & " on " & onWhat
+		                    else if contracts then plural(ciCount, "contract") & (if ciCount = 1 then " needs" else " need") & " a correction in Solusi"
+		                    else plural(ciCount, "CI") & (if ciCount = 1 then " needs" else " need") & " your attention in the CMDB",
+		                subjectTopic = if kind = "reminder" then "Reminder: " & topic
+		                    else if kind = "escalation" then "No answer on " & plural(ciCount, noun) & " of " & (if person[Name] <> "" then person[Name] else person[Email])
+		                    else topic,
+		                // The plain text: the parts with an empty line between them, never two.
+		                joined = Text.Combine(List.Transform(body, (piece) => piece[Text]), "#(lf)#(lf)"),
+		                collapsed = List.Last(List.Generate(() => joined, (value) => value <> null,
+		                    (value) => if Text.Contains(value, "#(lf)#(lf)#(lf)") then Text.Replace(value, "#(lf)#(lf)#(lf)", "#(lf)#(lf)") else null)),
+		                fact = items{0}[Fact]
+		            in
+		                [
+		                    Ref = if index = 1 then group[PreviousRef] else "", Kind = kind, To = to, ToName = group[To][Name], Cc = Text.Combine(cc, "; "),
+		                    Subject = subjectTopic & (if count > 1 then " (part " & Text.From(index) & " of " & Text.From(count) & ")" else "") & " [" & ref & "]",
+		                    Body = Text.Combine(List.Transform(body, (piece) => piece[Html])), Plain = Text.Trim(collapsed),
+		                    Keys = List.Transform(items, (item) => item[Key]), NewKeys = List.Transform(newOnes, (item) => item[Key]),
+		                    CheckIds = List.Distinct(List.Transform(items, (item) => item[Fact][CheckId])), CiCount = ciCount, PartIndex = index, PartCount = count,
+		                    About = if kind = "escalation" then (if person[Name] <> "" then person[Name] else person[Email]) else "",
+		                    NobodyAbove = kind = "escalation" and group[NobodyAbove],
+		                    Mailbox = List.AllTrue(List.Transform(items, (item) => toMailbox(item[Fact]))), Team = allTeam,
+		                    Person = if fact[ContactId] <> "" then fact[ContactId] else lower(textOf(fact[ContactEmail])),
+		                    Items = items
+		                ],
+
+		        /* ---------------------------------------------------------- every group, sorted and split */
+		        draftsOf = (group as record) as list =>
+		            let
+		                fresh = group[Fresh],
+		                // What the lines are sorted by, worked out once per line: new points last, then the order of the checks,
+		                // the kind of problem, the route and the name.
+		                numbered = List.Buffer(List.Transform(List.Positions(group[Items]), (at) =>
+		                    let item = group[Items]{at}, fact = item[Fact] in
+		                    [Item = item, Order = at, Fresh = if Record.HasFields(fresh, item[Key]) then 1 else 0, Pack = Record.Field(orderById, fact[CheckId]),
+		                        Problem = problemOrder(fact), Route = textOf(fact[Route]), Name = textOf(fact[CiName])])),
+		                order = (a as record, b as record) as number =>
+		                    let
+		                        byFresh = Value.Compare(a[Fresh], b[Fresh]),
+		                        byPack = if byFresh <> 0 then byFresh else Value.Compare(a[Pack], b[Pack]),
+		                        byProblem = if byPack <> 0 then byPack else Value.Compare(a[Problem], b[Problem]),
+		                        byRoute = if byProblem <> 0 then byProblem else compare(a[Route], b[Route]),
+		                        byName = if byRoute <> 0 then byRoute else compare(a[Name], b[Name])
+		                    in
+		                        if byName <> 0 then byName else Value.Compare(a[Order], b[Order]),
+		                items = List.Buffer(List.Transform(List.Sort(numbered, order), (entry) => entry[Item])),
+		                // Split by CI, never in the middle of a CI; the limit counts for the whole email. A mailbox or a team gets one message.
+		                whole = List.AllTrue(List.Transform(items, (item) => toMailbox(item[Fact]) or isTeam(item[Fact]))),
+		                limit = words[maxCis],
+		                count = List.Count(items),
+		                chunkIds = if whole then List.Repeat({0}, count)
+		                    else List.Buffer(List.Skip(List.Generate(
+		                        () => [At = -1, Chunk = 0, Seen = [], Count = 0],
+		                        (state) => state[At] < count,
+		                        (state) =>
+		                            let at = state[At] + 1 in
+		                            if at >= count then [At = at, Chunk = state[Chunk], Seen = [], Count = 0]
+		                            else
+		                                let
+		                                    key = items{at}[Fact][CiKey],
+		                                    known = Record.HasFields(state[Seen], key)
+		                                in
+		                                    if not known and state[Count] >= limit then [At = at, Chunk = state[Chunk] + 1, Seen = Record.AddField([], key, true), Count = 1]
+		                                    else if known then [At = at, Chunk = state[Chunk], Seen = state[Seen], Count = state[Count]]
+		                                    else [At = at, Chunk = state[Chunk], Seen = Record.AddField(state[Seen], key, true), Count = state[Count] + 1],
+		                        (state) => state[Chunk]))),
+		                chunkCount = if count = 0 then 0 else List.Last(chunkIds) + 1,
+		                byChunk = fnGroupBy(List.Transform(List.Positions(items), (at) => [Chunk = Text.From(chunkIds{at}), Item = items{at}]), (entry) => entry[Chunk]),
+		                chunks = List.Buffer(List.Transform(Record.FieldValues(byChunk), (entries) => List.Transform(entries, (entry) => entry[Item]))),
+		                one = (chunk as number) as record =>
+		                    let
+		                        members = chunks{chunk},
+		                        // A part that holds only new points is a first message of its own.
+		                        onlyNew = group[Kind] = "reminder" and List.AllTrue(List.Transform(members, (item) => Record.HasFields(fresh, item[Key]))),
+		                        own = if onlyNew then group & [Kind = "first", PreviousRef = "", Fresh = []] else group
+		                    in
+		                        draftOf(members, own, "%%REF%%", chunk + 1, chunkCount)
+		            in
+		                if count = 0 then {} else List.Transform(List.Numbers(0, chunkCount), one)
+		    in
+		        List.Buffer(List.Combine(List.Transform(merged, draftsOf)))
+	queryGroup: Reading
+
+/// The part Drafts of the table Run (build B7, D300), which the DAX table Drafts shows: every message ready to send, one row per draft of fnDrafts (one per person across the cards, D34; a long one in parts, D36). A case is written about when it is to solve, a manager may ask its owner (Askable), and it was never asked, or its reminder is due, or its reminders got no answer (ReminderDue, OverLimit): what the Email window of the HTML app offers with "Add the points from other cards" ticked. Keys and NewKeys hold one key per line. Chat: the first message of a Teams chat with the person asked (fnChatMessage). AssignedTo: who has the cases ("Several" when they are not one manager's, "" when nobody has them). FreeKeys: the keys nobody has, which become the sender's when the message goes (D164). The Power App "SACM messages" shows the drafts and sends one when a manager presses Send (D301). `cases` is fnCases(CheckRun).
+expression fnDraftsPart =
+		(cases as list) as table =>
+		    let
+		        settings = MessageSettings,
+		        // The check files read once for every chat (ARCHITECTURE §12, the speed rules).
+		        packs = List.Buffer(List.Transform(Json.Document(CheckFiles), (file) => file[pack])),
+		        chosen = List.Select(cases, (item) => item[InLatest] and item[ToSolve] and item[Askable] and (item[Messages] = 0 or item[ReminderDue] or item[OverLimit])),
+		        drafts = fnDrafts(chosen, settings),
+		        kindWords = [first = "Email", reminder = "Reminder", escalation = "Escalation"],
+		        assigned = (items as list) as text =>
+		            let names = List.Distinct(List.Transform(items, (item) => item[AssignedTo])) in
+		            if List.Count(names) = 1 then names{0} else "Several",
+		        row = (at as number) as list =>
+		            let draft = drafts{at} in
+		            {
+		                "D" & Text.PadStart(Text.From(at + 1), 4, "0"), draft[Ref], draft[Kind], Record.Field(kindWords, draft[Kind]), draft[To], draft[ToName], draft[Cc],
+		                draft[Subject], draft[Body], draft[Plain], fnChatMessage(draft[Items], settings, "%%REF%%", draft[To], packs),
+		                Text.Combine(draft[Keys], "#(lf)"), Text.Combine(draft[NewKeys], "#(lf)"), Text.Combine(draft[CheckIds], ", "),
+		                draft[CiCount], draft[PartIndex], draft[PartCount], draft[About], draft[NobodyAbove], draft[Mailbox], draft[Team], draft[Person], assigned(draft[Items]),
+		                Text.Combine(List.Transform(List.Select(draft[Items], (item) => item[AssignedTo] = ""), (item) => item[Key]), "#(lf)")
+		            }
+		    in
+		        #table(
+		            type table [DraftId = text, Ref = text, Kind = text, KindLabel = text, To = text, ToName = text, Cc = text, Subject = text, Body = text, Plain = text,
+		                Chat = text, Keys = text, NewKeys = text, CheckIds = text, CiCount = Int64.Type, PartIndex = Int64.Type, PartCount = Int64.Type, About = text,
+		                NobodyAbove = logical, Mailbox = logical, Team = logical, Person = text, AssignedTo = text,
+		                FreeKeys = text],
+		            List.Transform(List.Positions(drafts), row))
 	queryGroup: Reading
 
 /// The end of the key of a finding about one relationship: <parent key>><type, compared form>><child key> (relationship-detectors.ts, edgeSuffix).
@@ -1015,6 +1474,10 @@ expression fnHistoryRun =
 		        Table.ReorderColumns(typed, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(typed), (column) => column <> "Part" and column <> "ReportDate"))
 	queryGroup: Reading
 
+/// A text made safe for the HTML of a message (src/core/shared/text.ts, escapeHtml): & < > and " as their entities. Every value from a report is written this way.
+expression fnHtml = (value as text) as text => Text.Replace(Text.Replace(Text.Replace(Text.Replace(value, "&", "&amp;"), "<", "&lt;"), ">", "&gt;"), """", "&quot;")
+	queryGroup: Reading
+
 /// Is the CI in the scope of a check (src/core/checks/engine.ts, runChecks)? Its class is one of scope.classes ("*": every class), and its status is not one of scope.exclude.operational_status. Parked CIs are left out before (fnCheckRun, which tests the scope of each check itself, with the words in compared form once). `ci` has its StatusKey.
 expression fnInScope =
 		(pack as record, ci as record) as logical =>
@@ -1137,6 +1600,155 @@ expression fnMappingBacklogPart =
 		            type table [Key = text, CiKey = text, CiName = text, ClassLabel = text, Owner = text, Reasons = text, ReasonIds = text, Stage = text, StageNumber = Int64.Type,
 		                Steps = text, State = text, StateLabel = text, StateOrder = Int64.Type, StateWhy = text, Criticality = text, CanMarkProcessMissing = logical, NextStep = text, Order = Int64.Type],
 		            List.Transform(List.Positions(sorted), row))
+	queryGroup: Reading
+
+/// A text of a check's message with its placeholders filled (src/core/messages/messages.ts, fill; build B7, D300), in two forms: Html for the mailbox, Text for Outlook and Teams. `fields`: the fields of the findings of the part (their roles fill {role}, {who}, {epoRole} and the requests of {request}); `texts`: the message texts of the check; `settings`: MessageSettings, with Channel "email" or "chat" ({reply} reads "reply to this email" or "answer in this chat", D163). The placeholders: {role}, {who}, {epoRole}, {request} (the request of the texts, or of each role when it is "role"), {request:<id>}, {form:<id>} (the request without the action inside its form), {reply} and {Reply}. Any other text in braces stays as it is.
+expression fnMessageFill =
+		(template as text, fields as list, texts as record, settings as record) as record =>
+		    let
+		        words = MessageWords,
+		        roles = List.Select(fields, (field) => Record.HasFields(words[roleLabel], field)),
+		        plain = (value as text) as record => [Html = fnHtml(value), Text = value],
+		        join = (parts as list, separator as text) as record => [
+		            Html = Text.Combine(List.Select(List.Transform(parts, (part) => part[Html]), (value) => value <> ""), separator),
+		            Text = Text.Combine(List.Select(List.Transform(parts, (part) => part[Text]), (value) => value <> ""), separator)
+		        ],
+		        orList = (items as list) as text =>
+		            if List.Count(items) <= 1 then List.First(items, "") else Text.Combine(List.RemoveLastN(items, 1), ", ") & " or " & List.Last(items),
+		        https = (value as text) as text => let trimmed = Text.Trim(value) in if Text.StartsWith(Text.Lower(trimmed, "en-US"), "https://") then trimmed else "",
+		        // A request with its link (requestRef). Head: the same words without " in the Service Portal" at the end (requestRefs).
+		        requestRef = (id as text, withAction as logical) as record =>
+		            let
+		                known = List.First(List.Select(words[requests], (request) => request[id] = id), null),
+		                set = Record.FieldOrDefault(settings[Requests], id, [Name = "", Link = ""]),
+		                saved = Text.Trim(set[Name]),
+		                name = if known = null then (if saved <> "" then saved else id)
+		                    else if saved = "" or saved = Record.FieldOrDefault(known, "was", null) then known[name] else saved,
+		                action = if known <> null and Record.FieldOrDefault(known, "action", "") <> "" and withAction then ", action """ & known[action] & """" else "",
+		                link = https(set[Link]),
+		                portal = https(settings[PortalLink]),
+		                where = if action <> "" then ", in the" else " in the",
+		                comma = if action <> "" then "," else "",
+		                headText = """" & name & """" & action & comma
+		            in
+		                if link <> "" then [Html = """<a href=""" & fnHtml(link) & """>" & fnHtml(name) & "</a>""" & fnHtml(action), Text = """" & name & """" & action & " (" & link & ")", Tail = false, Head = null]
+		                else if portal <> "" then [
+		                    Html = """" & fnHtml(name) & """" & fnHtml(action) & where & " <a href=""" & fnHtml(portal) & """>Service Portal</a>",
+		                    Text = """" & name & """" & action & where & " Service Portal (" & portal & ")", Tail = true,
+		                    Head = [Html = """" & fnHtml(name) & """" & fnHtml(action) & comma, Text = headText]]
+		                else [Html = fnHtml("""" & name & """" & action & where & " Service Portal"), Text = """" & name & """" & action & where & " Service Portal", Tail = true,
+		                    Head = [Html = fnHtml(headText), Text = headText]],
+		        // Several requests: "A" or "B" in the Service Portal, with "in the Service Portal" once, at the end.
+		        requestRefs = (ids as list) as record =>
+		            let
+		                refs = List.Buffer(List.Transform(ids, (id) => requestRef(id, true))),
+		                last = List.Count(refs) - 1,
+		                trimmed = List.Transform(List.Positions(refs), (at) => let ref = refs{at} in if at < last and ref[Tail] and refs{last}[Tail] then ref[Head] else ref)
+		            in
+		                [Html = Text.Combine(List.Transform(trimmed, (ref) => ref[Html]), " or "), Text = Text.Combine(List.Transform(trimmed, (ref) => ref[Text]), " or ")],
+		        isName = (value as text) as logical => value <> "" and Text.Remove(value, {"a".."z", "A".."Z"}) = "",
+		        isArgument = (value as text) as logical => value <> "" and Text.Remove(value, {"a".."z", "-"}) = "",
+		        // One placeholder: "{name}" or "{name:arg}" (the braces included), else null.
+		        token = (piece as text) as nullable record =>
+		            let
+		                inner = Text.Middle(piece, 1, Text.Length(piece) - 2),
+		                colon = Text.PositionOf(inner, ":"),
+		                name = if colon < 0 then inner else Text.Start(inner, colon),
+		                arg = if colon < 0 then null else Text.Middle(inner, colon + 1)
+		            in
+		                if isName(name) and (arg = null or isArgument(arg)) then [Name = name, Arg = arg] else null,
+		        filled = (found as record, piece as text) as record =>
+		            let name = found[Name], arg = found[Arg] in
+		            if name = "role" then plain(orList(List.Transform(roles, (field) => Record.Field(words[roleLabel], field))))
+		            else if name = "who" then plain(let who = orList(List.Transform(roles, (field) => Record.Field(words[roleWord], field))) in if who = "" then "person" else who)
+		            else if name = "epoRole" then plain(orList(List.Transform(roles, (field) => Record.FieldOrDefault(words[epoRole], field, Record.Field(words[roleLabel], field)))))
+		            else if name = "request" then
+		                let
+		                    request = Record.FieldOrDefault(texts, "request", ""),
+		                    ids = if arg <> null then {arg}
+		                        else if request = "role" then List.Select(List.Transform(roles, (field) => Record.FieldOrDefault(words[roleRequest], field, "")), (id) => id <> "")
+		                        else if request <> "" then {request} else {}
+		                in
+		                    requestRefs(ids)
+		            else if name = "form" and arg <> null then requestRef(arg, false)
+		            else if name = "reply" or name = "Reply" then
+		                let reply = if settings[Channel] = "chat" then "answer in this chat" else "reply to this email" in
+		                plain(if name = "Reply" then Text.Upper(Text.Start(reply, 1), "en-US") & Text.Middle(reply, 1) else reply)
+		            else plain(piece),
+		        // The pieces of the template: the text between the placeholders and each placeholder, in order.
+		        chunks = Text.Split(template, "{"),
+		        pieces = List.Combine(List.Transform(List.Positions(chunks), (at) =>
+		            let chunk = chunks{at}, close = Text.PositionOf(chunk, "}") in
+		            if at = 0 then {[Literal = chunk]}
+		            else if close < 0 then {[Literal = "{" & chunk]}
+		            else
+		                let piece = "{" & Text.Start(chunk, close + 1), found = token(piece), rest = Text.Middle(chunk, close + 1) in
+		                (if found = null then {[Literal = piece]} else {[Token = found, Piece = piece]}) & {[Literal = rest]})),
+		        out = List.Transform(List.Select(pieces, (piece) => not Record.HasFields(piece, "Literal") or piece[Literal] <> ""),
+		            (piece) => if Record.HasFields(piece, "Literal") then plain(piece[Literal]) else filled(piece[Token], piece[Piece]))
+		    in
+		        join(out, "")
+	queryGroup: Reading
+
+/// The texts of one part of a message (src/core/messages/messages.ts, sectionTexts; build B7, D300): its Heading, the Intro, the Ask, the Why it matters (each [Html, Text]) and WhyYou (fnWhyYou). A part is the cases of one check and one route (and one kind of problem, for a check with byProblem). `texts`: the message texts of the part (fnDrafts gives those of its kind of problem); `route`: "epo" when the fix is made in EPO; `items`: the cases, each with its Fact; `settings`: MessageSettings. For a CI from EPO the ask names EPO's words for the roles; a team responsible for the record has its own ask (askByTeam, D195); a class may have its own ask (askByClass); a role with no request in the portal (Supported by) asks for a reply only (askNoRequest).
+expression fnMessageSection =
+		(texts as record, route as text, items as list, settings as record) as record =>
+		    let
+		        words = MessageWords,
+		        facts = List.Buffer(List.Transform(items, (item) => item[Fact])),
+		        fields = List.Distinct(List.Transform(facts, (fact) => fact[Field])),
+		        roles = List.Select(fields, (field) => Record.HasFields(words[roleLabel], field)),
+		        fill = (template as text) as record => fnMessageFill(template, fields, texts, settings),
+		        plain = (value as text) as record => [Html = fnHtml(value), Text = value],
+		        join = (parts as list) as record => [
+		            Html = Text.Combine(List.Select(List.Transform(parts, (part) => part[Html]), (value) => value <> ""), " "),
+		            Text = Text.Combine(List.Select(List.Transform(parts, (part) => part[Text]), (value) => value <> ""), " ")
+		        ],
+		        andList = (values as list) as text =>
+		            if List.Count(values) <= 1 then List.First(values, "") else Text.Combine(List.RemoveLastN(values, 1), ", ") & " and " & List.Last(values),
+		        textOf = (name as text) as text => let value = Record.FieldOrDefault(texts, name, null) in if value = null then "" else value,
+		        // 'sacm' is in runs saved before version 0.17 only: the fix is made in EPO all the same (D123).
+		        epo = route = "epo" or route = "sacm",
+		        contactId = facts{0}[ContactId],
+		        teamId = if Text.StartsWith(contactId, "team:") then Text.Middle(contactId, 5) else "",
+		        teamAsk = if teamId <> "" and List.AllTrue(List.Transform(facts, (fact) => fact[ContactId] = contactId))
+		            then Record.FieldOrDefault(Record.FieldOrDefault(texts, "askByTeam", []), teamId, null) else null,
+		        byClass = Record.FieldOrDefault(texts, "askByClass", []),
+		        ask =
+		            if epo then
+		                let
+		                    named = List.Select(roles, (field) => Record.HasFields(words[epoRole], field)),
+		                    first = if Record.FieldOrDefault(texts, "epoAsk", null) <> null then texts[epoAsk]
+		                        else if textOf("epoWhat") <> "" then "Please correct the " & texts[epoWhat] & " in EPO."
+		                        else if not List.IsEmpty(named) then
+		                            "In EPO, " & andList(List.Transform(named, (field) => Record.Field(words[roleLabel], field) & " is called " & Record.Field(words[epoRole], field))) & ". Please correct it in EPO."
+		                        else "Please correct it in EPO."
+		                in
+		                    // The service mapped flag is never named and never a reason to ask for a reply: copying EPO into ServiceNow is SACM's own job.
+		                    plain("These CIs come from EPO. " & first & " ServiceNow receives the change from EPO.")
+		            else if teamAsk <> null and teamAsk <> "" then fill(teamAsk)
+		            else
+		                let
+		                    noRequest = textOf("request") = "role" and textOf("askNoRequest") <> "" and not List.AnyTrue(List.Transform(roles, (field) => Record.HasFields(words[roleRequest], field))),
+		                    general = if noRequest then texts[askNoRequest] else texts[ask],
+		                    classes = List.Distinct(List.Transform(facts, (fact) => fact[Class])),
+		                    own = List.Select(classes, (cls) => Record.FieldOrDefault(byClass, cls, "") <> ""),
+		                    // "Service Offerings": the label of the class, a final y as ie, and an s.
+		                    labelOf = (cls as text) as text =>
+		                        let label = List.First(List.Select(facts, (fact) => fact[Class] = cls))[ClassLabel] in
+		                        (if Text.EndsWith(label, "y") then Text.Start(label, Text.Length(label) - 1) & "ie" else label) & "s"
+		                in
+		                    if List.Count(classes) = 1 and not List.IsEmpty(own) then fill(Record.Field(byClass, own{0}))
+		                    else if not List.IsEmpty(own) then
+		                        join(List.Transform(own, (cls) => join({plain("For " & labelOf(cls) & ":"), fill(Record.Field(byClass, cls))}))
+		                            & (if List.Count(classes) > List.Count(own) then {join({plain("For the other CIs:"), fill(general)})} else {}))
+		                    else fill(general),
+		        withSeveral = if textOf("several") <> "" and List.Count(List.Distinct(List.Transform(facts, (fact) => fact[CiKey]))) >= 3 then join({ask, fill(texts[several])}) else ask
+		    in
+		        [
+		            Heading = fill(texts[subject]), Intro = fill(texts[intro]), Ask = withSeveral, Why = fill(texts[why]),
+		            WhyYou = fnWhyYou(facts{0}[ContactVia], fnBelowWords(items))
+		        ]
 	queryGroup: Reading
 
 /// "the report has no column "Supported by (active)" (supported_by.active)": the label first, the technical name for whoever builds the report (src/core/shared/text.ts, missingColumns).
@@ -1669,6 +2281,27 @@ expression fnReadTable =
 		            Lossless = isZip or hasBom or List.AnyTrue(List.Transform(hidden, (char) => Text.Contains(text, char)))]
 	queryGroup: Reading
 
+/// Who a finding goes to (src/core/messages/messages.ts, recipientOf; build B7): [Name, Email]. The EPO inventory owner, the Procurement mailbox and the people of a team come from the team settings (MessageSettings); everybody else is the contact of the finding (fnFacts). The address of a team is its people's addresses, "a@…; b@…" (teamAddresses: no space, an @ with text before and after it); "" when the settings name nobody.
+expression fnRecipient =
+		(fact as record, settings as record) as record =>
+		    let
+		        contactId = fact[ContactId],
+		        isAddress = (value as text) as logical =>
+		            value <> "" and Text.Remove(value, {" ", "#(tab)", "#(cr)", "#(lf)"}) = value
+		            and List.AnyTrue(List.Transform(Text.PositionOf(value, "@", Occurrence.All), (at) => at >= 1 and at <= Text.Length(value) - 2)),
+		        textOf = (value as any) as text => if value = null then "" else value
+		    in
+		        if contactId = ReadingRules[epoOwner][id] then [Name = if settings[EpoOwnerName] <> "" then settings[EpoOwnerName] else ReadingRules[epoOwner][name], Email = settings[EpoOwnerEmail]]
+		        else if contactId = ReadingRules[procurement][id] then [Name = if settings[ProcurementName] <> "" then settings[ProcurementName] else "Procurement", Email = settings[ProcurementEmail]]
+		        else if Text.StartsWith(contactId, "team:") then
+		            let team = Record.FieldOrDefault(settings[Teams], Text.Middle(contactId, 5), null) in
+		            [
+		                Name = if team <> null and Text.Trim(team[Name]) <> "" then Text.Trim(team[Name]) else textOf(fact[ContactName]),
+		                Email = if team = null then "" else Text.Combine(List.Select(List.Transform(team[People], (person) => Text.Trim(person[Email])), isAddress), "; ")
+		            ]
+		        else [Name = textOf(fact[ContactName]), Email = textOf(fact[ContactEmail])]
+	queryGroup: Reading
+
 /// A reference file by the name a check file gives it ("reference/criticality"); null when it is not there.
 expression fnReference =
 		(name as nullable text) as any =>
@@ -1956,6 +2589,60 @@ expression fnServiceNowLink =
 		        else list("cmdb_ci", "name=" & ciName)
 	queryGroup: Reading
 
+/// Share out (D24, build B7; src/core/team/team.ts, shareOut): the manager each free group of a card goes to, as a record case key → name. A group is the cases of one check that go to one person by one route, to solve (groupCases); it is free when none of its open cases is assigned. On a SACM fix list a group is a record (a CI), sized by its lines. The groups of each card go out together: the biggest first (by its open CIs, then by its key), each to the active member of the list SACM Team with the fewest CIs so far (the first of the list when equal). Fewer than two active members: nobody (the Power App says to add colleagues first). `lines`: the cases of fnCases, before this column.
+expression fnShareOut =
+		(lines as list) as record =>
+		    let
+		        rows = Table.ToRecords(fnStateList("team")),
+		        members = List.Buffer(List.Transform(List.Select(rows, (row) => not List.Contains({"no", "false", "0"}, Text.Lower(Text.Trim(row[Active]), "en-US"))), (row) => row[Title])),
+		        compare = Comparer.FromCulture("en-US"),
+		        open = List.Select(lines, (item) => item[InLatest] and item[State] = "open"),
+		        contactOf = (fact as record) as text =>
+		            if fact[ContactId] <> "" then fact[ContactId] else if Text.Lower(fact[ContactEmail], "en-US") <> "" then Text.Lower(fact[ContactEmail], "en-US") else "nobody",
+		        byCard = fnGroupBy(open, (item) => item[CheckId]),
+		        card = (items as list) as list =>
+		            let
+		                book = Record.FieldOrDefault(CheckPlaybooks, items{0}[CheckId], [Kind = "", AskWhenUnsure = ""]),
+		                // A SACM fix list (FixListCard, ShareRecords): its records (one CI each) that SACM fixes itself, by their
+		                // lines still to mark; free when no line not closed has anybody. Without such lines: the lines
+		                // handed to the owner, by group, as on an owners card.
+		                fixOnes = if book[Kind] = "fix" then List.Select(items, (item) => not (book[AskWhenUnsure] <> "" and item[Askable])) else {},
+		                records = List.Transform(Record.FieldValues(fnGroupBy(fixOnes, (item) => item[CiKey])), (rows) =>
+		                    let
+		                        live = List.Select(rows, (item) => not item[Closed]),
+		                        toMark = List.Select(live, (item) => item[Status] <> "Fixed")
+		                    in
+		                        [Key = rows{0}[CiKey], Open = toMark, Size = List.Count(toMark), Taken = List.AnyTrue(List.Transform(live, (item) => item[AssignedTo] <> ""))]),
+		                owned = if book[Kind] = "fix" then List.Select(items, (item) => item[Askable]) else items,
+		                groups = Record.FieldValues(fnGroupBy(owned, (item) => item[CheckId] & "|" & item[Fact][Route] & "|" & contactOf(item[Fact]))),
+		                keyed = List.Transform(groups, (rows) =>
+		                    let fact = rows{0}[Fact], openOnes = List.Select(rows, (item) => not item[Closed]) in
+		                    [Key = fact[CheckId] & "|" & fact[Route] & "|" & contactOf(fact), Open = openOnes, Size = List.Count(List.Distinct(List.Transform(openOnes, (item) => item[CiKey]))),
+		                        Taken = List.AnyTrue(List.Transform(openOnes, (item) => item[AssignedTo] <> ""))]),
+		                free = List.Select(if List.IsEmpty(fixOnes) then keyed else records, (group) => not List.IsEmpty(group[Open]) and not group[Taken]),
+		                ordered = List.Buffer(List.Sort(free, (a, b) => let bySize = Value.Compare(b[Size], a[Size]) in if bySize <> 0 then bySize else compare(a[Key], b[Key]))),
+		                count = List.Count(ordered),
+		                // Each group to the member with the least so far: one step per group, carrying the CIs of each member
+		                // (Load) and giving the name (no list grows step by step, which is slow in M).
+		                names = if count = 0 then {} else List.Buffer(List.Skip(List.Generate(
+		                    () => [At = -1, Load = List.Repeat({0}, List.Count(members)), Name = ""],
+		                    (step) => step[At] < count,
+		                    (step) =>
+		                        let
+		                            at = step[At] + 1,
+		                            load = step[Load],
+		                            best = List.PositionOf(load, List.Min(load))
+		                        in
+		                            if at >= count then [At = at, Load = load, Name = ""]
+		                            else [At = at, Load = List.Buffer(List.ReplaceRange(load, best, 1, {load{best} + ordered{at}[Size]})), Name = members{best}],
+		                    (step) => step[Name])))
+		            in
+		                List.Combine(List.Transform(List.Positions(ordered), (at) => List.Transform(ordered{at}[Open], (item) => {item[Key], names{at}}))),
+		        pairs = if List.Count(members) < 2 then {} else List.Combine(List.Transform(Record.FieldValues(byCard), card))
+		    in
+		        Record.FromList(List.Transform(pairs, (pair) => pair{1}), List.Transform(pairs, (pair) => pair{0}))
+	queryGroup: Reading
+
 /// The files of the reports folder in SharePoint: FileName, Modified, Content. Only read when SourceMode is "SharePoint". SharePoint.Contents opens one folder, which is much faster than SharePoint.Files on a big team site.
 expression fnSharePointFiles =
 		() as table =>
@@ -2110,6 +2797,26 @@ expression fnUserNames =
 expression fnVisibleName = (name as text) as text => List.Accumulate(ReadingRules[hiddenCharacters], name, (text, entry) => Text.Replace(text, Character.FromNumber(entry[code]), "?"))
 	queryGroup: Reading
 
+/// Why a person gets a message, from how the contact was found (src/core/messages/messages.ts, whyYou; build B7): "ServiceNow names you as Managed by of the CI below." `via`: the ContactVia of the finding; `below`: fnBelowWords.
+expression fnWhyYou =
+		(via as text, below as text) as text =>
+		    let
+		        words = MessageWords,
+		        firstSpace = (value as text) as text => let at = Text.PositionOf(value, " ") in if at < 0 then value else Text.Start(value, at) & "_" & Text.Middle(value, at + 1),
+		        label = (value as text) as text => Record.FieldOrDefault(words[roleLabel], firstSpace(Text.Trim(value)), value),
+		        above = if Text.StartsWith(via, "manager of ") and Text.Length(via) > 11 then [Who = "manager", Of = Text.Middle(via, 11)]
+		            else if Text.StartsWith(via, "department head of ") and Text.Length(via) > 19 then [Who = "department head", Of = Text.Middle(via, 19)]
+		            else null
+		    in
+		        if above <> null then "You are the " & above[Who] & " of the " & label(above[Of]) & " of " & below & "."
+		        else if via = ReadingRules[epoOwner][via] then "You are the inventory owner of EPO, and nobody else could be asked about " & below & "."
+		        // A team responsible for the record of a class (D195): "Process Management team".
+		        else if Text.EndsWith(via, " team") then Text.Start(via, Text.Length(via) - 5) & " is responsible for the record of " & below & ". SACM updates ServiceNow with what you tell us."
+		        else if via = ReadingRules[procurement][via] then "Procurement owns the contract data in Solusi. The contracts below need a correction in Solusi: ServiceNow receives it with the next upload."
+		        else if Record.HasFields(words[roleLabel], firstSpace(via)) then "ServiceNow names you as " & label(via) & " of " & below & "."
+		        else "You are named on " & below & "."
+	queryGroup: Reading
+
 /// The name without its hidden characters: the name to type in ServiceNow (src/core/shared/names.ts, withoutHidden).
 expression fnWithoutHidden = (name as text) as text => List.Accumulate(ReadingRules[hiddenCharacters], name, (text, entry) => Text.Replace(text, Character.FromNumber(entry[code]), ""))
 	queryGroup: Reading
@@ -2148,6 +2855,44 @@ expression ListingRules =
 		        NotLiveKeys = if notLive = null then {} else List.Buffer(List.Transform(notLive[statuses], (status) => fnNameKey(status, ""))),
 		        ExceptChecks = if notLive = null then {} else Record.FieldOrDefault(notLive, "exceptChecks", {}),
 		        Known = List.Buffer(List.Transform(known, (rule) => rule & [TagKeys = List.Buffer(List.Transform(rule[tags], (word) => fnNameKey(word, "")))]))
+		    ]
+	queryGroup: Reading
+
+/// The team settings the messages use (build B7, D300), from the list SACM Settings, with the defaults of the HTML app (src/app/state/store.ts, DEFAULT_SETTINGS): the Service Portal, the signature, the EPO inventory owner, the Procurement mailbox and its lead, the name and link of each request of the portal, and the people of each team of reference/record-teams. One row per setting: Title is the key, Value the value. The keys: portalLink, signature, epoOwnerName, epoOwnerEmail, procurementName, procurementEmail, procurementLeadName, procurementLeadEmail, request.<id>.name and request.<id>.link (the ids of MessageWords[requests]), team.<id>.name and team.<id>.people ("Name <address>; Name <address>", one person per part). A key that is not there, or empty, keeps its default. The manager who sends is not a setting: the Power App puts their name in the draft (%%SENDER%%, fnDrafts).
+expression MessageSettings =
+		let
+		    // A Title typed twice: the last row counts (as the HTML app reads its settings); an empty Title is left out.
+		    rows = List.Select(Table.ToRecords(fnStateList("settings")), (row) => row[Title] <> null and Text.Trim(row[Title]) <> ""),
+		    titles = List.Distinct(List.Transform(rows, (row) => Text.Trim(row[Title]))),
+		    lastOf = (title as text) as text =>
+		        let row = List.Last(List.Select(rows, (candidate) => Text.Trim(candidate[Title]) = title)) in if row[Value] = null then "" else Text.Trim(row[Value]),
+		    values = Record.FromList(List.Transform(titles, lastOf), titles),
+		    value = (key as text, default as text) as text => let found = Record.FieldOrDefault(values, key, "") in if found = "" then default else found,
+		    requests = Record.FromList(
+		        List.Transform(MessageWords[requests], (request) => [Name = value("request." & request[id] & ".name", ""), Link = value("request." & request[id] & ".link", "")]),
+		        List.Transform(MessageWords[requests], (request) => request[id])),
+		    // "Pat Process <pat.process@example.com>; quinn@example.com": a name and its address in angle brackets, or an address alone.
+		    person = (part as text) as record =>
+		        let
+		            open = Text.PositionOf(part, "<"),
+		            close = Text.PositionOf(part, ">", Occurrence.Last)
+		        in
+		            if open >= 0 and close > open then [Name = Text.Trim(Text.Start(part, open)), Email = Text.Trim(Text.Middle(part, open + 1, close - open - 1))]
+		            else [Name = "", Email = Text.Trim(part)],
+		    teamIds = List.Transform(Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "record-teams", []), "teams", {}), (team) => team[id]),
+		    teams = Record.FromList(
+		        List.Transform(teamIds, (id) => [
+		            Name = value("team." & id & ".name", ""),
+		            People = List.Transform(List.Select(Text.SplitAny(value("team." & id & ".people", ""), ";#(cr)#(lf)"), (part) => Text.Trim(part) <> ""), person)
+		        ]),
+		        teamIds)
+		in
+		    [
+		        PortalLink = value("portalLink", ""), Signature = value("signature", "SACM team"),
+		        EpoOwnerName = value("epoOwnerName", ""), EpoOwnerEmail = value("epoOwnerEmail", ""),
+		        ProcurementName = value("procurementName", "Procurement"), ProcurementEmail = value("procurementEmail", ""),
+		        ProcurementLeadName = value("procurementLeadName", ""), ProcurementLeadEmail = value("procurementLeadEmail", ""),
+		        Requests = requests, Teams = teams, Channel = "email"
 		    ]
 	queryGroup: Reading
 
@@ -3886,7 +4631,9 @@ expression fnFacts =
 		                    EpoId = ci[AssetTag], Status = ci[Status], SupportGroup = ci[SupportGroup],
 		                    OwnedBy = nameOf(ci, "owned_by"), ManagedBy = nameOf(ci, "managed_by"), SupportedBy = nameOf(ci, "supported_by"),
 		                    Chips = own & List.Select(List.Distinct(finding[Chips]), (chip) => not List.Contains(own, chip)),
-		                    Tags = ci[TagList]
+		                    Tags = ci[TagList],
+		                    // A contract (fnContractSubject): its number, name and vendor, for the table of a message (build B7); null for a CI.
+		                    Contract = Record.FieldOrDefault(ci, "Contract", null)
 		                ],
 		                team = if pack = null or List.Contains(audience, "sacm") then null
 		                    else List.First(List.Select(teams, (candidate) => List.Contains(candidate[classes], ci[Class]) and List.Contains(candidate[checks], pack[id])), null),
@@ -4494,7 +5241,7 @@ expression ReviewsRows =
 		    #table(type table [ReviewDate = date, CiKey = text, CiName = text, Class = text, StatusInEpo = text, Answer = text, AnswerLabel = text, Note = text, By = text, At = datetime], lines)
 	queryGroup: Tables
 
-/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of eleven parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add the journal of the team, D292). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules).
+/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of twelve parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add the journal of the team, D292; from build B7 Drafts, the messages ready to send, D300). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules).
 expression RunRows =
 		let
 		    run = CheckRun,
@@ -4505,7 +5252,8 @@ expression RunRows =
 		        {"Findings", findings}, {"Tested", tested}, {"Notes", fnNotesPart(run)}, {"Parked", fnParkedPart(run)},
 		        {"MappingBacklog", fnMappingBacklogPart(run, cases)}, {"RelationshipLinks", fnRelationshipLinksPart(run)},
 		        {"CapabilitySheet", fnCapabilitySheetPart(run)}, {"SelfCheck", fnSelfCheckPart(findings, tested)},
-		        {"CaseLines", fnCaseLinesPart(cases)}, {"RepliesToRead", fnRepliesToReadPart(cases)}, {"Exceptions", fnExceptionsPart(run)}
+		        {"CaseLines", fnCaseLinesPart(cases)}, {"RepliesToRead", fnRepliesToReadPart(cases)}, {"Exceptions", fnExceptionsPart(run)},
+		        {"Drafts", fnDraftsPart(cases)}
 		    },
 		    // Each part with its columns named <Part>.<Column> and a column Part. The type of each column is the data type of the
 		    // calculated table that shows it (RunColumnTypes, generated), so Run and the calculated tables never differ.

@@ -1,0 +1,245 @@
+/// The messages ready to send (build B7, D300): one row per draft, one per person across the cards (D34), a long one in parts (D36). Built by Power Query at each refresh (fnDrafts); the Power App "SACM messages" shows them and sends one when a manager presses Send (D301).
+table Drafts
+
+	/// Every message ready to send.
+	measure 'Messages ready' = COUNTROWS ( Drafts ) + 0
+		formatString: #,0
+
+	/// The first messages ready to send.
+	measure 'Emails ready' = CALCULATE ( COUNTROWS ( Drafts ), Drafts[Kind] = "first" ) + 0
+		formatString: #,0
+
+	/// The reminders ready to send (the working days to the reminder passed at the refresh).
+	measure 'Reminders ready' = CALCULATE ( COUNTROWS ( Drafts ), Drafts[Kind] = "reminder" ) + 0
+		formatString: #,0
+
+	/// The escalations ready to send.
+	measure 'Escalations ready' = CALCULATE ( COUNTROWS ( Drafts ), Drafts[Kind] = "escalation" ) + 0
+		formatString: #,0
+
+	/// The line at the top of the page Messages: how many messages are ready, of each kind.
+	measure 'Messages line' =
+			VAR n = [Messages ready]
+			VAR first = [Emails ready]
+			VAR reminders = [Reminders ready]
+			VAR escalations = [Escalations ready]
+			RETURN
+				IF (
+					n = 0,
+					"No message is ready to send. After the next report, or when a reminder is due, it is listed here.",
+					n & IF ( n = 1, " message", " messages" ) & " ready to send: "
+						& first & IF ( first = 1, " first message, ", " first messages, " )
+						& reminders & IF ( reminders = 1, " reminder and ", " reminders and " )
+						& escalations & IF ( escalations = 1, " escalation.", " escalations." )
+				)
+
+	/// On a line of the page Messages: Mine when the cases of the draft are assigned to me, Free when nobody has them.
+	measure 'Draft who' =
+			VAR me = [Me]
+			VAR who = SELECTEDVALUE ( Drafts[AssignedTo] )
+			RETURN IF ( NOT ISBLANK ( me ) && who = me, "Mine", IF ( who = "", "Free", who ) )
+
+	/// The draft, D0001 first: by person in the order the newest report first names them (one refresh only: the next refresh numbers them again).
+	column DraftId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [DraftId]
+
+	/// The reference of the message a reminder answers (the same thread, D5); "" for a new message: the Power App makes one when it sends.
+	column Ref
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Ref]
+
+	/// first, reminder or escalation.
+	column Kind
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Kind]
+
+	/// Email, Reminder or Escalation.
+	column KindLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [KindLabel]
+
+	/// The address the message goes to; "" for an escalation nobody is known for (the manager types it, D160).
+	column To
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [To]
+
+	/// The name of who gets it.
+	column ToName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ToName]
+
+	/// The addresses in copy, "a; b".
+	column Cc
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Cc]
+
+	/// The subject, with %%REF%% where the reference goes.
+	column Subject
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Subject]
+
+	/// The message as HTML, with %%REF%% and %%SENDER%% (the manager who sends).
+	column Body
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Body]
+
+	/// The same message as text, for Outlook.
+	column Plain
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Plain]
+
+	/// The first message of a Teams chat with the person asked (D163).
+	column Chat
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Chat]
+
+	/// The keys of the cases of the message, one per line.
+	column Keys
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Keys]
+
+	/// The keys of the second part of a reminder, "New since then" (D161), one per line.
+	column NewKeys
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [NewKeys]
+
+	/// The checks of the message, "A, B".
+	column CheckIds
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [CheckIds]
+
+	/// The CIs (or contracts) of the message.
+	column CiCount
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CiCount]
+
+	/// The part of a long message (D36).
+	column PartIndex
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [PartIndex]
+
+	/// How many parts the message has.
+	column PartCount
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [PartCount]
+
+	/// For an escalation: who did not answer.
+	column About
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [About]
+
+	/// An escalation for which nobody is known (D160).
+	column NobodyAbove
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [NobodyAbove]
+
+	/// To the Procurement mailbox (D98).
+	column Mailbox
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mailbox]
+
+	/// To the people of a team (D195).
+	column Team
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Team]
+
+	/// Who the message is about: the user ID of the person asked, else the address in lower case.
+	column Person
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Person]
+
+	/// Who has the cases: a manager, Several, or "" when nobody has them.
+	column AssignedTo
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AssignedTo]
+
+	/// The keys of the draft nobody has, one per line: they become the sender's when the message goes (D164).
+	column FreeKeys
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FreeKeys]
+
+	partition Drafts = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "Drafts" ),
+					"DraftId", Run[Drafts.DraftId],
+					"Ref", Run[Drafts.Ref],
+					"Kind", Run[Drafts.Kind],
+					"KindLabel", Run[Drafts.KindLabel],
+					"To", Run[Drafts.To],
+					"ToName", Run[Drafts.ToName],
+					"Cc", Run[Drafts.Cc],
+					"Subject", Run[Drafts.Subject],
+					"Body", Run[Drafts.Body],
+					"Plain", Run[Drafts.Plain],
+					"Chat", Run[Drafts.Chat],
+					"Keys", Run[Drafts.Keys],
+					"NewKeys", Run[Drafts.NewKeys],
+					"CheckIds", Run[Drafts.CheckIds],
+					"CiCount", Run[Drafts.CiCount],
+					"PartIndex", Run[Drafts.PartIndex],
+					"PartCount", Run[Drafts.PartCount],
+					"About", Run[Drafts.About],
+					"NobodyAbove", Run[Drafts.NobodyAbove],
+					"Mailbox", Run[Drafts.Mailbox],
+					"Team", Run[Drafts.Team],
+					"Person", Run[Drafts.Person],
+					"AssignedTo", Run[Drafts.AssignedTo],
+					"FreeKeys", Run[Drafts.FreeKeys]
+				)

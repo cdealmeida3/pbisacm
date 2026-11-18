@@ -60,6 +60,10 @@ export function probes(stages: boolean): Probe[] {
   // The parts of the table Run (D284), each alone, and what EPO already says (the slowest column of Findings).
   for (const part of ['Findings', 'Tested', 'Notes', 'Parked', 'MappingBacklog', 'RelationshipLinks', 'CapabilitySheet']) stage(`Part.${part}`, `ProbeTable(fn${part}Part(${run}))`);
   stage('Part.SelfCheck', `ProbeTable(fnSelfCheckPart(Table.Buffer(fnFindingsPart(${run})), Table.Buffer(fnTestedPart(${run}))))`);
+  // The cases (fnCases, with share out) and the parts that read them (build B7): the case lines and the drafts.
+  stage('Cases', `ProbeList(fnCases(${run}), {"Key", "State", "ShareTo", "ToSolve", "Askable"})`);
+  stage('Part.CaseLines', `ProbeTable(fnCaseLinesPart(List.Buffer(fnCases(${run}))))`);
+  stage('Part.Drafts', `ProbeTable(fnDraftsPart(List.Buffer(fnCases(${run}))))`);
   stage('EpoCorrections', `ProbeAny(fnEpoCorrections(${run}[Facts], ${run}))`);
   stage('Shared.Member', 'ProbeList(List.Transform(List.Numbers(1, 15000), (n) => [Found = Text.From(ReadingRules[staleDays] + n)]), {"Found"})');
   stage('Shared.Named', 'let rules = ReadingRules in ProbeList(List.Transform(List.Numbers(1, 15000), (n) => [Found = Text.From(rules[staleDays] + n)]), {"Found"})');

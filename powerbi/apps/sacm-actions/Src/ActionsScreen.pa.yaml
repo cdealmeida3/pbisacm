@@ -4,8 +4,8 @@
 # What it does: the manager picks an action the selected lines all have, types or picks what it asks, and presses Save.
 # Save adds ONE row to the list SACM Journal (never changes or removes a row, D272), then asks flow F5 (SACMRefresh) to
 # refresh the report. Below: what the team did lately on these lines, read from the list at once (before the refresh).
-# Nothing is sent from this app (messages come with build B7). The visual gives the app 1,000 lines at most (Microsoft's
-# limit), so Save is off at 1,000: the app may not have them all.
+# Share out (build B7) adds one row per member. Nothing is sent from this app: the app SACM messages sends (build B7).
+# The visual gives the app 1,000 lines at most (Microsoft's limit), so Save is off at 1,000: the app may not have them all.
 Screens:
   ActionsScreen:
     Properties:
@@ -149,40 +149,61 @@ Screens:
                   Set(
                       varSaved,
                       IfError(
-                          Patch(
-                              'SACM Journal',
-                              Defaults('SACM Journal'),
-                              {
-                                  Title: Text(GUID()),
-                                  At: Now(),
-                                  By: Lower(User().Email),
-                                  ByName: MeName,
-                                  Type: action.Type,
-                                  Keys: Switch(action.Scope, "mine", KeysFor.mine, "person", "", KeysFor.lines),
-                                  Text: Switch(
-                                      action.Id,
-                                      "status", StatusPick.Selected.Status,
-                                      "request", Trim(RequestText.Text),
-                                      "assign", If(MemberPick.Selected.Value = Nobody, "", MemberPick.Selected.Value),
-                                      "stage", StagePick.Selected.Id,
-                                      If(",text," in "," & action.Asks & ",", Trim(NoteText.Text), action.Text)
-                                  ),
-                                  To: If(action.Id = "handover", MemberPick.Selected.Value, ""),
-                                  Person: If(action.Scope = "person", First(LinePeople).Value, ""),
-                                  Reason: Switch(action.Id, "stop", ReasonPick.Selected.Value, "follow-again", FollowAgainReason, ""),
-                                  ReviewOn: Switch(action.Id, "stop", ReviewDate.SelectedDate, "follow-again", Today(), Blank()),
-                                  RetireOn: If(action.Id = "retirement", RetireDate.SelectedDate, Blank())
-                              }
-                          ),
+                          If(
+                              // Share out: one assign row per member, with the lines the refresh gave that member (D24).
+                              action.Id = "share-out",
+                              ForAll(
+                                  ShareMembers As member,
+                                  Patch(
+                                      'SACM Journal',
+                                      Defaults('SACM Journal'),
+                                      {
+                                          Title: Text(GUID()),
+                                          At: Now(),
+                                          By: Lower(User().Email),
+                                          ByName: MeName,
+                                          Type: "assign",
+                                          Keys: Concat(Filter(ShareLines, ShareTo = member.Value), Key, Char(10)),
+                                          Text: member.Value
+                                      }
+                                  )
+                              ),
+                              Patch(
+                                  'SACM Journal',
+                                  Defaults('SACM Journal'),
+                                  {
+                                      Title: Text(GUID()),
+                                      At: Now(),
+                                      By: Lower(User().Email),
+                                      ByName: MeName,
+                                      Type: action.Type,
+                                      Keys: Switch(action.Scope, "mine", KeysFor.mine, "person", "", KeysFor.lines),
+                                      Text: Switch(
+                                          action.Id,
+                                          "status", StatusPick.Selected.Status,
+                                          "request", Trim(RequestText.Text),
+                                          "assign", If(MemberPick.Selected.Value = Nobody, "", MemberPick.Selected.Value),
+                                          "stage", StagePick.Selected.Id,
+                                          If(",text," in "," & action.Asks & ",", Trim(NoteText.Text), action.Text)
+                                      ),
+                                      To: If(action.Id = "handover", MemberPick.Selected.Value, ""),
+                                      Person: If(action.Scope = "person", First(LinePeople).Value, ""),
+                                      Reason: Switch(action.Id, "stop", ReasonPick.Selected.Value, "follow-again", FollowAgainReason, ""),
+                                      ReviewOn: Switch(action.Id, "stop", ReviewDate.SelectedDate, "follow-again", Today(), Blank()),
+                                      RetireOn: If(action.Id = "retirement", RetireDate.SelectedDate, Blank())
+                                  }
+                              )
+                          );
+                          true,
                           Set(varError, FirstError.Message);
-                          Blank()
+                          false
                       )
                   );
                   If(
-                      IsBlank(varSaved),
+                      !varSaved,
                       Notify("Not saved: " & varError, NotificationType.Error),
                       Set(varJustSaved, { Id: action.Id, Keys: KeysFor.lines, At: Now() });
-                      Notify("Saved: " & action.Value & ". The report shows it after the next refresh, in about a minute.", NotificationType.Success);
+                      Notify("Saved: " & action.Value & If(action.Id = "share-out", " to " & Concat(ShareMembers, Value, ", "), "") & ". The report shows it after the next refresh, in about a minute.", NotificationType.Success);
                       IfError(SACMRefresh.Run(), Notify("Saved. The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning));
                       Reset(NoteText);
                       Reset(RequestText)

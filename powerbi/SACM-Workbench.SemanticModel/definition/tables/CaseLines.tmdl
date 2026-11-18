@@ -352,6 +352,13 @@ table CaseLines
 		isNameInferred
 		sourceColumn: [StageId]
 
+	/// Share out (build B7, D24): the manager this line goes to when its card is shared out (a free group, the biggest first, to who has least); "" when its group is taken or there are fewer than two managers.
+	column ShareTo
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ShareTo]
+
 	partition CaseLines = calculated
 		mode: import
 		source =
@@ -394,5 +401,6 @@ table CaseLines
 					"Actions", Run[CaseLines.Actions],
 					"ActionWords", Run[CaseLines.ActionWords],
 					"Stages", Run[CaseLines.Stages],
-					"StageId", Run[CaseLines.StageId]
+					"StageId", Run[CaseLines.StageId],
+					"ShareTo", Run[CaseLines.ShareTo]
 				)

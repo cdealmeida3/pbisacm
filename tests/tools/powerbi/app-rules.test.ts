@@ -26,14 +26,31 @@ test('a catalogue entry with an unknown type, ask or a label with | is a problem
   assert.ok(problems.some((line) => line.includes('gives other')));
 });
 
-test('the flows only refresh, wait or file, one at a time, and none starts on a timer', () => {
+test('the flows only refresh, wait, file or send what a manager pressed, one at a time, and none starts on a timer', () => {
   assert.deepEqual(flowProblems(appFlows()), []);
-  const timer = { ...appFlows()[0]!, trigger: 'Recurrence', concurrency: 2, steps: [{ action: 'Send an email from a shared mailbox (V2)', connector: 'Office 365 Outlook', fields: {} }] };
+  const timer = { ...appFlows()[0]!, trigger: 'Recurrence', concurrency: 2, steps: [{ action: 'Post message in a chat or channel', connector: 'Microsoft Teams', fields: {} }] };
   const problems = flowProblems([timer]);
   assert.ok(problems.some((line) => line.includes('never on a timer')));
   assert.ok(problems.some((line) => line.includes('one at a time')));
-  assert.ok(problems.some((line) => line.includes('no sending')));
+  assert.ok(problems.some((line) => line.includes('sends what a manager pressed Send on')));
   assert.ok(problems.some((line) => line.includes('does not refresh')));
+});
+
+test('a flow sends only from the app, one message, exactly the inputs the manager sends; it files replies only in SACM Replies', () => {
+  const send = { action: 'Send an email from a shared mailbox (V2)', connector: 'Office 365 Outlook', fields: { To: 'someone@example.com', Subject: '=input Subject', Body: 'Made by the flow' } };
+  const onMail = { id: 'FX', name: 'X', purpose: '', trigger: 'When a new email arrives in a shared mailbox (V2)', inputs: ['Subject'], concurrency: 1, steps: [send, send, { action: 'Create item', connector: 'SharePoint', fields: { 'List Name': 'SACM Journal' } }] };
+  const problems = flowProblems([onMail]);
+  assert.ok(problems.some((line) => line.includes('nothing is sent on its own')));
+  assert.ok(problems.some((line) => line.includes('one message a run')));
+  assert.ok(problems.some((line) => line.includes('To "someone@example.com"')));
+  assert.ok(problems.some((line) => line.includes('Body "Made by the flow"')));
+  assert.ok(problems.some((line) => line.includes('adds an item to SACM Journal')));
+  assert.ok(problems.some((line) => line.includes('only a flow the app calls')));
+  const given = { id: 'FY', name: 'Y', purpose: '', trigger: 'Power Apps (V2)', inputs: ['To', 'Subject', 'Body'], concurrency: 1,
+    steps: [{ action: 'Send an email from a shared mailbox (V2)', connector: 'Office 365 Outlook', fields: { To: '=the user who ran it', Subject: '=input Subject', Body: '=input Body', Attachments: 'a file' } }] };
+  const more = flowProblems([given]);
+  assert.ok(more.some((line) => line.includes('To "=the user who ran it"')));
+  assert.ok(more.some((line) => line.includes('the field Attachments')));
 });
 
 test('the app may add a row to the journal with its columns, and run the refresh flow', () => {

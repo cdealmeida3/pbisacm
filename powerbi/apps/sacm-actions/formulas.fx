@@ -23,6 +23,11 @@ MyOpenLines = Filter(Lines As line, line.AssignedTo = MeName && (StartsWith(line
 // The people of the lines: a note about a person needs every line to be about the same person.
 LinePeople = Distinct(Filter(Lines, Person <> ""), Person);
 
+// Share out (D24, build B7): the lines of a free group, each with the member the refresh gave it (the column ShareTo of
+// CaseLines: the biggest group first, to the active member with the fewest CIs so far). Save adds one assign row per member.
+ShareLines = Filter(Lines, ShareTo <> "");
+ShareMembers = Distinct(ShareLines, ShareTo);
+
 // The actions every selected line has (scope line). Value is what the menu shows: the words of the first line
 // (its Actions, "id=Label|id=Label"). Then Hand over when I have open work among the lines, and a note about the person
 // when every line is about one person.
@@ -38,6 +43,7 @@ LineActions = ForAll(
 OtherActions = ForAll(
     Filter(ActionCatalog As action,
         (action.Scope = "mine" && CountRows(MyOpenLines) > 0) ||
+        (action.Scope = "card" && CountRows(ShareLines) > 0) ||
         (action.Scope = "person" && LineCount > 0 && CountRows(LinePeople) = 1 && CountRows(Filter(Lines, Person = "")) = 0)) As chosen,
     { Id: chosen.Id, Type: chosen.Type, Text: chosen.Text, Asks: chosen.Asks, Scope: chosen.Scope, Order: chosen.Order, Value: chosen.Label });
 AvailableActions = Sort(Table(LineActions, OtherActions), Order);

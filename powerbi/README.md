@@ -160,7 +160,7 @@ In the site: **New → List → Blank list**, the name, then **Add column** for 
 |---|---|---|
 | **SACM Journal** | Title (the event id), At (Date and time), By (Single line: the email), ByName, Type, Keys (Multiple lines: one finding key per line), Text (Multiple lines), Ref, To, Cc, Subject, Kind, Channel, Person, Reason, ReviewOn (Date), RetireOn (Date), CheckId, CiKey, CiName: all Single line of text unless said | One action of a manager: a message, a reminder, an escalation, a note, fixed, not followed up, assigned, … (the events of [DATA-MODEL.md](../docs/DATA-MODEL.md) §3) |
 | **SACM Replies** | Title (the reference, `SACM-…`), From, Received (Date and time), Subject, Body (Multiple lines, plain text), ConversationId (for the flows of stage 2; not read yet) | One reply that came to the shared mailbox |
-| **SACM Settings** | Title (the setting, for example `reminderDays`), Value | One setting of the team. A number outside its range is not used, its default is. You may add column validation for the ranges. In B5 the report reads `reminderDays` and `maxReminders`; the other settings keep their defaults until build B8 |
+| **SACM Settings** | Title (the setting, for example `reminderDays`), Value | One setting of the team. A number outside its range is not used, its default is. You may add column validation for the ranges. In B5 the report reads `reminderDays` and `maxReminders`; from B7 the messages read their settings too (section 6.7); the other settings keep their defaults until build B8 |
 | **SACM Team** | Title (the name), Email, Active (Yes/No) | One manager of the team |
 | **SACM Reviews** | ReviewDate (Date), CiKey, CiName, Class, StatusInEpo, Answer, Note, By, At (Date and time) | One mark of the lifecycle review |
 
@@ -178,9 +178,9 @@ only what every selected line allows. **Save** adds **one row** to the list *SAC
 *SACMRefresh* to refresh the report. The report shows the change after that refresh, in about a minute. In the meantime
 the app shows, under **Done lately**, what the team did on these lines (it reads the list at once).
 
-The app never changes or removes a row (D272), never writes to ServiceNow, EPO or Solusi, and sends nothing. Sending
-messages, reminders and escalations comes in build B7; the Settings screen and the lifecycle marks in build B8. Why it is
-built this way: D294 to D299.
+The app never changes or removes a row (D272), never writes to ServiceNow, EPO or Solusi, and sends nothing. From build
+B7 a second app, **SACM messages**, sits on the page *Messages* and sends the messages, reminders and escalations
+(section 6.6). The Settings screen and the lifecycle marks come in build B8. Why it is built this way: D294 to D304.
 
 The source is in `powerbi/apps/`. You make the app and the flows **once, by hand**, in the company tenant, with the steps
 below: a Power Apps visual must create its own app inside the tenant (Microsoft's rule), so the repository cannot hold a
@@ -192,7 +192,10 @@ ready app.
 | `apps/sacm-actions/App-Formulas.fx` | **Generated.** The named formulas of the app, to paste into **App → Formulas** |
 | `apps/sacm-actions/Src/ActionsScreen.pa.yaml` | The screen of the app, to paste into Power Apps Studio |
 | `apps/sacm-actions/Src/App.pa.yaml` | **Generated.** The same formulas, as Power Apps keeps them in its source |
-| `apps/flows.json` | The three flows below, step by step. `npm run powerbi:lint` checks that they only refresh, wait or file |
+| `apps/sacm-messages/App-Formulas.fx` | **Generated.** The named formulas of the app *SACM messages* (section 6.6) |
+| `apps/sacm-messages/Src/MessagesScreen.pa.yaml` | The screen of the app *SACM messages* |
+| `apps/sacm-messages/Src/App.pa.yaml` | **Generated.** Its formulas, as Power Apps keeps them |
+| `apps/flows.json` | The six flows below, step by step. `npm run powerbi:lint` checks that they only refresh, wait, file, or send exactly what a manager pressed Send or Test on |
 
 What the app offers (the words are those of the HTML app; a check file can give its own):
 
@@ -207,8 +210,7 @@ What the app offers (the words are those of the HTML app; a check file can give 
 | **Retirement date**, **Stage**, **The process does not exist** | the planned retirement date; the mapping stage; the process mark | the cards that have it |
 | **Hand over my work** | your open lines among the selected ones, to another member | when you have open lines there |
 | **Note about the person** | a note about the person asked | when every line is about one person |
-
-*Share out* (free groups to the managers, D24) comes in build B7 with the drafts.
+| **Share out** | one *assign* per member: the free groups of the card, the biggest first, each to the active member with the fewest CIs so far (D24, D303) | when a line belongs to a free group and the team has two active members or more |
 
 ### 6.1 Check first (question Q4)
 
@@ -273,11 +275,40 @@ these: the app calls *SACMRefresh* by its name.
 5. Share the flow: on its page, **Run only users**: the group `SACM managers`, and **Use this connection** for Power BI,
    as in F5.
 
+**F2 SACMSend** (the button **Send** of the app *SACM messages*):
+
+1. **Create → Instant cloud flow.** Name `SACMSend`, trigger **When Power Apps calls a flow (V2)**. Add four **Text**
+   inputs, in this order: `To`, `Cc`, `Subject`, `Body`.
+2. Concurrency `1`, as in F5 step 2.
+3. **New step → Office 365 Outlook → Send an email from a shared mailbox (V2).** Original Mailbox Address: the shared
+   SACM mailbox. To: the input *To*. CC: the input *Cc*. Subject: the input *Subject*. Body: the input *Body* (the
+   message is HTML: in the editor press **</>** first, then put the input). Nothing else: no attachment, no other text.
+4. **Save.** **Run only users**: the group `SACM managers`; for **Office 365 Outlook** choose **Use this connection**
+   (yours, which may send as the shared mailbox). The flow sends exactly what the app gives it, and records nothing: the
+   app adds the journal rows itself after the flow answers (D301).
+
+**F4 SACMTest** (the button **Test**): as F2, with only the inputs `Subject` and `Body`. In **To** put the expression
+`triggerOutputs()['headers']['x-ms-user-email']`: the email of the manager who pressed Test. Nobody else gets it, and
+the app records nothing. Run only users and connection as in F2.
+
+**F3 SACM - File replies** (made for the HTML app, [SETUP.md](../docs/SETUP.md) §2.5; change it so):
+
+1. Trigger **When a new email arrives in a shared mailbox (V2)**, the shared SACM mailbox, **Subject Filter** `[SACM-`,
+   Include Attachments *No*. Concurrency `1`.
+2. **Content Conversion → Html to text**, Content: the *Body* of the email.
+3. **SharePoint → Create item**, the team's site, List Name **SACM Replies**. Title: the reference of the subject, with
+   the expression `concat('SACM-', first(split(last(split(triggerOutputs()?['body/subject'], '[SACM-')), ']')))`. From:
+   *From*. Received: *Received Time*. Subject: *Subject*. Body: the *Plain text content* of step 2. ConversationId:
+   *Conversation Id*.
+4. **Power BI → Refresh a dataset**, as in F5 step 3. The reply shows on *My day* after the refresh.
+5. If the old flow still saves the replies as files in the team folder, take that step out: the report reads the list.
+
 **F1 SACM - File reports** (made for the HTML app, [SETUP.md](../docs/SETUP.md) §2.3): at the end, after the *Apply to each* that saves the
 attachments, add **Refresh a dataset** (the workspace of section 4, Dataset *SACM-Workbench*). The report then refreshes
 when a new report arrives, with no button (D271). Set its concurrency to `1` too.
 
-None of the flows sends anything or runs on a timer. The scheduled refresh of section 4 stays as a safety net.
+Only F2 and F4 send, and only when a manager presses Send or Test in the app; none of the flows runs on a timer. The
+scheduled refresh of section 4 stays as a safety net.
 
 Two flows may ask for a refresh at the same moment (for example F1 after a new report and F5 after a Save). Power BI
 runs one refresh of a model at a time and refuses the other: that run of the flow then shows *Failed* at the step
@@ -292,7 +323,8 @@ not while you edit it. Publish the report first (section 4).
 1. Open the report, **Edit**. Go to the page **Case**. **Visualizations → Power Apps**. Place it on the right.
 2. With the visual selected, add these fields of **CaseLines** to **Power Apps data**, in this order: *Key*, *CheckId*,
    *CiName*, *Status*, *AssignedTo*, *Person*, *Actions*, *Stages*, *StageId*, *ExceptionReason*, *RetireOn*,
-   *ContactName*. For each: the arrow next to it → **Don't summarize**.
+   *ContactName*, *ShareTo* (from build B7: an app made in B6 gets it when you add the field and edit the app from the
+   visual, then paste the new `App-Formulas.fx` and `ActionsScreen.pa.yaml`). For each: the arrow next to it → **Don't summarize**.
 3. In the visual's filters (**Filters on this visual**): drag the measure **CaseLines → For the app**, *Show items when
    the value* **is** `1`, **Apply filter**. The app then gets only the lines of the case shown.
 4. In the visual: **Create new**. Power Apps Studio opens with a new app that is bound to the report.
@@ -352,6 +384,65 @@ If all ten are *Completed*, nothing changes. If refreshes fail with *too many re
 
 Each Save starts at most one refresh, and they wait for each other: on a busy morning with four managers this is a few
 refreshes an hour. A refresh takes about a minute at the real size (D283).
+
+### 6.6 The app SACM messages (build B7)
+
+The page **Messages** lists every message ready to send (the table *Drafts*): first messages, reminders that are due and
+escalations, one per person across the cards (D300). The words are those of the HTML app, and the check of every pull
+request compares them with it. The app **SACM messages** sits at the right of the page:
+
+- The list shows each message: what kind, who gets it, how many CIs, and who has the cases. Press one to open it.
+- **To**, **Cc** and the subject can be changed. The message is shown as it goes, with its reference and your name.
+- **Send**: the flow *SACMSend* sends it from the shared mailbox. Then the app records it on the cases (and gives you
+  the cases nobody had), and the report refreshes. The message leaves the list after the refresh.
+- **Test**: the flow *SACMTest* sends it to you only. The cases are not changed.
+- **Outlook**: opens it in Outlook. A long message is copied first: paste it into the email. Then the app asks **Sent
+  from Outlook?**: *Yes* records it.
+- **Teams**: opens a Teams chat with the person and the first message. Then **Did you start the chat?**: *Yes* records it.
+- **A colleague wrote lately**: when a colleague wrote to the same person, or about the same cases, in the last 24
+  hours, the app says who and when. Send and Outlook wait until you tick **Send anyway** (D302).
+
+Make it once, as the app of section 6.4:
+
+1. In the report (the service, **Edit**), page **Messages**: **Visualizations → Power Apps**, at the right (the table
+   leaves the space). Add these fields of **Drafts**, each **Don't summarize**: *DraftId*, *Ref*, *Kind*, *KindLabel*,
+   *To*, *ToName*, *Cc*, *Subject*, *Body*, *Plain*, *Chat*, *Keys*, *NewKeys*, *FreeKeys*, *CiCount*, *PartIndex*,
+   *PartCount*, *About*, *NobodyAbove*, *Mailbox*, *AssignedTo*.
+2. **Create new**. In Studio: **Data → Add data → SharePoint** → **SACM Journal** and **SACM Team**. **Power Automate →
+   Add flow** → **SACMSend**, **SACMTest** and **SACMRefresh**.
+3. **App → Formulas**: paste `apps/sacm-messages/App-Formulas.fx`. Paste `apps/sacm-messages/Src/MessagesScreen.pa.yaml`
+   on *Screen1* (Ctrl+V), delete *Screen1*, **App → StartScreen** `MessagesScreen`.
+4. **Settings → General → Data row limit** `2000`. **Save as** `SACM messages`, **Publish**, **Share** with `SACM
+   managers`. Save the report.
+
+How to try it: in *SACM Team* put yourself as a member. On a test message, change **To** to your own address, press
+**Test**: the email comes to you. Then **Send**: it comes again, and after the refresh the page *Activity* shows the
+message.
+
+What to know:
+
+- The visual gives the app 1,000 messages at most: filter the page (for example by kind) when there are more.
+- A reminder keeps the reference of the first message, so the reply finds the case (D5). A new message gets its
+  reference when you open it in the list.
+- Until the refresh, a message you sent stays in the list: the app keeps **Send** off on it for 10 minutes.
+- **Copy** in the app copies text only. To keep the table of a long message, use **Send** or **Test** instead.
+
+### 6.7 The settings the messages read
+
+The messages read these rows of *SACM Settings* (Title, Value). A row that is not there keeps the default of the HTML
+app ([DATA-MODEL.md](../docs/DATA-MODEL.md) §3, the settings).
+
+| Title | Value |
+|---|---|
+| `portalLink` | The link of the Service Portal |
+| `signature` | The team line under a message (default `SACM team`) |
+| `epoOwnerName`, `epoOwnerEmail` | The EPO inventory owner |
+| `procurementName`, `procurementEmail` | The Procurement mailbox (default name `Procurement`) |
+| `procurementLeadName`, `procurementLeadEmail` | The Procurement lead (no escalation when empty) |
+| `request.<id>.name`, `request.<id>.link` | A request of the Service Portal: its name and link. The ids: `owned-by-update`, `managed-by-update`, `support-group-update`, `modify-service-offering`, `criticality`, `service-mapping` |
+| `team.<id>.name`, `team.<id>.people` | A team responsible for records (D195): its name, and its people as `Name <address>; Name <address>` |
+
+The real links and addresses go into the list only, never into the repository.
 
 ## 7. What was assumed (questions still open)
 

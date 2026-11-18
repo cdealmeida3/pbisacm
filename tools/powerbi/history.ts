@@ -30,6 +30,7 @@ import { loadPacks, loadReferences } from '../../src/hosts/cli.ts';
 import { DEFAULT_SETTINGS, settingNumber } from '../../src/app/state/store.ts';
 import { EARLIER, RECORD_DATE, SAMPLE_FILES } from '../../tests/sample-record.ts';
 import { caseActions, personOf } from './actions.ts';
+import { sampleMembers, shareOutOf } from './messages.ts';
 import { mappingConfig } from '../../src/core/mapping/backlog.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -176,6 +177,7 @@ export function caseLines(key: HistoryKey): Array<Record<string, string | number
   const latest = new Set(newest.facts.map((fact) => fact.key));
   const packs = loadPacks();
   const mapping = mappingConfig(loadReferences());
+  const shares = shareOutOf(key.cases, sampleMembers());
   return key.cases.map((item) => {
     const due = !(item.state === 'waiting' && stateOf(item.fact) === 'open');
     const remind = due && item.status === 'Contacted' ? (item.messages.length <= key.rules.maxReminders ? 'reminder' : 'escalation') : '';
@@ -200,7 +202,9 @@ export function caseLines(key: HistoryKey): Array<Record<string, string | number
       ReviewOn: exception?.reviewOn ?? '', ExceptionEnded: item.exceptionEnded, RetireOn: item.retireOn, VerifiedOn: item.verifiedOn,
       FixedBy: fixed ? fixed.byName || fixed.by : '', FixedOn: fixed ? isoDate(fixed.at) : '', Events: item.timeline.length,
       // Build B6 (D294): who the case is about, and what the Power App offers on it (the case panel of the HTML app).
-      Person: inLatest ? personOf(item) : '', ...caseActions(item, inLatest, packs, mapping)
+      Person: inLatest ? personOf(item) : '', ...caseActions(item, inLatest, packs, mapping),
+      // Build B7 (D24): who the line goes to when its card is shared out.
+      ShareTo: shares.get(item.key) ?? ''
     };
   });
 }

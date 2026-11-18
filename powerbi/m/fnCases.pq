@@ -8,11 +8,16 @@
 // key the newest report no longer shows. Remind: "reminder" or "escalation" once ReminderFrom comes, for a case that
 // was asked and did not answer (D39, D40); the measures compare ReminderFrom with today, so it is right between two
 // refreshes. Every message counts as sent on the day it was recorded (the outbox is the app's, D162). `run` is CheckRun
-// (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run.
-(run as nullable record) as list =>
+// (null when no CI report is loaded). Read by the parts CaseLines and RepliesToRead of the table Run. `given` (build B7):
+// [Events, Replies] instead of the journal and the replies of the team; the answer key gives none, to compare the
+// drafts with the recorded messages (DraftsRecorded). Each case also keeps, for the drafts (fnDrafts): Fact (its
+// finding), MessageEvents (its messages), ReminderDue and OverLimit (as buildCases: asked, no answer, the working days
+// to the reminder passed by CaseToday, and the reminders used or not) and Askable (a line of a fix list with
+// askWhenUnsure only once SACM handed it to the owner, src/app/view/fix-list.ts).
+(run as nullable record, optional given as nullable record) as list =>
     let
         facts = if run = null then {} else run[Facts],
-        events = JournalEvents,
+        events = if given = null then JournalEvents else given[Events],
         rules = CaseRules,
         today = Date.ToText(CaseToday, [Format = "yyyy-MM-dd", Culture = "en-US"]),
         date = if run = null then null else run[Date],
@@ -30,7 +35,8 @@
             (event[CheckId] = "*" or event[CheckId] = checkId)
             and (ciKey = event[CiKey] or Text.StartsWith(ciKey, event[CiKey] & "|") or Text.StartsWith(ciKey, event[CiKey] & "#")),
         order = (a as record, b as record) as number => let first = Value.Compare(a[At], b[At]) in if first <> 0 then first else Value.Compare(a[Id], b[Id]),
-        repliesByRef = fnGroupBy(ReplyItems, (reply) => reply[Ref]),
+        repliesByRef = fnGroupBy(if given = null then ReplyItems else given[Replies], (reply) => reply[Ref]),
+        todayDate = CaseToday,
         // Parts of a key: <check>:<CI key>:<field>; a CI key may hold ":" (a contract), a check id and a field never do.
         partsOf = (key as text) as record =>
             let first = Text.PositionOf(key, ":"), last = Text.PositionOf(key, ":", Occurrence.Last) in
@@ -89,7 +95,10 @@
                     Status = status, Timeline = timeline, Stopped = exception <> null, RetireOn = retireOn,
                     Class = Record.FieldOrDefault(fact, "Class", ""), Mapping = Record.FieldOrDefault(fact, "Mapping", {})
                 ]),
-                contactId = Record.FieldOrDefault(fact, "ContactId", "")
+                contactId = Record.FieldOrDefault(fact, "ContactId", ""),
+                reminderFrom = if sentOn = null then null else fnAddBusinessDays(sentOn, rules[ReminderDays]),
+                waited = reminderFrom <> null and reminderFrom <= todayDate,
+                book = Record.FieldOrDefault(CheckPlaybooks, fact[CheckId], [AskWhenUnsure = ""])
             in
                 [
                     Key = key, CheckId = fact[CheckId], CiKey = fact[CiKey], CiName = fact[CiName], ClassLabel = fact[ClassLabel], Field = fact[Field],
@@ -101,7 +110,7 @@
                     HandoverNote = if assignment = null or assignment[Type] <> "handover" then "" else assignment[Text],
                     Request = lastText(timeline, "request"), Messages = List.Count(messages), SentOn = sentOn,
                     LastMessageTo = if lastMessage = null then "" else lastMessage[To], LastRef = if lastMessage = null then "" else lastMessage[Ref],
-                    ReminderFrom = if sentOn = null then null else fnAddBusinessDays(sentOn, rules[ReminderDays]),
+                    ReminderFrom = reminderFrom,
                     Remind = if due and status = "Contacted" then (if List.Count(messages) <= rules[MaxReminders] then "reminder" else "escalation") else "",
                     Replies = replies, LastReplyOn = if List.IsEmpty(replies) then null else dateOf(List.Last(replies)[Received]),
                     ExceptionReason = if exception = null then "" else if legacy then "Set before version 0.12 (no reason)" else exception[Reason],
@@ -114,7 +123,15 @@
                     Closed = closed,
                     // Who the case is about: the user ID of the person asked, else the email in lower case (as the HTML app knows a person contacted).
                     Person = if not inLatest then "" else if contactId <> "" then contactId else Text.Lower(fact[ContactEmail], "en-US"),
-                    Actions = actions[Actions], ActionWords = actions[ActionWords], Stages = actions[Stages], StageId = actions[StageId]
-                ]
+                    Actions = actions[Actions], ActionWords = actions[ActionWords], Stages = actions[Stages], StageId = actions[StageId],
+                    // For the drafts (build B7).
+                    Fact = fact, MessageEvents = messages,
+                    ReminderDue = due and status = "Contacted" and List.Count(messages) <= rules[MaxReminders] and waited,
+                    OverLimit = due and status = "Contacted" and List.Count(messages) > rules[MaxReminders] and waited,
+                    ToSolve = not closed and state = "open", Askable = book[AskWhenUnsure] = "" or ownerAsked
+                ],
+        lines = List.Buffer(List.Transform(subjects, line)),
+        // Share out (build B7, D24): the manager a free group of its card goes to, "" otherwise.
+        shareTo = fnShareOut(lines)
     in
-        List.Buffer(List.Transform(subjects, line))
+        List.Buffer(List.Transform(lines, (item) => item & [ShareTo = Record.FieldOrDefault(shareTo, item[Key], "")]))

@@ -28,7 +28,7 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
 import { EXPECTED_HISTORY, lightColours, staleQueries, THEME_FILE } from './generate.ts';
 import { connectorSource } from './connector.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
-import { APP_FOLDER } from './actions.ts';
+import { APP_FOLDERS } from './actions.ts';
 import { callProblems, catalogueProblems, flowProblems } from './app-rules.ts';
 import type { Formula } from './app-rules.ts';
 
@@ -240,7 +240,7 @@ done.push(`Run: ${calculatedTables.length} calculated tables take their part of 
 
 /* 9. App */
 problems.push(...catalogueProblems(undefined, expressions.find((expression) => expression.name === 'fnCaseActions')?.m ?? ''), ...flowProblems());
-const appFiles = filesUnder(APP_FOLDER, /(\.pa\.yaml|App-Formulas\.fx)$/);
+const appFiles = APP_FOLDERS.flatMap((folder) => filesUnder(folder, /(\.pa\.yaml|App-Formulas\.fx)$/));
 if (process.argv.includes('--no-dotnet')) {
   done.push('App: catalogue and flows checked; the app source NOT PARSED (--no-dotnet). The CI parses it.');
 } else {
@@ -260,10 +260,10 @@ if (process.argv.includes('--no-dotnet')) {
       if (!validate(file.json)) for (const error of (validate.errors ?? []).slice(0, 5)) problems.push(`App: ${where}: ${error.instancePath || '/'} ${error.message}`);
     }
     problems.push(...callProblems(read.formulas.filter((formula) => formula.file !== schema!.file)));
-    done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the app only adds journal rows and runs only the refresh flow`);
+    done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the apps only add journal rows and run only the flows of flows.json`);
   }
 }
-done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait or file');
+done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait, file, or send what a manager pressed');
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);
