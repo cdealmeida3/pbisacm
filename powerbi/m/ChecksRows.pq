@@ -15,12 +15,8 @@ let
             topic = topicOf(file[folder]),
             sectionNo = sectionOrder(pack[dimension]),
             module = if detector[type] = "rule" then "rule" else Record.FieldOrDefault(detector, "module", detector[type]),
-            // The kind of card page (src/app/view/cards.ts, cardKind; plan §6.1).
-            kind = if List.Contains(Record.FieldOrDefault(playbook, "audience", {}), "procurement") then "mailbox"
-                else if Record.FieldOrDefault(playbook, "path", "") = "mapping" then "mapping"
-                else if Record.FieldOrDefault(pack, "reviewOnly", false) = true then "review"
-                else if Record.FieldOrDefault(playbook, "path", "") = "sacm-fix" then "fix"
-                else "owners"
+            // The kind of card page (src/app/view/cards.ts, cardKind; plan §6.1), as the Power App knows it too (CheckPlaybooks).
+            kind = Record.Field(CheckPlaybooks, pack[id])[Kind]
         in
             {
                 pack[id], pack[status], Record.FieldOrDefault(pack, "title", ""), Record.FieldOrDefault(pack, "cardLabel", ""), Record.FieldOrDefault(pack, "cardHint", ""), Record.FieldOrDefault(pack, "cardText", Record.FieldOrDefault(pack, "cardHint", "")),

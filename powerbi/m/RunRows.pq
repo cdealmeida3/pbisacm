@@ -14,7 +14,7 @@ let
     cases = fnCases(run),
     parts = {
         {"Findings", findings}, {"Tested", tested}, {"Notes", fnNotesPart(run)}, {"Parked", fnParkedPart(run)},
-        {"MappingBacklog", fnMappingBacklogPart(run)}, {"RelationshipLinks", fnRelationshipLinksPart(run)},
+        {"MappingBacklog", fnMappingBacklogPart(run, cases)}, {"RelationshipLinks", fnRelationshipLinksPart(run)},
         {"CapabilitySheet", fnCapabilitySheetPart(run)}, {"SelfCheck", fnSelfCheckPart(findings, tested)},
         {"CaseLines", fnCaseLinesPart(cases)}, {"RepliesToRead", fnRepliesToReadPart(cases)}, {"Exceptions", fnExceptionsPart(run)}
     },

@@ -29,6 +29,8 @@ import type { Episode, VerificationRecord } from '../../src/core/audit/audit.ts'
 import { loadPacks, loadReferences } from '../../src/hosts/cli.ts';
 import { DEFAULT_SETTINGS, settingNumber } from '../../src/app/state/store.ts';
 import { EARLIER, RECORD_DATE, SAMPLE_FILES } from '../../tests/sample-record.ts';
+import { caseActions, personOf } from './actions.ts';
+import { mappingConfig } from '../../src/core/mapping/backlog.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const utf8 = new TextDecoder('utf-8');
@@ -172,6 +174,8 @@ const packOf = (id: string) => loadPacks().find((pack) => pack.id === id);
 export function caseLines(key: HistoryKey): Array<Record<string, string | number | boolean>> {
   const newest = key.runs[key.runs.length - 1]!;
   const latest = new Set(newest.facts.map((fact) => fact.key));
+  const packs = loadPacks();
+  const mapping = mappingConfig(loadReferences());
   return key.cases.map((item) => {
     const due = !(item.state === 'waiting' && stateOf(item.fact) === 'open');
     const remind = due && item.status === 'Contacted' ? (item.messages.length <= key.rules.maxReminders ? 'reminder' : 'escalation') : '';
@@ -194,7 +198,9 @@ export function caseLines(key: HistoryKey): Array<Record<string, string | number
       ReminderFrom: from, Remind: remind, Replies: item.replies.length, LastReplyOn: isoDate(item.replies[item.replies.length - 1]?.received ?? ''),
       ExceptionReason: exception ? (exception.type === 'status' ? 'Set before version 0.12 (no reason)' : exception.reason ?? '') : '',
       ReviewOn: exception?.reviewOn ?? '', ExceptionEnded: item.exceptionEnded, RetireOn: item.retireOn, VerifiedOn: item.verifiedOn,
-      FixedBy: fixed ? fixed.byName || fixed.by : '', FixedOn: fixed ? isoDate(fixed.at) : '', Events: item.timeline.length
+      FixedBy: fixed ? fixed.byName || fixed.by : '', FixedOn: fixed ? isoDate(fixed.at) : '', Events: item.timeline.length,
+      // Build B6 (D294): who the case is about, and what the Power App offers on it (the case panel of the HTML app).
+      Person: inLatest ? personOf(item) : '', ...caseActions(item, inLatest, packs, mapping)
     };
   });
 }
