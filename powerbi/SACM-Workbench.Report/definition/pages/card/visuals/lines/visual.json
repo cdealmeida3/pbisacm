@@ -4,10 +4,10 @@
   "position": {
     "x": 224,
     "y": 84,
-    "z": 5000,
+    "z": 8000,
     "height": 300,
     "width": 720,
-    "tabOrder": 5000
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -98,21 +98,6 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "ContactVia"
-                }
-              },
-              "queryRef": "Findings.ContactVia",
-              "nativeQueryRef": "ContactVia",
-              "displayName": "Why them"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
                   "Property": "StateWhy"
                 }
               },
@@ -128,42 +113,12 @@
                       "Entity": "CaseLines"
                     }
                   },
-                  "Property": "Line status"
-                }
-              },
-              "queryRef": "CaseLines.Line status",
-              "nativeQueryRef": "Line status",
-              "displayName": "Status"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "CaseLines"
-                    }
-                  },
                   "Property": "Line follow-up"
                 }
               },
               "queryRef": "CaseLines.Line follow-up",
               "nativeQueryRef": "Line follow-up",
               "displayName": "Follow-up"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "CaseLines"
-                    }
-                  },
-                  "Property": "Line who"
-                }
-              },
-              "queryRef": "CaseLines.Line who",
-              "nativeQueryRef": "Line who",
-              "displayName": "Has it"
             }
           ]
         }
@@ -226,7 +181,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "39D"
+                  "Value": "101D"
                 }
               }
             }
@@ -240,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "51D"
+                  "Value": "93D"
                 }
               }
             }
@@ -254,7 +209,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "111D"
+                  "Value": "160D"
                 }
               }
             }
@@ -268,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "51D"
+                  "Value": "55D"
                 }
               }
             }
@@ -282,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "53D"
+                  "Value": "77D"
                 }
               }
             }
@@ -296,21 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "72D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.ContactVia"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "101D"
+                  "Value": "108D"
                 }
               }
             }
@@ -324,41 +265,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "58D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "CaseLines.Line status"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "81D"
+                  "Value": "85D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "CaseLines.Line follow-up"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "58D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "CaseLines.Line who"
           }
         }
       ]

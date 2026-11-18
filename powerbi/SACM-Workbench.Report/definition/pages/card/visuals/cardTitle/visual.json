@@ -5,8 +5,8 @@
     "x": 224,
     "y": 16,
     "z": 2000,
-    "height": 32,
-    "width": 640,
+    "height": 28,
+    "width": 564,
     "tabOrder": 2000
   },
   "visual": {
@@ -48,7 +48,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "14D"
                 }
               }
             },
@@ -116,7 +116,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },

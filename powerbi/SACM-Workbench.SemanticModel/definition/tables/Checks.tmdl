@@ -104,10 +104,10 @@ table Checks
 		formatString: 0
 
 	/// What the card page says to do: the hint of the check file.
-	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "The page shows every card until you choose one." )
+	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "On All cards, right-click a line, then Drill through, Card. Until then the page shows every card." )
 
 	/// The name of the check on its card page.
-	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen: on All cards, right-click a line and choose Drill through, Card." )
+	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen" )
 
 	/// The line of the section Completeness (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
 	measure Completeness =

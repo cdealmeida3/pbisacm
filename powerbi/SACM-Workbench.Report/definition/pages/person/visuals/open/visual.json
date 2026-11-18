@@ -53,21 +53,6 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "ClassLabel"
-                }
-              },
-              "queryRef": "Findings.ClassLabel",
-              "nativeQueryRef": "ClassLabel",
-              "displayName": "Class"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
                   "Property": "Detail"
                 }
               },
@@ -119,21 +104,6 @@
               "queryRef": "Findings.Cc",
               "nativeQueryRef": "Cc",
               "displayName": "Copied"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "CaseLines"
-                    }
-                  },
-                  "Property": "Line status"
-                }
-              },
-              "queryRef": "CaseLines.Line status",
-              "nativeQueryRef": "Line status",
-              "displayName": "Status"
             },
             {
               "field": {
@@ -226,7 +196,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "44D"
+                  "Value": "88D"
                 }
               }
             }
@@ -240,7 +210,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "72D"
+                  "Value": "96D"
                 }
               }
             }
@@ -254,21 +224,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "88D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.ClassLabel"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "105D"
+                  "Value": "113D"
                 }
               }
             }
@@ -296,7 +252,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "71D"
+                  "Value": "80D"
                 }
               }
             }
@@ -310,7 +266,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "57D"
+                  "Value": "112D"
                 }
               }
             }
@@ -324,21 +280,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "57D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "CaseLines.Line status"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "78D"
+                  "Value": "80D"
                 }
               }
             }

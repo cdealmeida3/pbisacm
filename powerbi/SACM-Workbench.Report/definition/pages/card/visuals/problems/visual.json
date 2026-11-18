@@ -4,10 +4,10 @@
   "position": {
     "x": 744,
     "y": 396,
-    "z": 7000,
+    "z": 10000,
     "height": 148,
     "width": 512,
-    "tabOrder": 7000
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "tableEx",
@@ -89,21 +89,6 @@
               "queryRef": "Findings.StateLabel",
               "nativeQueryRef": "StateLabel",
               "displayName": "State"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "AskWho"
-                }
-              },
-              "queryRef": "Findings.AskWho",
-              "nativeQueryRef": "AskWho",
-              "displayName": "Asked"
             }
           ]
         }
@@ -160,7 +145,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "57D"
+                  "Value": "78D"
                 }
               }
             }
@@ -174,7 +159,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "117D"
+                  "Value": "114D"
                 }
               }
             }
@@ -188,7 +173,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "56D"
+                  "Value": "75D"
                 }
               }
             }
@@ -202,7 +187,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "125D"
+                  "Value": "150D"
                 }
               }
             }
@@ -216,27 +201,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "56D"
+                  "Value": "53D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "Findings.StateLabel"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "56D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.AskWho"
           }
         }
       ]

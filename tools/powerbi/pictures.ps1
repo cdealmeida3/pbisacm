@@ -8,7 +8,7 @@
 param([Parameter(Mandatory)][string]$Pages, [string]$Out = ".build/desktop/pictures")
 $ErrorActionPreference = "Continue"
 New-Item -ItemType Directory -Force $Out | Out-Null
-Add-Type -AssemblyName System.Windows.Forms, System.Drawing, UIAutomationClient, UIAutomationTypes
+Add-Type -AssemblyName System.Windows.Forms, System.Drawing, UIAutomationClient, UIAutomationTypes, WindowsBase
 Add-Type @"
 using System; using System.Runtime.InteropServices;
 public static class PictureWin {
@@ -86,13 +86,25 @@ function Find-Tab($root, [string]$name) {
 # stays out of sight is selected as UI Automation offers.
 function Open-Tab($tab) {
   try {
-    if ($tab.Current.IsOffscreen) { $tab.GetCurrentPattern([System.Windows.Automation.ScrollItemPattern]::Pattern).ScrollIntoView(); Start-Sleep -Milliseconds 300 }
+    if ($tab.Current.IsOffscreen) { $tab.GetCurrentPattern([System.Windows.Automation.ScrollItemPattern]::Pattern).ScrollIntoView() }
   } catch { }
-  if (-not $tab.Current.IsOffscreen) { $at = Center $tab; Click $at[0] $at[1]; return }
+  # The tab strip slides when it scrolls: wait until the tab stays at one place, so the click does not land on the
+  # tab beside it or on "New page" (a click there adds a page to the report).
+  $last = $null
+  for ($i = 0; $i -lt 10; $i++) {
+    Start-Sleep -Milliseconds 200
+    $r = $tab.Current.BoundingRectangle
+    if ($last -and $r.X -eq $last.X -and $r.Y -eq $last.Y) { break }
+    $last = $r
+  }
+  if (-not $tab.Current.IsOffscreen) {
+    $at = Center $tab
+    $under = $null
+    try { $under = [System.Windows.Automation.AutomationElement]::FromPoint((New-Object System.Windows.Point($at[0], $at[1]))) } catch { }
+    if ($under -and $under.Current.Name -eq $tab.Current.Name) { Click $at[0] $at[1]; return }
+  }
   try { $tab.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select(); return } catch { }
   try { $tab.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke(); return } catch { }
-  $at = Center $tab
-  Click $at[0] $at[1]
 }
 # The names at the foot of the window (the tab strip), for the log when a tab is not found.
 function Tab-Names($root) {
@@ -207,8 +219,10 @@ foreach ($page in $list) {
   $words = Words (Window)
   # A word of a broken visual is often part of a longer name ("Replies to read (Blank)"), so each name is searched.
   $broken = @($BROKEN | Where-Object { $word = $_; @($words | Where-Object { $_.Contains($word) }).Count -gt 0 })
-  Say "$($page.displayName): drawn in $seconds s, $file$(if ($broken.Count) { ', shows: ' + ($broken -join '; ') })"
-  $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken }
+  # The status bar says which page is open ("Page 14 of 17"): the judge compares it with the place of the page.
+  $status = @($words | Where-Object { $_ -match '^Page \d+ of \d+$' }) | Select-Object -First 1
+  Say "$($page.displayName): drawn in $seconds s, $file, $status$(if ($broken.Count) { ', shows: ' + ($broken -join '; ') })"
+  $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken; status = $status }
 }
 [ordered]@{ taken = $true; minutes = [math]::Round(((Get-Date) - $started).TotalMinutes, 1); pages = $results } | ConvertTo-Json -Depth 5 |
   Out-File -Encoding utf8NoBOM (Join-Path $Out "pictures.json")

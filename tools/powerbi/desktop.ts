@@ -223,7 +223,7 @@ export interface QueryResult { query: VisualQuery; error?: string; rows?: Array<
 /** What the runner gives back: the model's own errors (TOM), the open and refresh, and each query. */
 export interface Results { opened: boolean; openError?: string; refreshError?: string; modelErrors: string[]; results: QueryResult[] }
 /** What the picture step gives back (pictures.ps1): per page the seconds it took to draw and the words of a broken visual it shows. */
-export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] }> }
+export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[]; status?: string | null }> }
 /** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
 export const DRAW_SECONDS = 3;
 
@@ -260,7 +260,12 @@ export function judge(results: Results, pictures?: Pictures): { problems: string
       continue;
     }
     if (!lines.length) { if (!query.drill || query.drill.value) notes.push(`${where(query)}: empty`); continue; }
-    if (query.type === 'slicer' || groups === 0) continue;
+    if (query.type === 'slicer') {
+      // A blank value is a button or an item "(Blank)" in a slicer.
+      if (groups && lines.some((line) => line.slice(0, groups).every(blank))) problems.push(`${where(query)}: the slicer shows "(Blank)" (${query.groups.join(', ')})`);
+      continue;
+    }
+    if (groups === 0) continue;
     const blankRows = lines.filter((line) => line.slice(0, groups).every(blank)).length;
     if (blankRows) problems.push(`${where(query)}: ${blankRows === 1 ? 'a line' : `${blankRows} lines`} with every column blank (${query.groups.join(', ')})`);
   }
@@ -268,15 +273,18 @@ export function judge(results: Results, pictures?: Pictures): { problems: string
 }
 
 /**
- * What the pictures show wrong (D318): a page that has no tab, a page that shows the words of a broken visual or
- * "(Blank)", a page that takes more than DRAW_SECONDS to draw. A picture step that could not run is a problem too: the
+ * What the pictures show wrong (D318): a page that has no tab, a tab that opened another page (the status bar of
+ * Desktop says "Page 3 of 17"), a page that shows the words of a broken visual or "(Blank)", a page that takes more
+ * than DRAW_SECONDS to draw. A picture step that could not run is a problem too: the
  * check would pass without looking.
  */
 export function judgePictures(pictures: Pictures, notes: string[] = []): string[] {
   const problems: string[] = [];
   if (!pictures.taken) return [`The pictures of the pages were not taken: ${pictures.why ?? 'no reason given'}`];
-  for (const page of pictures.pages) {
+  for (const [index, page] of pictures.pages.entries()) {
     if (!page.found) { problems.push(`${page.displayName}: the picture step found no tab for the page`); continue; }
+    const expected = `Page ${index + 1} of ${pictures.pages.length}`;
+    if (page.status && page.status !== expected) { problems.push(`${page.displayName}: the picture shows "${page.status}", not "${expected}": the tab did not open the page (picture ${page.file})`); continue; }
     for (const words of page.broken) problems.push(`${page.displayName}: the page shows "${words}" (picture ${page.file})`);
     if (page.seconds !== null && page.seconds > DRAW_SECONDS) problems.push(`${page.displayName}: the page took ${page.seconds} s to draw, more than ${DRAW_SECONDS} s (picture ${page.file})`);
     else notes.push(`${page.displayName}: drawn in ${page.seconds} s (picture ${page.file})`);

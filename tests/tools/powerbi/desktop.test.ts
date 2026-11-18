@@ -84,11 +84,12 @@ test('the list of the pages: the drill-through pages, Self-check and the parts o
   for (const page of pages) assert.equal(page.width, 1280, page.name);
 });
 
-test('the pictures: a page with no tab, a broken word or a slow page is a problem; a page in time is a note', () => {
+test('the pictures: a page with no tab, a tab that opened another page, a broken word or a slow page is a problem; a page in time is a note', () => {
   const pictures: Pictures = {
     taken: true,
     pages: [
-      { page: 'myday', displayName: 'My day', found: true, seconds: 1.2, file: '01-myday.png', broken: [] },
+      { page: 'myday', displayName: 'My day', found: true, seconds: 1.2, file: '01-myday.png', broken: [], status: 'Page 1 of 5' },
+      { page: 'case', displayName: 'Case', found: true, seconds: 1.0, file: '02-case.png', broken: [], status: 'Page 6 of 6' },
       { page: 'cards', displayName: 'Cards', found: false, seconds: null, file: null, broken: [] },
       { page: 'backlog', displayName: 'Backlog', found: true, seconds: 1.0, file: '03-backlog.png', broken: ['(Blank)'] },
       { page: 'history', displayName: 'History', found: true, seconds: 4.5, file: '04-history.png', broken: [] }
@@ -96,10 +97,20 @@ test('the pictures: a page with no tab, a broken word or a slow page is a proble
   };
   const notes: string[] = [];
   const problems = judgePictures(pictures, notes);
-  assert.equal(problems.length, 3);
+  assert.equal(problems.length, 4);
+  assert.match(problems.join('\n'), /Case: the picture shows "Page 6 of 6", not "Page 2 of 5"/);
   assert.match(problems.join('\n'), /Cards/);
   assert.match(problems.join('\n'), /\(Blank\)/);
   assert.match(problems.join('\n'), /History.*4\.5/);
   assert.ok(notes.some((note) => /My day/.test(note)));
   assert.match(judgePictures({ taken: false, why: 'no window', pages: [] })[0]!, /no window/);
+});
+
+test('a slicer with a blank value shows a button "(Blank)": the judge finds it', () => {
+  const { problems } = judge({ opened: true, modelErrors: [], results: [
+    { query: visual('slicer', ['Topic'], []), rows: [[null], ['CI']] },
+    { query: visual('slicer', ['Kind'], []), rows: [['Email'], ['Reminder']] }
+  ] });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0]!, /slicer shows "\(Blank\)" \(Topic\)/);
 });
