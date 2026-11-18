@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "runs",
   "position": {
-    "x": 24,
-    "y": 296,
-    "z": 3000,
-    "height": 170,
-    "width": 800,
-    "tabOrder": 3000
+    "x": 224,
+    "y": 316,
+    "z": 4000,
+    "height": 192,
+    "width": 720,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "tableEx",
@@ -28,7 +28,7 @@
               },
               "queryRef": "Runs.ReportDate",
               "nativeQueryRef": "ReportDate",
-              "displayName": "CI report of"
+              "displayName": "Date"
             },
             {
               "field": {
@@ -73,7 +73,7 @@
               },
               "queryRef": "Runs.RelationshipFile",
               "nativeQueryRef": "RelationshipFile",
-              "displayName": "Relationship report"
+              "displayName": "Relationships"
             },
             {
               "field": {
@@ -88,7 +88,7 @@
               },
               "queryRef": "Runs.EpoFile",
               "nativeQueryRef": "EpoFile",
-              "displayName": "EPO systems report"
+              "displayName": "EPO"
             },
             {
               "field": {
@@ -103,7 +103,7 @@
               },
               "queryRef": "Runs.SolusiFile",
               "nativeQueryRef": "SolusiFile",
-              "displayName": "Solusi contract file"
+              "displayName": "Solusi"
             },
             {
               "field": {
@@ -118,7 +118,7 @@
               },
               "queryRef": "Runs.ContractFile",
               "nativeQueryRef": "ContractFile",
-              "displayName": "ServiceNow contract report"
+              "displayName": "Contracts"
             }
           ]
         }
@@ -141,35 +141,6 @@
         ],
         "isDefaultSort": true
       }
-    },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "visualContainerObjects": {
       "title": [
@@ -204,8 +175,135 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Runs"
+                    }
+                  },
+                  "Property": "Runs note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "64D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Runs.ReportDate"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "118D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Runs.FileName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "57D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Runs.CIs"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "145D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Runs.RelationshipFile"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "77D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Runs.EpoFile"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "97D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Runs.SolusiFile"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "118D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Runs.ContractFile"
+          }
+        }
+      ]
+    }
   }
 }

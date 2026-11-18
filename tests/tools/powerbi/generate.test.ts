@@ -82,6 +82,21 @@ test('the theme uses the colours of LOOK.md (src/app/styles.css) and the committ
   assert.deepEqual(JSON.parse(readFileSync(THEME_FILE, 'utf8')), theme());
 });
 
+test('the theme: Segoe UI, no text under 9 pt, totals off, the header of a table on one line, the cards with no title (D311)', () => {
+  const written = theme() as { visualStyles: Record<string, Record<string, Record<string, Array<Record<string, unknown>>>>>; textClasses: Record<string, { fontSize: number; fontFace: string }> };
+  for (const [name, text] of Object.entries(written.textClasses)) {
+    assert.ok(text.fontSize >= 9, name);
+    assert.match(text.fontFace, /^Segoe UI/, name);
+  }
+  for (const size of JSON.stringify(written).matchAll(/"fontSize":(\d+)/g)) assert.ok(Number(size[1]) >= 9, size[0]);
+  assert.equal(written.visualStyles.tableEx!['*']!.total![0]!.totals, false);
+  assert.equal(written.visualStyles.pivotTable!['*']!.subTotals![0]!.rowSubtotals, false);
+  assert.equal(written.visualStyles.pivotTable!['*']!.subTotals![0]!.columnSubtotals, false);
+  assert.equal(written.visualStyles.tableEx!['*']!.columnHeaders![0]!.wordWrap, false);
+  assert.equal(written.visualStyles.tableEx!['*']!.values![0]!.wordWrap, true);
+  assert.equal(written.visualStyles['*']!['*']!.subTitle![0]!.titleWrap, true);
+});
+
 test('the packed check files are every check file, and the unit cases cover each reading function', () => {
   const packed = JSON.parse(queries().find((query) => query.name === 'CheckFiles')!.m.replace(/^"|"$/g, '').replace(/""/g, '"').replace(/#\(#\)\(/g, '#(')) as Array<{ pack: { id: string } }>;
   assert.equal(packed.length, loadPackFiles().length);

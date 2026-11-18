@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "checks",
   "position": {
-    "x": 24,
-    "y": 144,
+    "x": 224,
+    "y": 84,
     "z": 3000,
-    "height": 524,
-    "width": 1232,
+    "height": 356,
+    "width": 1032,
     "tabOrder": 3000
   },
   "visual": {
@@ -43,7 +43,7 @@
               },
               "queryRef": "SelfCheck.ExpectedState",
               "nativeQueryRef": "ExpectedState",
-              "displayName": "Expected state"
+              "displayName": "Expected"
             },
             {
               "field": {
@@ -157,35 +157,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "title": [
         {
@@ -219,8 +190,149 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SelfCheck"
+                    }
+                  },
+                  "Property": "Self-check result"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "124D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.CheckId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "108D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.ExpectedState"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "108D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.ExpectedToSolve"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "108D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.ExpectedToCheck"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "101D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.ExpectedWaiting"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.ExpectedKnown"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "128D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.Found"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "224D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "SelfCheck.Why"
+          }
+        }
+      ]
+    }
   }
 }

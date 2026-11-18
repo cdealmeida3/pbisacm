@@ -1,0 +1,222 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "found",
+  "position": {
+    "x": 744,
+    "y": 396,
+    "z": 7000,
+    "height": 144,
+    "width": 512,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
+                    }
+                  },
+                  "Property": "CardLabel"
+                }
+              },
+              "queryRef": "Checks.CardLabel",
+              "nativeQueryRef": "CardLabel",
+              "displayName": "Check"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Period findings"
+                }
+              },
+              "queryRef": "History.Period findings",
+              "nativeQueryRef": "Period findings",
+              "displayName": "To solve"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Period CIs"
+                }
+              },
+              "queryRef": "History.Period CIs",
+              "nativeQueryRef": "Period CIs",
+              "displayName": "CIs"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "New in the period"
+                }
+              },
+              "queryRef": "History.New in the period",
+              "nativeQueryRef": "New in the period",
+              "displayName": "New"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "History"
+                  }
+                },
+                "Property": "Period findings"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Found per check in the period'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Found per check'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Found note"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "188D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CardLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "117D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Period findings"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "83D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Period CIs"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "83D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.New in the period"
+          }
+        }
+      ]
+    }
+  }
+}

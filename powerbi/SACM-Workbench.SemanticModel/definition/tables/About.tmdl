@@ -8,6 +8,10 @@ table About
 	/// The line at the foot of every page.
 	measure 'About line' = "SACM Workbench " & SELECTEDVALUE ( About[Version] ) & " · " & SELECTEDVALUE ( About[Data] ) & " · refreshed " & FORMAT ( MAX ( About[RefreshedAt] ), "d mmm yyyy hh:nn" )
 
+	/// The line at the foot of the rail of every page (design pass §3.2): the version, where the data comes from, when it was refreshed.
+	measure 'Rail line' = SELECTEDVALUE ( About[Version] ) & " · " & IF ( SELECTEDVALUE ( About[SourceMode] ) = "Sample", "Sample data", "SharePoint" ) & " · refreshed " & FORMAT ( MAX ( About[RefreshedAt] ), "d mmm hh:nn" )
+		displayFolder: Page notes
+
 	column Version
 		dataType: string
 		sourceColumn: Version

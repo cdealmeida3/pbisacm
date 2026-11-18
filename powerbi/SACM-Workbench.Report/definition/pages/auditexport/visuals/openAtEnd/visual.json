@@ -1,0 +1,338 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "openAtEnd",
+  "position": {
+    "x": 224,
+    "y": 552,
+    "z": 8000,
+    "height": 152,
+    "width": 1032,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "History.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "CI"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "ClassLabel"
+                }
+              },
+              "queryRef": "History.ClassLabel",
+              "nativeQueryRef": "ClassLabel",
+              "displayName": "Class"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
+                    }
+                  },
+                  "Property": "CardLabel"
+                }
+              },
+              "queryRef": "Checks.CardLabel",
+              "nativeQueryRef": "CardLabel",
+              "displayName": "Check"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Field"
+                }
+              },
+              "queryRef": "History.Field",
+              "nativeQueryRef": "Field",
+              "displayName": "Field"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Open first seen"
+                }
+              },
+              "queryRef": "History.Open first seen",
+              "nativeQueryRef": "Open first seen",
+              "displayName": "First seen"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Open age"
+                }
+              },
+              "queryRef": "History.Open age",
+              "nativeQueryRef": "Open age",
+              "displayName": "Age in days"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "ContactName"
+                }
+              },
+              "queryRef": "History.ContactName",
+              "nativeQueryRef": "ContactName",
+              "displayName": "Person asked"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "State"
+                }
+              },
+              "queryRef": "History.State",
+              "nativeQueryRef": "State",
+              "displayName": "Listed as"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "History"
+                  }
+                },
+                "Property": "Open age"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Open at the end of the period (the newest CI report on or before its last day)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Open at the end of the period'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Open at end note"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "149D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.ClassLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CardLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Field"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "121D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Open first seen"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "128D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Open age"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "173D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.ContactName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "115D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.State"
+          }
+        }
+      ]
+    }
+  }
+}

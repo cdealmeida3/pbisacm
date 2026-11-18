@@ -1,0 +1,570 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "reviews",
+  "position": {
+    "x": 224,
+    "y": 84,
+    "z": 3000,
+    "height": 384,
+    "width": 1032,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Order"
+                }
+              },
+              "queryRef": "ReviewLines.Order",
+              "nativeQueryRef": "Order",
+              "displayName": "#"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "ReviewLabel"
+                }
+              },
+              "queryRef": "ReviewLines.ReviewLabel",
+              "nativeQueryRef": "ReviewLabel",
+              "displayName": "Review"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "GroupLabel"
+                }
+              },
+              "queryRef": "ReviewLines.GroupLabel",
+              "nativeQueryRef": "GroupLabel",
+              "displayName": "Part"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "ReviewLines.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "ClassLabel"
+                }
+              },
+              "queryRef": "ReviewLines.ClassLabel",
+              "nativeQueryRef": "ClassLabel",
+              "displayName": "Class"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "EpoId"
+                }
+              },
+              "queryRef": "ReviewLines.EpoId",
+              "nativeQueryRef": "EpoId",
+              "displayName": "EPO ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "ReviewLines.Status",
+              "nativeQueryRef": "Status",
+              "displayName": "ServiceNow"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "EpoStatusWords"
+                }
+              },
+              "queryRef": "ReviewLines.EpoStatusWords",
+              "nativeQueryRef": "EpoStatusWords",
+              "displayName": "EPO"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "ResultLabel"
+                }
+              },
+              "queryRef": "ReviewLines.ResultLabel",
+              "nativeQueryRef": "ResultLabel",
+              "displayName": "Result"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Note"
+                }
+              },
+              "queryRef": "ReviewLines.Note",
+              "nativeQueryRef": "Note",
+              "displayName": "Note"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CheckedBy"
+                }
+              },
+              "queryRef": "ReviewLines.CheckedBy",
+              "nativeQueryRef": "CheckedBy",
+              "displayName": "Checked by"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CheckedOn"
+                }
+              },
+              "queryRef": "ReviewLines.CheckedOn",
+              "nativeQueryRef": "CheckedOn",
+              "displayName": "Checked on"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CaseStatus"
+                }
+              },
+              "queryRef": "ReviewLines.CaseStatus",
+              "nativeQueryRef": "CaseStatus",
+              "displayName": "Case"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "FirstMessage"
+                }
+              },
+              "queryRef": "ReviewLines.FirstMessage",
+              "nativeQueryRef": "FirstMessage",
+              "displayName": "Asked on"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Reminders"
+                }
+              },
+              "queryRef": "ReviewLines.Reminders",
+              "nativeQueryRef": "Reminders",
+              "displayName": "Reminders"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "EscalatedOn"
+                }
+              },
+              "queryRef": "ReviewLines.EscalatedOn",
+              "nativeQueryRef": "EscalatedOn",
+              "displayName": "Escalated"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "ReviewLines"
+                  }
+                },
+                "Property": "Order"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The lifecycle review: each CI of each review with its mark and the follow-up of its case, then the CIs of the next review'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The lifecycle review'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Review line"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "38D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Order"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "59D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.ReviewLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "46D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.GroupLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "48D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "52D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.ClassLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "59D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.EpoId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "86D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Status"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "39D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.EpoStatusWords"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "59D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.ResultLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "48D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Note"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "86D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CheckedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "86D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CheckedOn"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "46D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CaseStatus"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "73D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.FirstMessage"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "80D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Reminders"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "80D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.EscalatedOn"
+          }
+        }
+      ]
+    }
+  }
+}

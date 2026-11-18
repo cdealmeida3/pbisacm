@@ -11,6 +11,14 @@ table Journal
 			VAR n = CALCULATE ( COUNTROWS ( JournalKeys ), TREATAS ( keys, JournalKeys[Key] ) )
 			RETURN IF ( n > 0, n & IF ( n = 1, " finding", " findings" ) )
 
+	/// Under the title of the timeline (Case, Person): the order, or why the box is empty.
+	measure 'Timeline note' = IF ( COUNTROWS ( Journal ) + 0 = 0, "Nothing recorded yet: the team's actions show here.", "What the team did, oldest first." )
+		displayFolder: Page notes
+
+	/// Under the title of the actions of the period (Audit export).
+	measure 'Actions note' = IF ( COUNTROWS ( Journal ) + 0 = 0, "No action in the period chosen.", "The journal of the team in the period chosen." )
+		displayFolder: Page notes
+
 	column Id
 		dataType: string
 		sourceColumn: Id

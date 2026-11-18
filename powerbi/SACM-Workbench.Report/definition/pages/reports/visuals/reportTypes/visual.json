@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "reportTypes",
   "position": {
-    "x": 24,
+    "x": 224,
     "y": 84,
-    "z": 2000,
-    "height": 200,
-    "width": 1232,
-    "tabOrder": 2000
+    "z": 3000,
+    "height": 220,
+    "width": 1032,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "tableEx",
@@ -191,30 +191,103 @@
           }
         }
       ],
-      "columnHeaders": [
+      "columnWidth": [
         {
           "properties": {
-            "fontFamily": {
+            "value": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
+                  "Value": "91D"
                 }
               }
             }
+          },
+          "selector": {
+            "metadata": "ReportTypes.Label"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "193D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReportTypes.NewestFile"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReportTypes.NewestDate"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "105D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReportTypes.Report age"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "84D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReportTypes.Report state"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "112D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReportTypes.Newest rows"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "281D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReportTypes.Hint"
           }
         }
       ]
@@ -247,6 +320,31 @@
               "expr": {
                 "Literal": {
                   "Value": "'Report types'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReportTypes"
+                    }
+                  },
+                  "Property": "Report types note"
                 }
               }
             }

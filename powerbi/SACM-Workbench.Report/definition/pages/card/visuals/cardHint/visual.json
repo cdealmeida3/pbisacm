@@ -2,21 +2,32 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "cardHint",
   "position": {
-    "x": 24,
-    "y": 92,
-    "z": 1600,
-    "height": 40,
-    "width": 820,
-    "tabOrder": 1600
+    "x": 224,
+    "y": 48,
+    "z": 4000,
+    "height": 32,
+    "width": 640,
+    "tabOrder": 4000
   },
   "visual": {
-    "visualType": "card",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
+    "visualType": "actionButton",
+    "objects": {
+      "text": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "text": {
+              "expr": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
@@ -24,23 +35,6 @@
                     }
                   },
                   "Property": "Card hint"
-                }
-              },
-              "queryRef": "Checks.Card hint",
-              "nativeQueryRef": "Card hint"
-            }
-          ]
-        }
-      }
-    },
-    "objects": {
-      "labels": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "12D"
                 }
               }
             },
@@ -51,21 +45,106 @@
                 }
               }
             },
-            "color": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#2b2623'"
+                      "Value": "'#655a52'"
                     }
                   }
+                }
+              }
+            },
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            },
+            "verticalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'middle'"
+                }
+              }
+            },
+            "leftMargin": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "rightMargin": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "icon": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
           }
         }
       ],
-      "categoryLabels": [
+      "fill": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fillColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#ffffff'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "outline": [
         {
           "properties": {
             "show": {
@@ -80,26 +159,13 @@
       ]
     },
     "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
       "general": [
         {
           "properties": {
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'What to do'"
+                  "Value": "'What the card finds'"
                 }
               }
             }

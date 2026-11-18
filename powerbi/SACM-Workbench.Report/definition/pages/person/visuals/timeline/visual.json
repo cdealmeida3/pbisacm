@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "timeline",
   "position": {
-    "x": 24,
-    "y": 680,
-    "z": 5600,
+    "x": 224,
+    "y": 464,
+    "z": 5000,
     "height": 240,
-    "width": 1232,
-    "tabOrder": 5600
+    "width": 508,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "tableEx",
@@ -127,35 +127,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "general": [
         {
@@ -183,7 +154,32 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Timeline: what the team did (the journal), oldest first'"
+                  "Value": "'Timeline'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Journal"
+                    }
+                  },
+                  "Property": "Timeline note"
                 }
               }
             }
@@ -191,6 +187,94 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "60D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Journal.At"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "53D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Journal.Who"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "60D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Journal.Type"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "96D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Journal.Subject"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "109D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Journal.Text"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Journal.Timeline mark"
+          }
+        }
+      ]
+    }
   }
 }

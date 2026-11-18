@@ -130,6 +130,28 @@ export function queryOf(projections: Array<{ role: string; projection: Projectio
 
 const readJson = <T>(file: string): T => JSON.parse(readFileSync(file, 'utf8')) as T;
 
+/** The parts of a visual.json the check reads. */
+interface VisualFile {
+  visual?: { visualType: string; query?: { queryState?: Record<string, { projections?: Projection[] }> }; objects?: Record<string, ObjectEntry[]>; visualContainerObjects?: Record<string, ObjectEntry[]> };
+  filterConfig?: { filters: Filter[] };
+}
+interface ObjectEntry { properties?: Record<string, { expr?: FieldRef }>; selector?: unknown }
+
+/** The texts of a visual that a measure writes: its title, its subtitle, the text of a button. */
+export function boundTexts(visual: VisualFile): Array<[string, FieldRef]> {
+  const out: Array<[string, FieldRef]> = [];
+  const places: Array<[string, ObjectEntry[] | undefined]> = [
+    ['title', visual.visual?.visualContainerObjects?.title], ['subtitle', visual.visual?.visualContainerObjects?.subTitle], ['text', visual.visual?.objects?.text]
+  ];
+  for (const [where, entries] of places) {
+    for (const entry of entries ?? []) {
+      const expr = entry.properties?.text?.expr;
+      if (expr?.Measure) out.push([where, { Measure: expr.Measure }]);
+    }
+  }
+  return out;
+}
+
 /** Every query of the report: one per visual, and on a drill-through page one more per drill value (`drillValues`). */
 export function queriesOf(drillValues: Map<string, string[]> = new Map()): VisualQuery[] {
   const queries: VisualQuery[] = [];
@@ -141,18 +163,28 @@ export function queriesOf(drillValues: Map<string, string[]> = new Map()): Visua
     const folder = join(PAGES, pageName, 'visuals');
     if (!existsSync(folder)) continue;
     for (const name of readdirSync(folder).sort()) {
-      const visual = readJson<{ visual?: { visualType: string; query?: { queryState?: Record<string, { projections?: Projection[] }> } }; filterConfig?: { filters: Filter[] } }>(join(folder, name, 'visual.json'));
+      const visual = readJson<VisualFile>(join(folder, name, 'visual.json'));
+      const filters = [...(page.filterConfig?.filters ?? []), ...(visual.filterConfig?.filters ?? [])];
+      const base = { page: page.displayName, pageName, visual: name, type: visual.visual?.visualType ?? '', title: name };
+      const runs: Array<{ column: string; value: string } | undefined> = drillField
+        ? [{ column: drillField.dax, value: '' }, ...(drillValues.get(drillField.dax) ?? []).map((value) => ({ column: drillField.dax, value }))]
+        : [undefined];
+      const drillOf = (drill: { column: string; value: string } | undefined) => (drill ? { dax: drill.column, value: drill.value === '' ? '' : `"${drill.value.replace(/"/g, '""')}"` } : undefined);
+      // The texts a measure writes: the title and the line under it (the empty state, D318), the text of a button.
+      // A filter of a visual on a measure filters its lines, not these texts, so it is left out.
+      const columnFilters = filters.filter((item) => !item.field?.Measure);
+      for (const [where, field] of boundTexts(visual)) {
+        for (const drill of runs) {
+          const query = queryOf([{ role: 'Values', projection: { field, queryRef: where, displayName: field.Measure?.Property ?? where } }], columnFilters, drillOf(drill));
+          queries.push({ ...base, type: 'text', title: `${name} ${where}`, ...query, ...(drill ? { drill } : {}) });
+        }
+      }
       const state = visual.visual?.query?.queryState;
       if (!state) continue;
       const projections = Object.entries(state).flatMap(([role, value]) => (value.projections ?? []).map((projection) => ({ role, projection })));
       if (!projections.length) continue;
-      const filters = [...(page.filterConfig?.filters ?? []), ...(visual.filterConfig?.filters ?? [])];
-      const base = { page: page.displayName, pageName, visual: name, type: visual.visual!.visualType, title: name };
-      const runs: Array<{ column: string; value: string } | undefined> = drillField
-        ? [{ column: drillField.dax, value: '' }, ...(drillValues.get(drillField.dax) ?? []).map((value) => ({ column: drillField.dax, value }))]
-        : [undefined];
       for (const drill of runs) {
-        const query = queryOf(projections, filters, drill ? { dax: drill.column, value: drill.value === '' ? '' : `"${drill.value.replace(/"/g, '""')}"` } : undefined);
+        const query = queryOf(projections, filters, drillOf(drill));
         queries.push({ ...base, ...query, ...(drill ? { drill } : {}) });
       }
     }
@@ -217,7 +249,12 @@ export function judge(results: Results, pictures?: Pictures): { problems: string
     if (error) { problems.push(`${where(query)}: the query fails, so Desktop shows the visual empty or broken: ${error.split('\n')[0]}`); continue; }
     const lines = rows ?? [];
     const groups = query.groups.length;
-    if (query.type === 'card') {
+    if (query.type === 'text') {
+      // A title, the line under it or the text of a button that a measure writes: blank leaves a box without its words.
+      if (!lines.length || lines[0]!.every(blank)) problems.push(`${where(query)}: the text from ${query.values.join(', ')} is blank`);
+      continue;
+    }
+    if (query.type === 'card' || query.type === 'multiRowCard') {
       // A card of a column only (no measure) shows the column; one with measures shows the measures.
       if (!lines.length || lines[0]!.slice(query.values.length ? groups : 0).every(blank)) problems.push(`${where(query)}: the card shows "(Blank)" (${query.values.join(', ')})`);
       continue;

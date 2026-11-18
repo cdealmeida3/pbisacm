@@ -99,6 +99,22 @@ table CaseLines
 	measure 'Case first seen' = CALCULATE ( MIN ( History[ReportDate] ), REMOVEFILTERS ( History ), TREATAS ( VALUES ( CaseLines[Key] ), History[Key] ) )
 		formatString: d mmm yyyy
 
+	/// Under the title of Reminders due (My day): the order, or why the box is empty.
+	measure 'Reminders note' = IF ( [Reminders due] = 0, "Nobody to remind today.", "The oldest first: one line per person and card." )
+		displayFolder: Page notes
+
+	/// Under the title of To escalate (My day): what it means, or why the box is empty.
+	measure 'Escalations note' = IF ( [To escalate] = 0, "Nobody to escalate today.", "Every reminder went out and no answer came: write to their manager." )
+		displayFolder: Page notes
+
+	/// Under the title of Assigned to me (My work): whose work it is, or why the box is empty.
+	measure 'Assigned note' = IF ( NOT ISBLANK ( [Me] ) && [Mine] = 0, "Nothing is assigned to " & [Me] & ". Free lines are on the Card pages.", [My work line] )
+		displayFolder: Page notes
+
+	/// Under the title of Cases not followed up (Not followed): what to do, or why the box is empty.
+	measure 'Not followed note' = IF ( COUNTROWS ( CaseLines ) + 0 = 0, "No case is set aside: the team follows every case.", "Select lines, then Follow again in the app." )
+		displayFolder: Page notes
+
 	column Key
 		dataType: string
 		isDataTypeInferred

@@ -3,7 +3,7 @@
   "name": "person",
   "displayName": "Person",
   "displayOption": "FitToPage",
-  "height": 1144,
+  "height": 720,
   "width": 1280,
   "filterConfig": {
     "filters": [

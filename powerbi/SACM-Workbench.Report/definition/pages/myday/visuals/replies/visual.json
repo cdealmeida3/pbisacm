@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "replies",
   "position": {
-    "x": 24,
-    "y": 240,
-    "z": 2000,
-    "height": 220,
-    "width": 616,
-    "tabOrder": 2000
+    "x": 224,
+    "y": 192,
+    "z": 8000,
+    "height": 248,
+    "width": 508,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -112,35 +112,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "general": [
         {
@@ -174,8 +145,107 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RepliesToRead"
+                    }
+                  },
+                  "Property": "Replies note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "74D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RepliesToRead.From"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "163D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RepliesToRead.FirstLine"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "86D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RepliesToRead.Received"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "52D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RepliesToRead.CIs"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "93D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RepliesToRead.Reply step"
+          }
+        }
+      ]
+    }
   }
 }

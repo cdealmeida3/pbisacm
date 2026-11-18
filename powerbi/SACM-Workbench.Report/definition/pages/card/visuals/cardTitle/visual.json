@@ -2,21 +2,32 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "cardTitle",
   "position": {
-    "x": 24,
-    "y": 52,
-    "z": 1500,
-    "height": 40,
-    "width": 820,
-    "tabOrder": 1500
+    "x": 224,
+    "y": 12,
+    "z": 2000,
+    "height": 36,
+    "width": 640,
+    "tabOrder": 2000
   },
   "visual": {
-    "visualType": "card",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
+    "visualType": "actionButton",
+    "objects": {
+      "text": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "text": {
+              "expr": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
@@ -25,33 +36,23 @@
                   },
                   "Property": "Card title"
                 }
-              },
-              "queryRef": "Checks.Card title",
-              "nativeQueryRef": "Card title"
-            }
-          ]
-        }
-      }
-    },
-    "objects": {
-      "labels": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "14D"
-                }
               }
             },
             "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segoe UI'"
+                  "Value": "'Segoe UI Semibold'"
                 }
               }
             },
-            "color": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            },
+            "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
@@ -61,11 +62,89 @@
                   }
                 }
               }
+            },
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            },
+            "verticalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'middle'"
+                }
+              }
+            },
+            "leftMargin": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "rightMargin": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "icon": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
             }
           }
         }
       ],
-      "categoryLabels": [
+      "fill": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fillColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#ffffff'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "outline": [
         {
           "properties": {
             "show": {
@@ -80,26 +159,13 @@
       ]
     },
     "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
       "general": [
         {
           "properties": {
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'The card and its state'"
+                  "Value": "'The card'"
                 }
               }
             }

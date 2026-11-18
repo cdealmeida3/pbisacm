@@ -24,6 +24,42 @@ table Findings
 	/// The state of one finding as a colour (LOOK.md): red to solve, blue to check, grey waiting or known.
 	measure 'Finding colour' = SWITCH ( SELECTEDVALUE ( Findings[State] ), "open", "#b42318", "review", "#175cd3", "#475467" )
 
+	/// Under the title of the lines of a card (Card): the order, or why the box is empty. Opened from its tab, the page says how to choose a card.
+	measure 'Lines note' = SWITCH ( TRUE (), NOT ISFILTERED ( Checks[CheckId] ), "No card chosen: on All cards, right-click a line, Drill through, Card.", COUNTROWS ( Findings ) + 0 = 0, "No line: the newest report finds nothing on this card.", "Who is asked about which CI. Owned by, Managed by and Tags are in the export." )
+		displayFolder: Page notes
+
+	/// Under the title of the SACM fix list (Card): only a card SACM fixes itself has lines.
+	measure 'Fix list note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "No fix list: on this card the person asked fixes the CI.", "The change to make in ServiceNow, line by line." )
+		displayFolder: Page notes
+
+	/// Under the title of the lines by kind of problem (Card): only the contract cards have them.
+	measure 'Problems note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "No kinds of problem: only the contract cards have them.", "One table per kind in the email to Procurement." )
+		displayFolder: Page notes
+
+	/// Under the title of the export (Card): how to get the file.
+	measure 'Export note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing to export.", "The columns of the SACM template: More options, Export data." )
+		displayFolder: Page notes
+
+	/// Under the title of the CI (Case).
+	measure 'CI note' = IF ( NOT ISFILTERED ( Findings[CiName] ), "No CI chosen: right-click a line of a card, Drill through, Case.", "As the newest CI report shows it." )
+		displayFolder: Page notes
+
+	/// Under the title of the problems of a CI (Case).
+	measure 'Case problems note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "No problem: the newest report finds nothing on this CI.", "Each problem of the newest report, its state and who is asked." )
+		displayFolder: Page notes
+
+	/// Under the title of the people of a CI (Case).
+	measure 'People note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nobody is asked about this CI.", "Who is asked, who is copied, and who gets an escalation." )
+		displayFolder: Page notes
+
+	/// Under the title of the person (Person). Opened from its tab, the page says how to choose a person.
+	measure 'Person note' = IF ( NOT ISFILTERED ( Findings[ContactName] ), "No person chosen: right-click a name on a page, Drill through, Person.", "Who they are and why the team asks them." )
+		displayFolder: Page notes
+
+	/// Under the title of what is open with a person (Person).
+	measure 'Open with note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers." )
+		displayFolder: Page notes
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred

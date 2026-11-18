@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "teams",
   "position": {
-    "x": 24,
-    "y": 420,
-    "z": 2200,
-    "height": 248,
-    "width": 616,
-    "tabOrder": 2200
+    "x": 224,
+    "y": 452,
+    "z": 10000,
+    "height": 252,
+    "width": 508,
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "pivotTable",
@@ -72,35 +72,6 @@
         }
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "general": [
         {
@@ -129,6 +100,31 @@
               "expr": {
                 "Literal": {
                   "Value": "'To solve per support group'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Per group note"
                 }
               }
             }

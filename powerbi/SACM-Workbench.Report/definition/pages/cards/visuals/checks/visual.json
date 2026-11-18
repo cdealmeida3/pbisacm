@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "checks",
   "position": {
-    "x": 24,
-    "y": 144,
-    "z": 5000,
-    "height": 436,
-    "width": 1232,
-    "tabOrder": 5000
+    "x": 224,
+    "y": 140,
+    "z": 7000,
+    "height": 448,
+    "width": 1032,
+    "tabOrder": 7000
   },
   "visual": {
     "visualType": "tableEx",
@@ -188,33 +188,6 @@
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
@@ -262,6 +235,148 @@
             "metadata": "Checks.Card state"
           }
         }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Section"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "92D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CardLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "98D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CheckId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "74D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Card state"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "81D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Card number"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "68D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Card fact"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "68D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Card time"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "227D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CardHint"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "117D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Card note"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "74D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Card order"
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -292,6 +407,31 @@
               "expr": {
                 "Literal": {
                   "Value": "'Cards'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
+                    }
+                  },
+                  "Property": "Cards note"
                 }
               }
             }

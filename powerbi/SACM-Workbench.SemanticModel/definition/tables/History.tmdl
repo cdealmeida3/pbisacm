@@ -198,6 +198,30 @@ table History
 			            & FORMAT ( AVERAGEX ( verified, [@days] ), "0" ) & " days from the first report · the longest " & FORMAT ( MAXX ( verified, [@days] ), "0" ) & " days."
 			    )
 
+	/// Under the title of the trend (History).
+	measure 'Trend note' = IF ( [Report dates] + 0 < 2, "One CI report so far: the trend shows from the second.", "Each CI report date, for 24 months." )
+		displayFolder: Page notes
+
+	/// Under the title of the days to fix (History).
+	measure 'Days to fix note' = IF ( [Report dates] + 0 < 2, "One CI report so far: the days show from the second.", "Average days from the first report that showed a finding to the one that no longer did." )
+		displayFolder: Page notes
+
+	/// Under the title of the per group and per class tables (History).
+	measure 'Per group note' = IF ( [History to solve] = 0, "Nothing to solve on the report dates chosen.", "To solve on each CI report date." )
+		displayFolder: Page notes
+
+	/// Under the title of the record (Audit).
+	measure 'Record note' = "Per check, on " & FORMAT ( COALESCE ( MAX ( Runs[ReportDate] ), [Newest report date] ), "d mmm yyyy" ) & ": the newest report date when none is chosen."
+		displayFolder: Page notes
+
+	/// Under the title of found per check (Audit export).
+	measure 'Found note' = IF ( ISBLANK ( [Period findings] ), "Nothing found in the period chosen.", "Each check with what it found in the period chosen." )
+		displayFolder: Page notes
+
+	/// Under the title of open at the end of the period (Audit export).
+	measure 'Open at end note' = "Open on the newest CI report on or before " & FORMAT ( [Period to], "d mmm yyyy" ) & "."
+		displayFolder: Page notes
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred

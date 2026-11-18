@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "history",
   "position": {
-    "x": 24,
-    "y": 740,
-    "z": 5100,
-    "height": 312,
-    "width": 1232,
-    "tabOrder": 5100
+    "x": 224,
+    "y": 452,
+    "z": 4000,
+    "height": 252,
+    "width": 1032,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "tableEx",
@@ -97,35 +97,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "general": [
         {
@@ -153,7 +124,32 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'The history and the team''s state (two report dates, the sample lists)'"
+                  "Value": "'The history and the state of the team'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "HistoryExpected"
+                    }
+                  },
+                  "Property": "History self-check"
                 }
               }
             }
@@ -161,6 +157,66 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "467D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HistoryExpected.Metric"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "175D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HistoryExpected.Expected"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "195D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HistoryExpected.History found"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "154D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HistoryExpected.History match"
+          }
+        }
+      ]
+    }
   }
 }

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "notRead",
   "position": {
-    "x": 24,
-    "y": 478,
-    "z": 5000,
-    "height": 188,
-    "width": 800,
-    "tabOrder": 5000
+    "x": 224,
+    "y": 520,
+    "z": 6000,
+    "height": 184,
+    "width": 720,
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "tableEx",
@@ -82,35 +82,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "title": [
         {
@@ -144,8 +115,79 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "NotRead"
+                    }
+                  },
+                  "Property": "Not read note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "193D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "NotRead.FileName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "118D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "NotRead.ReportDate"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "368D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "NotRead.Message"
+          }
+        }
+      ]
+    }
   }
 }

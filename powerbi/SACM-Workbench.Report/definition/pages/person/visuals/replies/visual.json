@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "replies",
   "position": {
-    "x": 24,
-    "y": 928,
-    "z": 5700,
-    "height": 160,
-    "width": 1232,
-    "tabOrder": 5700
+    "x": 744,
+    "y": 464,
+    "z": 6000,
+    "height": 240,
+    "width": 512,
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "tableEx",
@@ -88,7 +88,7 @@
               },
               "queryRef": "Replies.Reply mark",
               "nativeQueryRef": "Reply mark",
-              "displayName": "Reference"
+              "displayName": "Ref"
             }
           ]
         }
@@ -111,35 +111,6 @@
         ],
         "isDefaultSort": true
       }
-    },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "visualContainerObjects": {
       "general": [
@@ -174,8 +145,107 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Replies"
+                    }
+                  },
+                  "Property": "Replies list note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "86D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Replies.Received"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "59D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Replies.From"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "94D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Replies.Subject"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "179D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Replies.Body"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "52D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Replies.Reply mark"
+          }
+        }
+      ]
+    }
   }
 }

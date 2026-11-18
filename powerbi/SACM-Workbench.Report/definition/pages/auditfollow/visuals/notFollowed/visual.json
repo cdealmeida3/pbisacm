@@ -1,0 +1,308 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "notFollowed",
+  "position": {
+    "x": 224,
+    "y": 396,
+    "z": 4000,
+    "height": 308,
+    "width": 720,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "CaseLines.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "CI"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "CheckId"
+                }
+              },
+              "queryRef": "CaseLines.CheckId",
+              "nativeQueryRef": "CheckId",
+              "displayName": "Check"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "ExceptionReason"
+                }
+              },
+              "queryRef": "CaseLines.ExceptionReason",
+              "nativeQueryRef": "ExceptionReason",
+              "displayName": "Reason"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "ReviewOn"
+                }
+              },
+              "queryRef": "CaseLines.ReviewOn",
+              "nativeQueryRef": "ReviewOn",
+              "displayName": "Review on"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "AssignedTo"
+                }
+              },
+              "queryRef": "CaseLines.AssignedTo",
+              "nativeQueryRef": "AssignedTo",
+              "displayName": "Assigned to"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "CaseLines"
+                  }
+                },
+                "Property": "CiName"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The cases not followed up: select lines for Follow again in the app SACM actions'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cases not followed up'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Not followed note"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "141D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "102D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.CheckId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "162D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.ExceptionReason"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "130D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.ReviewOn"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "143D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.AssignedTo"
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "notFollowedFilter",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Status"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "c",
+              "Entity": "CaseLines",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "c"
+                          }
+                        },
+                        "Property": "Status"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Not followed up'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "parked",
   "position": {
-    "x": 24,
-    "y": 588,
-    "z": 5500,
-    "height": 84,
-    "width": 1232,
-    "tabOrder": 5500
+    "x": 224,
+    "y": 600,
+    "z": 8000,
+    "height": 104,
+    "width": 1032,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -28,7 +28,7 @@
               },
               "queryRef": "Parked.Line",
               "nativeQueryRef": "Line",
-              "displayName": "Classes that are not checked yet"
+              "displayName": "Classes"
             }
           ]
         }
@@ -51,35 +51,6 @@
         ],
         "isDefaultSort": true
       }
-    },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "visualContainerObjects": {
       "title": [
@@ -114,8 +85,51 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Parked"
+                    }
+                  },
+                  "Property": "Parked note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "992D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Parked.Line"
+          }
+        }
+      ]
+    }
   }
 }

@@ -2,21 +2,32 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "reportsLine",
   "position": {
-    "x": 24,
-    "y": 84,
-    "z": 1050,
-    "height": 32,
-    "width": 1000,
-    "tabOrder": 1050
+    "x": 836,
+    "y": 24,
+    "z": 3000,
+    "height": 40,
+    "width": 420,
+    "tabOrder": 3000
   },
   "visual": {
-    "visualType": "card",
-    "query": {
-      "queryState": {
-        "Values": {
-          "projections": [
-            {
-              "field": {
+    "visualType": "actionButton",
+    "objects": {
+      "text": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "text": {
+              "expr": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
@@ -24,23 +35,6 @@
                     }
                   },
                   "Property": "Reports line"
-                }
-              },
-              "queryRef": "ReportTypes.Reports line",
-              "nativeQueryRef": "Reports line"
-            }
-          ]
-        }
-      }
-    },
-    "objects": {
-      "labels": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "11D"
                 }
               }
             },
@@ -51,7 +45,14 @@
                 }
               }
             },
-            "color": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
@@ -61,11 +62,89 @@
                   }
                 }
               }
+            },
+            "horizontalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            },
+            "verticalAlignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'middle'"
+                }
+              }
+            },
+            "leftMargin": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "rightMargin": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "icon": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
             }
           }
         }
       ],
-      "categoryLabels": [
+      "fill": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fillColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#ffffff'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "outline": [
         {
           "properties": {
             "show": {
@@ -86,20 +165,41 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'The reports: how many, the newest date, and whether one is missing or too old'"
+                  "Value": "'The reports: press to open the page Reports'"
                 }
               }
             }
           }
         }
       ],
-      "title": [
+      "visualLink": [
         {
           "properties": {
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'PageNavigation'"
+                }
+              }
+            },
+            "navigationSection": {
+              "expr": {
+                "Literal": {
+                  "Value": "'reports'"
+                }
+              }
+            },
+            "tooltip": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Open Reports'"
                 }
               }
             }

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { daxLiteral, judge, queriesOf, queryOf } from '../../../tools/powerbi/desktop.ts';
-import type { Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
+import { boundTexts, daxLiteral, judge, judgePictures, pageList, queriesOf, queryOf } from '../../../tools/powerbi/desktop.ts';
+import type { Pictures, Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
 
 /*
  * The Desktop check (tools/powerbi/desktop.ts, D309): the DAX query of each visual, and the judge that says what Desktop
@@ -61,4 +61,45 @@ test('the judge finds the faults of 0.44.0: a failing query, "(Blank)" on a card
 
 test('the judge says when Desktop did not open the project', () => {
   assert.match(judge({ opened: false, openError: 'refresh policy', modelErrors: [], results: [] }).problems[0]!, /did not open/);
+});
+
+test('the line under a title and a text a measure writes are asked too, so an empty box never says nothing (D318)', () => {
+  const texts = boundTexts({
+    visual: {
+      visualContainerObjects: { subTitle: [{ properties: { text: { expr: measure('Findings', 'Lines note') } } }], title: [{ properties: { text: { expr: { Literal: { Value: "'Lines'" } } } } }] },
+      objects: { text: [{ properties: { text: { expr: measure('About', 'Rail line') } } }] }
+    }
+  } as never);
+  assert.deepEqual(texts.map(([where]) => where), ['subtitle', 'text']);
+  const queries = queriesOf(new Map());
+  assert.ok(queries.some((query) => query.type === 'text' && query.values[0] === 'Lines note'));
+  const { problems } = judge({ opened: true, modelErrors: [], results: [{ query: { ...visual('text', [], ['Lines note']), type: 'text' }, rows: [[null]] }] });
+  assert.match(problems[0]!, /the text from .* is blank/);
+});
+
+test('the list of the pages: the drill-through pages and Self-check are hidden, every page is 1280 wide (D312)', () => {
+  const pages = pageList();
+  assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['card', 'case', 'person', 'selfcheck']);
+  assert.deepEqual(pages.filter((page) => page.drillThrough).map((page) => page.name).sort(), ['card', 'case', 'person']);
+  for (const page of pages) assert.equal(page.width, 1280, page.name);
+});
+
+test('the pictures: a page with no tab, a broken word or a slow page is a problem; a page in time is a note', () => {
+  const pictures: Pictures = {
+    taken: true,
+    pages: [
+      { page: 'myday', displayName: 'My day', found: true, seconds: 1.2, file: '01-myday.png', broken: [] },
+      { page: 'cards', displayName: 'Cards', found: false, seconds: null, file: null, broken: [] },
+      { page: 'backlog', displayName: 'Backlog', found: true, seconds: 1.0, file: '03-backlog.png', broken: ['(Blank)'] },
+      { page: 'history', displayName: 'History', found: true, seconds: 4.5, file: '04-history.png', broken: [] }
+    ]
+  };
+  const notes: string[] = [];
+  const problems = judgePictures(pictures, notes);
+  assert.equal(problems.length, 3);
+  assert.match(problems.join('\n'), /Cards/);
+  assert.match(problems.join('\n'), /\(Blank\)/);
+  assert.match(problems.join('\n'), /History.*4\.5/);
+  assert.ok(notes.some((note) => /My day/.test(note)));
+  assert.match(judgePictures({ taken: false, why: 'no window', pages: [] })[0]!, /no window/);
 });

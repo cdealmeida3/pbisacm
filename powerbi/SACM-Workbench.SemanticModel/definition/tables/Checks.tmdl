@@ -153,6 +153,10 @@ table Checks
 			VAR words = three & IF ( three <> "" && greyText <> "", " · " ) & greyText
 			RETURN "Compliance: " & IF ( words = "", "All OK", words )
 
+	/// Under the title of the table of cards (All cards).
+	measure 'Cards note' = IF ( COUNTROWS ( Checks ) + 0 = 0, "No card is about this: choose another subject.", "Red: to solve. Blue: to check. Green: OK. Grey: not tested. Right-click, Drill through, Card." )
+		displayFolder: Page notes
+
 	column CheckId
 		dataType: string
 		sourceColumn: CheckId

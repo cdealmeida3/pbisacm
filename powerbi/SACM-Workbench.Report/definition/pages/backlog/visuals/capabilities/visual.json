@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "capabilities",
   "position": {
-    "x": 24,
-    "y": 468,
-    "z": 3000,
-    "height": 204,
-    "width": 1232,
-    "tabOrder": 3000
+    "x": 224,
+    "y": 416,
+    "z": 5000,
+    "height": 288,
+    "width": 1032,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "tableEx",
@@ -43,7 +43,7 @@
               },
               "queryRef": "CapabilitySheet.Status",
               "nativeQueryRef": "Status",
-              "displayName": "Operational status"
+              "displayName": "Status"
             },
             {
               "field": {
@@ -58,7 +58,7 @@
               },
               "queryRef": "CapabilitySheet.CapabilitiesAbove",
               "nativeQueryRef": "CapabilitiesAbove",
-              "displayName": "Capabilities above"
+              "displayName": "Above"
             },
             {
               "field": {
@@ -73,7 +73,7 @@
               },
               "queryRef": "CapabilitySheet.CapabilitiesBelow",
               "nativeQueryRef": "CapabilitiesBelow",
-              "displayName": "Capabilities below"
+              "displayName": "Below"
             },
             {
               "field": {
@@ -88,7 +88,7 @@
               },
               "queryRef": "CapabilitySheet.ProcessesBelow",
               "nativeQueryRef": "ProcessesBelow",
-              "displayName": "Business Processes below"
+              "displayName": "Processes below"
             },
             {
               "field": {
@@ -188,33 +188,6 @@
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
@@ -225,6 +198,148 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "77D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.Name"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "73D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.Status"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "66D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.CapabilitiesAbove"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "66D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.CapabilitiesBelow"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "134D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.ProcessesBelow"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "157D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.Description"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "77D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.Tags"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.OwnedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.ManagedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "148D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CapabilitySheet.HiddenCharacters"
           }
         }
       ]
@@ -256,7 +371,32 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Capability sheet: every Business Capability (More options, Export data)'"
+                  "Value": "'Capability sheet'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CapabilitySheet"
+                    }
+                  },
+                  "Property": "Capability line"
                 }
               }
             }

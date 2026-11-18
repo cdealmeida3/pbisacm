@@ -1,6 +1,10 @@
 /// The files of no known type, with what each type is missing.
 table NotRead
 
+	/// Under the title of the files not read (Reports).
+	measure 'Not read note' = IF ( COUNTROWS ( NotRead ) + 0 = 0, "Every file in the folder was read.", "A file is known by its columns: these were not." )
+		displayFolder: Page notes
+
 	column FileName
 		dataType: string
 		sourceColumn: FileName

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "export",
   "position": {
-    "x": 24,
-    "y": 680,
-    "z": 4000,
-    "height": 156,
-    "width": 1232,
-    "tabOrder": 4000
+    "x": 224,
+    "y": 556,
+    "z": 8000,
+    "height": 148,
+    "width": 1032,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -172,35 +172,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "title": [
         {
@@ -215,7 +186,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Export for Excel: the columns of the SACM template (More options, Export data)'"
+                  "Value": "'Export for Excel'"
                 }
               }
             }
@@ -234,8 +205,163 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Export note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "85D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "77D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.EpoId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "70D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ClassLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "91D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.OwnedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "104D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ManagedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "159D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Status"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "125D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.SupportGroup"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "85D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Tags"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "188D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Detail"
+          }
+        }
+      ]
+    }
   }
 }

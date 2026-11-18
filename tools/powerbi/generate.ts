@@ -4,7 +4,8 @@
 //     reference files, the reading rules of src/core/sources/ and the recorded result of the samples (tests/recorded/).
 //   - powerbi/SACM-Workbench.SemanticModel/definition/tables/Run.tmdl and HistoryRun.tmdl: the hidden tables Run and
 //     HistoryRun (with its incremental refresh, D290), from the calculated tables that split them.
-//   - powerbi/SACM-Workbench.Report/StaticResources/RegisteredResources/sacm-theme.json: the colours of docs/LOOK.md.
+//   - powerbi/SACM-Workbench.Report/StaticResources/RegisteredResources/sacm-theme.json: the theme, from the design tokens of
+//     tools/powerbi/tokens.ts (the colours of docs/LOOK.md, the text sizes, the page grid).
 // Same repository, same bytes (no date, no random value).
 //   node tools/powerbi/generate.ts            writes both files (npm run powerbi:generate)
 //   node tools/powerbi/generate.ts --check    fails when they are not up to date (also in npm test)
@@ -31,6 +32,7 @@ import { MODEL, readExpressions, readTables, SOURCE_TABLES, tmdlName } from './t
 import type { SourceTable } from './tmdl.ts';
 import { expectedHistory, HISTORY_FILES, STATE_LISTS } from './history.ts';
 import { compilePattern, fastForm } from './regex.ts';
+import { DATA_COLOURS, FONT, FONT_SEMIBOLD, GRID, lightColours, TEXT } from './tokens.ts';
 import { ACTIONS_FILE, APP_FORMULAS_FILE, APP_YAML_FILE, appFormulas, appYaml, AUDIT_APP_FORMULAS_FILE, AUDIT_APP_YAML_FILE, auditFormulas, MESSAGES_APP_FORMULAS_FILE, MESSAGES_APP_YAML_FILE, messagesFormulas } from './actions.ts';
 import { SETTING_LABELS } from '../../src/app/view/setup.ts';
 import { reviewConfig } from '../../src/core/cases/inventory.ts';
@@ -392,34 +394,98 @@ export function runTmdl(source: SourceTable = 'Run'): string {
 
 /* ------------------------------------------------------------------ the theme */
 
-/** The light colours of src/app/styles.css by name (--wb-<name>, the first `:root` block). Power BI reports have one theme. */
-export function lightColours(): Record<string, string> {
-  const css = read('src/app/styles.css');
-  const start = css.indexOf(':root {');
-  const light = css.slice(start, css.indexOf('}', start));
-  const out: Record<string, string> = {};
-  for (const match of light.matchAll(/--wb-([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})/g)) if (!(match[1]! in out)) out[match[1]!] = match[2]!.toLowerCase();
-  return out;
-}
+/** The light colours of src/app/styles.css by name (tokens.ts); kept here for the files that import it from generate.ts. */
+export { lightColours };
 
+/** A colour of a formatting property, as a theme writes it. */
+const solid = (color: string) => ({ solid: { color } });
+
+/**
+ * The theme of the report (design pass §3.1): the colours of LOOK, the text classes, and the look of every visual type
+ * the report uses, so a visual sets only what is its own (its position, fields, title and column widths). Checked against
+ * Microsoft's schema of report themes (tools/powerbi/schemas/theme/, lint step 3).
+ */
 export function theme(): Record<string, unknown> {
   const c = lightColours();
-  const text = (size: number, colour = c.ink!) => ({ fontFace: 'Segoe UI', fontSize: size, color: colour });
+  const text = (size: number, colour = c.ink!, face = FONT) => ({ fontFace: face, fontSize: size, color: colour });
+  const title = { show: true, fontColor: solid(c.ink!), fontFamily: FONT_SEMIBOLD, fontSize: TEXT.title, titleWrap: false, alignment: 'left' };
+  const subTitle = { fontColor: solid(c.muted!), fontFamily: FONT, fontSize: TEXT.subtitle, titleWrap: true, alignment: 'left' };
+  const table = {
+    grid: [{ gridVertical: false, gridHorizontal: true, gridHorizontalColor: solid(c.line!), gridHorizontalWeight: 1, rowPadding: 6, outlineColor: solid(c.line!), textSize: TEXT.table }],
+    columnHeaders: [{ backColor: solid(c['accent-soft']!), fontColor: solid(c.ink!), fontFamily: FONT_SEMIBOLD, fontSize: TEXT.table, wordWrap: false, autoSizeColumnWidth: false, outlineStyle: 0 }],
+    values: [{ fontColorPrimary: solid(c.ink!), fontColorSecondary: solid(c.ink!), backColorPrimary: solid(c.surface!), backColorSecondary: solid(c.surface!), fontFamily: FONT, fontSize: TEXT.table, wordWrap: true, urlIcon: true }],
+    total: [{ totals: false }]
+  };
   return {
     name: 'SACM Workbench',
-    dataColors: [c.accent, c.red, c.blue, c.teal, c.green, c.violet, c.amber, c.grey],
+    dataColors: DATA_COLOURS.map((name) => c[name]),
     foreground: c.ink, foregroundNeutralSecondary: c.muted, foregroundNeutralTertiary: c.muted,
     background: c.surface, backgroundLight: c['surface-2'], backgroundNeutral: c.line,
-    tableAccent: c.accent, hyperlink: c.accent, visualHyperlink: c.accent,
+    tableAccent: c.accent, hyperlink: c.accent, visitedHyperlink: c.accent,
     good: c.green, neutral: c.amber, bad: c.red, maximum: c.red, center: c.amber, minimum: c.green, null: c.grey,
-    textClasses: { title: text(16), header: text(15), label: text(13, c.muted), callout: text(22) },
+    textClasses: {
+      title: text(TEXT.title, c.ink, FONT_SEMIBOLD),
+      header: text(TEXT.table, c.ink, FONT_SEMIBOLD),
+      label: text(TEXT.label, c.muted),
+      callout: text(TEXT.callout, c.ink, FONT_SEMIBOLD)
+    },
     visualStyles: {
       '*': { '*': {
-        background: [{ color: { solid: { color: c.surface } } }],
-        border: [{ show: true, color: { solid: { color: c.line } }, radius: 10 }],
-        title: [{ fontColor: { solid: { color: c.ink } }, fontFamily: 'Segoe UI', fontSize: 12 }]
+        background: [{ show: true, color: solid(c.surface!), transparency: 0 }],
+        border: [{ show: true, color: solid(c.line!), radius: GRID.radius, width: 1 }],
+        dropShadow: [{ show: false }],
+        padding: [{ top: GRID.padding, bottom: GRID.padding, left: GRID.padding, right: GRID.padding }],
+        title: [title],
+        subTitle: [subTitle],
+        spacing: [{ customizeSpacing: true, spaceBelowTitle: 2, spaceBelowSubTitle: 8, spaceBelowTitleArea: 8 }]
       } },
-      page: { '*': { background: [{ color: { solid: { color: c.page } }, transparency: 0 }], outspace: [{ color: { solid: { color: c.page } } }] } }
+      page: { '*': { background: [{ color: solid(c.page!), transparency: 0 }], outspace: [{ color: solid(c.page!), transparency: 0 }] } },
+      tableEx: { '*': table },
+      // A matrix has no total row of its own: its totals are the subtotals of its rows and columns (off: they add up
+      // counts of different days).
+      pivotTable: { '*': {
+        grid: table.grid, columnHeaders: table.columnHeaders,
+        subTotals: [{ rowSubtotals: false, columnSubtotals: false }],
+        rowHeaders: [{ fontColor: solid(c.ink!), fontFamily: FONT, fontSize: TEXT.table, wordWrap: true }],
+        values: [{ ...table.values[0], bandedRowHeaders: false }],
+        rowTotal: [{ fontColor: solid(c.ink!), fontFamily: FONT_SEMIBOLD, fontSize: TEXT.table }],
+        columnTotal: [{ fontColor: solid(c.ink!), fontFamily: FONT_SEMIBOLD, fontSize: TEXT.table }]
+      } },
+      card: { '*': {
+        labels: [{ color: solid(c.ink!), fontFamily: FONT_SEMIBOLD, fontSize: TEXT.callout }],
+        categoryLabels: [{ show: true, color: solid(c.muted!), fontFamily: FONT, fontSize: TEXT.label }],
+        wordWrap: [{ show: true }],
+        title: [{ ...title, show: false }]
+      } },
+      multiRowCard: { '*': {
+        dataLabels: [{ color: solid(c.ink!), fontFamily: FONT, fontSize: TEXT.title }],
+        categoryLabels: [{ show: false, color: solid(c.muted!), fontFamily: FONT, fontSize: TEXT.label }],
+        cardTitle: [{ color: solid(c.ink!), fontFamily: FONT_SEMIBOLD, fontSize: TEXT.title }],
+        card: [{ barShow: false, outlineStyle: 0, cardPadding: 0, cardBackground: solid(c.surface!) }],
+        title: [{ ...title, show: false }],
+        padding: [{ top: 4, bottom: 4, left: GRID.padding, right: GRID.padding }]
+      } },
+      slicer: { '*': {
+        header: [{ show: true, fontColor: solid(c.muted!), fontFamily: FONT, textSize: TEXT.label }],
+        items: [{ fontColor: solid(c.ink!), fontFamily: FONT, textSize: TEXT.table, background: solid(c.surface!) }],
+        title: [{ ...title, show: false }],
+        padding: [{ top: 4, bottom: 4, left: 8, right: 8 }]
+      } },
+      lineChart: { '*': {
+        legend: [{ show: true, position: 'Top', fontFamily: FONT, fontSize: TEXT.label, labelColor: solid(c.muted!) }],
+        categoryAxis: [{ fontFamily: FONT, fontSize: TEXT.label, labelColor: solid(c.muted!), gridlineShow: false, showAxisTitle: false }],
+        valueAxis: [{ fontFamily: FONT, fontSize: TEXT.label, labelColor: solid(c.muted!), gridlineShow: true, gridlineColor: solid(c.line!), showAxisTitle: false }],
+        lineStyles: [{ strokeWidth: 2, showMarker: true, markerSize: 4 }]
+      } },
+      textbox: { '*': {
+        background: [{ show: false }],
+        border: [{ show: false }],
+        padding: [{ top: 0, bottom: 0, left: 0, right: 0 }],
+        title: [{ ...title, show: false }]
+      } },
+      actionButton: { '*': {
+        title: [{ ...title, show: false }]
+      } }
     }
   };
 }

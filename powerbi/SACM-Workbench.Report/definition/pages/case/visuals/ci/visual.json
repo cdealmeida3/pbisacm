@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "ci",
   "position": {
-    "x": 24,
-    "y": 64,
-    "z": 2000,
-    "height": 100,
-    "width": 1232,
-    "tabOrder": 2000
+    "x": 224,
+    "y": 84,
+    "z": 3000,
+    "height": 120,
+    "width": 1032,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "tableEx",
@@ -139,35 +139,6 @@
         }
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "title": [
         {
@@ -201,8 +172,149 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "CI note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "105D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "80D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ClassLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "87D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.EpoId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "169D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Status"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "166D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.SupportGroup"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "132D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.OwnedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "145D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ManagedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "105D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Tags"
+          }
+        }
+      ]
+    }
   }
 }
