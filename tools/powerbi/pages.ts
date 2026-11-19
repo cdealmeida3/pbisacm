@@ -7,7 +7,8 @@
 //      Power Apps visual, and none on the first page.
 //   3. Native visuals only (D311): no custom visual, no R or Python visual, no picture from the web.
 //   4. The grid: every place and size on the 4 px grid, inside the page, inside the content frame (the rail apart),
-//      no two visuals over each other, and none over the place a Power Apps visual is set by hand (APP_SLOTS).
+//      no two visuals over each other, and none over the place a Power Apps visual is set by hand (APP_SLOTS), or the
+//      button Refresh now on the rail of My day and Reports (FLOW_SLOTS, D333; the rail picture under it apart).
 //   5. Tables: every column of a table has its width (a matrix makes a column per value, so it has none), the widths fit the visual (no scroll bar to the side), each header fits on
 //      one line (LOOK rule 3), totals stay off and the values wrap.
 //   6. Titles: a title written in the file fits on one line; every table, matrix and chart shows a line under its title
@@ -26,7 +27,7 @@
 //      every text (rule 8), are checked on the pictures of the Desktop check (desktop.ts, judgeLook).
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { APP_SLOTS, CELL_PADDING, GRID, MIN_TEXT_POINTS, TABLE_CHROME, TEXT, textWidth } from './tokens.ts';
+import { APP_SLOTS, CELL_PADDING, FLOW_SLOTS, GRID, MIN_TEXT_POINTS, TABLE_CHROME, TEXT, textWidth } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 export const REPORT_DEFINITION = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition');
@@ -233,6 +234,8 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
         }
         if (slot && overlap(visual.position, slot)) problems.push(`${at}: over the place of the Power Apps visual ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} × ${slot.height})`);
       }
+      const flowSlot = FLOW_SLOTS[page.name];
+      if (flowSlot && visual.name !== 'rail' && overlap(visual.position, flowSlot)) problems.push(`${at}: over the place of the button Refresh now (the Power Automate visual of ${flowSlot.flow}, ${flowSlot.x}, ${flowSlot.y}, ${flowSlot.width} × ${flowSlot.height})`);
       // 7. Text sizes.
       const formatting = JSON.stringify([visual.visual?.objects ?? {}, visual.visual?.visualContainerObjects ?? {}]);
       const sizes = formatting.matchAll(/"fontSize":\{"expr":\{"Literal":\{"Value":"(\d+(?:\.\d+)?)D"\}\}\}/g);

@@ -78,6 +78,16 @@ export const APP_SLOTS: Record<string, { app: string; x: number; y: number; widt
   case: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 }
 };
 
+/**
+ * The place of the button Refresh now (the Power Automate visual of flow F6, which Carlos adds by hand in the service,
+ * D333): on the rail of My day and Reports, above the line at its foot, under the refresh rule (railRefresh). On the rail
+ * it counts as part of the rail (pages.ts rule 2); no visual may sit over it (rule 4).
+ */
+export const FLOW_SLOTS: Record<string, { flow: string; x: number; y: number; width: number; height: number }> = {
+  myday: { flow: 'SACM refresh now', x: 16, y: 604, width: 156, height: 40 },
+  reports: { flow: 'SACM refresh now', x: 16, y: 604, width: 156, height: 40 }
+};
+
 /** The space a table's column needs beside its header text (the padding of the cell and the sort arrow), in px. */
 export const CELL_PADDING = 16;
 /** The part of a table's width the columns cannot use (the padding of the visual and a vertical scroll bar), in px. */

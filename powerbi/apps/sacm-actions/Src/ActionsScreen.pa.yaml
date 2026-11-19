@@ -1,12 +1,15 @@
-# The one screen of the Power App "SACM actions" (builds B6 and D5, D294 to D296, D317), written by hand. To use it: in
+# The one screen of the Power App "SACM actions" (builds B6, D5 and 0.52.0, D294 to D296, D317, D334), written by hand. To use it: in
 # Power Apps Studio, select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6.4).
 # It is drawn for the places of README §6.4 (300 wide, 300 to 620 high) and grows with a wider place. The reply reader
 # needs 480 high (Person, Case, Work queue); on the short place of Card it says to open the person.
+# At the top, the header line (D334): the time of the report's data and the changes on these lines saved since then,
+# which the report does not show yet. Only the button Refresh now asks flow F5 (SACMRefresh) for a refresh: at most one
+# in each window of the refresh rule (D333), and the flow says when the window was used. No Save refreshes (D332).
 # Two tabs:
 #   - Actions: the manager picks an action the selected lines all have, types or picks what it asks, and presses Save.
-#     Save adds ONE row to the list SACM Journal (never changes or removes a row, D272), then asks flow F5 (SACMRefresh)
-#     to refresh the report. Below: what the team did lately on these lines, read from the list at once (before the
-#     refresh). Share out (build B7) adds one row per member.
+#     Save adds ONE row to the list SACM Journal (never changes or removes a row, D272). Below: what the team did lately
+#     on these lines, read from the list at once, each row not in the report yet marked so. When such a row is of the
+#     same type as the action, Save waits until the manager ticks Save anyway. Share out (build B7) adds one row per member.
 #   - Reply (the reply reader, design pass §7): what the person wrote (the list SACM Replies, filed by flow F3), next to
 #     the lines it is about, with a tick box each. Mark answered (the main button), Waiting until a date, or Add note
 #     add rows to SACM Journal on the ticked lines.
@@ -32,6 +35,19 @@ Screens:
             Y: =8
             Width: =Parent.Width - 212
             Height: =36
+      - ReportLabel:
+          Control: Label
+          Properties:
+            # The header line (D334): the time of the report's data, and how many changes on these lines it does not show yet.
+            Text: =ReportLine
+            Tooltip: =RefreshRuleText
+            Font: =AppFont
+            Size: =9
+            Color: =ColourMuted
+            X: =16
+            Y: =44
+            Width: =Parent.Width - 32
+            Height: =32
       - Tabs:
           Control: ModernTabList@1.0.0
           Properties:
@@ -53,7 +69,7 @@ Screens:
           Properties:
             Fill: =ColourLine
             X: =0
-            Y: =47
+            Y: =79
             Width: =Parent.Width
             Height: =1
       - EmptyLabel:
@@ -66,7 +82,7 @@ Screens:
             Color: =ColourMuted
             Visible: =LineCount = 0
             X: =16
-            Y: =56
+            Y: =84
             Width: =Parent.Width - 32
             Height: =48
       # ------------------------------------------------------------------ the tab Actions
@@ -82,7 +98,7 @@ Screens:
             Size: =10
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions"
             X: =16
-            Y: =56
+            Y: =84
             Width: =Parent.Width - 32
             Height: =36
       - StatusPick:
@@ -97,7 +113,7 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",status," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =100
+            Y: =128
             Width: =Parent.Width - 32
             Height: =36
       - RequestText:
@@ -113,7 +129,7 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",request," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =100
+            Y: =128
             Width: =Parent.Width - 32
             Height: =36
       - MemberPick:
@@ -130,7 +146,7 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",member," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =100
+            Y: =128
             Width: =Parent.Width - 32
             Height: =36
       - ReasonPick:
@@ -145,7 +161,7 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",reason," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =100
+            Y: =128
             Width: =Parent.Width - 32
             Height: =36
       - ReviewDate:
@@ -161,7 +177,7 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",reviewOn," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =144
+            Y: =172
             Width: =Parent.Width - 32
             Height: =36
       - RetireDate:
@@ -177,7 +193,7 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",retireOn," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =100
+            Y: =128
             Width: =Parent.Width - 32
             Height: =36
       - StagePick:
@@ -192,7 +208,7 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",stage," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =100
+            Y: =128
             Width: =Parent.Width - 32
             Height: =36
       - NoteText:
@@ -210,9 +226,10 @@ Screens:
             Visible: |-
               =Tabs.Selected.Value = "Actions" && ",text," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =188
+            Y: =216
             Width: =Parent.Width - 32
-            Height: =68
+            # Short on the place of Card (300 high), so Save still fits.
+            Height: =If(Parent.Height < 400, 36, 68)
       - SaveButton:
           Control: ModernButton@1.0.0
           Properties:
@@ -287,38 +304,93 @@ Screens:
                   If(
                       !varSaved,
                       Notify("Not saved: " & varError, NotificationType.Error),
-                      Set(varJustSaved, { Id: action.Id, Keys: KeysFor.lines, At: Now() });
-                      Notify("Saved: " & action.Value & If(action.Id = "share-out", " to " & Concat(ShareMembers, Value, ", "), "") & ". The report shows it after the next refresh, in about a minute.", NotificationType.Success);
-                      IfError(SACMRefresh.Run(), Notify("Saved. The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning));
+                      // No refresh after a Save (D332): Done lately shows the row at once, the report after the next refresh.
+                      Notify("Saved: " & action.Value & If(action.Id = "share-out", " to " & Concat(ShareMembers, Value, ", "), "") & ". Done lately shows it now; the report shows it after the next refresh.", NotificationType.Success);
                       Reset(NoteText);
-                      Reset(RequestText)
+                      Reset(RequestText);
+                      Reset(AnywayCheck)
                   )
               )
             X: =Parent.Width - 136
-            Y: =264
+            Y: =NoteText.Y + NoteText.Height + 4
             Width: =120
             Height: =36
       - RefreshButton:
           Control: ModernButton@1.0.0
           Properties:
+            # The only control that asks for a refresh (D332, lint): flow F5 refreshes at most once in each window (D333)
+            # and answers what happened. The same formula in the three apps.
             Text: ="Refresh now"
             Icon: ="ArrowSync"
             Appearance: =ButtonAppearance.Subtle
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
-            Tooltip: ="Refresh the report now (about a minute)"
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions"
+            Tooltip: =RefreshRuleText
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && IsBlank(SameLabel.Text)
             OnSelect: |-
-              =IfError(
-                  SACMRefresh.Run();
-                  Notify("The report refreshes now, in about a minute.", NotificationType.Success),
-                  Notify("The refresh could not start now. Try again in two minutes.", NotificationType.Warning)
+              =With(
+                  { answer: IfError(SACMRefresh.Run(), { result: "error", at: "", by: "", message: "" }) },
+                  Switch(
+                      answer.result,
+                      "started", Notify(RefreshStartedText, NotificationType.Success),
+                      "taken", Notify(Coalesce(answer.by, "A colleague") & " asked for a refresh at " & answer.at & ". One refresh every " & RefreshWindowWords & ": " & RefreshNextText & ". Your work is saved, and this app shows it.", NotificationType.Information),
+                      "closed", Notify(RefreshClosedText, NotificationType.Information),
+                      "refused", Notify("Power BI did not start the refresh: " & answer.message & ". Your work is saved.", NotificationType.Warning),
+                      Notify(RefreshErrorText, NotificationType.Error)
+                  )
               )
             X: =16
-            Y: =264
+            Y: =SaveButton.Y
             Width: =128
             Height: =36
+      - AnywayCheck:
+          Control: ModernCheckbox@1.0.0
+          Properties:
+            # In the place of Refresh now when SameLabel says a row of the same type is not in the report yet (D334).
+            Label: ="Save anyway"
+            Checked: =false
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && !IsBlank(SameLabel.Text)
+            X: =16
+            Y: =SaveButton.Y
+            Width: =128
+            Height: =36
+      - SameLabel:
+          Control: Label
+          Properties:
+            # The guard against a second row (D334): a row of the same type as the action, on one of these lines, saved
+            # by anyone since the report's data. The menu still offers the action until the refresh. Empty when there is
+            # none, and for a note. Not shown: SaveWhy says it.
+            Text: |-
+              =If(
+                  LineCount = 0 || IsBlank(ActionPick.Selected.Id) || ActionPick.Selected.Id in ["note", "person-note"], "",
+                  With(
+                      { last: First(Sort(Filter(PendingEvents, Type = ActionPick.Selected.Type), At, SortOrder.Descending)) },
+                      If(
+                          IsBlank(last.At), "",
+                          Coalesce(last.ByName, last.By) & " saved " &
+                          Switch(
+                              last.Type,
+                              "assign", If(IsBlank(last.Text), "an assign to nobody", "an assign to " & last.Text),
+                              "status", "the status " & last.Text,
+                              "request", "the request " & last.Text,
+                              "exception", "a decision about following",
+                              "reviewed", "the step " & last.Text,
+                              "retirement", "a retirement date",
+                              "stage", "a stage",
+                              "no-process", "the process mark",
+                              "handover", "a hand-over",
+                              last.Type) &
+                          " on " & CountRows(Filter(Split(last.Keys, Char(10)) As key, Trim(key.Value) in SelectedKeys.Value)) &
+                          " of these lines at " & Text(last.At, "hh:mm") & ". The report shows it after the next refresh.")))
+            Visible: =false
+            X: =0
+            Y: =0
+            Width: =10
+            Height: =10
       - SaveWhy:
           Control: Label
           Properties:
@@ -329,8 +401,7 @@ Screens:
                   LineCount = 0, "",
                   IsBlank(ActionPick.Selected.Id), "Pick what to do.",
                   TooManyLines, "Too many lines: select fewer than 1,000.",
-                  !(ActionPick.Selected.Id in ["note", "person-note"]) && varJustSaved.Id = ActionPick.Selected.Id && varJustSaved.Keys = KeysFor.lines && Now() < DateAdd(varJustSaved.At, 3, TimeUnit.Minutes),
-                  "Saved just now. The menu shows what these lines allow after the refresh, in about a minute.",
+                  !IsBlank(SameLabel.Text) && !AnywayCheck.Checked, SameLabel.Text & " Tick Save anyway to save it again.",
                   Switch(
                       ActionPick.Selected.Id,
                       "note", If(IsBlank(Trim(NoteText.Text)), "Type the note.", ""),
@@ -354,7 +425,21 @@ Screens:
             Color: =ColourMuted
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && Parent.Height > 400
             X: =16
-            Y: =304
+            Y: =SaveButton.Y + 40
+            Width: =Parent.Width - 32
+            Height: =32
+      - MenuNote:
+          Control: Label
+          Properties:
+            # When Save is on and these lines have rows the report does not show yet: the menu is from the report's data (D334).
+            Text: |-
+              ="The menu is from " & ReportAtText & ": press Refresh now to see what the lines allow now."
+            Font: =AppFont
+            Size: =9
+            Color: =ColourMuted
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && Parent.Height > 400 && IsBlank(SaveWhy.Text) && PendingCount > 0
+            X: =16
+            Y: =SaveButton.Y + 40
             Width: =Parent.Width - 32
             Height: =32
       - RecentLabel:
@@ -368,7 +453,7 @@ Screens:
             Color: =ColourMuted
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && Parent.Height > 400
             X: =16
-            Y: =340
+            Y: =SaveButton.Y + 76
             Width: =Parent.Width - 32
             Height: =24
       - RecentGallery:
@@ -380,9 +465,9 @@ Screens:
             TemplatePadding: =0
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && Parent.Height > 400
             X: =16
-            Y: =368
+            Y: =RecentLabel.Y + 28
             Width: =Parent.Width - 32
-            Height: =Parent.Height - 376
+            Height: =Parent.Height - Self.Y - 8
           Children:
             - RecentLine:
                 Control: Label
@@ -395,8 +480,23 @@ Screens:
                   Color: =ColourInk
                   X: =0
                   Y: =0
-                  Width: =Parent.TemplateWidth
+                  Width: =Parent.TemplateWidth - If(!IsBlank(ReportSince) && ThisItem.At >= ReportSince, 128, 0)
                   Height: =Parent.TemplateHeight - 1
+            - RecentChip:
+                Control: Label
+                Properties:
+                  # A row the report does not show yet (D334).
+                  Text: ="not in the report yet"
+                  Font: =AppFont
+                  Size: =9
+                  Color: =ColourGrey
+                  Fill: =ColourGreySoft
+                  Align: =Align.Center
+                  Visible: =!IsBlank(ReportSince) && ThisItem.At >= ReportSince
+                  X: =Parent.TemplateWidth - 124
+                  Y: =3
+                  Width: =124
+                  Height: =18
             - RecentRule:
                 Control: Rectangle
                 Properties:
@@ -416,7 +516,7 @@ Screens:
             Color: =ColourMuted
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && IsEmpty(LineReplies)
             X: =16
-            Y: =56
+            Y: =84
             Width: =Parent.Width - 32
             Height: =56
       - SmallLabel:
@@ -429,7 +529,7 @@ Screens:
             Color: =ColourMuted
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height < 480
             X: =16
-            Y: =56
+            Y: =84
             Width: =Parent.Width - 32
             Height: =56
       - ReplyPick:
@@ -444,7 +544,7 @@ Screens:
             Size: =10
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
             X: =16
-            Y: =56
+            Y: =84
             Width: =Parent.Width - 32
             Height: =32
       - ReplySubject:
@@ -456,7 +556,7 @@ Screens:
             Color: =ColourMuted
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
             X: =16
-            Y: =92
+            Y: =120
             Width: =Parent.Width - 32
             Height: =20
       - ReplyBody:
@@ -478,9 +578,9 @@ Screens:
             Overflow: =Overflow.Scroll
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
             X: =16
-            Y: =116
+            Y: =144
             Width: =Parent.Width - 32
-            Height: =Max(40, (Parent.Height - 116 - 156 - 28) / 2)
+            Height: =Max(40, (Parent.Height - 144 - 156 - 28) / 2)
       - TickCaption:
           Control: Label
           Properties:
@@ -489,8 +589,7 @@ Screens:
               =With(
                   { ticked: CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) },
                   If(
-                      !IsBlank(varReplyDone) && varReplyDone.Ref = ReplyPick.Selected.Title && Now() < DateAdd(varReplyDone.At, 3, TimeUnit.Minutes),
-                      "Done just now. The report shows it after the refresh.",
+                      !IsBlank(ReplyDoneLabel.Text), ReplyDoneLabel.Text,
                       ticked = 0, "Tick the lines the reply answers.",
                       ticked & If(ticked = 1, " line ticked.", " lines ticked.") &
                       If(IsBlank(WaitDate.SelectedDate) || WaitDate.SelectedDate <= Today(), " Waiting until needs a date after today.", "") &
@@ -503,6 +602,28 @@ Screens:
             Y: =ReplyBody.Y + ReplyBody.Height + 4
             Width: =Parent.Width - 32
             Height: =22
+      - ReplyDoneLabel:
+          Control: Label
+          Properties:
+            # A reply already answered or put to wait since the report's data (D334): the status Answered or Fix in
+            # progress on a line of this reply, saved by anyone. The report shows the reply as read after the next
+            # refresh; until then Mark answered and Waiting until stay off. Not shown: TickCaption says it.
+            Text: |-
+              =With(
+                  { replyKeys: Filter(Lines, LastRef = ReplyPick.Selected.Title) },
+                  With(
+                      {
+                          done: First(Sort(
+                              Filter(PendingEvents As event, event.Type = "status" && (event.Text = "Answered" || event.Text = "Fix in progress") &&
+                                  CountRows(Filter(Split(event.Keys, Char(10)) As key, Trim(key.Value) in replyKeys.Key)) > 0),
+                              At, SortOrder.Descending))
+                      },
+                      If(IsBlank(done.At), "", Coalesce(done.ByName, done.By) & " set " & done.Text & " at " & Text(done.At, "hh:mm") & " on the lines of this reply. The report shows it after the next refresh.")))
+            Visible: =false
+            X: =0
+            Y: =0
+            Width: =10
+            Height: =10
       - ReplyGallery:
           Control: Gallery
           Variant: Vertical
@@ -605,7 +726,7 @@ Screens:
             DisplayMode: |-
               =If(
                   CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || IsBlank(WaitDate.SelectedDate) || WaitDate.SelectedDate <= Today() || TooManyLines ||
-                  (!IsBlank(varReplyDone) && varReplyDone.Ref = ReplyPick.Selected.Title && Now() < DateAdd(varReplyDone.At, 3, TimeUnit.Minutes)),
+                  !IsBlank(ReplyDoneLabel.Text),
                   DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =With(
@@ -616,10 +737,8 @@ Screens:
                   IfError(
                       Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "status", Keys: keys, Text: "Fix in progress" });
                       Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: keys, Text: note });
-                      Set(varReplyDone, { Ref: ReplyPick.Selected.Title, At: Now() });
                       Notify("Saved: Fix in progress, waiting until " & Text(WaitDate.SelectedDate, "d mmm") & ". The report shows it after the next refresh.", NotificationType.Success);
-                      Reset(ReplyNote);
-                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Reset(ReplyNote),
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)
                   )
               )
@@ -644,8 +763,7 @@ Screens:
               =IfError(
                   Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: Concat(Filter(ReplyGallery.AllItems, LineCheck.Checked), Key, Char(10)), Text: Trim(ReplyNote.Text) });
                   Notify("Note saved. The report shows it after the next refresh.", NotificationType.Success);
-                  Reset(ReplyNote);
-                  IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                  Reset(ReplyNote),
                   Notify("Not saved: " & FirstError.Message, NotificationType.Error)
               )
             X: =16
@@ -668,7 +786,7 @@ Screens:
             DisplayMode: |-
               =If(
                   CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || TooManyLines ||
-                  (!IsBlank(varReplyDone) && varReplyDone.Ref = ReplyPick.Selected.Title && Now() < DateAdd(varReplyDone.At, 3, TimeUnit.Minutes)),
+                  !IsBlank(ReplyDoneLabel.Text),
                   DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =With(
@@ -676,10 +794,8 @@ Screens:
                   IfError(
                       Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "status", Keys: keys, Text: "Answered" });
                       If(!IsBlank(note), Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: keys, Text: note }));
-                      Set(varReplyDone, { Ref: ReplyPick.Selected.Title, At: Now() });
                       Notify("Marked answered. The report shows it after the next refresh.", NotificationType.Success);
-                      Reset(ReplyNote);
-                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Reset(ReplyNote),
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)
                   )
               )

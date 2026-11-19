@@ -1,4 +1,4 @@
-// The named formulas of the Power App "SACM actions" (builds B6 and D5, D294 to D296, D317), written by hand. npm run powerbi:generate
+// The named formulas of the Power App "SACM actions" (builds B6, D5 and 0.52.0, D294 to D296, D317, D334), written by hand. npm run powerbi:generate
 // puts them after the catalogue of powerbi/apps/actions.json into App-Formulas.fx (to paste into App → Formulas) and
 // Src/App.pa.yaml. Words of the app: plain English, as in the report.
 //
@@ -63,7 +63,7 @@ FollowAgainReason = If(
     "Other",
     First(Lines).ExceptionReason);
 
-// What the team did lately on these lines, before the next refresh shows it: the journal of the last 60 days, newest
+// What the team did lately on these lines, also before the next refresh shows it: the journal of the last 60 days, newest
 // first (the date test and the sort run in SharePoint, so they are delegated), then the events that name one of the
 // keys. The second filter runs in the app on the newest rows only, as many as the data row limit of the app (set it to
 // 2,000, README §6.4).
@@ -71,6 +71,15 @@ SelectedKeys = ForAll(Lines, Key);
 RecentEvents = Filter(
     Sort(Filter('SACM Journal', At >= DateAdd(Today(), -60, TimeUnit.Days)), At, SortOrder.Descending) As event,
     CountRows(Filter(Split(event.Keys, Char(10)) As key, Trim(key.Value) in SelectedKeys.Value)) > 0);
+
+// What is not in the report yet (build 0.52.0, D334): the events of Done lately saved since the time of the report's data
+// (ReportSince, from the field Report at). The report, and the menu of actions it gave the lines, do not know them until
+// the next refresh, which can be two hours away: Done lately marks them, the header line counts them, and Save waits when
+// one of them is of the same type as the action (the box says who saved it, and Save anyway lets it through).
+PendingEvents = Filter(RecentEvents, !IsBlank(ReportSince) && At >= ReportSince);
+PendingCount = CountRows(PendingEvents);
+PendingWhere = " on these lines";
+ReportUnknownText = "Select lines in the report to see the time of its data.";
 
 // The reply reader (build D5, design pass §7): the tab Reply shows what a person wrote next to the lines it is about.
 // A reply is filed by flow F3 in the list SACM Replies under the reference of the message it answers (its Title). The

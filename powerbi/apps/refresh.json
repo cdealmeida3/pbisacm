@@ -1,0 +1,11 @@
+{
+  "note": "The refresh rule of the report in My workspace (build 0.52.0, D332, D333): shared capacity allows 8 refreshes of the semantic model a day, scheduled and started by a flow together (Microsoft Learn, Data refresh in Power BI). One scheduled refresh in the morning, after the reports arrive (scheduled, set by Carlos in the service), and at most one refresh on demand in each window of windowMinutes from 'from' to 'to' (flows F3, F5 and F6, locked by the list SACM Refreshes). Times are in the team's time zone. npm run powerbi:generate writes these numbers into the three apps (App-Formulas.fx) and into the table About (the text on My day and Reports); npm test checks that flows.json, powerbi/README.md §6.5 and the apps hold them, and that the windows and the scheduled times stay at least 2 under dailyLimit. marginMinutes: the apps count a journal row saved up to this many minutes before the time of the refresh as not in the report yet, because a refresh reads the journal while it runs, not at its very start. A change of the rule is a new build.",
+  "windowMinutes": 120,
+  "from": "08:00",
+  "to": "18:00",
+  "scheduled": [
+    "07:00"
+  ],
+  "dailyLimit": 8,
+  "marginMinutes": 5
+}

@@ -1,4 +1,4 @@
-# The one screen of the Power App "SACM audit" (builds B8 and D5, D306, D308, D317), written by hand. To use it: in Power
+# The one screen of the Power App "SACM audit" (builds B8, D5 and 0.52.0, D306, D308, D317, D334), written by hand. To use it: in Power
 # Apps Studio, select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6.8). It is
 # drawn for its place on the page Lifecycle review (300 × 620, README §6.4), with the modern controls (D317).
 # What it does, on two tabs:
@@ -7,7 +7,9 @@
 #     a note, and Save adds one row per CI. "Mark N same in EPO" marks at once the CIs whose status EPO shows the same.
 #   - Settings: the numbers of the team (D158) with their ranges, and the lines a table of an email shows (D314). Save adds one row to SACM Settings per changed
 #     number (the last row counts, D308) and one settings row to SACM Journal that says what changed.
-# Every Save asks flow F5 (SACMRefresh) to refresh the report. The app changes and removes no row, and sends nothing.
+# At the top, the header line (D334) and Refresh now (flow F5, once in each window of the refresh rule, D333). No Save
+# refreshes (D332): a review started today, and marks saved since the report's data, show in the app at once, the
+# report shows them after the next refresh. The app changes and removes no row, and sends nothing.
 Screens:
   AuditScreen:
     Properties:
@@ -24,8 +26,49 @@ Screens:
             Color: =ColourInk
             X: =16
             Y: =8
-            Width: =Parent.Width - 32
+            Width: =Parent.Width - 32 - 120
             Height: =28
+      - RefreshButton:
+          Control: ModernButton@1.0.0
+          Properties:
+            # The only control that asks for a refresh (D332, lint): flow F5 refreshes at most once in each window (D333)
+            # and answers what happened. The same formula in the three apps.
+            Text: ="Refresh now"
+            Icon: ="ArrowSync"
+            Appearance: =ButtonAppearance.Subtle
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Tooltip: =RefreshRuleText
+            OnSelect: |-
+              =With(
+                  { answer: IfError(SACMRefresh.Run(), { result: "error", at: "", by: "", message: "" }) },
+                  Switch(
+                      answer.result,
+                      "started", Notify(RefreshStartedText, NotificationType.Success),
+                      "taken", Notify(Coalesce(answer.by, "A colleague") & " asked for a refresh at " & answer.at & ". One refresh every " & RefreshWindowWords & ": " & RefreshNextText & ". Your work is saved, and this app shows it.", NotificationType.Information),
+                      "closed", Notify(RefreshClosedText, NotificationType.Information),
+                      "refused", Notify("Power BI did not start the refresh: " & answer.message & ". Your work is saved.", NotificationType.Warning),
+                      Notify(RefreshErrorText, NotificationType.Error)
+                  )
+              )
+            X: =Parent.Width - 128
+            Y: =6
+            Width: =112
+            Height: =32
+      - ReportLabel:
+          Control: Label
+          Properties:
+            # The header line (D334): the time of the report's data, and how many changes of the team it does not show yet.
+            Text: =ReportLine
+            Tooltip: =RefreshRuleText
+            Font: =AppFont
+            Size: =9
+            Color: =ColourMuted
+            X: =16
+            Y: =38
+            Width: =Parent.Width - 32
+            Height: =32
       - Tabs:
           Control: ModernTabList@1.0.0
           Properties:
@@ -38,7 +81,7 @@ Screens:
             Size: =10
             AccessibleLabel: ="The review or the settings"
             X: =8
-            Y: =40
+            Y: =72
             Width: =Parent.Width - 16
             Height: =40
       - HeadRule:
@@ -46,7 +89,7 @@ Screens:
           Properties:
             Fill: =ColourLine
             X: =0
-            Y: =83
+            Y: =115
             Width: =Parent.Width
             Height: =1
       # ------------------------------------------------------------------ the lifecycle review
@@ -57,8 +100,9 @@ Screens:
               =If(
                   IsEmpty(CurrentLines), "No lifecycle review yet. New review draws " & CountRows(NextLines) & " CIs from the newest CI report.",
                   "Review " & CurrentId & ": " & MarkedCount & " of " & CountRows(CurrentLines) & " CIs checked." &
+                  If(ReviewPending, " Review of today: not in the report yet. Marks are saved on it.", "") &
                   // Why the buttons are grey (LOOK rule 7).
-                  If(StartedToday, " A review was started today: one a day.", "") &
+                  If(StartedToday && !ReviewPending, " A review was started today: one a day.", "") &
                   If(IsEmpty(Filter(LineGallery.AllItems, MarkCheck.Checked)), " Tick CIs to mark them.", "") &
                   If(IsEmpty(AgreeingLines), " No CI left that EPO shows the same.", ""))
             Font: =AppFont
@@ -66,7 +110,7 @@ Screens:
             Color: =ColourInk
             Visible: =Tabs.Selected.Value = "Lifecycle review"
             X: =16
-            Y: =92
+            Y: =124
             Width: =Parent.Width - 32
             Height: =40
       - NewReviewButton:
@@ -92,12 +136,11 @@ Screens:
             OnSelect: |-
               =IfError(
                   Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: TodayId, Text: NewReviewText, Items: NewReviewItems });
-                  Notify("The review is started: " & CountRows(NextLines) & " CIs. The report shows them after the next refresh, in about a minute.", NotificationType.Success);
-                  IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                  Notify("The review is started: " & CountRows(NextLines) & " CIs. Mark them here now; the report shows the review after the next refresh.", NotificationType.Success),
                   Notify("Not started: " & FirstError.Message, NotificationType.Error)
               )
             X: =16
-            Y: =136
+            Y: =168
             Width: =Parent.Width - 32
             Height: =36
       - LineGallery:
@@ -109,9 +152,9 @@ Screens:
             TemplatePadding: =0
             Visible: =Tabs.Selected.Value = "Lifecycle review" && !IsEmpty(CurrentLines)
             X: =16
-            Y: =180
+            Y: =212
             Width: =Parent.Width - 32
-            Height: =Parent.Height - 180 - 196
+            Height: =Parent.Height - 212 - 196
           Children:
             - MarkCheck:
                 Control: ModernCheckbox@1.0.0
@@ -134,13 +177,32 @@ Screens:
                   Color: =ColourInk
                   X: =36
                   Y: =4
-                  Width: =Parent.TemplateWidth - 36
+                  Width: =Parent.TemplateWidth - 36 - If(ThisItem.CiKey in MarkedSince.CiKey, 128, 0)
                   Height: =22
+            - MarkChip:
+                Control: Label
+                Properties:
+                  # A mark saved since the report's data (D334): the report shows it after the next refresh.
+                  Text: ="not in the report yet"
+                  Font: =AppFont
+                  Size: =9
+                  Color: =ColourGrey
+                  Fill: =ColourGreySoft
+                  Align: =Align.Center
+                  Visible: =ThisItem.CiKey in MarkedSince.CiKey
+                  X: =Parent.TemplateWidth - 124
+                  Y: =6
+                  Width: =124
+                  Height: =18
             - MarkLine:
                 Control: Label
                 Properties:
+                  # The result of the report, or the mark saved since its data (the newest, D334).
                   Text: |-
-                    ="ServiceNow " & ThisItem.Status & " · EPO " & Coalesce(ThisItem.EpoStatus, "not in the report") & " · " & ThisItem.ResultLabel
+                    =With(
+                        { mark: First(Sort(Filter(MarkedSince, CiKey = ThisItem.CiKey), At, SortOrder.Descending)) },
+                        "ServiceNow " & ThisItem.Status & " · EPO " & Coalesce(ThisItem.EpoStatus, "not in the report") & " · " &
+                        If(IsBlank(mark.At), ThisItem.ResultLabel, Coalesce(LookUp(ReviewResults, Id = mark.Reason).Label, mark.Reason) & " by " & mark.ByName))
                   Font: =AppFont
                   Size: =9
                   Color: =ColourMuted
@@ -209,9 +271,8 @@ Screens:
                           ticked As line,
                           Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: result, Text: note })
                       );
-                      Notify(CountRows(ticked) & If(CountRows(ticked) = 1, " CI marked ", " CIs marked ") & ResultPick.Selected.Label & ". The report shows it after the next refresh.", NotificationType.Success);
-                      Reset(NoteText);
-                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Notify(CountRows(ticked) & If(CountRows(ticked) = 1, " CI marked ", " CIs marked ") & ResultPick.Selected.Label & ". The list shows it now; the report after the next refresh.", NotificationType.Success);
+                      Reset(NoteText),
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)
                   )
               )
@@ -240,8 +301,7 @@ Screens:
                           agreeing As line,
                           Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: "same", Text: note })
                       );
-                      Notify(CountRows(agreeing) & " CIs marked Same in EPO. The report shows it after the next refresh.", NotificationType.Success);
-                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Notify(CountRows(agreeing) & " CIs marked Same in EPO. The list shows it now; the report after the next refresh.", NotificationType.Success),
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)
                   )
               )
@@ -259,9 +319,9 @@ Screens:
             TemplatePadding: =0
             Visible: =Tabs.Selected.Value = "Settings"
             X: =16
-            Y: =92
+            Y: =124
             Width: =Parent.Width - 32
-            Height: =Parent.Height - 92 - 112
+            Height: =Parent.Height - 124 - 112
           Children:
             - SettingLabel:
                 Control: Label
@@ -357,8 +417,7 @@ Screens:
                       IfError(
                           ForAll(changed As setting, Patch('SACM Settings', Defaults('SACM Settings'), { Title: setting.Key, Value: setting.After }));
                           Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "settings", Text: "Team settings changed. " & Concat(changed, Label & ": " & Before & " → " & After, "; ") });
-                          Notify("Saved. The report uses the new numbers after the next refresh, in about a minute.", NotificationType.Success);
-                          IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                          Notify("Saved. The numbers count in the report after the next refresh.", NotificationType.Success),
                           Notify("Not saved: " & FirstError.Message, NotificationType.Error)
                       )
                   )

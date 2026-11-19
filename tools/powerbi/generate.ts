@@ -46,6 +46,7 @@ import { EMAIL_STYLE, ROWS_IN_EMAIL_RANGE } from './email.ts';
 import { COLUMNS, CONTRACT_COLUMNS, EPO_ROLE, MAX_CIS_PER_MESSAGE, REQUESTS, ROLE_LABEL, ROLE_REQUEST, ROLE_WORD } from '../../src/core/messages/messages.ts';
 import type { FastForm, Node } from './regex.ts';
 import { staleRail, writeRail } from './rail.ts';
+import { refreshRuleM } from './refresh.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const read = (path: string): string => readFileSync(join(root, path), 'utf8');
@@ -299,6 +300,7 @@ function packed(): Query[] {
     { name: 'ExpectedHistory', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team\'s state, for the Self-check page.', m: mText(JSON.stringify(EXPECTED_HISTORY)) },
     { name: 'ExpectedResult', group: 'Packed', description: 'GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.', m: mText(JSON.stringify(expectedResult())) },
     { name: 'WorkbenchVersion', group: 'Packed', description: 'GENERATED from package.json. The version of the Workbench.', m: mText(version) },
+    { name: 'RefreshRule', group: 'Packed', description: 'GENERATED from powerbi/apps/refresh.json (D333). The refresh rule of the report in My workspace: the length of a window on demand, its hours, the scheduled times, the limit a day, and the rule in words for the pages My day and Reports.', m: refreshRuleM() },
     { name: 'SampleDate', group: 'Packed', description: 'GENERATED from tests/sample-record.ts. The day the samples were recorded.', m: `#date(${year}, ${month}, ${day})` }
   ];
 }

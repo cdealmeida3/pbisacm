@@ -320,7 +320,7 @@ if (process.argv.includes('--no-dotnet')) {
     done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the apps only add journal rows and run only the flows of flows.json`);
   }
 }
-done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait, file, or send what a manager pressed');
+done.push('App: the actions agree with fnCaseActions; the flows refresh only through the refresh rule, file, or send what a manager pressed');
 
 /* 10. Pages */
 const report = readPages();

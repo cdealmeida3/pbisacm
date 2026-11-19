@@ -7,12 +7,14 @@
 //     line, and on the pages of the Audit its four parts.
 //   - railNav<page>: a button on each item, clear until the pointer is on it, that opens its page.
 //   - railBadge<page>: a small picture of a count (a measure of the model) beside My day and Work queue.
-//   - railAbout: the version, the data and the last refresh at the foot.
+//   - railAbout: the version, the data and how long ago the report was refreshed, at the foot.
+//   - railRefresh (My day and Reports, build 0.52.0, D333): the refresh rule in words, above the place of the button
+//     Refresh now (FLOW_SLOTS), which Carlos adds by hand in the service.
 // A page navigator would be one visual, but it has no icons and no counts, so the rail is these parts; the lint counts
 // every visual whose name starts with rail as one (pages.ts rule 2). Same repository, same bytes.
 import { existsSync, readdirSync, readFileSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { FONT, FONT_SEMIBOLD, lightColours } from './tokens.ts';
+import { FLOW_SLOTS, FONT, FONT_SEMIBOLD, lightColours } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const REPORT = join(root, 'powerbi', 'SACM-Workbench.Report');
@@ -227,6 +229,30 @@ export function railVisuals(page: string, height: number): Visual[] {
       drillFilterOtherVisuals: true
     }
   });
+  const flow = FLOW_SLOTS[page];
+  if (flow) {
+    out.push({
+      $schema: VISUAL_SCHEMA,
+      name: 'railRefresh',
+      position: { x: 16, y: flow.y - 76, z: 1000, height: 68, width: 156, tabOrder: 1001 },
+      visual: {
+        visualType: 'card',
+        query: { queryState: { Values: { projections: [{ field: { Measure: { Expression: { SourceRef: { Entity: 'About' } }, Property: 'Refresh rule' } }, queryRef: 'About.Refresh rule', nativeQueryRef: 'Refresh rule', displayName: 'Refresh rule' }] } } },
+        objects: {
+          labels: [{ properties: { color: colour(SOFT), fontFamily: literal(`'${FONT}'`), fontSize: literal('9D') } }],
+          categoryLabels: hidden,
+          wordWrap: [{ properties: { show: literal('true') } }]
+        },
+        visualContainerObjects: {
+          background: hidden,
+          border: hidden,
+          padding: [{ properties: { top: literal('0D'), bottom: literal('0D'), left: literal('4D'), right: literal('4D') } }],
+          general: altText('When Refresh now refreshes the report')
+        },
+        drillFilterOtherVisuals: true
+      }
+    });
+  }
   out.push(reportsChip());
   return out;
 }

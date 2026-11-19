@@ -6,7 +6,10 @@
 //     columns of the list; the app SACM audit also adds rows to SACM Settings (its Settings screen, build B8, D308) the
 //     same way. They never change, remove or clear a row of any list of the team, and write no other list.
 //   - The apps call no connector but the flows of powerbi/apps/flows.json with the trigger Power Apps (V2).
-//   - The flows refresh, wait, file a report or a reply, or send exactly what a manager pressed Send or Test on: the
+//   - The apps run the refresh flow (SACMRefresh) only from their button Refresh now (a control named RefreshButton): no
+//     Save refreshes (D332).
+//   - The flows refresh through the gate (D333: a row in SACM Refreshes, whose Title is the window, before every refresh,
+//     with the expressions of tools/powerbi/refresh.ts), file a report or a reply, or send exactly what a manager pressed Send or Test on: the
 //     To, Cc, Subject, Body and file of a sending step are the inputs of its trigger (a test goes to the manager who ran
 //     it). A flow that starts on a new email never sends; none runs on a timer (D2, D269). The flow of the button Outlook
 //     draft (F7, D315) only makes a draft in the manager's own Drafts (POST to /me/messages, never /send) and answers the
@@ -21,6 +24,7 @@ import { ASKS, appActions } from './actions.ts';
 import type { AppAction } from './actions.ts';
 import { STATE_LISTS } from './history.ts';
 import type { EventType } from '../../src/core/cases/cases.ts';
+import { gateExpressions } from './refresh.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 export const FLOWS_FILE = join(root, 'powerbi', 'apps', 'flows.json');
@@ -38,8 +42,12 @@ const ADD_ONLY = new Map<string, Set<string>>([
 /** Functions that change or remove what a data source holds. Only Patch with Defaults (a new row) is allowed. */
 const WRITERS = new Set(['Patch', 'Collect', 'ClearCollect', 'Clear', 'Remove', 'RemoveIf', 'Update', 'UpdateIf', 'SubmitForm']);
 
-export interface Flow { id: string; name: string; purpose: string; trigger: string; inputs?: string[]; triggerFields?: Record<string, string>; concurrency: number; steps: Array<{ action: string; connector: string; fields: Record<string, string>; runAfter?: string[]; forEach?: string }> }
+export interface Flow { id: string; name: string; purpose: string; trigger: string; inputs?: string[]; outputs?: string[]; triggerFields?: Record<string, string>; concurrency: number; steps: Array<{ action: string; connector: string; fields: Record<string, string>; if?: string; runAfter?: string[]; forEach?: string }> }
 export const appFlows = (): Flow[] => (JSON.parse(readFileSync(FLOWS_FILE, 'utf8')) as { flows: Flow[] }).flows;
+
+/** The flow that refreshes the report on demand (F5), and where an app may run it: the OnSelect of its button Refresh now. */
+export const REFRESH_FLOW = 'SACMRefresh';
+const REFRESH_BUTTON = /\/RefreshButton\/Properties\/OnSelect$/;
 
 /** One call of a formula, as tools/powerbi/powerfx-check gives it. */
 export interface Call { name: string; namespace: string | null; source: string | null; second: string | null; fields: string[] }
@@ -55,6 +63,7 @@ export function callProblems(formulas: Formula[], flows: Flow[] = appFlows()): s
     for (const call of formula.calls) {
       if (call.namespace) {
         if (!(call.name === 'Run' && appFlowNames.has(call.namespace))) problems.push(`App: ${where} calls ${call.namespace}.${call.name}: the app may only run the flows of powerbi/apps/flows.json with the trigger Power Apps (V2)`);
+        else if (call.namespace === REFRESH_FLOW && !REFRESH_BUTTON.test(formula.where)) problems.push(`App: ${where} runs ${REFRESH_FLOW}: only the button Refresh now (a control named RefreshButton, its OnSelect) refreshes the report; a Save never does (D332)`);
         continue;
       }
       if (!WRITERS.has(call.name) || !call.source) continue;
@@ -110,7 +119,14 @@ const DRAFT = 'Send an HTTP request';
 const RESPOND = 'Respond to a PowerApp or flow';
 /** The only request a flow may make: a new message in the Drafts of the person who runs it (never /send or /sendMail). */
 export const DRAFT_REQUEST = { URI: 'https://graph.microsoft.com/v1.0/me/messages', Method: 'POST', Body: '=input Message with the file Csv and the shared SACM mailbox as From', ContentType: 'application/json' };
-const STEPS = new Set(['Refresh a dataset', 'Delay', 'Create file', 'Html to text', 'Create item', SEND, DRAFT, RESPOND]);
+/** The steps of the gate (D333) and of filing; no Delay any more: the gate keeps refreshes apart, and the app would wait. */
+const STEPS = new Set(['Refresh a dataset', 'Compose', 'Condition', 'Get items', 'Terminate', 'Create file', 'Html to text', 'Create item', SEND, DRAFT, RESPOND]);
+const REFRESH = 'Refresh a dataset';
+/** The list of the gate: one row per window used, Title unique (D333). The flows add rows with these fields only. */
+export const REFRESHES = 'SACM Refreshes';
+const REFRESH_FIELDS = new Set(['List Name', 'Title', 'By', 'Source']);
+/** The workspace of every refresh: Carlos's own (D331). */
+export const WORKSPACE = 'My workspace';
 /** The fields of a sending step and the input of the trigger each must be. To of a test: the manager who ran the flow. */
 const SEND_FIELDS: Record<string, { input: string; or?: string; optional?: boolean }> = {
   To: { input: 'To', or: '=the user who ran it' }, CC: { input: 'Cc', optional: true }, BCC: { input: 'Bcc', optional: true },
@@ -138,9 +154,22 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
       if (!STEPS.has(step.action)) problems.push(`Flows: ${flow.id} has the step "${step.action}": a flow refreshes, waits, files a report or a reply, or sends what a manager pressed Send on`);
       else if (step.action !== SEND && step.action !== DRAFT && /send|post|message|reply|forward/i.test(step.action)) problems.push(`Flows: ${flow.id} sends something ("${step.action}")`);
       if (step.action === RESPOND && flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} answers a Power App, but the app does not start it`);
-      if (step.action === 'Create item' && step.fields['List Name'] !== REPLIES) problems.push(`Flows: ${flow.id} adds an item to ${step.fields['List Name'] ?? 'a list'}: a flow only files replies in ${REPLIES} (the journal is the managers' own, D272)`);
-      if (step.action === 'Create item' && flow.trigger !== MAILBOX_TRIGGER) problems.push(`Flows: ${flow.id} files a reply, but does not start on a new email`);
+      const list = step.fields['List Name'];
+      if (step.action === 'Create item' && list === REFRESHES) {
+        for (const field of Object.keys(step.fields)) if (!REFRESH_FIELDS.has(field)) problems.push(`Flows: ${flow.id} adds the field ${field} to ${REFRESHES}: only Title (the window), By and Source`);
+        if (step.fields.Title !== '=output Window') problems.push(`Flows: ${flow.id} adds to ${REFRESHES} the Title "${step.fields.Title ?? ''}": it must be the window (=output Window), the lock of the gate`);
+      } else if (step.action === 'Create item') {
+        if (list !== REPLIES) problems.push(`Flows: ${flow.id} adds an item to ${list ?? 'a list'}: a flow only files replies in ${REPLIES} (the journal is the managers' own, D272) and the windows of the gate in ${REFRESHES}`);
+        if (flow.trigger !== MAILBOX_TRIGGER) problems.push(`Flows: ${flow.id} files a reply, but does not start on a new email`);
+      }
+      if (step.action === 'Get items' && list !== REFRESHES) problems.push(`Flows: ${flow.id} reads ${list ?? 'a list'}: a flow only reads ${REFRESHES} (who used the window)`);
+      if (step.action === RESPOND && flow.outputs) {
+        const keys = Object.keys(step.fields);
+        if (keys.join() !== flow.outputs.join()) problems.push(`Flows: ${flow.id} answers the app with ${keys.join(', ') || 'nothing'}: every answer must give the outputs ${flow.outputs.join(', ')}, in this order`);
+      }
+      if (step.action === REFRESH && step.fields.Workspace !== WORKSPACE) problems.push(`Flows: ${flow.id} refreshes in the workspace "${step.fields.Workspace ?? ''}": the report is in ${WORKSPACE} (D331)`);
     }
+    problems.push(...gateProblems(flow));
     if (drafts.length) {
       // The Outlook draft (D315): started by the button of the app, one draft a run, exactly the request of DRAFT_REQUEST.
       if (flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} makes a draft, but does not start when a manager presses Outlook draft in the app (Power Apps (V2))`);
@@ -177,13 +206,48 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
       }
       continue;
     }
-    const refresh = flow.steps.findIndex((step) => step.action === 'Refresh a dataset');
-    if (refresh < 0) problems.push(`Flows: ${flow.id} does not refresh the report`);
-    // A refresh started by the app or a button waits two minutes before the next run may start one.
-    if (refresh >= 0 && flow.trigger !== MAILBOX_TRIGGER && flow.steps[refresh + 1]?.action !== 'Delay') problems.push(`Flows: ${flow.id} must wait (Delay) after the refresh, so the next run does not start one while it runs`);
+    const files = flow.steps.some((step) => step.action === 'Create file' || (step.action === 'Create item' && step.fields['List Name'] === REPLIES));
+    const refreshes = flow.steps.some((step) => step.action === REFRESH);
+    if (!refreshes && !files) problems.push(`Flows: ${flow.id} does not refresh the report, file a report or file a reply`);
+    if (refreshes && flow.steps.some((step) => step.action === 'Create file')) problems.push(`Flows: ${flow.id} files reports and refreshes: a new report waits for the morning refresh or Refresh now (D332)`);
   }
   return problems;
 }
+
+/**
+ * The gate of a flow that refreshes (D333): before the refresh, the steps Now, Minutes, Open and Window with the
+ * expressions of refresh.ts, then a row in SACM Refreshes whose Title is the window, and the refresh only when that row
+ * was made (the Title is unique, so a second flow in the same window cannot make it). No Delay: the app gets its answer at once.
+ */
+export function gateProblems(flow: Flow, expected = gateExpressions()): string[] {
+  const problems: string[] = [];
+  const refresh = flow.steps.findIndex((step) => step.action === REFRESH);
+  if (refresh < 0) return problems;
+  if (flow.steps.filter((step) => step.action === REFRESH).length > 1) problems.push(`Flows: ${flow.id} refreshes twice: one refresh a run`);
+  const named = (name: string) => flow.steps.findIndex((step) => step.fields.Name === name);
+  for (const name of ['Now', 'Minutes', 'Window'] as const) {
+    const at = named(name);
+    if (at < 0 || at > refresh || flow.steps[at]!.action !== 'Compose') { problems.push(`Flows: ${flow.id} refreshes without the step ${name} of the gate (Compose) before it`); continue; }
+    if (flow.steps[at]!.fields.Inputs !== expected[name]) problems.push(`Flows: ${flow.id} the step ${name} is "${flow.steps[at]!.fields.Inputs}": it must be ${expected[name]} (tools/powerbi/refresh.ts, from refresh.json)`);
+  }
+  const open = named('Open');
+  if (open < 0 || open > refresh || flow.steps[open]!.action !== 'Condition') problems.push(`Flows: ${flow.id} refreshes without the condition Open of the gate before it`);
+  else if (flow.steps[open]!.fields.Expression !== expected.Open) problems.push(`Flows: ${flow.id} the condition Open is "${flow.steps[open]!.fields.Expression}": it must be ${expected.Open} (the hours of refresh.json)`);
+  const lock = flow.steps.findIndex((step) => step.action === 'Create item' && step.fields['List Name'] === REFRESHES);
+  if (lock < 0 || lock > refresh) problems.push(`Flows: ${flow.id} refreshes without first adding the window to ${REFRESHES} (the lock of the gate, D333)`);
+  else if (!/^Create item\b.*\bis successful$/.test(flow.steps[refresh]!.if ?? '')) problems.push(`Flows: ${flow.id} refreshes even when the window is taken: run it only after the Create item in ${REFRESHES} is successful`);
+  for (const step of flow.steps.filter((entry) => entry.action === 'Get items')) {
+    if (step.fields['Filter Query'] !== expected.Filter) problems.push(`Flows: ${flow.id} looks for the window with "${step.fields['Filter Query']}": it must be ${expected.Filter}`);
+  }
+  if (flow.trigger === 'Power Apps (V2)') {
+    const answers = new Set(flow.steps.filter((step) => step.action === RESPOND).map((step) => step.fields.Result));
+    for (const result of REFRESH_RESULTS) if (!answers.has(result)) problems.push(`Flows: ${flow.id} never answers the app ${result}`);
+  }
+  return problems;
+}
+
+/** What the refresh flow answers the app (F5, D333). */
+export const REFRESH_RESULTS = ['started', 'taken', 'closed', 'refused', 'error'];
 
 /* ------------------------------------------------------------------ the controls of the apps (D317) */
 

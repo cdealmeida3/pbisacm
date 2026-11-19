@@ -2,6 +2,17 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.52.0 — The Power BI report in My workspace: fewer refreshes
+
+- **The report lives in your My workspace** (D331): README §4A says how to publish there, share it with **Share** (each manager needs Pro or Premium Per User) and set one scheduled refresh. §4B keeps the team workspace for later.
+- **A Save no longer refreshes** (D332). My workspace allows 8 refreshes a day, and every Save, sent email and filed report used one. The flow *File reports* no longer refreshes: the report refreshes at 07:00, after the morning reports.
+- **Refresh now, once every 2 hours from 08:00 to 18:00** (D333): the button in each app, the button on *My day* and *Reports*, and a reply that comes in. The first ask in each window refreshes; the app tells the others who asked and when the next window starts. A new small list, *SACM Refreshes*, makes sure two asks never both refresh. At most 6 of the 8 a day are used.
+- **The apps say what is not in the report yet** (D334): a top line "Report data from 07:05. 3 changes since then are not in it yet." *Done lately* and the marks of the review say *not in the report yet*; a sent email stays *Sent* for every manager; a second action of the same kind on the same lines waits, with **Save anyway**; a review started today can be marked before the refresh.
+- **The rail says how old the data is** ("refreshed 2 h ago", D335), because the service shows times in UTC. *My day* and *Reports* show the rule above their Refresh now button.
+- **The first refresh must finish in 2 hours** (D336): README §4A says how many CI reports to keep in the folder; older ones go into a sub-folder *Archive*, which the report does not read.
+- What to do in the tenant: README §5 (the list *SACM Refreshes*, unique Title), §6.3 (the new steps of F5, F6 and F3; F1 without its refresh), §6.4, §6.6 and §6.8 (the field *Report at* of each app, then paste the new formulas and screens).
+- No check, number or email text changed.
+
 ## 0.51.0 — The Power BI report, the design pass part 6: polish and the team guide (D6)
 
 - **A guide for the team** (D329): [powerbi/GUIDE.md](../powerbi/GUIDE.md) shows every page with a picture and says what to do there, with the day in five steps (My day, Open person, Prepare email, Send, the reply). The pictures come from the Desktop check, with the invented samples.

@@ -26,6 +26,41 @@ App:
       ColourGreySoft = ColorValue("#f2f4f7");
       AppFont = "Segoe UI";
 
+      // The refresh rule (D333, powerbi/apps/refresh.json): one refresh on demand in each window, from RefreshFrom to RefreshTo,
+      // and the scheduled refresh in the morning. The times are the team's (the browser's time of the managers).
+      RefreshWindowMinutes = 120;
+      RefreshFromMinutes = 480;
+      RefreshToMinutes = 1080;
+      RefreshFrom = "08:00";
+      RefreshTo = "18:00";
+      RefreshScheduled = "07:00";
+      RefreshWindowWords = "2 hours";
+      RefreshRuleText = "Refresh now: once every 2 hours, 08:00 to 18:00. The report refreshes at 07:00.";
+      // The time of the report's data: the field Report at of the visual (About[Report at], the refresh time in UTC as
+      // yyyy-mm-ddThh:nn:ssZ), in the browser's time. Blank when the visual gives no row. A journal row from ReportSince on
+      // is not in the report yet: the refresh reads the journal while it runs, so the 5 minutes before count too.
+      ReportAt = If(IsBlank(First(PowerBIIntegration.Data).'Report at'), Blank(), DateTimeValue(First(PowerBIIntegration.Data).'Report at'));
+      ReportSince = If(IsBlank(ReportAt), Blank(), DateAdd(ReportAt, -5, TimeUnit.Minutes));
+      ReportAtText = If(IsBlank(ReportAt), "", IsToday(ReportAt), Text(ReportAt, "hh:mm"), Text(ReportAt, "d mmm hh:mm"));
+      // The start of the next window after now, in words: the answer when the window of now is taken.
+      RefreshNextText = With(
+          { clock: Hour(Now()) * 60 + Minute(Now()) },
+          With(
+              { following: If(clock < RefreshFromMinutes, RefreshFromMinutes, RefreshFromMinutes + (RoundDown((clock - RefreshFromMinutes) / RefreshWindowMinutes, 0) + 1) * RefreshWindowMinutes) },
+              If(following >= RefreshToMinutes, "the next is the morning refresh at " & RefreshScheduled, "the next from " & Text(Time(RoundDown(following / 60, 0), Mod(following, 60), 0), "hh:mm"))));
+      // The header line of the app (D334): the time of the report's data and the changes saved since then (PendingWhere: where
+      // the app counts them, " on these lines" or nothing).
+      ReportLine = If(
+          IsBlank(ReportAt), ReportUnknownText,
+          "Report data from " & ReportAtText & ". " &
+          If(
+              PendingCount = 0, "Everything saved" & PendingWhere & " is in it.",
+              PendingCount & If(PendingCount = 1, " change", " changes") & PendingWhere & " since then " & If(PendingCount = 1, "is", "are") & " not in it yet."));
+      // What the button Refresh now says after the flow SACMRefresh answers (F5: started, taken, closed, refused, error).
+      RefreshStartedText = "The report refreshes now. In about 2 minutes, press Refresh in the report's top bar to see it.";
+      RefreshClosedText = "Refresh now works from 08:00 to 18:00. The report refreshes at 07:00.";
+      RefreshErrorText = "The refresh could not be asked. Your work is saved. Tell the owner of the report if it happens again.";
+
       SettingCatalog = Table(
           { Key: "reminderDays", Label: "Working days before a reminder is due", Min: 1, Max: 30, Default: 3, Order: 1 },
           { Key: "maxReminders", Label: "Reminders before Escalate", Min: 0, Max: 10, Default: 2, Order: 2 },
@@ -41,7 +76,7 @@ App:
           { Id: "not-in-epo", Label: "Not in EPO" }
       );
 
-      // The named formulas of the Power App "SACM audit" (build B8, D306, D308), written by hand. npm run powerbi:generate puts
+      // The named formulas of the Power App "SACM audit" (builds B8 and 0.52.0, D306, D308, D334), written by hand. npm run powerbi:generate puts
       // them after the settings and the results of the review (SettingCatalog, ReviewResults) into App-Formulas.fx (to paste
       // into App → Formulas) and Src/App.pa.yaml. Words of the app: plain English, as in the report.
       //
@@ -57,16 +92,33 @@ App:
       MeName = Coalesce(Me.Title, User().FullName);
       MeEmail = Lower(User().Email);
 
-      // The lifecycle review (D192, D306). CurrentLines: the CIs of the newest review; NextLines: the CIs a new review draws
-      // from the newest CI report (fnReviewDraw of the report: the same report always draws the same CIs), in their order.
-      CurrentLines = Sort(Filter(Lines, IsCurrent), Order);
-      CurrentId = First(CurrentLines).Review;
+      // The lifecycle review (D192, D306). ReportCurrentLines: the CIs of the newest review in the report; NextLines: the CIs
+      // a new review draws from the newest CI report (fnReviewDraw of the report: the same report always draws the same CIs),
+      // in their order.
+      ReportCurrentLines = Sort(Filter(Lines, IsCurrent), Order);
       NextLines = Sort(Filter(Lines, IsNext), Order);
       // A review is known by the day it starts: "2026-11-12_lifecycle" (reviewId of the HTML app).
       TodayId = Text(Today(), "yyyy-mm-dd") & "_lifecycle";
-      // A review started today is never started again: it is in the report, or in the journal before the refresh shows it
-      // (Type and Ref are tested in SharePoint, so they are delegated).
-      StartedToday = CurrentId = TodayId || !IsEmpty(Filter('SACM Journal', Type = "review" && Ref = TodayId));
+      // The review of today is in the journal (Type and Ref are tested in SharePoint, so they are delegated).
+      TodayInJournal = !IsEmpty(Filter('SACM Journal', Type = "review" && Ref = TodayId));
+      // A review started today is never started again: it is in the report, or in the journal before the refresh shows it.
+      StartedToday = First(ReportCurrentLines).Review = TodayId || TodayInJournal;
+      // The review of today before the refresh shows it (build 0.52.0, D334): the journal has it, the report's newest review is
+      // older. Then the review to mark is today's: its CIs are NextLines (New review saved exactly them in Items) and its id
+      // TodayId, so a mark never goes to the previous review while the refresh is hours away.
+      ReviewPending = TodayInJournal && First(ReportCurrentLines).Review <> TodayId;
+      CurrentLines = If(ReviewPending, NextLines, ReportCurrentLines);
+      CurrentId = If(ReviewPending, TodayId, First(ReportCurrentLines).Review);
+      // The marks saved on the review since the report's data, by anyone (D334): the report shows them after the next
+      // refresh. ForAll keeps them in the app (Type, Ref and At are tested in SharePoint, so they are delegated).
+      MarksSince = ForAll(
+          Filter('SACM Journal', Type = "review" && Ref = CurrentId && At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))) As row,
+          { CiKey: row.CiKey, Reason: row.Reason, At: row.At, ByName: Coalesce(row.ByName, row.By) });
+      MarkedSince = Filter(MarksSince, !IsBlank(CiKey));
+      // The header line (D334): every journal row of the team saved since the report's data.
+      PendingCount = CountRows(Filter('SACM Journal', At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))));
+      PendingWhere = "";
+      ReportUnknownText = "The report gave the app no line.";
       // The sample as the journal keeps it (the column Items of SACM Journal, read by LifecycleReviews): the report, its date
       // and the CIs, as the HTML app saves a review in data/reviews/.
       NewReviewItems = JSON(
@@ -78,9 +130,10 @@ App:
           JSONFormat.Compact);
       NewReviewText = "Started the lifecycle review of " & Text(Today(), "yyyy-mm-dd") & ": " & CountRows(NextLines) & " CIs drawn from " &
           First(NextLines).Report & " (report of " & Text(First(NextLines).ReportDate, "yyyy-mm-dd") & ")";
-      MarkedCount = CountRows(Filter(CurrentLines, !IsBlank(Result)));
+      MarkedCount = CountRows(Filter(CurrentLines As line, !IsBlank(line.Result) || line.CiKey in MarkedSince.CiKey));
       // The CIs not marked yet whose status EPO shows the same: one press marks them all "same" (markSameAsEpo of the HTML app).
-      AgreeingLines = Filter(CurrentLines, Agrees);
+      // Not those marked since the report's data.
+      AgreeingLines = Filter(CurrentLines As line, line.Agrees && !(line.CiKey in MarkedSince.CiKey));
       AgreeNote = "Same status in the EPO systems report of " & Text(First(CurrentLines).EpoDate, "d mmm yyyy", "en-US");
 
       // The settings (D158; rowsInEmail, D314): each number with the value that counts now: the last row of its key in SACM Settings when it is a

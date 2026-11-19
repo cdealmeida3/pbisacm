@@ -1,4 +1,4 @@
-# The one screen of the Power App "SACM messages", the email studio (builds B7 and D5, D301, D313 to D317), written by
+# The one screen of the Power App "SACM messages", the email studio (builds B7, D5 and 0.52.0, D301, D313 to D317, D334), written by
 # hand. To use it: in Power Apps Studio, select the screen in the Tree view, then Paste (Ctrl+V) this whole file
 # (powerbi/README.md §6.6). It is drawn for the place of the app on the page Messages: 1032 × 620 (README §6.4).
 # Three columns, as the mockup of design A (design pass §7):
@@ -9,11 +9,13 @@
 #     colleague wrote to the same person or about the same cases in the last 24 hours; and the buttons:
 #       Send (the main button): flow F2 (SACMSend) sends it from the shared mailbox, with its file. Then the app adds the
 #         message to the list SACM Journal (D272: rows are only added) for EVERY part of the email, under its one
-#         reference, and asks flow F5 (SACMRefresh) to refresh the report.
+#         reference. No refresh (D332): the email stays in the list, Sent for everyone, until the next refresh (D334).
 #       Test to me: flow F4 (SACMTest) sends it, with its file, to the manager only. The cases are not changed.
 #       Outlook draft: flow F7 (SACMDraft) puts it in the manager's own Drafts, From = the shared mailbox (D315), and
 #         Outlook on the web opens it. The manager sends it there, then answers "Sent from Outlook?". Yes records it.
 #       Teams: opens a Teams chat with the person and the first message, then asks "Did you start the chat?".
+# At the top, the header line (D334): the time of the report's data, the changes since then, and Refresh now (flow F5,
+# once in each window of the refresh rule, D333).
 # Nothing is sent without a press (D2). One main button (LOOK rule 6); a grey button says why (LOOK rule 7).
 Screens:
   MessagesScreen:
@@ -39,7 +41,48 @@ Screens:
             Color: =ColourInk
             X: =16
             Y: =10
-            Width: =Parent.Width - 520
+            Width: =232
+            Height: =32
+      - ReportLabel:
+          Control: Label
+          Properties:
+            # The header line (D334): the time of the report's data, and how many changes of the team it does not show yet.
+            Text: =ReportLine
+            Tooltip: =RefreshRuleText
+            Font: =AppFont
+            Size: =9
+            Color: =ColourMuted
+            X: =264
+            Y: =8
+            Width: =Parent.Width - 264 - 336 - 128
+            Height: =36
+      - RefreshButton:
+          Control: ModernButton@1.0.0
+          Properties:
+            # The only control that asks for a refresh (D332, lint): flow F5 refreshes at most once in each window (D333)
+            # and answers what happened. The same formula in the three apps.
+            Text: ="Refresh now"
+            Icon: ="ArrowSync"
+            Appearance: =ButtonAppearance.Subtle
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Tooltip: =RefreshRuleText
+            OnSelect: |-
+              =With(
+                  { answer: IfError(SACMRefresh.Run(), { result: "error", at: "", by: "", message: "" }) },
+                  Switch(
+                      answer.result,
+                      "started", Notify(RefreshStartedText, NotificationType.Success),
+                      "taken", Notify(Coalesce(answer.by, "A colleague") & " asked for a refresh at " & answer.at & ". One refresh every " & RefreshWindowWords & ": " & RefreshNextText & ". Your work is saved, and this app shows it.", NotificationType.Information),
+                      "closed", Notify(RefreshClosedText, NotificationType.Information),
+                      "refused", Notify("Power BI did not start the refresh: " & answer.message & ". Your work is saved.", NotificationType.Warning),
+                      Notify(RefreshErrorText, NotificationType.Error)
+                  )
+              )
+            X: =Parent.Width - 336 - 120
+            Y: =10
+            Width: =112
             Height: =32
       - KindTabs:
           Control: ModernTabList@1.0.0
@@ -53,9 +96,9 @@ Screens:
             Size: =10
             AccessibleLabel: ="Which emails the list shows"
             Visible: =DraftCount > 0
-            X: =Parent.Width - 496
+            X: =Parent.Width - 336
             Y: =8
-            Width: =480
+            Width: =320
             Height: =36
       - HeadRule:
           Control: Rectangle
@@ -134,16 +177,16 @@ Screens:
                   # The kind in a word, in its colour (LOOK rule 5); Sent once this app sent it.
                   Text: |-
                     =If(
-                        ThisItem.SentKey in varSentIds, "Sent",
+                        (ThisItem.IsSent || ThisItem.SentKey in varSentIds), "Sent",
                         Switch(ThisItem.Kind, "first", "First", "reminder", "Reminder", "escalation", "Escalate", ThisItem.KindLabel))
                   Font: =AppFont
                   FontWeight: =FontWeight.Semibold
                   Size: =9
                   Align: =Align.Center
                   Color: |-
-                    =If(ThisItem.SentKey in varSentIds, ColourBlue, Coalesce(LookUp(KindColour, Kind = ThisItem.Kind).Ink, ColourGrey))
+                    =If((ThisItem.IsSent || ThisItem.SentKey in varSentIds), ColourBlue, Coalesce(LookUp(KindColour, Kind = ThisItem.Kind).Ink, ColourGrey))
                   Fill: |-
-                    =If(ThisItem.SentKey in varSentIds, ColourBlueSoft, Coalesce(LookUp(KindColour, Kind = ThisItem.Kind).Soft, ColourGreySoft))
+                    =If((ThisItem.IsSent || ThisItem.SentKey in varSentIds), ColourBlueSoft, Coalesce(LookUp(KindColour, Kind = ThisItem.Kind).Soft, ColourGreySoft))
                   X: =Parent.TemplateWidth - 92
                   Y: =10
                   Width: =80
@@ -420,20 +463,21 @@ Screens:
             Text: |-
               =If(
                   DraftCount = 0, "",
-                  DraftGallery.Selected.SentKey in varSentIds && varLast.Key <> DraftGallery.Selected.SentKey,
-                  "Recorded in this session. The report shows it after the refresh, in about a minute.",
-                  DraftGallery.Selected.SentKey in varSentIds,
+                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds) && varLast.Key <> DraftGallery.Selected.SentKey,
+                  // Sent by a colleague, or in another session, since the report's data (D334).
+                  "Sent by " & Coalesce(DraftGallery.Selected.SentBy, MeName) & If(IsBlank(DraftGallery.Selected.SentAt), "", " at " & Text(DraftGallery.Selected.SentAt, "hh:mm")) & ". It leaves the list after the next refresh.",
+                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds),
                   Switch(varLast.Channel, "teams", "Teams chat recorded with ", "outlook", "Recorded as sent from Outlook to ", "Sent from the SACM mailbox to ") &
                   varLast.To & " at " & Text(varLast.At, "hh:mm") & ". " & varLast.Cases &
-                  If(varLast.Cases = 1, " case is", " cases are") & " now asked. The report shows it after the refresh, in about a minute.",
+                  If(varLast.Cases = 1, " case is", " cases are") & " now asked. It leaves the list after the next refresh.",
                   !IsBlank(WarnLabel.Text), WarnLabel.Text,
                   "Nobody in the team wrote to this person, or about these cases, in the last 24 hours.")
             Font: =AppFont
             Size: =9.5
             Color: |-
-              =If(DraftGallery.Selected.SentKey in varSentIds, ColourBlue, !IsBlank(WarnLabel.Text), ColourAmber, ColourGrey)
+              =If((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds), ColourBlue, !IsBlank(WarnLabel.Text), ColourAmber, ColourGrey)
             Fill: |-
-              =If(DraftGallery.Selected.SentKey in varSentIds, ColourBlueSoft, !IsBlank(WarnLabel.Text), ColourAmberSoft, ColourGreySoft)
+              =If((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds), ColourBlueSoft, !IsBlank(WarnLabel.Text), ColourAmberSoft, ColourGreySoft)
             PaddingLeft: =10
             PaddingRight: =10
             Visible: =DraftCount > 0
@@ -450,7 +494,7 @@ Screens:
             Font: =AppFont
             Size: =10
             Visible: |-
-              =DraftCount > 0 && !IsBlank(WarnLabel.Text) && !(DraftGallery.Selected.SentKey in varSentIds)
+              =DraftCount > 0 && !IsBlank(WarnLabel.Text) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
             X: =Parent.Width - 256
             Y: =394
             Width: =240
@@ -465,7 +509,7 @@ Screens:
                   DraftCount = 0, "",
                   !IsBlank(varAsk) && varAsk.Keys <> DraftGallery.Selected.Keys, "Answer first whether the email to " & varAsk.To & " went: open it in the list.",
                   IsBlank(RefValue.Text), "Press the email in the list to open it.",
-                  DraftGallery.Selected.SentKey in varSentIds, "Sent. It leaves the list after the refresh.",
+                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds), "Sent. It leaves the list after the next refresh.",
                   DraftGallery.Selected.Whole = "cut", "The report gave the app only part of this email (it is too long for the Power Apps visual). Tell the project thread; lower rowsInEmail in Settings to shorten it.",
                   DraftGallery.Selected.Whole = "unknown", "Add the fields HtmlLength and CsvLength of Drafts to the Power Apps visual (README 6.6).",
                   IsBlank(Trim(ToText.Text)), "Fill in To first.",
@@ -483,9 +527,9 @@ Screens:
             # Teams, then Next email.
             Text: |-
               =If(
-                  !IsBlank(SendWhy.Text) && !(DraftGallery.Selected.SentKey in varSentIds), SendWhy.Text,
-                  DraftGallery.Selected.SentKey in varSentIds,
-                  If(IsBlank(LookUp(DraftGallery.AllItems, !(SentKey in varSentIds))), "Sent. Every email of the list is recorded.", SendWhy.Text),
+                  !IsBlank(SendWhy.Text) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds)), SendWhy.Text,
+                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds),
+                  If(IsBlank(LookUp(DraftGallery.AllItems, !(IsSent || SentKey in varSentIds))), "Sent. Every email of the list is recorded.", SendWhy.Text),
                   !IsBlank(TeamsWhy.Text), "Teams is off: " & TeamsWhy.Text,
                   "")
             Font: =AppFont
@@ -507,7 +551,7 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: ="Put it in your own Drafts in Outlook, From the SACM mailbox, to change it before you send it"
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !(DraftGallery.Selected.SentKey in varSentIds)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
             DisplayMode: =If(IsBlank(SendWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
               =With(
@@ -558,7 +602,7 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: =Coalesce(TeamsWhy.Text, "Open a Teams chat with the person, with the first message ready")
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !(DraftGallery.Selected.SentKey in varSentIds)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
             DisplayMode: =If(IsBlank(SendWhy.Text) && IsBlank(TeamsWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
               =With(
@@ -611,7 +655,7 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: ="Send it, with its file, to you only. The cases are not changed."
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !(DraftGallery.Selected.SentKey in varSentIds)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
             DisplayMode: =If(IsBlank(RefValue.Text) || DraftGallery.Selected.Whole <> "yes", DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =With(
@@ -640,7 +684,7 @@ Screens:
             Size: =10.5
             FontWeight: =FontWeight.Semibold
             Tooltip: ="Send it from the shared SACM mailbox, with its file, and record it on the cases"
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !(DraftGallery.Selected.SentKey in varSentIds)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
             DisplayMode: =If(IsBlank(SendWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
               =Set(varError, "");
@@ -682,14 +726,13 @@ Screens:
                                   !IsBlank(d.FreeKeys) && !IsBlank(MeName),
                                   Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "assign", Keys: d.FreeKeys, Text: MeName })
                               );
-                              Notify("Sent from the shared mailbox to " & to & ". The report shows it after the next refresh, in about a minute.", NotificationType.Success),
+                              Notify("Sent from the shared mailbox to " & to & ". It leaves the list after the next refresh.", NotificationType.Success),
                               Notify("Sent, but not recorded: " & FirstError.Message & ". Add a note on the cases.", NotificationType.Error)
                           )
                       );
                       Set(varSentIds, varSentIds & d.SentKey);
                       Set(varLast, { Key: d.SentKey, Channel: "mailbox", To: to, At: Now(), Cases: CountRows(Filter(Split(d.Keys, Char(10)), !IsBlank(Value))) });
-                      Reset(AnywayCheck);
-                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning))
+                      Reset(AnywayCheck)
                   )
               )
             X: =Parent.Width - 132
@@ -708,15 +751,15 @@ Screens:
             Font: =AppFont
             Size: =10.5
             FontWeight: =FontWeight.Semibold
-            Visible: =DraftCount > 0 && DraftGallery.Selected.SentKey in varSentIds
+            Visible: =DraftCount > 0 && (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds)
             DisplayMode: |-
-              =If(IsBlank(LookUp(DraftGallery.AllItems, !(SentKey in varSentIds))), DisplayMode.Disabled, DisplayMode.Edit)
+              =If(IsBlank(LookUp(DraftGallery.AllItems, !(IsSent || SentKey in varSentIds))), DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =With(
                   {
                       next: Coalesce(
-                          LookUp(DraftGallery.AllItems, Value(Mid(DraftId, 2)) > Value(Mid(DraftGallery.Selected.DraftId, 2)) && !(SentKey in varSentIds)),
-                          LookUp(DraftGallery.AllItems, !(SentKey in varSentIds)))
+                          LookUp(DraftGallery.AllItems, Value(Mid(DraftId, 2)) > Value(Mid(DraftGallery.Selected.DraftId, 2)) && !(IsSent || SentKey in varSentIds)),
+                          LookUp(DraftGallery.AllItems, !(IsSent || SentKey in varSentIds)))
                   },
                   Set(varOpen, next.DraftId);
                   Reset(AnywayCheck);
@@ -793,8 +836,7 @@ Screens:
                       Notify(If(sent.Channel = "teams", "Recorded: the Teams chat.", "Recorded as sent from Outlook.") & " The report shows it after the next refresh.", NotificationType.Success);
                       Set(varSentIds, varSentIds & sent.SentKey);
                       Set(varLast, { Key: sent.SentKey, Channel: sent.Channel, To: sent.To, At: Now(), Cases: CountRows(Filter(Split(sent.Keys, Char(10)), !IsBlank(Value))) });
-                      Set(varAsk, Blank());
-                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Set(varAsk, Blank()),
                       Notify("Not recorded: " & FirstError.Message, NotificationType.Error)
                   )
               )

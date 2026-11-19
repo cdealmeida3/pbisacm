@@ -26,7 +26,42 @@ App:
       ColourGreySoft = ColorValue("#f2f4f7");
       AppFont = "Segoe UI";
 
-      // The named formulas of the Power App "SACM messages", the email studio (builds B7 and D5, D301, D313 to D317), written
+      // The refresh rule (D333, powerbi/apps/refresh.json): one refresh on demand in each window, from RefreshFrom to RefreshTo,
+      // and the scheduled refresh in the morning. The times are the team's (the browser's time of the managers).
+      RefreshWindowMinutes = 120;
+      RefreshFromMinutes = 480;
+      RefreshToMinutes = 1080;
+      RefreshFrom = "08:00";
+      RefreshTo = "18:00";
+      RefreshScheduled = "07:00";
+      RefreshWindowWords = "2 hours";
+      RefreshRuleText = "Refresh now: once every 2 hours, 08:00 to 18:00. The report refreshes at 07:00.";
+      // The time of the report's data: the field Report at of the visual (About[Report at], the refresh time in UTC as
+      // yyyy-mm-ddThh:nn:ssZ), in the browser's time. Blank when the visual gives no row. A journal row from ReportSince on
+      // is not in the report yet: the refresh reads the journal while it runs, so the 5 minutes before count too.
+      ReportAt = If(IsBlank(First(PowerBIIntegration.Data).'Report at'), Blank(), DateTimeValue(First(PowerBIIntegration.Data).'Report at'));
+      ReportSince = If(IsBlank(ReportAt), Blank(), DateAdd(ReportAt, -5, TimeUnit.Minutes));
+      ReportAtText = If(IsBlank(ReportAt), "", IsToday(ReportAt), Text(ReportAt, "hh:mm"), Text(ReportAt, "d mmm hh:mm"));
+      // The start of the next window after now, in words: the answer when the window of now is taken.
+      RefreshNextText = With(
+          { clock: Hour(Now()) * 60 + Minute(Now()) },
+          With(
+              { following: If(clock < RefreshFromMinutes, RefreshFromMinutes, RefreshFromMinutes + (RoundDown((clock - RefreshFromMinutes) / RefreshWindowMinutes, 0) + 1) * RefreshWindowMinutes) },
+              If(following >= RefreshToMinutes, "the next is the morning refresh at " & RefreshScheduled, "the next from " & Text(Time(RoundDown(following / 60, 0), Mod(following, 60), 0), "hh:mm"))));
+      // The header line of the app (D334): the time of the report's data and the changes saved since then (PendingWhere: where
+      // the app counts them, " on these lines" or nothing).
+      ReportLine = If(
+          IsBlank(ReportAt), ReportUnknownText,
+          "Report data from " & ReportAtText & ". " &
+          If(
+              PendingCount = 0, "Everything saved" & PendingWhere & " is in it.",
+              PendingCount & If(PendingCount = 1, " change", " changes") & PendingWhere & " since then " & If(PendingCount = 1, "is", "are") & " not in it yet."));
+      // What the button Refresh now says after the flow SACMRefresh answers (F5: started, taken, closed, refused, error).
+      RefreshStartedText = "The report refreshes now. In about 2 minutes, press Refresh in the report's top bar to see it.";
+      RefreshClosedText = "Refresh now works from 08:00 to 18:00. The report refreshes at 07:00.";
+      RefreshErrorText = "The refresh could not be asked. Your work is saved. Tell the owner of the report if it happens again.";
+
+      // The named formulas of the Power App "SACM messages", the email studio (builds B7, D5 and 0.52.0, D301, D313 to D317, D334), written
       // by hand. npm run powerbi:generate puts the look of the report before them in App-Formulas.fx (to paste into App →
       // Formulas) and Src/App.pa.yaml. Words of the app: plain English, as in the report.
       //
@@ -61,6 +96,18 @@ App:
           'SACM Journal',
           Type = "message" && At >= DateAdd(Now(), -DoubleContactHours, TimeUnit.Hours) && By <> MeEmail);
 
+      // The emails recorded since the time of the report's data (build 0.52.0, D334): the journal rows of type message from
+      // ReportSince on, by anyone (Type and At are tested in SharePoint, so they are delegated; ForAll keeps them in the app).
+      // The report shows an email in the list until the next refresh, which can be two hours away: an email whose cases one of
+      // these rows names is Sent for everyone (the buttons are off), not only in the session that sent it.
+      SentRows = ForAll(
+          Filter('SACM Journal', Type = "message" && At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))) As row,
+          { Keys: row.Keys, At: row.At, ByName: Coalesce(row.ByName, row.By) });
+      // The header line (D334): every journal row of the team saved since the report's data.
+      PendingCount = CountRows(Filter('SACM Journal', At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))));
+      PendingWhere = "";
+      ReportUnknownText = "No email from the report now.";
+
       // The emails, in the order of the HTML app (D0001 first): one per message, on its first part, with the cases of all its
       // parts. Keys, NewKeys and FreeKeys are lists of keys, one per line (Char(10)). An email of an older report (no
       // EmailId) is its draft alone.
@@ -68,33 +115,44 @@ App:
           Sort(Filter(Drafts, IsBlank(EmailId) || EmailId = DraftId), DraftId) As email,
           With(
               { parts: If(IsBlank(email.EmailId), Filter(Drafts, DraftId = email.DraftId), Filter(Drafts, EmailId = email.DraftId)) },
-              {
-                  DraftId: email.DraftId, Ref: email.Ref, Kind: email.Kind, KindLabel: email.KindLabel,
-                  To: email.To, ToName: email.ToName, Cc: email.Cc, About: email.About, NobodyAbove: email.NobodyAbove,
-                  Mailbox: email.Mailbox, AssignedTo: email.AssignedTo, Chat: email.Chat,
-                  Subject: Coalesce(email.EmailSubject, email.Subject),
-                  Html: Coalesce(email.Html, email.Body),
-                  Csv: email.Csv,
-                  Summary: email.Summary,
-                  // The Power Apps visual may pass a long text cut (a limit of about 32,000 characters is reported for the visuals
-                  // of Power BI): "cut" when the email or its file is shorter than the report says (Drafts[HtmlLength],
-                  // [CsvLength]), "unknown" when the visual has not these two fields. The app sends neither (README §6.6).
-                  Whole: If(
-                      IsBlank(email.Html), "yes",
-                      IsBlank(email.HtmlLength) || IsBlank(email.CsvLength), "unknown",
-                      Len(email.Html) = email.HtmlLength && Len(email.Csv) = email.CsvLength, "yes",
-                      "cut"),
-                  // What the app remembers of an email it recorded, until the refresh takes it off the list: its first key
-                  // between two line breaks (a refresh may number the drafts again, the keys stay).
-                  SentKey: Char(10) & First(Split(Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)), Char(10))).Value & Char(10),
-                  PartCount: CountRows(parts),
-                  CiCount: Sum(parts, CiCount),
-                  Keys: Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)),
-                  NewKeys: Concat(Filter(parts, !IsBlank(NewKeys)), NewKeys, Char(10)),
-                  FreeKeys: Concat(Filter(parts, !IsBlank(FreeKeys)), FreeKeys, Char(10)),
-                  // The parts of "In this email" (one line each in Summary), for the line of the list.
-                  Topics: If(IsBlank(email.Summary), 1, CountRows(Split(email.Summary, Char(10))))
-              }
+              With(
+                  { keys: Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)) },
+                  With(
+                      // The newest message recorded since the report's data on one of the cases of the email (SentRows).
+                      { sent: First(Sort(Filter(SentRows As row, CountRows(Filter(Split(row.Keys, Char(10)) As key, !IsBlank(Trim(key.Value)) && (Char(10) & Trim(key.Value) & Char(10)) in (Char(10) & keys & Char(10)))) > 0), At, SortOrder.Descending)) },
+                      {
+                          DraftId: email.DraftId, Ref: email.Ref, Kind: email.Kind, KindLabel: email.KindLabel,
+                          To: email.To, ToName: email.ToName, Cc: email.Cc, About: email.About, NobodyAbove: email.NobodyAbove,
+                          Mailbox: email.Mailbox, AssignedTo: email.AssignedTo, Chat: email.Chat,
+                          Subject: Coalesce(email.EmailSubject, email.Subject),
+                          Html: Coalesce(email.Html, email.Body),
+                          Csv: email.Csv,
+                          Summary: email.Summary,
+                          // The Power Apps visual may pass a long text cut (a limit of about 32,000 characters is reported for the visuals
+                          // of Power BI): "cut" when the email or its file is shorter than the report says (Drafts[HtmlLength],
+                          // [CsvLength]), "unknown" when the visual has not these two fields. The app sends neither (README §6.6).
+                          Whole: If(
+                              IsBlank(email.Html), "yes",
+                              IsBlank(email.HtmlLength) || IsBlank(email.CsvLength), "unknown",
+                              Len(email.Html) = email.HtmlLength && Len(email.Csv) = email.CsvLength, "yes",
+                              "cut"),
+                          // What the app remembers of an email it recorded, until the refresh takes it off the list: its first key
+                          // between two line breaks (a refresh may number the drafts again, the keys stay).
+                          SentKey: Char(10) & First(Split(Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)), Char(10))).Value & Char(10),
+                          PartCount: CountRows(parts),
+                          CiCount: Sum(parts, CiCount),
+                          Keys: keys,
+                          // Sent since the report's data, by anyone (D334): who and when.
+                          IsSent: !IsBlank(sent.At),
+                          SentBy: sent.ByName,
+                          SentAt: sent.At,
+                          NewKeys: Concat(Filter(parts, !IsBlank(NewKeys)), NewKeys, Char(10)),
+                          FreeKeys: Concat(Filter(parts, !IsBlank(FreeKeys)), FreeKeys, Char(10)),
+                          // The parts of "In this email" (one line each in Summary), for the line of the list.
+                          Topics: If(IsBlank(email.Summary), 1, CountRows(Split(email.Summary, Char(10))))
+                      }
+                  )
+              )
           )
       );
       EmailCount = CountRows(Emails);

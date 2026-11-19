@@ -93,8 +93,53 @@ test('the apps use the modern controls, with only the properties Microsoft gives
   assert.ok(problems.some((line) => line.includes('has the property FontSize')));
 });
 
-test('the app may add a row to the journal with its columns, and run the refresh flow', () => {
-  assert.deepEqual(callProblems([formula('ok', [patch(['Title', 'At', 'Keys']), { name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }])]), []);
+test('the app may add a row to the journal with its columns, and run the refresh flow from its button Refresh now', () => {
+  const button: Formula = { ...formula('ok', [{ name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }]), where: '/Screens/S/Children/3/RefreshButton/Properties/OnSelect' };
+  assert.deepEqual(callProblems([formula('ok', [patch(['Title', 'At', 'Keys'])]), button]), []);
+});
+
+test('a Save, or any other control or a named formula, that runs the refresh flow is a problem (D332)', () => {
+  const save: Formula = { ...formula('save', [patch(['Title']), { name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }]), where: '/Screens/S/Children/9/SaveButton/Properties/OnSelect' };
+  const named: Formula = { ...formula('named', [{ name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }]), where: '/App/Properties/Formulas/Refresh' };
+  const problems = callProblems([save, named]);
+  assert.equal(problems.filter((line) => line.includes('only the button Refresh now')).length, 2);
+  // Another flow may run from any button.
+  const send: Formula = { ...formula('send', [patch(['Title']), { name: 'Run', namespace: 'SACMSend', source: null, second: null, fields: [] }]), file: 'powerbi/apps/sacm-messages/Src/X.pa.yaml', where: '/Screens/S/Children/9/SendButton/Properties/OnSelect' };
+  assert.deepEqual(callProblems([send]), []);
+});
+
+test('a refresh goes through the gate: Now, Minutes, Open, Window, the row in SACM Refreshes, and only then the refresh (D333)', () => {
+  const f5 = appFlows().find((flow) => flow.id === 'F5')!;
+  const f3 = appFlows().find((flow) => flow.id === 'F3')!;
+  const f1 = appFlows().find((flow) => flow.id === 'F1')!;
+  assert.deepEqual(flowProblems([f5, f3, f1]), []);
+  assert.ok(!f1.steps.some((step) => step.action === 'Refresh a dataset'), 'F1 does not refresh (D332)');
+  // The old F5: a refresh and a Delay, no gate.
+  const old: Flow = { ...f5, steps: [
+    { action: 'Refresh a dataset', connector: 'Power BI', fields: { Workspace: 'SACM Workbench', Dataset: 'SACM-Workbench' } },
+    { action: 'Delay', connector: 'Schedule', fields: { Count: '2', Unit: 'Minute' } }
+  ] };
+  const problems = flowProblems([old]);
+  assert.ok(problems.some((line) => line.includes('the step "Delay"')));
+  assert.ok(problems.some((line) => line.includes('without the step Now')));
+  assert.ok(problems.some((line) => line.includes('without the condition Open')));
+  assert.ok(problems.some((line) => line.includes('without first adding the window to SACM Refreshes')));
+  assert.ok(problems.some((line) => line.includes('the workspace "SACM Workbench"')));
+  assert.ok(problems.some((line) => line.includes('never answers the app taken')));
+  // A refresh that does not wait for the lock, other hours, another field in the list, a flow that files reports and refreshes.
+  const loose: Flow = { ...f5, steps: f5.steps.map((step) => {
+    if (step.action === 'Refresh a dataset') return { ...step, if: 'Open is Yes' };
+    if (step.fields.Name === 'Open') return { ...step, fields: { ...step.fields, Expression: step.fields.Expression!.replace('1080', '1200') } };
+    if (step.action === 'Create item') return { ...step, fields: { ...step.fields, Note: 'x' } };
+    if (step.action === 'Respond to a PowerApp or flow' && step.fields.Result === 'closed') return { ...step, fields: { Result: 'closed' } };
+    return step;
+  }) };
+  const more = flowProblems([loose, { ...f1, steps: [...f1.steps, ...f5.steps.filter((step) => step.action !== 'Respond to a PowerApp or flow')], trigger: f1.trigger }]);
+  assert.ok(more.some((line) => line.includes('refreshes even when the window is taken')));
+  assert.ok(more.some((line) => line.includes('the condition Open is')));
+  assert.ok(more.some((line) => line.includes('the field Note to SACM Refreshes')));
+  assert.ok(more.some((line) => line.includes('every answer must give the outputs Result, At, By, Message')));
+  assert.ok(more.some((line) => line.includes('files reports and refreshes')));
 });
 
 test('changing or removing a row, another list, an unknown column, another connector or no journal row at all is a problem', () => {
