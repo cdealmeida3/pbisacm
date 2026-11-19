@@ -42,7 +42,7 @@ The report opens on the **My day** page. Look at:
 | **Audit export** | The export of a period (**Period of the export**): what was verified (2 findings solved on 11 November, with the days to verify), the actions of the team, the CI reports loaded, the findings per check and those new in the period, and what was open at the end. **More options (...)**, **Export data** on each table gives the Excel file. |
 | **Not followed** | The exceptions (the 3 decisions to stop following: 2 still run, 1 ended on 10 November) and the cases not followed up. The app *SACM actions* sits at the right for **Follow again** (section 6.4). |
 | **Lifecycle review** | The lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The marks, then the evidence (who checked, the case, when it was asked); the app *SACM audit* sits at the right (section 6.8). |
-| **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. Below: the runs, the classes and the files that could not be read (none for the samples). |
+| **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. First, the box **What to fix in the folder**: a kind with no file, the columns the CI report lacks (one line to copy; the samples lack 3), a file not used and why, then the files the report knows but does not use. Below: the runs and the classes. |
 | **Cards** | Two tabs. **Sections**: the three sections side by side, each card with a badge (the number to solve, a tick when OK) and a small line of its report dates. **List**: one row per check, as before. Select a card, then **Open card**. On the list: the three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. The row of states (*To solve*, *To check*, *OK*, *Not tested*) and **Topic** filter the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
 | **Card** (drill through) | On All cards select a card and press **Open card**. **Back**, the card and what it finds, then the tabs **To solve with a person** (the lines by the person to ask, then the kind of problem, with why a line waits), **SACM fix list** (with **Open in ServiceNow**), **To check** (the lines to check first) and **Export** (the columns of the SACM template: **More options (...)**, **Export data** gives the Excel file). At the right the app, *About this card* with the numbers, and **Open CI** for the line selected. A contract shows as `CT…: name`. |
 | **Case** (drill through) | On a card or a person select a line and press **Open CI**. **Back**, the CI and its fields, then the tabs **Problems** (each problem, its state, why it waits, who is asked, the follow-up, **Open in ServiceNow**), **People** (who is asked, copied, who gets an escalation), **Relationships** (every CI above and below it, and whether the line counts), **Timeline** and **Replies**. The app *SACM actions* at the right (section 6.4). |
@@ -145,10 +145,15 @@ reports there (flow F1 of the plan). The real site and folder are typed in Power
 How a file is read:
 
 - Files ending in `.csv`, `.xlsx` or `.txt` are read; others, and Office's temporary files (`~$...`), are not.
-- The kind of report is found from its columns, as in the HTML app. A file that is no known report is listed under
-  "Files not read" on the Reports page, with what it is missing.
+- The kind of report is found from its columns, as in the HTML app. A file that is no known report is listed in the box
+  **What to fix in the folder** on the Reports page, with what it is missing. A CMDB Health result and the contract–CI
+  links are known files: listed there as "known", never read as a report (D341, D342).
 - The date of a report is the `yyyy-MM-dd_` at the start of its file name (for example `2026-11-17_cmdb_ci.csv`), else the
   day the file was last changed. The newest file of each kind is the one the checks use.
+- Two files of one kind with the same date (a copy such as `…_1cmdb…`): the report uses the one with the most columns,
+  then the most rows, then the one changed last, then the last name (D348). The box says which file is not used and
+  why; move it into the sub-folder *Archive*.
+- The box also lists the columns the newest CI report lacks, in one line to copy into the ServiceNow report (D347).
 
 To go back to the samples, set **SourceMode** to `Sample` again.
 
@@ -423,8 +428,9 @@ scheduled refresh (it stays in the flow, never in the repository).
    email is HTML: in the editor press **</>** first, then put the input).
 4. **Show advanced options → Attachments**: press **T** (*Switch to input entire array*) and put this expression (the
    file of a long email, D314; none for a short one):
-   `if(empty(triggerBody()?['text_4']), json('[]'), createArray(json(concat('{"Name":"', triggerBody()?['text_5'], '","ContentBytes":"', base64(triggerBody()?['text_4']), '"}'))))`.
-   The names `text_4` and `text_5` are the inputs *Csv* and *FileName* (the 5th and 6th): if Power Automate named them
+   `if(empty(triggerBody()?['text_4']), json('[]'), createArray(addProperty(addProperty(json('{}'), 'Name', triggerBody()?['text_5']), 'ContentBytes', triggerBody()?['text_4'])))`.
+   Put the CSV text as it is: the Outlook action encodes *ContentBytes* itself, so `base64(...)` would encode it twice
+   and the file would open as unreadable text. The names `text_4` and `text_5` are the inputs *Csv* and *FileName* (the 5th and 6th): if Power Automate named them
    otherwise, look at the trigger's outputs (**Peek code** on the trigger) and use those names. Nothing else: no
    other text, no other file.
 5. **Save.** **Run only users**: the group `SACM managers`; for **Office 365 Outlook** choose **Use this connection**
@@ -432,7 +438,8 @@ scheduled refresh (it stays in the flow, never in the repository).
    app adds the journal rows itself after the flow answers (D301).
 
 **F4 SACMTest** (the button **Test to me**): as F2, with only the inputs `Subject`, `Body`, `Csv` and `FileName` (the
-last two optional), and the same **Attachments** with the names of these two inputs (`text_2` and `text_3`). In **To** put the expression
+last two optional), and the same **Attachments** with the names of these two inputs (`text_2` and `text_3`):
+`if(empty(triggerBody()?['text_2']), json('[]'), createArray(addProperty(addProperty(json('{}'), 'Name', triggerBody()?['text_3']), 'ContentBytes', triggerBody()?['text_2'])))`. In **To** put the expression
 `triggerOutputs()['headers']['x-ms-user-email']`: the email of the manager who pressed Test. Nobody else gets it, and
 the app records nothing. Run only users and connection as in F2.
 

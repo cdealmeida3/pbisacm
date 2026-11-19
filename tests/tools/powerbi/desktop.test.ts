@@ -154,7 +154,7 @@ test('one query per relationship asks for the values of the many side with no ro
   assert.ok(queries.length >= 20);
   const inventory = queries.find((query) => query.visual === 'Inventory_Classes')!;
   assert.equal(inventory.dax, "EVALUATE ROW ( \"v0\", COUNTROWS ( EXCEPT ( ALLNOBLANKROW ( 'Inventory'[Class] ), ALLNOBLANKROW ( 'Classes'[Id] ) ) ) + 0 )");
-  const { problems } = judge({ opened: true, modelErrors: [], results: [{ query: inventory, rows: [[2]] }, { query: queries[1]!, rows: [[0]] }] });
+  const { problems } = judge({ opened: true, modelErrors: [], results: [{ query: inventory, rows: [['2']] }, { query: queries[1]!, rows: [['0']] }] });
   assert.equal(problems.length, 1);
   assert.match(problems[0]!, /Relationship Inventory_Classes .*2 values of the many side have no row on the one side/);
 });

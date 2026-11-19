@@ -381,7 +381,7 @@ expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"","
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.53.0"
+expression WorkbenchVersion = "0.54.0"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
@@ -3279,7 +3279,9 @@ expression fnTypeFiles =
 		(files as table) as table =>
 		    let
 		        read = Table.AddColumn(files, "Read", each
-		            let attempt = try fnReadTable([Content]) in
+		            // The headers are read inside the try: a workbook opens only when its sheets are read, so a file that cannot
+		            // be opened fails here, as its own row, and never spoils the choice of the other files.
+		            let attempt = try (let value = fnReadTable([Content]) in value & [Headers = List.Buffer(value[Headers])]) in
 		            if attempt[HasError] then [Format = "", Sheets = {}, Headers = {}, RawHeaders = {}, Rows = #table({}, {}), Error = attempt[Error][Message]]
 		            else attempt[Value]),
 		        typed = Table.AddColumn(read, "Type", each

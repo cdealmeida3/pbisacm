@@ -15,7 +15,7 @@ import { readTable } from '../../src/core/reading/table.ts';
 import { fileKind, folderFixes, recogniseReport, REPORT_TYPES } from '../../src/core/sources/report-types.ts';
 import type { FolderFix } from '../../src/core/sources/report-types.ts';
 import { chooseReports, columnCount } from '../../src/core/memory/finder.ts';
-import { readRealShape } from '../../tests/real-shape.ts';
+import { csvRealShapeFiles, readRealShape } from '../../tests/real-shape.ts';
 import { missingWanted, PERSON_PARTS, readCiReport } from '../../src/core/sources/ci/ci-report.ts';
 import { readRelationshipReport } from '../../src/core/sources/relationships/relationship-report.ts';
 import { epoConfig, readEpoReport } from '../../src/core/sources/epo/epo-report.ts';
@@ -177,7 +177,8 @@ export async function parityProblems(folder: string): Promise<string[]> {
     { name: newestCi.name, date: newestCi.date, missing: missingWanted(readCiReport(read[SAMPLE_FILES.ci.name]!.rows).columns) });
   problems.push(...compare('FolderFixes', rows('FolderFixes'), fixRows(sampleFixes), 'Order', ['FileName', 'ReportDate', 'ReadAs', 'What', 'Level']));
   // 3b. The real-shape samples (D353): the M reads Carlos's shapes as src/core does (tests/recorded/real-shape.json).
-  const realShape = await readRealShape();
+  // PQTest opens no .xlsx, so the M reads the CSV files of the folder; the Solusi workbook is tested in src/core only.
+  const realShape = await readRealShape(csvRealShapeFiles());
   problems.push(...compare('RealShape', rows('RealShape'), realShape.files.map((file) => ({ FileName: file.name, Kind: file.kind, Used: file.used, WhyNotUsed: file.whyNotUsed, Rows: file.rows, Fact: file.fact })),
     'FileName', ['Kind', 'Used', 'WhyNotUsed', 'Rows', 'Fact']));
   problems.push(...compare('RealShapeFixes', rows('RealShapeFixes'), fixRows(realShape.fixes), 'Order', ['FileName', 'ReportDate', 'ReadAs', 'What', 'Level']));

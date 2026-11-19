@@ -5,7 +5,9 @@
 (files as table) as table =>
     let
         read = Table.AddColumn(files, "Read", each
-            let attempt = try fnReadTable([Content]) in
+            // The headers are read inside the try: a workbook opens only when its sheets are read, so a file that cannot
+            // be opened fails here, as its own row, and never spoils the choice of the other files.
+            let attempt = try (let value = fnReadTable([Content]) in value & [Headers = List.Buffer(value[Headers])]) in
             if attempt[HasError] then [Format = "", Sheets = {}, Headers = {}, RawHeaders = {}, Rows = #table({}, {}), Error = attempt[Error][Message]]
             else attempt[Value]),
         typed = Table.AddColumn(read, "Type", each

@@ -6,7 +6,7 @@ import { normaliseHeader } from '../../src/core/reading/headers.ts';
 import { canonicalClass, level, truthy } from '../../src/core/sources/ci/ci-report.ts';
 import { flag as contractFlag } from '../../src/core/sources/contracts/contract-reports.ts';
 import { dateInName, localDate } from '../../src/core/memory/finder.ts';
-import { recogniseReport } from '../../src/core/sources/report-types.ts';
+import { fileKind, recogniseReport } from '../../src/core/sources/report-types.ts';
 import { serviceNowAddress } from '../../src/core/cases/record-search.ts';
 import { lettersOf, plainText } from '../../src/core/sources/epo/epo-report.ts';
 import { environmentOf } from '../../src/core/checks/detectors/relationship-detectors.ts';
@@ -72,7 +72,7 @@ export function unitCases(): UnitCase[] {
   for (const row of HEADER_ROWS) {
     const found = recogniseReport(row);
     const list = `{${row.map(mText).join(', ')}}`;
-    cases.push({ name: 'fnReportType', input: row.join(','), expected: show(found.type?.kind ?? ''), m: `fnReportType(${list})[Kind]` });
+    cases.push({ name: 'fnReportType', input: row.join(','), expected: show(fileKind(row)), m: `fnReportType(${list})[Kind]` });
     if (!found.type) cases.push({ name: 'fnReportType message', input: row.join(','), expected: found.message, m: `fnReportType(${list})[Message]` });
   }
   // The regular expressions of the checks (tools/powerbi/regex.ts and fnRegexTest), each on every text, against JavaScript.

@@ -154,11 +154,17 @@ export interface RealShapeRead {
 const inflate = async (data: Uint8Array): Promise<Uint8Array> => new Uint8Array(inflateRawSync(data));
 const utf8 = new TextDecoder('utf-8');
 
+/**
+ * The real-shape files that Power Query's test tool can open: PQTest reads no .xlsx (Excel.Workbook needs the Access
+ * engine there, which Power BI Desktop does not), so the Power BI check reads the CSV files only.
+ */
+export const csvRealShapeFiles = (): RealShapeFile[] => realShapeFiles().filter((file) => !/\.xlsx$/i.test(file.name));
+
 /** The real-shape folder read as the Power BI report reads it: the type of each file, the choice of the day, the readers, what to fix and the checks. */
-export async function readRealShape(): Promise<{ files: RealShapeRead[]; fixes: FolderFix[]; cis: number; findings: Record<string, number>; notes: Array<{ checkId: string; note: string }> }> {
+export async function readRealShape(files: RealShapeFile[] = realShapeFiles()): Promise<{ files: RealShapeRead[]; fixes: FolderFix[]; cis: number; findings: Record<string, number>; notes: Array<{ checkId: string; note: string }> }> {
   const references = loadReferences();
   const config = contractConfig(references)!;
-  const tables = await Promise.all(realShapeFiles().map(async (file) => ({ file, table: await readTable(file.bytes, inflate, (data) => utf8.decode(data)) })));
+  const tables = await Promise.all(files.map(async (file) => ({ file, table: await readTable(file.bytes, inflate, (data) => utf8.decode(data)) })));
   const kinds = tables.map(({ table }) => fileKind(table.rows[0] ?? []));
   const reportKinds = new Set(REPORT_TYPES.map((type) => type.kind as string));
   const choices = chooseReports(tables.flatMap(({ file, table }, at) => reportKinds.has(kinds[at]!)
@@ -168,7 +174,7 @@ export async function readRealShape(): Promise<{ files: RealShapeRead[]; fixes: 
   let relationships: Relationship[] | null = null;
   let epo: EpoInput | null = null;
   const contracts: ContractInput = { solusi: null, servicenow: null };
-  const files = tables.map(({ file, table }, at): RealShapeRead => {
+  const read = tables.map(({ file, table }, at): RealShapeRead => {
     const kind = kinds[at]!;
     const choice = choiceOf.get(file.name);
     const used = choice?.used ?? false;
@@ -204,14 +210,14 @@ export async function readRealShape(): Promise<{ files: RealShapeRead[]; fixes: 
   if (!chosen) throw new Error('The real-shape folder has no CI report.');
   const report = readCiReport(chosen.table.rows, { lossless: chosen.table.lossless });
   const fixes = folderFixes(tables.map(({ file, table }, at) => ({
-    name: file.name, date: dateInName(file.name), kind: kinds[at]!, used: files[at]!.used, whyNotUsed: files[at]!.whyNotUsed, message: recogniseReport(table.rows[0] ?? []).message
+    name: file.name, date: dateInName(file.name), kind: kinds[at]!, used: read[at]!.used, whyNotUsed: read[at]!.whyNotUsed, message: recogniseReport(table.rows[0] ?? []).message
   })), { name: chosen.name, date: dateInName(chosen.name), missing: missingWanted(report.columns) });
   const packs = checksInUse(loadPacks());
   const result = runChecks(report.cis, report.columns, packs, references, { relationships, date: REAL_SHAPE_DATE, epo, contracts });
   const findings: Record<string, number> = {};
   for (const finding of result.findings) findings[finding.checkId] = (findings[finding.checkId] ?? 0) + 1;
   const sorted = Object.fromEntries(Object.entries(findings).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
-  return { files, fixes, cis: report.cis.length, findings: sorted, notes: result.notes };
+  return { files: read, fixes, cis: report.cis.length, findings: sorted, notes: result.notes };
 }
 
 /** The text of tests/recorded/real-shape.json. */

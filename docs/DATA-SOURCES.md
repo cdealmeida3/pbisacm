@@ -14,6 +14,15 @@ How data reaches the Workbench and what each report must contain. The layouts fo
 
 Not used yet: the criticality approval tasks with their creation date (for approvals close to the 14-day limit, piece 5E, parked) and the contract-to-CI mappings (`ast_contract_instance`).
 
+**Files the Workbench knows but does not use yet** (build R2). The Power BI report lists them in the box *What to fix in the folder* as "known", and never reads them as a report:
+
+| File | Known by | Why it is not a report |
+|---|---|---|
+| A CMDB Health result | The columns `ci` and `ci.sys_class_name` (every CI column has the prefix `ci.`) | It has a name, a class and owners, but it is a list of problems, not the CIs. It is never the CI report (D341) |
+| The links between contracts and CIs | The columns `ast_contract` and `ci_item` | Not used yet. The ServiceNow contract report is the export of the contracts table `ast_contract` (D342) |
+
+**One report per type and day** (D348). When the folder holds two files of one type with the same date (a copy, a second export), the Workbench uses the one with the most named columns, then the most rows, then the one changed last, then the last file name. The other is listed in *What to fix in the folder* with the reason; move it into the sub-folder *Archive*. The history uses the same choice for every date.
+
 Format: CSV or Excel (`.xlsx`). The app recognises each report by its columns, not by its file name. Limit: 20,000 rows per report (the logical classes are far below it). One report can cover all nine classes.
 
 An `.xlsx` export keeps letters and characters that a Windows-1252 CSV loses. A CSV export writes "?" for a character it cannot write, for example a hidden zero-width space in a name.
@@ -56,7 +65,7 @@ The `cmdb_rel_ci` list export, as ServiceNow writes it: Parent, Type, Child, Con
 | Parent, Type, Child | Needed. The app knows the report by these three. |
 | Class, Asset tag (twice) | Two columns have the same name. **The first Class and Asset tag are the parent's, the second the child's.** The app reads them by position. |
 | `parent.sys_class_name`, `parent.asset_tag`, `child.sys_class_name`, `child.asset_tag` | The same, when the report uses field names. |
-| Excluded for calculation | A relationship that is excluded passes no criticality from the parent to the child (D131): used by *Above parent* and *No criticality reaches the CI*. Without the column, the load says so and every relationship passes criticality. |
+| Excluded for calculation | Known by the end of its name (`excluded_for_calculation`, with any prefix such as the instance's scoped-app prefix, D351). A relationship that is excluded passes no criticality from the parent to the child (D131): used by *Above parent* and *No criticality reaches the CI*. Without the column, the load says so and every relationship passes criticality. |
 
 Parent and child are matched with the CIs of the CI report by name (and asset tag when two CIs share a name). Hidden characters do not count, so a name that shows "?" in the CSV matches the same name with the hidden character in the `.xlsx`. The Reports strip says how many parents and children are not in the CI report.
 
@@ -96,19 +105,19 @@ The header forms the app accepts are in `checks/reference/contract-reports.json`
 | `number`, `vendor_contract`, `state` | Needed |
 | `short_description`, `vendor`, `u_contract_category`, `starts`, `ends`, `business_owner`, `u_point_of_contact`, `contract_administrator` | Compared with Solusi |
 | `sys_tags` | The status tag ("S - Concluded") and the tag "Target BC = n" |
-| The four inherited criticality columns | "Still linked": the contract carries a criticality from a CI |
+| The four inherited criticality columns | "Still linked": the contract carries a criticality from a CI. Known by the end of their name (`inherited_confidentiality` …), whatever the prefix (`u_`, or the instance's scoped-app prefix, D351) |
 | `business_owner.active`, `business_owner.user_name`, `business_owner.email`, and the same three for `contract_administrator` | The contract owner on the case; Contracts to fix in ServiceNow: the contract owner or the Procurement partner is inactive. Without the `.active` columns this is not tested, and the card says so |
 
 A missing column gives a note on the Reports tile. Without one of the two files the contract cards are grey.
 
 ## 3. What the reader handles
 
-- Field names or labels as headers; the `ci.` prefix of a CMDB Health result report.
+- Field names or labels as headers. The `ci.` prefix is kept: it marks a CMDB Health result, which is never the CI report (D341).
 - Class as label or table name (for example *Application Service* and `cmdb_ci_service_auto` both become Service Instance).
 - Operational status as label or number.
 - Criticality as 1–4 or as label. The criticality columns are recognised by the end of their name, so the instance prefix is not configured anywhere.
 - UTF-8 and Windows-1252 files; comma, semicolon or tab as separator.
-- `.xlsx` files: the first sheet; inline or shared strings; dates stored as numbers are written `yyyy-mm-dd hh:mm:ss`; true/false.
+- `.xlsx` files: the first sheet; inline or shared strings; dates stored as numbers are written `yyyy-mm-dd hh:mm:ss`; true/false. XML whose elements carry a prefix (`<x:row>`, as the Solusi export writes it) is read the same. A date number before 1900 or after 31 December 9999 gives an empty cell, not an error (D350).
 - Hidden characters in names (zero-width space and the like) are ignored for matching and reported by `NAME-HIDDEN-CHAR`.
 
 ## 4. Delivery

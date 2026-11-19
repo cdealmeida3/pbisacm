@@ -17,7 +17,9 @@ that the Workbench reads the real reports correctly. All the data is invented: a
 The files use CRLF line ends and quote every field, as ServiceNow writes them.
 
 - `npm test` reads them with `src/core` and compares the result with `tests/recorded/real-shape.json`.
-- The Power BI check reads the same files with the M (the query `RealShape` of `tools/powerbi/connector.ts`) and compares.
+- The Power BI check reads the CSV files with the M (the queries `RealShape` and `RealShapeFixes` of
+  `tools/powerbi/connector.ts`) and compares. Power Query's test tool cannot open an `.xlsx`, so the workbook is
+  tested with `src/core` only.
 
 Never put a real report here. The real criticality prefix and the real name of the Solusi workbook carry the employer's
 own word; the stand-ins are listed in `tools/placeholders.json`.

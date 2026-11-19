@@ -15,7 +15,7 @@ import { unitQuery, unitQueryNames } from './units.ts';
 import { historyStart, numberArgument, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { mText } from './generate.ts';
 import { loadedTables, probeMembers } from './probes.ts';
-import { realShapeFiles } from '../../tests/real-shape.ts';
+import { csvRealShapeFiles } from '../../tests/real-shape.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 export const EVAL_FOLDER = join(root, '.build', 'powerbi');
@@ -32,11 +32,11 @@ export const PARITY_QUERIES = ['DraftsRecorded', 'ChatsRecorded', 'EmailsSplit',
 
 /**
  * The members of the real-shape check (D353), only in the test connector: the model never carries these files. The
- * files of samples/real-shape/ and the Solusi workbook of tests/real-shape.ts, typed and chosen by fnTypeFiles as the
+ * CSV files of samples/real-shape/ (PQTest opens no .xlsx: csvRealShapeFiles), typed and chosen by fnTypeFiles as the
  * folder's files are; per file the rows its reader gives and one fact, as readRealShape counts them.
  */
 export function realShapeMembers(): Array<{ name: string; m: string }> {
-  const files = realShapeFiles().map((file) => `\t{${mText(file.name)}, ${mText(Buffer.from(file.bytes).toString('base64'))}}`).join(',\n');
+  const files = csvRealShapeFiles().map((file) => `\t{${mText(file.name)}, ${mText(Buffer.from(file.bytes).toString('base64'))}}`).join(',\n');
   return [
     { name: 'RealShapeFiles', m: `#table(type table [FileName = text, Base64 = text], {\n${files}\n})` },
     { name: 'RealShapeTyped', m: `let
