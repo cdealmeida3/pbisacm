@@ -23,6 +23,9 @@ export const ALLOWED_HOSTS = [
   'powerapps.com',
   // Microsoft's installer of Power BI Desktop, for the Desktop check on GitHub's runner (tools/powerbi/desktop.ps1, D309).
   'download.microsoft.com',
+  // Microsoft Graph, the same for every tenant: the Outlook draft of flow F7 is a new message in the manager's own
+  // Drafts (powerbi/apps/flows.json, D315).
+  'graph.microsoft.com',
   // A one-letter placeholder host in the test files of the .xlsx reader.
   'x'
 ];

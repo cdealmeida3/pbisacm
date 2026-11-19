@@ -508,6 +508,11 @@ table CaseLines
 		summarizeBy: none
 		sortByColumn: StepOrder
 
+	/// The title of the card of the line, for the reply reader of the app SACM actions (build D5): a reply is read next to the lines it answers, each with its card.
+	column Card = RELATED ( Checks[Title] )
+		dataType: string
+		summarizeBy: none
+
 	partition CaseLines = calculated
 		mode: import
 		source =

@@ -1,5 +1,5 @@
 {
-  "note": "The Power Automate flows of builds B6 and B7 (D295, D301), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power Apps call a flow by it), the trigger, the inputs a Power App gives it, the concurrency of the trigger (1: one run at a time; the others wait) and the steps in order. A flow refreshes, waits, files a report or a reply, or sends exactly the message a manager pressed Send or Test on: its To, Cc, Subject and Body are the inputs of the trigger, never made by the flow (D2, D301). None runs on a timer (D269). npm run powerbi:lint checks these rules and that the apps call only flows of this file. The workspace and the semantic model are picked from a list in the step: the workspace is the one Carlos made (README section 4), the semantic model has the name of the .pbip.",
+  "note": "The Power Automate flows of builds B6, B7 and D5 (D295, D301, D315), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power Apps call a flow by it), the trigger, the inputs a Power App gives it, the concurrency of the trigger (1: one run at a time; the others wait) and the steps in order. A flow refreshes, waits, files a report or a reply, sends exactly the message a manager pressed Send or Test on (its To, Cc, Subject, Body and file are the inputs of the trigger, never made by the flow, D2, D301), or makes the Outlook draft a manager pressed Outlook draft on in the manager's own Drafts, which sends nothing (F7, D315). None runs on a timer (D269). npm run powerbi:lint checks these rules and that the apps call only flows of this file. The workspace and the semantic model are picked from a list in the step: the workspace is the one Carlos made (README section 4), the semantic model has the name of the .pbip.",
   "flows": [
     {
       "id": "F5",
@@ -15,23 +15,35 @@
     {
       "id": "F2",
       "name": "SACMSend",
-      "purpose": "Send the message a manager pressed Send on in the Power App SACM messages, from the shared mailbox, exactly as the app gives it. The app records it in the journal after the flow answers.",
+      "purpose": "Send the email a manager pressed Send on in the Power App SACM messages, from the shared mailbox, exactly as the app gives it: the email of the template (Drafts[Html], D313) and, for a long list, its CSV file (Drafts[Csv], D314). The app records it in the journal after the flow answers.",
       "trigger": "Power Apps (V2)",
-      "inputs": ["To", "Cc", "Subject", "Body"],
+      "inputs": ["To", "Cc", "Subject", "Body", "Csv", "FileName"],
       "concurrency": 1,
       "steps": [
-        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=input To", "CC": "=input Cc", "Subject": "=input Subject", "Body": "=input Body", "Importance": "Normal" } }
+        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=input To", "CC": "=input Cc", "Subject": "=input Subject", "Body": "=input Body", "Attachments": "=input Csv as the file FileName", "Importance": "Normal" } }
       ]
     },
     {
       "id": "F4",
       "name": "SACMTest",
-      "purpose": "Send a test of a message to the manager who pressed Test, from the shared mailbox. Nobody else gets it, and the cases are not changed.",
+      "purpose": "Send a test of an email to the manager who pressed Test to me, from the shared mailbox, with its file when it has one. Nobody else gets it, and the cases are not changed.",
       "trigger": "Power Apps (V2)",
-      "inputs": ["Subject", "Body"],
+      "inputs": ["Subject", "Body", "Csv", "FileName"],
       "concurrency": 1,
       "steps": [
-        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=the user who ran it", "Subject": "=input Subject", "Body": "=input Body", "Importance": "Normal" } }
+        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=the user who ran it", "Subject": "=input Subject", "Body": "=input Body", "Attachments": "=input Csv as the file FileName", "Importance": "Normal" } }
+      ]
+    },
+    {
+      "id": "F7",
+      "name": "SACMDraft",
+      "purpose": "Make an Outlook draft of the email a manager pressed Outlook draft on in the Power App SACM messages, in the manager's own Drafts, with From set to the shared SACM mailbox (D315, the manager needs Send as on it), and give the app its link. It sends nothing: the manager checks the draft and sends it from Outlook, then tells the app (Sent from Outlook? Yes records it).",
+      "trigger": "Power Apps (V2)",
+      "inputs": ["Message", "Csv"],
+      "concurrency": 1,
+      "steps": [
+        { "action": "Send an HTTP request", "connector": "Office 365 Outlook", "fields": { "URI": "https://graph.microsoft.com/v1.0/me/messages", "Method": "POST", "Body": "=input Message with the file Csv and the shared SACM mailbox as From", "ContentType": "application/json" } },
+        { "action": "Respond to a PowerApp or flow", "connector": "Power Apps", "fields": { "Link": "=the webLink of the draft" } }
       ]
     },
     {

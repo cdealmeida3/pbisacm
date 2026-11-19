@@ -2,6 +2,18 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.50.0 — The Power BI report, the design pass part 5: the Power Apps and the flows (D5)
+
+- **The email studio** (D326): the app *SACM messages* now fills the page *Messages*. On the left the list of emails (one line per email, tabs *All*, *First*, *Reminder*, *Escalate*), in the middle the email exactly as it will arrive, on the right From (the shared SACM mailbox), To, Cc, Subject, the warning when a colleague wrote lately, and the buttons **Outlook draft**, **Teams**, **Test to me** and **Send**, then **Next email**. The table of drafts and the kind buttons left the page.
+- **Send and Test to me send the finished email** of build D4, with its CSV file when the list is long (flows *SACMSend* and *SACMTest* get the inputs *Csv* and *FileName*). Send records the cases of every part of the email under its one reference.
+- **Outlook draft** (D315): the new flow *SACMDraft* (F7) puts the email, with its file, into the manager's own Drafts, From the shared SACM mailbox, and opens it. It sends nothing. The manager needs *Send as* on the mailbox.
+- **No more Copy and `mailto:`** (D316): both lost the tables and the file.
+- **The reply reader** (D327): the app *SACM actions* has two tabs, *Actions* and *Reply*. *Reply* shows the newest reply next to the lines it answers, with tick boxes, and **Mark answered**, **Waiting until** a date and **Add note**. The app on *Person* is taller and the table of replies under it left the page.
+- **Modern controls** (D317) in the three apps, in the colours of the report; every grey button says why. The lint refuses a control or a property Power Apps does not have.
+- **A cut email is never sent**: the new columns *HtmlLength* and *CsvLength* of *Drafts* let the app see when the Power Apps visual passed a long email cut; it then keeps the buttons off and says so.
+- The README (section 6) has the new steps for the flows and the apps, and what to change in apps made before.
+- No check, number or message text changed.
+
 ## 0.49.0 — The Power BI report, the design pass part 4: the email template (D4)
 
 - **Every message is now also a finished email** (D313), in the new columns *Html*, *Csv*, *Summary*, *EmailSubject* and *EmailId* of *Drafts*: a navy band with the reference, **In this email** (the numbered parts and how many lines each has), a number before each part, clear tables with the class under the name, the values that are the same on every line said once above the table, a box **What we ask**, **Why it matters** in grey, and a footer that says why the person gets the email. The words are the same as before, word for word. On a phone each line of a table becomes a small card.

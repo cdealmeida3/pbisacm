@@ -16,7 +16,8 @@
 //      fill and on the page with a contrast of 4.5:1 or more.
 //   9. App (build B6): the Power App source of powerbi/apps/sacm-actions/ is valid against Microsoft's schema of pa.yaml
 //      (a copy in tools/powerbi/schemas/pa-yaml/), every Power Fx formula parses with Microsoft's Power Fx library
-//      (tools/powerbi/powerfx-check/, needs `dotnet`), and the app and its flows keep the rules of tools/powerbi/app-rules.ts.
+//      (tools/powerbi/powerfx-check/, needs `dotnet`), every control is a modern one with the properties Microsoft gives it
+//      (D317), and the app and its flows keep the rules of tools/powerbi/app-rules.ts.
 //  10. Pages (design pass §8.1, tools/powerbi/pages.ts): the size of every page, at most 12 native visuals, the 4 px grid,
 //      no overlap, the places of the Power Apps, the widths of the table columns, titles on one line, a line by a measure
 //      under every table and chart, no text under 9 pt, only properties Power BI has, the hidden pages.
@@ -33,7 +34,7 @@ import { lightColours } from './tokens.ts';
 import { connectorSource } from './connector.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
 import { APP_FOLDERS } from './actions.ts';
-import { callProblems, catalogueProblems, flowProblems } from './app-rules.ts';
+import { callProblems, catalogueProblems, controlProblems, flowProblems } from './app-rules.ts';
 import type { Formula } from './app-rules.ts';
 import { pageProblems, readCatalogue, readPages, THEME_SCHEMA_FILE, themeProblems } from './pages.ts';
 
@@ -312,6 +313,7 @@ if (process.argv.includes('--no-dotnet')) {
       const where = relative(root, file.file);
       if (file.error) { problems.push(`App: ${where} is not YAML: ${file.error}`); continue; }
       if (!validate(file.json)) for (const error of (validate.errors ?? []).slice(0, 5)) problems.push(`App: ${where}: ${error.instancePath || '/'} ${error.message}`);
+      problems.push(...controlProblems(file.file, file.json));
     }
     problems.push(...callProblems(read.formulas.filter((formula) => formula.file !== schema!.file)));
     done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the apps only add journal rows and run only the flows of flows.json`);
