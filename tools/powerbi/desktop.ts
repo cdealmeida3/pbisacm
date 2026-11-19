@@ -12,7 +12,7 @@
 // nothing. Only invented data: the job runs in Sample mode.
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { NAMES_IN_CAPITALS, readTabGroups } from './pages.ts';
+import { readTabGroups } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -241,8 +241,8 @@ export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: s
 export interface Look { canvas: number[]; texts: LookText[] }
 export interface LookText { text: string; x: number; y: number; width: number; height: number; background: string | null; colour: string | null; ratio: number | null }
 
-/** The contrast a text needs (LOOK rule 8, WCAG 2.1 AA): 4.5:1, or 3:1 for large text (24 px, a box of 30 points or more). */
-export const CONTRAST = { text: 4.5, large: 3, largeBox: 30 } as const;
+/** The contrast every text needs (LOOK rule 8: 4.5:1 or more for every text, large text too). */
+export const CONTRAST = 4.5;
 
 /** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
 export const DRAW_SECONDS = 3;
@@ -321,36 +321,37 @@ export function judgePictures(pictures: Pictures, notes: string[] = []): string[
 
 /**
  * The rules of LOOK §1 on the pages as Desktop draws them (build D6, D328), for every picture of a page and of a tab:
- *   - the page was found on the picture (the navy rail), and it shows some text;
- *   - rule 8: every text has a contrast of 4.5:1 or more on what is behind it (3:1 for large text);
- *   - rule 2: no text ends with three dots (a text Power BI cut, or written so);
- *   - rule 1: no word in capitals in a sentence (the team's short names apart, NAMES_IN_CAPITALS of pages.ts).
- * The rules of the files (titles and headers that fit, the size of a text, the words on a button) are in pages.ts.
+ *   - the page was found on the picture (the navy rail), and its texts were read: a picture without them is a problem,
+ *     never a silent pass;
+ *   - rule 8: every text has a contrast of 4.5:1 or more on what is behind it;
+ *   - rule 2: no text ends with three dots (Power BI cut it).
+ * Capitals (rule 1) and the words on a button (rule 4) are checked on the words of the files (pages.ts, rule 11): on a
+ * picture most words are data, and a CI name may be in capitals. A text whose box shows one colour only cannot be
+ * measured; the notes count those.
  */
 export function judgeLook(pictures: Pictures, notes: string[] = []): string[] {
   const problems: string[] = [];
   if (!pictures.taken) return problems;
-  const shots = pictures.pages.flatMap((page) => [
+  const shots = pictures.pages.filter((page) => page.found).flatMap((page) => [
     { where: page.displayName, file: page.file, look: page.look },
     ...(page.tabs ?? []).filter((tab) => tab.found).map((tab) => ({ where: `${page.displayName}, tab ${tab.tab}`, file: tab.file, look: tab.look }))
-  ]).filter((shot) => shot.file);
+  ]);
   for (const { where, file, look } of shots) {
-    if (!look) continue;
+    if (!look) { problems.push(`${where}: the picture step gave no look of the page, so its look was not checked (picture ${file})`); continue; }
     if (look.canvas.length !== 4) { problems.push(`${where}: the picture step did not find the page on the screen (no navy rail), so its look was not checked (picture ${file})`); continue; }
     if (!look.texts.length) { problems.push(`${where}: no text of the page was read, so its look was not checked (picture ${file})`); continue; }
     let lowest: LookText | undefined;
+    let unmeasured = 0;
     for (const text of look.texts) {
       const at = `${where}: "${text.text.slice(0, 60)}" at ${text.x}, ${text.y}`;
-      if (text.ratio !== null) {
-        const need = text.height >= CONTRAST.largeBox ? CONTRAST.large : CONTRAST.text;
-        if (text.ratio < need) problems.push(`${at} has a contrast of ${text.ratio}:1 (${text.colour} on ${text.background}), under ${need}:1 (LOOK rule 8, picture ${file})`);
+      if (text.ratio === null) unmeasured++;
+      else {
+        if (text.ratio < CONTRAST) problems.push(`${at} has a contrast of ${text.ratio}:1 (${text.colour} on ${text.background}), under ${CONTRAST}:1 (LOOK rule 8, picture ${file})`);
         if (!lowest || text.ratio < lowest.ratio!) lowest = text;
       }
-      if (/(\.\.\.|…)$/.test(text.text.trim())) problems.push(`${at} ends with three dots: it is cut or written so (LOOK rule 2, picture ${file})`);
-      const capitals = text.text.match(/\b[A-Z]{2,}\b/g)?.filter((word) => !NAMES_IN_CAPITALS.has(word)) ?? [];
-      if (capitals.length && /[a-z]/.test(text.text) && !/\d/.test(text.text)) problems.push(`${at} has the word ${capitals[0]} in capitals (LOOK rule 1, picture ${file})`);
+      if (/(\.\.\.|…)$/.test(text.text.trim())) problems.push(`${at} ends with three dots: Power BI cut it (LOOK rule 2, picture ${file})`);
     }
-    notes.push(`${where}: ${look.texts.length} texts read${lowest ? `, the lowest contrast ${lowest.ratio}:1 ("${lowest.text.slice(0, 40)}", ${lowest.colour} on ${lowest.background})` : ''}`);
+    notes.push(`${where}: ${look.texts.length} texts read${unmeasured ? ` (${unmeasured} of one colour, not measured)` : ''}${lowest ? `, the lowest contrast ${lowest.ratio}:1 ("${lowest.text.slice(0, 40)}", ${lowest.colour} on ${lowest.background})` : ''}`);
   }
   return problems;
 }

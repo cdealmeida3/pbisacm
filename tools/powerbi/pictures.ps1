@@ -5,6 +5,9 @@
 #   page, picture file, seconds to draw, and the words that mean a visual is broken ("Can't display the visual",
 #   "Select or drag fields", "(Blank)", ...). A page with tabs (D323) gets one more picture per tab after its first: the
 #   tab is pressed with Ctrl (Desktop edits the report, and Ctrl+click is how a button acts there). Invented samples only.
+#   Since build D6 (D328) each picture also gives the page alone (<name>-page.png, cut where the navy rail shows the page
+#   is) and its look: where the page is on the screen and every text of the page with its box, the colour behind it, the
+#   text colour and their contrast, measured on the picture. The judge applies LOOK rules 8 and 2 to them.
 #   ./tools/powerbi/pictures.ps1 -Pages .build/desktop/pages.json -Out .build/desktop/pictures
 param([Parameter(Mandatory)][string]$Pages, [string]$Out = ".build/desktop/pictures")
 $ErrorActionPreference = "Continue"
@@ -40,7 +43,10 @@ public static class PictureLook {
       while (top > 0 && Navy(b.GetPixel(column, top - 1))) top--;
       while (bottom < b.Height - 1 && Navy(b.GetPixel(column, bottom + 1))) bottom++;
       double scale = run / railWidth;
-      return new int[] { start, top, (int)Math.Round(pageWidth * scale), bottom - top + 1 };
+      // The rail is as tall as the page (720 of 1280): a navy run that is not (a label, another band) is not the rail.
+      double height = bottom - top + 1, expected = pageWidth * scale * 720.0 / 1280.0;
+      if (Math.Abs(height - expected) > expected * 0.05) continue;
+      return new int[] { start, top, (int)Math.Round(pageWidth * scale), (int)height };
     }
     return new int[0];
   }
@@ -48,9 +54,10 @@ public static class PictureLook {
   static double Luminance(Color c) { return 0.2126 * Channel(c.R) + 0.7152 * Channel(c.G) + 0.0722 * Channel(c.B); }
   static double Ratio(Color a, Color b) { double x = Luminance(a), y = Luminance(b); return (Math.Max(x, y) + 0.05) / (Math.Min(x, y) + 0.05); }
   static string Hex(Color c) { return "#" + c.R.ToString("x2") + c.G.ToString("x2") + c.B.ToString("x2"); }
-  // The contrast of the text in a box: the background is the colour most of the box has; the text is the colour that
-  // stands out most from it and that at least three pixels have (one odd pixel is the edge of an icon or a line).
-  // The edges of letters are mixed with the background, so the text colour is its darkest (or lightest) pixels.
+  // The contrast of the text in a box: the background is the colour most of the box has. The pixels are taken from the
+  // one that stands out most from it; the text colour is the one where three pixels are reached (one or two odd pixels
+  // are the edge of an icon or a line). The edges of letters are mixed with the background, so the text colour is its
+  // darkest (or lightest) pixels: the measure errs towards passing a text, never towards failing a good one.
   // Gives "background text ratio", or "" for a box with one colour only.
   public static string Contrast(Bitmap b, int x, int y, int w, int h) {
     x = Math.Max(0, x); y = Math.Max(0, y); w = Math.Min(w, b.Width - x); h = Math.Min(h, b.Height - y);
@@ -102,10 +109,13 @@ function Click([double]$x, [double]$y, [switch]$Right) {
   else { [PictureWin]::mouse_event(2, 0, 0, 0, 0); [PictureWin]::mouse_event(4, 0, 0, 0, 0) }
 }
 # The pointer off the page, so a picture never shows a tooltip or the hover of a visual (its header "Filters and
-# slicers affecting this visual"): the bottom right corner of the screen, on the status bar.
+# slicers affecting this visual"): on the status bar of Desktop, at the left of its foot (where "Page 1 of 19" is),
+# not on the taskbar of Windows.
 function Pointer-Away {
-  $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-  [PictureWin]::SetCursorPos($bounds.Width - 4, $bounds.Height - 4) | Out-Null
+  $process = Get-Process PBIDesktop -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+  if (-not $process) { return }
+  $r = $UIA::FromHandle($process.MainWindowHandle).Current.BoundingRectangle
+  [PictureWin]::SetCursorPos([int]($r.X + 300), [int]($r.Y + $r.Height - 10)) | Out-Null
 }
 function Center($element) { $r = $element.Current.BoundingRectangle; return @(($r.X + $r.Width / 2), ($r.Y + $r.Height / 2)) }
 function Screen-Bitmap {

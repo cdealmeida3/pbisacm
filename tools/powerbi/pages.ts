@@ -146,10 +146,10 @@ const RAIL_VISUAL = /^rail/;
 
 const literal = (entry: Literal | undefined): string | undefined => entry?.expr?.Literal?.Value;
 
-/** The longer button words LOOK rule 4 agrees (docs/LOOK.md §1), with N for a number. */
+/** The longer button words LOOK rule 4 agrees (docs/LOOK.md §1), with N for a number; a test keeps the two lists the same. */
 export const LONG_BUTTONS = ['Escalate to (name)', 'Mark N fixed', 'Mapping done: ask owner', 'Ask the owner', 'Send from mailbox', 'Hand over to (name)', 'Try the demo', 'Tell Process Management'];
 /** Words in capitals that are the team's short names, not shouting (LOOK rule 1). */
-export const NAMES_IN_CAPITALS = new Set(['SACM', 'CMDB', 'CIAA', 'EPO', 'CSV', 'CI', 'CIS', 'ID', 'BI', 'HTML']);
+export const NAMES_IN_CAPITALS = new Set(['SACM', 'CMDB', 'CIAA', 'EPO', 'CSV', 'CI', 'CIS', 'ID', 'BI', 'HTML', 'OK']);
 /** The problems of one text against LOOK rules 1, 2 and (for a button) 4. */
 export function wordProblems(text: string, button: boolean): string[] {
   const problems: string[] = [];
@@ -171,6 +171,14 @@ function textsOf(visual: Visual): Array<{ text: string; button: boolean }> {
     for (const [object, entries] of Object.entries(group ?? {})) for (const entry of entries) {
       const value = literal(entry.properties?.text);
       if (value?.startsWith("'")) out.push({ text: value.slice(1, -1).replace(/''/g, "'"), button: button && isObjects && object === 'text' });
+    }
+  }
+  // A text box keeps its words in paragraphs of runs (the name of each page and the line under it).
+  for (const entry of visual.visual?.objects?.general ?? []) {
+    const paragraphs = (entry.properties as { paragraphs?: Array<{ textRuns?: Array<{ value?: string }> }> } | undefined)?.paragraphs ?? [];
+    for (const paragraph of paragraphs) {
+      const words = (paragraph.textRuns ?? []).map((run) => run.value ?? '').join('');
+      if (words.trim()) out.push({ text: words, button: false });
     }
   }
   for (const projection of projectionsOf(visual)) if (projection.displayName) out.push({ text: projection.displayName, button: false });

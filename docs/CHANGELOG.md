@@ -5,7 +5,7 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 ## 0.51.0 — The Power BI report, the design pass part 6: polish and the team guide (D6)
 
 - **A guide for the team** (D329): [powerbi/GUIDE.md](../powerbi/GUIDE.md) shows every page with a picture and says what to do there, with the day in five steps (My day, Open person, Prepare email, Send, the reply). The pictures come from the Desktop check, with the invented samples.
-- **The look is checked as the team sees it** (D328): the Desktop check now reads every text of every page as Power BI Desktop draws it and fails on a text that is hard to read (contrast under 4.5:1), a cut text with three dots, or a word in capitals. The lint checks the words of the report files the same way, and at most two words on a button.
+- **The look is checked as the team sees it** (D328): the Desktop check now reads every text of every page as Power BI Desktop draws it and fails on a text that is hard to read (contrast under 4.5:1) or a text Power BI cut with three dots. The lint checks the words of the report files: no capitals, no three dots, and at most two words on a button.
 - **Shorter buttons:** *Export for the auditor* is now **Auditor export**, *Open the record* **Open record**, *Prepare the email* **Prepare email**.
 - **Polish** (D330): the numbers of *Overview* no longer cut their line ("20 more since 4 Nov"); *Where the work sits* is darker for more lines again (every cell was the darkest); the grey **Open person**, **Open card** and **Open CI** are readable before a line is chosen; the chip of the reports is a small pill at the top right.
 - No check, number or email text changed.

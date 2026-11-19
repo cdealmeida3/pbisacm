@@ -12,7 +12,7 @@ How the report is set up (the workspace, the lists, the apps and the flows) is i
 ![My day, with the navy rail at the left](guide/my-day.png)
 
 - **The navy rail at the left** opens the pages. The page you are on is lighter, with a coral line. The number beside
-  *My day* is how many next steps you have today. The number beside *Work queue* is how many lines are open. At the
+  *My day* is how many next steps you have today. The number beside *Work queue* is how many open lines wait for a person. At the
   foot: the version, where the data comes from and when it was refreshed.
 - **The chip at the top right** says whether the reports are up to date. Green: every report arrived in time. Amber:
   one is old or missing. Press it to open *Reports*.
@@ -57,7 +57,7 @@ share them out, note, mark fixed.
 Everyone the team asks, in the order of the team's rules. The bar shows their open lines in the colours of the states.
 *Find a person* searches the names. Select one, then *Open person*.
 
-### Cards
+### Cards (the page All cards)
 
 ![All cards](guide/cards.png)
 

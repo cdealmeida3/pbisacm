@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { pageProblems, readCatalogue, readPages, themeProblems, wordProblems } from '../../../tools/powerbi/pages.ts';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { LONG_BUTTONS, pageProblems, readCatalogue, readPages, themeProblems, wordProblems } from '../../../tools/powerbi/pages.ts';
 import type { ReportPages, Visual } from '../../../tools/powerbi/pages.ts';
 import { theme } from '../../../tools/powerbi/generate.ts';
 
@@ -125,4 +127,12 @@ test('words (LOOK rules 1, 2, 4): capitals, three dots, more than two words on a
   assert.match(wordProblems('Show all...', false).join(), /three dots/);
   const button: Visual = { name: 'go', position: { x: 224, y: 84, width: 160, height: 32 }, visual: { visualType: 'actionButton', objects: { text: [{ properties: { show: lit('true'), text: lit("'Open the record now'") } }] } } };
   assert.match(pageProblems(page([button]), catalogue).join('\n'), /go: "Open the record now": 4 words on a button/);
+  const textbox: Visual = { name: 'title', position: { x: 224, y: 16, width: 400, height: 56 }, visual: { visualType: 'textbox', objects: { general: [{ properties: { paragraphs: [{ textRuns: [{ value: 'MY DAY' }] }] } as never }] } } };
+  assert.match(pageProblems(page([textbox]), catalogue).join('\n'), /title: "MY DAY": the word MY is in capitals/, 'the words of a text box are read');
+});
+
+test('the longer button words of the lint are those of LOOK rule 4', () => {
+  const look = readFileSync(join(import.meta.dirname, '..', '..', '..', 'docs', 'LOOK.md'), 'utf8');
+  const agreed = /agreed longer ones \((.*)\)\./.exec(look)?.[1]?.split(', ');
+  assert.deepEqual(agreed, LONG_BUTTONS);
 });
