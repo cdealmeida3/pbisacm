@@ -1,19 +1,305 @@
 {
   "taken": true,
-  "minutes": 11.8,
+  "minutes": 13.7,
   "pages": [
     {
       "page": "myday",
       "displayName": "My day",
       "found": true,
-      "seconds": 3.0,
+      "seconds": 2.0,
       "file": "01-myday.png",
       "broken": [],
       "status": "Page 1 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "My day",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 81.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "What needs you today, in the order of the team's rules.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 291.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#2b262f",
+            "ratio": 13.73
+          },
+          {
+            "text": "Replies to read",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Dee Owner · 2 CIs",
+            "x": 237.0,
+            "y": 162.0,
+            "width": 94.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "To escalate",
+            "x": 498.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Ada Example · 1 CI",
+            "x": 498.0,
+            "y": 162.0,
+            "width": 99.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Reminders due",
+            "x": 758.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Cy Keeper · 1 CI",
+            "x": 758.0,
+            "y": 162.0,
+            "width": 84.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "New since the last report",
+            "x": 1018.0,
+            "y": 96.0,
+            "width": 229.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "2 solved · 2 people to ask",
+            "x": 1018.0,
+            "y": 162.0,
+            "width": 135.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Your next steps",
+            "x": 237.0,
+            "y": 217.0,
+            "width": 618.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "5 steps for Wednesday 11 November · Alex Example, in the order of the team's rules. Select one, then Open person.",
+            "x": 237.0,
+            "y": 236.0,
+            "width": 618.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "The lines SACM fixes itself are below.",
+            "x": 237.0,
+            "y": 252.0,
+            "width": 618.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Since the last report",
+            "x": 890.0,
+            "y": 217.0,
+            "width": 358.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Since the report of 4 Nov, the daily cards: open before in navy, new",
+            "x": 890.0,
+            "y": 236.0,
+            "width": 358.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "in coral.",
+            "x": 890.0,
+            "y": 252.0,
+            "width": 358.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Waiting on others",
+            "x": 890.0,
+            "y": 498.0,
+            "width": 358.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Nobody to wait for: nobody was asked and has still to answer.",
+            "x": 890.0,
+            "y": 516.0,
+            "width": 358.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          }
+        ]
       }
     },
     {
@@ -26,8 +312,154 @@
       "status": "Page 2 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Work queue",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 133.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "Every open line, one row per person asked. Select lines, then use the app at the right.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 450.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "People to ask",
+            "x": 237.0,
+            "y": 157.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "32 open lines with 5 people, in the order of the team's rules. Select lines for the app at the right.",
+            "x": 237.0,
+            "y": 175.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#ece6dc",
+            "ratio": 1.15
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#cfc3b4",
+            "ratio": 1.61
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#cfc3b4",
+            "ratio": 1.61
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          }
+        ]
       }
     },
     {
@@ -40,8 +472,164 @@
       "status": "Page 3 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "People",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 74.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "Everyone the team asks, with what is open with them. Select a name, then Open person.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 465.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Find a person",
+            "x": 265.0,
+            "y": 94.0,
+            "width": 72.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "People to ask",
+            "x": 237.0,
+            "y": 149.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "5 people, in the order of the team's rules. Select one, then Open person.",
+            "x": 237.0,
+            "y": 168.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          }
+        ]
       }
     },
     {
@@ -54,15 +642,141 @@
       "status": "Page 4 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Messages",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 106.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "Every email ready to send. Open one in the list, check the email as it will arrive, and press Send.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 503.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#2b262f",
+            "ratio": 13.73
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          }
+        ]
       }
     },
     {
       "page": "cards",
       "displayName": "All cards",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "05-cards.png",
       "broken": [],
       "status": "Page 5 of 19",
@@ -74,14 +788,426 @@
           "file": "05-cards-tab1.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "All cards",
+                "x": 224.0,
+                "y": 15.0,
+                "width": 94.0,
+                "height": 33.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "One card per check, by section. Select a card, then Open card.",
+                "x": 224.0,
+                "y": 47.0,
+                "width": 327.0,
+                "height": 18.0,
+                "background": "#faf6f1",
+                "colour": "#655a52",
+                "ratio": 6.22
+              },
+              {
+                "text": "All",
+                "x": 689.0,
+                "y": 99.0,
+                "width": 15.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "",
+                "x": 837.0,
+                "y": 101.0,
+                "width": 14.0,
+                "height": 13.0,
+                "background": "#ffffff",
+                "colour": "#a25553",
+                "ratio": 5.3
+              },
+              {
+                "text": "Cards",
+                "x": 237.0,
+                "y": 149.0,
+                "width": 1010.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Red: to solve. Blue: to check. Green: OK. Grey: not tested. Select a card, then Open card.",
+                "x": 237.0,
+                "y": 168.0,
+                "width": 1010.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Not checked yet",
+                "x": 237.0,
+                "y": 618.0,
+                "width": 1010.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Classes of the CI report that no card checks yet.",
+                "x": 237.0,
+                "y": 636.0,
+                "width": 1010.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#ece6dc",
+                "ratio": 1.15
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#0b1b49",
+                "ratio": 15.4
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#0b1b49",
+                "ratio": 15.4
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#e8dfd3",
+                "ratio": 1.32
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              }
+            ]
           }
         }
       ],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "All cards",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 94.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "One card per check, by section. Select a card, then Open card.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 327.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "All",
+            "x": 689.0,
+            "y": 99.0,
+            "width": 15.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "",
+            "x": 837.0,
+            "y": 101.0,
+            "width": 14.0,
+            "height": 13.0,
+            "background": "#ffffff",
+            "colour": "#a25553",
+            "ratio": 5.3
+          },
+          {
+            "text": "Completeness",
+            "x": 237.0,
+            "y": 149.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Completeness: 3 to solve · 1 to check · 1 when there is time",
+            "x": 237.0,
+            "y": 168.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Correctness",
+            "x": 585.0,
+            "y": 149.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Correctness: 14 to solve · 2 to check · 2 not tested",
+            "x": 585.0,
+            "y": 168.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Compliance",
+            "x": 934.0,
+            "y": 149.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Compliance: 8 to solve",
+            "x": 934.0,
+            "y": 168.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Not checked yet",
+            "x": 237.0,
+            "y": 618.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Classes of the CI report that no card checks yet.",
+            "x": 237.0,
+            "y": 636.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b4e9e",
+            "ratio": 7.82
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#ece6dc",
+            "ratio": 1.15
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#0b1c48",
+            "ratio": 15.32
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#0c1c49",
+            "ratio": 16.43
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#0b1c48",
+            "ratio": 15.32
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          }
+        ]
       }
     },
     {
@@ -94,8 +1220,174 @@
       "status": "Page 6 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Mapping backlog",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 191.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "One line per CI to map with its owner. Waiting: in Ready. Planned: a tag says when.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 437.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "CIs to map",
+            "x": 237.0,
+            "y": 149.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "4 CIs to map for 1 owner",
+            "x": 237.0,
+            "y": 168.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Capability sheet",
+            "x": 237.0,
+            "y": 430.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "4 Business Capabilities",
+            "x": 237.0,
+            "y": 448.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#e6e9f4",
+            "ratio": 1.21
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          }
+        ]
       }
     },
     {
@@ -108,15 +1400,231 @@
       "status": "Page 7 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Contract changes",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 190.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "What changed in Solusi since the file before, and the contracts to watch.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 382.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#2b262f",
+            "ratio": 13.73
+          },
+          {
+            "text": "What changed",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "The Solusi contract file of 11 Nov 2026 against the one of 4 Nov 2026. 1 new · 1 no longer in the file · 1 status change · 2 changed fields",
+            "x": 237.0,
+            "y": 115.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Ending in 30 days",
+            "x": 237.0,
+            "y": 449.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "No Concluded contract ends in the next 30 days.",
+            "x": 237.0,
+            "y": 468.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Ending in 90 days",
+            "x": 585.0,
+            "y": 449.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "2 Concluded contracts end in the next 90 days, the",
+            "x": 585.0,
+            "y": 468.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "soonest first.",
+            "x": 585.0,
+            "y": 484.0,
+            "width": 314.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "No daily responsible",
+            "x": 934.0,
+            "y": 449.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Running contracts that name nobody for the daily work.",
+            "x": 934.0,
+            "y": 468.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e6e9f4",
+            "ratio": 1.21
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          }
+        ]
       }
     },
     {
       "page": "history",
       "displayName": "History",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "08-history.png",
       "broken": [],
       "status": "Page 8 of 19",
@@ -128,14 +1636,506 @@
           "file": "08-history-tab1.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "History",
+                "x": 224.0,
+                "y": 15.0,
+                "width": 80.0,
+                "height": 33.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "What the team did, and the trend of every CI report date for 24 months.",
+                "x": 224.0,
+                "y": 47.0,
+                "width": 381.0,
+                "height": 18.0,
+                "background": "#faf6f1",
+                "colour": "#4b5a7d",
+                "ratio": 6.38
+              },
+              {
+                "text": "To solve, new and solved",
+                "x": 237.0,
+                "y": 149.0,
+                "width": 485.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Each CI report date, for 24 months.",
+                "x": 237.0,
+                "y": 168.0,
+                "width": 485.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "0",
+                "x": 244.0,
+                "y": 361.0,
+                "width": 7.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "50",
+                "x": 237.0,
+                "y": 273.0,
+                "width": 14.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Nov 04",
+                "x": 251.0,
+                "y": 373.0,
+                "width": 39.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Nov 06",
+                "x": 374.0,
+                "y": 373.0,
+                "width": 39.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Nov 08",
+                "x": 497.0,
+                "y": 373.0,
+                "width": 39.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Nov 10",
+                "x": 621.0,
+                "y": 373.0,
+                "width": 39.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Days to fix",
+                "x": 758.0,
+                "y": 149.0,
+                "width": 490.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Average days from the first report that showed a finding to the one that no longer did.",
+                "x": 758.0,
+                "y": 168.0,
+                "width": 490.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "6",
+                "x": 758.0,
+                "y": 333.0,
+                "width": 8.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "7",
+                "x": 758.0,
+                "y": 277.0,
+                "width": 8.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "8",
+                "x": 758.0,
+                "y": 220.0,
+                "width": 8.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Nov 11",
+                "x": 991.0,
+                "y": 373.0,
+                "width": 39.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "To solve per support group",
+                "x": 237.0,
+                "y": 433.0,
+                "width": 485.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "To solve on each CI report date. A contract or a CI with no support group is not in this",
+                "x": 237.0,
+                "y": 452.0,
+                "width": 485.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "table.",
+                "x": 237.0,
+                "y": 469.0,
+                "width": 485.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "To solve per class",
+                "x": 758.0,
+                "y": 433.0,
+                "width": 490.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "To solve on each CI report date.",
+                "x": 758.0,
+                "y": 452.0,
+                "width": 490.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#eee7dd",
+                "ratio": 1.23
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              }
+            ]
           }
         }
       ],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "History",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 80.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "What the team did, and the trend of every CI report date for 24 months.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 381.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#4b5a7d",
+            "ratio": 6.38
+          },
+          {
+            "text": "Find a CI, a person, a card or a reference",
+            "x": 566.0,
+            "y": 94.0,
+            "width": 213.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "All",
+            "x": 1021.0,
+            "y": 99.0,
+            "width": 15.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "",
+            "x": 1225.0,
+            "y": 101.0,
+            "width": 13.0,
+            "height": 13.0,
+            "background": "#ffffff",
+            "colour": "#6d476e",
+            "ratio": 7.56
+          },
+          {
+            "text": "What happened",
+            "x": 237.0,
+            "y": 201.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "31 events",
+            "x": 237.0,
+            "y": 219.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#c37023",
+            "ratio": 3.71
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#eae7e3",
+            "ratio": 1.15
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          }
+        ]
       }
     },
     {
@@ -148,36 +2148,824 @@
       "status": "Page 9 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Overview",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 102.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "The state of the CMDB: the numbers, where the work sits and who holds the most.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 435.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Open lines",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "20 more since 4 Nov",
+            "x": 237.0,
+            "y": 168.0,
+            "width": 110.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Waiting on a person",
+            "x": 498.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "3 to escalate · 1 to remind",
+            "x": 498.0,
+            "y": 168.0,
+            "width": 138.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Solved since the last report",
+            "x": 758.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "since 4 Nov, verified",
+            "x": 758.0,
+            "y": 168.0,
+            "width": 107.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Where the work sits",
+            "x": 237.0,
+            "y": 229.0,
+            "width": 578.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "59 open lines by section and next step · darker is more",
+            "x": 237.0,
+            "y": 247.0,
+            "width": 578.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Who holds the most",
+            "x": 850.0,
+            "y": 229.0,
+            "width": 397.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "The most open lines first. 29 lines have no person: SACM fixes them, on",
+            "x": 850.0,
+            "y": 247.0,
+            "width": 397.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "the fix list of each card.",
+            "x": 850.0,
+            "y": 264.0,
+            "width": 397.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Open lines per report",
+            "x": 237.0,
+            "y": 473.0,
+            "width": 578.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Each CI report date: the lines that wait for a person, and the ones SACM fixes itself.",
+            "x": 237.0,
+            "y": 492.0,
+            "width": 578.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "20",
+            "x": 237.0,
+            "y": 629.0,
+            "width": 14.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "30",
+            "x": 237.0,
+            "y": 573.0,
+            "width": 14.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "4 Nov 2026",
+            "x": 352.0,
+            "y": 669.0,
+            "width": 62.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "11 Nov 2026",
+            "x": 656.0,
+            "y": 669.0,
+            "width": 68.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#7873ad",
+            "ratio": 4.33
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#eae2d7",
+            "ratio": 1.19
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#0c1c49",
+            "ratio": 16.43
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          }
+        ]
       }
     },
     {
       "page": "audit",
       "displayName": "Audit",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "10-audit.png",
       "broken": [],
       "status": "Page 10 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Audit",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 60.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "The proof for the auditor: the numbers of the period, found and closed, escalations.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 442.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Reports received",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "from 4 Nov to 11 Nov 2026",
+            "x": 237.0,
+            "y": 162.0,
+            "width": 146.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Problems found",
+            "x": 498.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "64 new in the period",
+            "x": 498.0,
+            "y": 162.0,
+            "width": 110.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Closed and verified",
+            "x": 758.0,
+            "y": 96.0,
+            "width": 225.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "3 % of the findings of the period",
+            "x": 758.0,
+            "y": 162.0,
+            "width": 173.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Median days to an answer",
+            "x": 1018.0,
+            "y": 96.0,
+            "width": 229.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "from the first email to the reply",
+            "x": 1018.0,
+            "y": 162.0,
+            "width": 167.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Found and closed per week",
+            "x": 237.0,
+            "y": 217.0,
+            "width": 558.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Each week of the period: the new findings of its CI reports, and the ones they verified as solved.",
+            "x": 237.0,
+            "y": 236.0,
+            "width": 558.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0",
+            "x": 243.0,
+            "y": 659.0,
+            "width": 7.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "5",
+            "x": 243.0,
+            "y": 583.0,
+            "width": 7.0,
+            "height": 16.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "10",
+            "x": 237.0,
+            "y": 506.0,
+            "width": 13.0,
+            "height": 16.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "15",
+            "x": 237.0,
+            "y": 428.0,
+            "width": 13.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "20",
+            "x": 237.0,
+            "y": 351.0,
+            "width": 13.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "9 Nov",
+            "x": 510.0,
+            "y": 670.0,
+            "width": 30.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Period",
+            "x": 834.0,
+            "y": 209.0,
+            "width": 35.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Escalations",
+            "x": 830.0,
+            "y": 285.0,
+            "width": 418.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "No escalation in the period chosen.",
+            "x": 830.0,
+            "y": 304.0,
+            "width": 418.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": "#0c1c49",
+            "colour": "#986849",
+            "ratio": 3.45
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#cfc3b4",
+            "ratio": 1.61
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#0c1c49",
+            "ratio": 16.43
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          }
+        ]
       }
     },
     {
       "page": "auditrecord",
       "displayName": "Audit record",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "11-auditrecord.png",
       "broken": [],
       "status": "Page 11 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Audit record",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 137.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "The verification record of a CI report date, per check: tested, found, new, verified.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 428.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Report date",
+            "x": 241.0,
+            "y": 89.0,
+            "width": 63.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "All",
+            "x": 244.0,
+            "y": 117.0,
+            "width": 15.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "",
+            "x": 452.0,
+            "y": 119.0,
+            "width": 13.0,
+            "height": 14.0,
+            "background": "#ffffff",
+            "colour": "#59558a",
+            "ratio": 6.79
+          },
+          {
+            "text": "Record",
+            "x": 237.0,
+            "y": 165.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Per check, on 11 Nov 2026: the newest report date when none is chosen.",
+            "x": 237.0,
+            "y": 183.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": "#0c1c49",
+            "colour": "#986849",
+            "ratio": 3.45
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#f1ebe2",
+            "ratio": 1.1
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          }
+        ]
       }
     },
     {
@@ -190,8 +2978,244 @@
       "status": "Page 12 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Audit export",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 138.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "Everything of a period for the auditor: More options, Export data gives the file.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 415.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Period of the export",
+            "x": 241.0,
+            "y": 89.0,
+            "width": 107.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Verified in the period",
+            "x": 237.0,
+            "y": 165.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "2 findings verified by a CI report of the period · on average 7 days from the first report · the longest 7 days.",
+            "x": 237.0,
+            "y": 183.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Actions of the team",
+            "x": 237.0,
+            "y": 329.0,
+            "width": 485.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "The journal of the team in the period chosen.",
+            "x": 237.0,
+            "y": 348.0,
+            "width": 485.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Found per check",
+            "x": 758.0,
+            "y": 329.0,
+            "width": 490.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Each check with what it found in the period chosen.",
+            "x": 758.0,
+            "y": 348.0,
+            "width": 490.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "The CI reports of the period",
+            "x": 237.0,
+            "y": 521.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "The CI reports of the period chosen.",
+            "x": 237.0,
+            "y": 540.0,
+            "width": 314.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Open at the end of the period",
+            "x": 585.0,
+            "y": 521.0,
+            "width": 661.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Open on the newest CI report on or before 20 Dec 2026.",
+            "x": 585.0,
+            "y": 540.0,
+            "width": 661.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": "#0c1c49",
+            "colour": "#c98e5f",
+            "ratio": 5.88
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#f1ebe2",
+            "ratio": 1.1
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          }
+        ]
       }
     },
     {
@@ -204,8 +3228,174 @@
       "status": "Page 13 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Not followed",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 143.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "Decisions to stop following a case, and the cases set aside. The app follows them again.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 463.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Decisions to stop following",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Newest first, with the date to look again.",
+            "x": 237.0,
+            "y": 115.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Cases not followed up",
+            "x": 237.0,
+            "y": 409.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Select lines, then Follow again in the app.",
+            "x": 237.0,
+            "y": 428.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": "#0c1c49",
+            "colour": "#986849",
+            "ratio": 3.45
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#ece6dc",
+            "ratio": 1.15
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#e6e9f4",
+            "colour": "#2b69b9",
+            "ratio": 4.53
+          }
+        ]
       }
     },
     {
@@ -218,8 +3408,174 @@
       "status": "Page 14 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Lifecycle review",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 170.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "The sample of CIs checked against EPO, with its evidence. The app records the marks.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 451.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#4b5a7d",
+            "ratio": 6.38
+          },
+          {
+            "text": "The lifecycle review",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Lifecycle review of 11 November 2026: 4 of 7 checked · 1 CI not the same as in EPO.",
+            "x": 237.0,
+            "y": 115.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "The evidence",
+            "x": 237.0,
+            "y": 409.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Lifecycle review of 11 November 2026: 4 of 7 checked · 1 CI not the same as in EPO.",
+            "x": 237.0,
+            "y": 428.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": "#0c1c49",
+            "colour": "#986849",
+            "ratio": 3.45
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#ece6dc",
+            "ratio": 1.15
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          }
+        ]
       }
     },
     {
@@ -232,8 +3588,214 @@
       "status": "Page 15 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Reports",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 85.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "The newest report of each type, how old it is, and the files not read.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 357.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Report types",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Reports: 5 reports · 11 Nov · fresh",
+            "x": 237.0,
+            "y": 115.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "The cards were checked with",
+            "x": 237.0,
+            "y": 329.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "The files of each CI report date.",
+            "x": 237.0,
+            "y": 348.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "CIs by class",
+            "x": 970.0,
+            "y": 329.0,
+            "width": 278.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "The newest CI report; the nine classes of the checks.",
+            "x": 970.0,
+            "y": 348.0,
+            "width": 278.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Files not read",
+            "x": 237.0,
+            "y": 534.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Every file in the folder was read.",
+            "x": 237.0,
+            "y": 552.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#ede7de",
+            "ratio": 1.14
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          }
+        ]
       }
     },
     {
@@ -252,8 +3814,174 @@
           "file": "16-card-tab1.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "On All cards, select a card, then Open card. Until then the page shows every card.",
+                "x": 300.0,
+                "y": 54.0,
+                "width": 430.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "SACM fix list",
+                "x": 237.0,
+                "y": 149.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "The change to make in ServiceNow, line by line.",
+                "x": 237.0,
+                "y": 168.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "About this card",
+                "x": 970.0,
+                "y": 409.0,
+                "width": 278.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "No card chosen.",
+                "x": 970.0,
+                "y": 428.0,
+                "width": 278.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "On All cards, select a card, then Open card.",
+                "x": 981.0,
+                "y": 534.0,
+                "width": 253.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#1f3a93",
+                "ratio": 10.07
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#e8dfd3",
+                "ratio": 1.32
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#1f3a93",
+                "ratio": 10.07
+              }
+            ]
           }
         },
         {
@@ -263,8 +3991,174 @@
           "file": "16-card-tab2.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "On All cards, select a card, then Open card. Until then the page shows every card.",
+                "x": 300.0,
+                "y": 54.0,
+                "width": 430.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "To check first",
+                "x": 237.0,
+                "y": 149.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "No card chosen: on All cards, select a card, then Open card.",
+                "x": 237.0,
+                "y": 168.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "About this card",
+                "x": 970.0,
+                "y": 409.0,
+                "width": 278.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "No card chosen.",
+                "x": 970.0,
+                "y": 428.0,
+                "width": 278.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "On All cards, select a card, then Open card.",
+                "x": 981.0,
+                "y": 534.0,
+                "width": 253.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#0b1b48",
+                "ratio": 15.43
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#0b1b48",
+                "ratio": 15.43
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#e8dfd3",
+                "ratio": 1.32
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              }
+            ]
           }
         },
         {
@@ -274,14 +4168,346 @@
           "file": "16-card-tab3.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "On All cards, select a card, then Open card. Until then the page shows every card.",
+                "x": 300.0,
+                "y": 54.0,
+                "width": 430.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Export for Excel",
+                "x": 237.0,
+                "y": 149.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "The columns of the SACM template: More options, Export data.",
+                "x": 237.0,
+                "y": 168.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "About this card",
+                "x": 970.0,
+                "y": 409.0,
+                "width": 278.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "No card chosen.",
+                "x": 970.0,
+                "y": 428.0,
+                "width": 278.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "On All cards, select a card, then Open card.",
+                "x": 981.0,
+                "y": 534.0,
+                "width": 253.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#e8dfd3",
+                "ratio": 1.32
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#0b1b49",
+                "ratio": 15.4
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#0b1b49",
+                "ratio": 15.4
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#e8dfd3",
+                "ratio": 1.32
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              }
+            ]
           }
         }
       ],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "On All cards, select a card, then Open card. Until then the page shows every card.",
+            "x": 300.0,
+            "y": 54.0,
+            "width": 430.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "To solve with a person",
+            "x": 237.0,
+            "y": 149.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "No card chosen: on All cards, select a card, then Open card.",
+            "x": 237.0,
+            "y": 168.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "About this card",
+            "x": 970.0,
+            "y": 409.0,
+            "width": 278.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "No card chosen.",
+            "x": 970.0,
+            "y": 428.0,
+            "width": 278.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "On All cards, select a card, then Open card.",
+            "x": 981.0,
+            "y": 534.0,
+            "width": 253.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e9e0d5",
+            "ratio": 1.31
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          }
+        ]
       }
     },
     {
@@ -300,8 +4526,184 @@
           "file": "17-case-tab1.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "On a card or a person, select a line, then Open CI.",
+                "x": 300.0,
+                "y": 52.0,
+                "width": 262.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Owned by",
+                "x": 237.0,
+                "y": 102.0,
+                "width": 55.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Managed by",
+                "x": 412.0,
+                "y": 102.0,
+                "width": 67.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Supported by",
+                "x": 587.0,
+                "y": 102.0,
+                "width": 73.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Tags",
+                "x": 763.0,
+                "y": 102.0,
+                "width": 23.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "People",
+                "x": 237.0,
+                "y": 241.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Who is asked, who is copied, and who gets an escalation.",
+                "x": 237.0,
+                "y": 259.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#ede7de",
+                "ratio": 1.14
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              }
+            ]
           }
         },
         {
@@ -311,8 +4713,184 @@
           "file": "17-case-tab2.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "On a card or a person, select a line, then Open CI.",
+                "x": 300.0,
+                "y": 52.0,
+                "width": 262.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Owned by",
+                "x": 237.0,
+                "y": 102.0,
+                "width": 55.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Managed by",
+                "x": 412.0,
+                "y": 102.0,
+                "width": 67.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Supported by",
+                "x": 587.0,
+                "y": 102.0,
+                "width": 73.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Tags",
+                "x": 763.0,
+                "y": 102.0,
+                "width": 23.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Relationships",
+                "x": 237.0,
+                "y": 241.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "No CI chosen: on a card or a person, select a line, then Open CI.",
+                "x": 237.0,
+                "y": 259.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#ede7de",
+                "ratio": 1.23
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#ede7de",
+                "ratio": 1.14
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#ece5dc",
+                "ratio": 1.25
+              }
+            ]
           }
         },
         {
@@ -322,8 +4900,184 @@
           "file": "17-case-tab3.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "On a card or a person, select a line, then Open CI.",
+                "x": 300.0,
+                "y": 52.0,
+                "width": 262.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Owned by",
+                "x": 237.0,
+                "y": 102.0,
+                "width": 55.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Managed by",
+                "x": 412.0,
+                "y": 102.0,
+                "width": 67.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Supported by",
+                "x": 587.0,
+                "y": 102.0,
+                "width": 73.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Tags",
+                "x": 763.0,
+                "y": 102.0,
+                "width": 23.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Timeline",
+                "x": 237.0,
+                "y": 241.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "What the team did, oldest first.",
+                "x": 237.0,
+                "y": 259.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#ede7de",
+                "ratio": 1.14
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              }
+            ]
           }
         },
         {
@@ -333,28 +5087,576 @@
           "file": "17-case-tab4.png",
           "broken": [],
           "look": {
-            "canvas": [],
-            "texts": []
+            "canvas": [
+              41,
+              196,
+              1314,
+              740
+            ],
+            "texts": [
+              {
+                "text": "On a card or a person, select a line, then Open CI.",
+                "x": 300.0,
+                "y": 52.0,
+                "width": 262.0,
+                "height": 17.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Owned by",
+                "x": 237.0,
+                "y": 102.0,
+                "width": 55.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Managed by",
+                "x": 412.0,
+                "y": 102.0,
+                "width": 67.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Supported by",
+                "x": 587.0,
+                "y": 102.0,
+                "width": 73.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Tags",
+                "x": 763.0,
+                "y": 102.0,
+                "width": 23.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "Replies",
+                "x": 237.0,
+                "y": 241.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
+              },
+              {
+                "text": "Every reply filed from the shared mailbox.",
+                "x": 237.0,
+                "y": 259.0,
+                "width": 697.0,
+                "height": 18.0,
+                "background": "#ffffff",
+                "colour": "#655a52",
+                "ratio": 6.69
+              },
+              {
+                "text": "0.51.0 · Sample data ·",
+                "x": 36.0,
+                "y": 661.0,
+                "width": 116.0,
+                "height": 17.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "refreshed 19 Nov 09:46",
+                "x": 32.0,
+                "y": 677.0,
+                "width": 124.0,
+                "height": 18.0,
+                "background": "#0c1c49",
+                "colour": "#e6e9f4",
+                "ratio": 13.56
+              },
+              {
+                "text": "Activity",
+                "x": 691.0,
+                "y": 536.0,
+                "width": 48.0,
+                "height": 19.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Results",
+                "x": 23.0,
+                "y": 497.0,
+                "width": 68.0,
+                "height": 21.0,
+                "background": null,
+                "colour": null,
+                "ratio": null
+              },
+              {
+                "text": "Your query results will show up here",
+                "x": 619.0,
+                "y": 694.0,
+                "width": 320.0,
+                "height": 27.0,
+                "background": "#faf6f1",
+                "colour": "#ede7de",
+                "ratio": 1.14
+              },
+              {
+                "text": "Run DAX queries on your model",
+                "x": 675.0,
+                "y": 72.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+                "x": 675.0,
+                "y": 443.0,
+                "width": 425.0,
+                "height": 40.0,
+                "background": "#ffffff",
+                "colour": "#ede6db",
+                "ratio": 1.24
+              },
+              {
+                "text": "Edit your model with TMDL",
+                "x": 675.0,
+                "y": 71.0,
+                "width": 397.0,
+                "height": 32.0,
+                "background": "#faf6f1",
+                "colour": "#e8dfd3",
+                "ratio": 1.23
+              },
+              {
+                "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+                "x": 675.0,
+                "y": 132.0,
+                "width": 422.0,
+                "height": 40.0,
+                "background": "#faf6f1",
+                "colour": "#2b2623",
+                "ratio": 13.9
+              },
+              {
+                "text": "Get started by dragging and dropping objects from the Data pane.",
+                "x": 675.0,
+                "y": 444.0,
+                "width": 401.0,
+                "height": 19.0,
+                "background": "#ffffff",
+                "colour": "#ede6db",
+                "ratio": 1.24
+              }
+            ]
           }
         }
       ],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "On a card or a person, select a line, then Open CI.",
+            "x": 300.0,
+            "y": 52.0,
+            "width": 262.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Owned by",
+            "x": 237.0,
+            "y": 102.0,
+            "width": 55.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Managed by",
+            "x": 412.0,
+            "y": 102.0,
+            "width": 67.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Supported by",
+            "x": 587.0,
+            "y": 102.0,
+            "width": 73.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Tags",
+            "x": 763.0,
+            "y": 102.0,
+            "width": 23.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Problems",
+            "x": 237.0,
+            "y": 241.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Each problem of the newest report, its state and who is asked.",
+            "x": 237.0,
+            "y": 259.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#f3efe9",
+            "ratio": 1.15
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#ede7de",
+            "ratio": 1.14
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          }
+        ]
       }
     },
     {
       "page": "person",
       "displayName": "Person",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 3.0,
       "file": "18-person.png",
       "broken": [],
       "status": "Page 18 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "On My day, People or Overview, select a name, then Open person.",
+            "x": 300.0,
+            "y": 52.0,
+            "width": 350.0,
+            "height": 17.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Open lines",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 209.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "on 27 CIs",
+            "x": 237.0,
+            "y": 157.0,
+            "width": 50.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Next step",
+            "x": 481.0,
+            "y": 96.0,
+            "width": 209.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "28 kinds of problem · one part each in the email",
+            "x": 481.0,
+            "y": 149.0,
+            "width": 207.0,
+            "height": 33.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Last contact",
+            "x": 726.0,
+            "y": 96.0,
+            "width": 209.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "asked 3 times",
+            "x": 726.0,
+            "y": 157.0,
+            "width": 88.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "Open with them",
+            "x": 237.0,
+            "y": 209.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Everything one email to them covers.",
+            "x": 237.0,
+            "y": 228.0,
+            "width": 697.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#ede7de",
+            "ratio": 1.14
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#2b264c",
+            "ratio": 13.15
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#faf6f1",
+            "colour": "#593a5a",
+            "ratio": 8.96
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#0c1c49",
+            "ratio": 16.43
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          }
+        ]
       }
     },
     {
@@ -367,8 +5669,174 @@
       "status": "Page 19 of 19",
       "tabs": [],
       "look": {
-        "canvas": [],
-        "texts": []
+        "canvas": [
+          41,
+          196,
+          1314,
+          740
+        ],
+        "texts": [
+          {
+            "text": "Self-check",
+            "x": 224.0,
+            "y": 15.0,
+            "width": 111.0,
+            "height": 33.0,
+            "background": "#faf6f1",
+            "colour": "#2b2623",
+            "ratio": 13.9
+          },
+          {
+            "text": "For the developer: per check, the answer key of the HTML app against this report.",
+            "x": 224.0,
+            "y": 47.0,
+            "width": 431.0,
+            "height": 18.0,
+            "background": "#faf6f1",
+            "colour": "#655a52",
+            "ratio": 6.22
+          },
+          {
+            "text": "Per check",
+            "x": 237.0,
+            "y": 96.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "39 of 39 checks give the recorded result",
+            "x": 237.0,
+            "y": 115.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "The history and the state of the team",
+            "x": 237.0,
+            "y": 466.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#2b2623",
+            "ratio": 14.95
+          },
+          {
+            "text": "12 of 12 history counts match",
+            "x": 237.0,
+            "y": 484.0,
+            "width": 1010.0,
+            "height": 18.0,
+            "background": "#ffffff",
+            "colour": "#655a52",
+            "ratio": 6.69
+          },
+          {
+            "text": "0.51.0 · Sample data ·",
+            "x": 36.0,
+            "y": 661.0,
+            "width": 116.0,
+            "height": 17.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "refreshed 19 Nov 09:46",
+            "x": 32.0,
+            "y": 677.0,
+            "width": 124.0,
+            "height": 18.0,
+            "background": "#0c1c49",
+            "colour": "#e6e9f4",
+            "ratio": 13.56
+          },
+          {
+            "text": "Activity",
+            "x": 691.0,
+            "y": 536.0,
+            "width": 48.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e6e9f4",
+            "ratio": 1.21
+          },
+          {
+            "text": "Results",
+            "x": 23.0,
+            "y": 497.0,
+            "width": 68.0,
+            "height": 21.0,
+            "background": null,
+            "colour": null,
+            "ratio": null
+          },
+          {
+            "text": "Your query results will show up here",
+            "x": 619.0,
+            "y": 694.0,
+            "width": 320.0,
+            "height": 27.0,
+            "background": "#faf6f1",
+            "colour": "#e8dfd3",
+            "ratio": 1.23
+          },
+          {
+            "text": "Run DAX queries on your model",
+            "x": 675.0,
+            "y": 72.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Once you get going, turn on Copilot with CTRL-I to also help you write the DAX query you need!",
+            "x": 675.0,
+            "y": 443.0,
+            "width": 425.0,
+            "height": 40.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "Edit your model with TMDL",
+            "x": 675.0,
+            "y": 71.0,
+            "width": 397.0,
+            "height": 32.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          },
+          {
+            "text": "TMDL view is a feature-rich code editor that allows you to edit models quickly.",
+            "x": 675.0,
+            "y": 132.0,
+            "width": 422.0,
+            "height": 40.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "Get started by dragging and dropping objects from the Data pane.",
+            "x": 675.0,
+            "y": 444.0,
+            "width": 401.0,
+            "height": 19.0,
+            "background": "#ffffff",
+            "colour": "#e8dfd3",
+            "ratio": 1.32
+          }
+        ]
       }
     }
   ]
