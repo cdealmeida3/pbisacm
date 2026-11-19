@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { pageProblems, readCatalogue, readPages, themeProblems } from '../../../tools/powerbi/pages.ts';
+import { pageProblems, readCatalogue, readPages, themeProblems, wordProblems } from '../../../tools/powerbi/pages.ts';
 import type { ReportPages, Visual } from '../../../tools/powerbi/pages.ts';
 import { theme } from '../../../tools/powerbi/generate.ts';
 
@@ -113,4 +113,16 @@ test('tabs: two tables at one place on two tabs are fine; a tab that sets filter
   assert.match(problems, /other shows, but the first tab hides it/);
   assert.match(problems, /no bookmark navigator/);
   assert.match(pageProblems(page([lines, other]), catalogue).join('\n'), /lines and other are over each other/);
+});
+
+test('words (LOOK rules 1, 2, 4): capitals, three dots, more than two words on a button, apart from the agreed ones', () => {
+  assert.deepEqual(wordProblems('Mark 3 fixed', true), []);
+  assert.deepEqual(wordProblems('Escalate to Ada Owner', true), []);
+  assert.deepEqual(wordProblems('‹ Back', true), []);
+  assert.deepEqual(wordProblems('Open the SACM list of the CMDB', false), [], 'a title may be long, and the team\'s short names are not capitals');
+  assert.match(wordProblems('Export for the auditor', true).join(), /4 words on a button/);
+  assert.match(wordProblems('Send NOW', true).join(), /NOW is in capitals/);
+  assert.match(wordProblems('Show all...', false).join(), /three dots/);
+  const button: Visual = { name: 'go', position: { x: 224, y: 84, width: 160, height: 32 }, visual: { visualType: 'actionButton', objects: { text: [{ properties: { show: lit('true'), text: lit("'Open the record now'") } }] } } };
+  assert.match(pageProblems(page([button]), catalogue).join('\n'), /go: "Open the record now": 4 words on a button/);
 });

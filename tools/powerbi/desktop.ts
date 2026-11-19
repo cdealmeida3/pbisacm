@@ -12,7 +12,7 @@
 // nothing. Only invented data: the job runs in Sample mode.
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { readTabGroups } from './pages.ts';
+import { NAMES_IN_CAPITALS, readTabGroups } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -232,7 +232,18 @@ export interface QueryResult { query: VisualQuery; error?: string; rows?: Array<
 /** What the runner gives back: the model's own errors (TOM), the open and refresh, and each query. */
 export interface Results { opened: boolean; openError?: string; refreshError?: string; modelErrors: string[]; results: QueryResult[] }
 /** What the picture step gives back (pictures.ps1): per page the seconds it took to draw and the words of a broken visual it shows. */
-export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] | null; status?: string | null; tabs?: Array<{ tab: string; found: boolean; seconds?: number | null; file: string | null; broken?: string[] }> }> }
+export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] | null; status?: string | null; look?: Look | null; tabs?: Array<{ tab: string; found: boolean; seconds?: number | null; file: string | null; broken?: string[]; look?: Look | null }> }> }
+/**
+ * What the picture step reads on the page as drawn (build D6, D328): where the page is on the screen (x, y, width,
+ * height in pixels; empty when the navy rail was not seen), and every text of the page with its box in points of the
+ * page, the background and the text colour measured on the picture, and their contrast.
+ */
+export interface Look { canvas: number[]; texts: LookText[] }
+export interface LookText { text: string; x: number; y: number; width: number; height: number; background: string | null; colour: string | null; ratio: number | null }
+
+/** The contrast a text needs (LOOK rule 8, WCAG 2.1 AA): 4.5:1, or 3:1 for large text (24 px, a box of 30 points or more). */
+export const CONTRAST = { text: 4.5, large: 3, largeBox: 30 } as const;
+
 /** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
 export const DRAW_SECONDS = 3;
 
@@ -250,7 +261,7 @@ const where = (query: VisualQuery): string => `${query.page} › ${query.visual}
 export function judge(results: Results, pictures?: Pictures): { problems: string[]; notes: string[] } {
   const problems: string[] = [];
   const notes: string[] = [];
-  if (pictures) problems.push(...judgePictures(pictures, notes));
+  if (pictures) problems.push(...judgePictures(pictures, notes), ...judgeLook(pictures, notes));
   if (!results.opened) { problems.push(`Desktop did not open the project: ${results.openError ?? 'no reason given'}`); return { problems, notes }; }
   if (results.refreshError) problems.push(`The refresh failed: ${results.refreshError}`);
   for (const error of results.modelErrors) problems.push(`Model: ${error}`);
@@ -304,6 +315,42 @@ export function judgePictures(pictures: Pictures, notes: string[] = []): string[
     }
     if (page.seconds !== null && page.seconds > DRAW_SECONDS) problems.push(`${page.displayName}: the page took ${page.seconds} s to draw, more than ${DRAW_SECONDS} s (picture ${page.file})`);
     else notes.push(`${page.displayName}: drawn in ${page.seconds} s (picture ${page.file})`);
+  }
+  return problems;
+}
+
+/**
+ * The rules of LOOK §1 on the pages as Desktop draws them (build D6, D328), for every picture of a page and of a tab:
+ *   - the page was found on the picture (the navy rail), and it shows some text;
+ *   - rule 8: every text has a contrast of 4.5:1 or more on what is behind it (3:1 for large text);
+ *   - rule 2: no text ends with three dots (a text Power BI cut, or written so);
+ *   - rule 1: no word in capitals in a sentence (the team's short names apart, NAMES_IN_CAPITALS of pages.ts).
+ * The rules of the files (titles and headers that fit, the size of a text, the words on a button) are in pages.ts.
+ */
+export function judgeLook(pictures: Pictures, notes: string[] = []): string[] {
+  const problems: string[] = [];
+  if (!pictures.taken) return problems;
+  const shots = pictures.pages.flatMap((page) => [
+    { where: page.displayName, file: page.file, look: page.look },
+    ...(page.tabs ?? []).filter((tab) => tab.found).map((tab) => ({ where: `${page.displayName}, tab ${tab.tab}`, file: tab.file, look: tab.look }))
+  ]).filter((shot) => shot.file);
+  for (const { where, file, look } of shots) {
+    if (!look) continue;
+    if (look.canvas.length !== 4) { problems.push(`${where}: the picture step did not find the page on the screen (no navy rail), so its look was not checked (picture ${file})`); continue; }
+    if (!look.texts.length) { problems.push(`${where}: no text of the page was read, so its look was not checked (picture ${file})`); continue; }
+    let lowest: LookText | undefined;
+    for (const text of look.texts) {
+      const at = `${where}: "${text.text.slice(0, 60)}" at ${text.x}, ${text.y}`;
+      if (text.ratio !== null) {
+        const need = text.height >= CONTRAST.largeBox ? CONTRAST.large : CONTRAST.text;
+        if (text.ratio < need) problems.push(`${at} has a contrast of ${text.ratio}:1 (${text.colour} on ${text.background}), under ${need}:1 (LOOK rule 8, picture ${file})`);
+        if (!lowest || text.ratio < lowest.ratio!) lowest = text;
+      }
+      if (/(\.\.\.|…)$/.test(text.text.trim())) problems.push(`${at} ends with three dots: it is cut or written so (LOOK rule 2, picture ${file})`);
+      const capitals = text.text.match(/\b[A-Z]{2,}\b/g)?.filter((word) => !NAMES_IN_CAPITALS.has(word)) ?? [];
+      if (capitals.length && /[a-z]/.test(text.text) && !/\d/.test(text.text)) problems.push(`${at} has the word ${capitals[0]} in capitals (LOOK rule 1, picture ${file})`);
+    }
+    notes.push(`${where}: ${look.texts.length} texts read${lowest ? `, the lowest contrast ${lowest.ratio}:1 ("${lowest.text.slice(0, 40)}", ${lowest.colour} on ${lowest.background})` : ''}`);
   }
   return problems;
 }

@@ -232,7 +232,8 @@ export function railVisuals(page: string, height: number): Visual[] {
 }
 
 /** Where the reports chip is on every page: the top right of the content, beside the name of the page. */
-export const REPORTS_CHIP = { x: 836, y: 24, width: 420, height: 40 };
+// A pill as in the mockups (build D6): wide enough for the longest words ("! 5 reports · 11 Nov · one is too old").
+export const REPORTS_CHIP = { x: 976, y: 28, width: 280, height: 32 };
 
 /**
  * The reports chip (build D3, D322): the words of the measure Reports chip at the top right of every page, green when
@@ -256,7 +257,7 @@ function reportsChip(): Visual {
               fontFamily: literal(`'${FONT_SEMIBOLD}'`),
               fontSize: literal('9D'),
               fontColor: { solid: { color: reportTypes('Reports colour') } },
-              horizontalAlignment: literal("'right'"),
+              horizontalAlignment: literal("'center'"),
               verticalAlignment: literal("'middle'"),
               leftMargin: literal('12D'),
               rightMargin: literal('12D')
@@ -265,6 +266,7 @@ function reportsChip(): Visual {
           }
         ],
         icon: hidden,
+        shape: [{ properties: { tileShape: literal("'rectangleRoundedByPixel'"), rectangleRoundedCurve: literal('16L') } }],
         fill: [
           { properties: { show: literal('true') } },
           { properties: { fillColor: { solid: { color: reportTypes('Reports fill') } }, transparency: literal('0D') }, selector: { id: 'default' } }

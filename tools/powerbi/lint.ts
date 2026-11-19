@@ -20,7 +20,8 @@
 //      (D317), and the app and its flows keep the rules of tools/powerbi/app-rules.ts.
 //  10. Pages (design pass §8.1, tools/powerbi/pages.ts): the size of every page, at most 12 native visuals, the 4 px grid,
 //      no overlap, the places of the Power Apps, the widths of the table columns, titles on one line, a line by a measure
-//      under every table and chart, no text under 9 pt, only properties Power BI has, the hidden pages.
+//      under every table and chart, no text under 9 pt, only properties Power BI has, the hidden pages, the words (LOOK
+//      rules 1, 2 and 4).
 // --no-dotnet skips step 1 and the parsing of step 9, and says so (for a computer without .NET); the CI never uses it.
 import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -325,7 +326,7 @@ done.push('App: the actions agree with fnCaseActions; the flows only refresh, wa
 const report = readPages();
 const catalogue = readCatalogue();
 problems.push(...pageProblems(report, catalogue), ...themeProblems(JSON.parse(readFileSync(THEME_FILE, 'utf8')) as never, catalogue));
-done.push(`Pages: ${report.pages.length} pages of 1280 × 720, at most 12 native visuals each, on the grid, tables fit, every empty box says why`);
+done.push(`Pages: ${report.pages.length} pages of 1280 × 720, at most 12 native visuals each, on the grid, tables fit, every empty box says why, the words keep LOOK rules 1, 2 and 4`);
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);

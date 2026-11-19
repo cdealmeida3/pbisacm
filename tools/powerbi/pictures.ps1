@@ -20,6 +20,61 @@ public static class PictureWin {
   [DllImport("user32.dll")] public static extern void keybd_event(byte k, byte s, int f, int e);
 }
 "@
+# The look of the canvas (build D6, D328): where the page is on the screen, and the contrast of a text as drawn.
+Add-Type -ReferencedAssemblies System.Drawing, System.Drawing.Primitives -TypeDefinition @"
+using System; using System.Collections.Generic; using System.Drawing; using System.Drawing.Imaging;
+public static class PictureLook {
+  // The navy of the rail (docs/LOOK.md, accent #0c1c49), a little either way for the drawing of the screen.
+  static bool Navy(Color c) { return Math.Abs(c.R - 12) <= 6 && Math.Abs(c.G - 28) <= 6 && Math.Abs(c.B - 73) <= 6; }
+  // The page on the screen: the rail is a navy band at its left, 188 of its 1280 points wide and as tall as the page.
+  // Gives x, y, width, height in screen pixels, or an empty array when no rail is seen.
+  public static int[] Canvas(Bitmap b, double pageWidth, double railWidth) {
+    for (int y = b.Height / 3; y < b.Height * 2 / 3; y += 7) {
+      int run = 0, start = -1;
+      for (int x = 0; x < b.Width; x++) {
+        if (Navy(b.GetPixel(x, y))) { if (run == 0) start = x; run++; }
+        else { if (run >= 120) break; run = 0; }
+      }
+      if (run < 120) continue;
+      int column = start + 3, top = y, bottom = y;
+      while (top > 0 && Navy(b.GetPixel(column, top - 1))) top--;
+      while (bottom < b.Height - 1 && Navy(b.GetPixel(column, bottom + 1))) bottom++;
+      double scale = run / railWidth;
+      return new int[] { start, top, (int)Math.Round(pageWidth * scale), bottom - top + 1 };
+    }
+    return new int[0];
+  }
+  static double Channel(int v) { double c = v / 255.0; return c <= 0.03928 ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4); }
+  static double Luminance(Color c) { return 0.2126 * Channel(c.R) + 0.7152 * Channel(c.G) + 0.0722 * Channel(c.B); }
+  static double Ratio(Color a, Color b) { double x = Luminance(a), y = Luminance(b); return (Math.Max(x, y) + 0.05) / (Math.Min(x, y) + 0.05); }
+  static string Hex(Color c) { return "#" + c.R.ToString("x2") + c.G.ToString("x2") + c.B.ToString("x2"); }
+  // The contrast of the text in a box: the background is the colour most of the box has; the text is the colour that
+  // stands out most from it and that at least three pixels have (one odd pixel is the edge of an icon or a line).
+  // The edges of letters are mixed with the background, so the text colour is its darkest (or lightest) pixels.
+  // Gives "background text ratio", or "" for a box with one colour only.
+  public static string Contrast(Bitmap b, int x, int y, int w, int h) {
+    x = Math.Max(0, x); y = Math.Max(0, y); w = Math.Min(w, b.Width - x); h = Math.Min(h, b.Height - y);
+    if (w < 2 || h < 2) return "";
+    var counts = new Dictionary<int, int>();
+    for (int j = y; j < y + h; j++) for (int i = x; i < x + w; i++) {
+      int key = b.GetPixel(i, j).ToArgb(); int n; counts.TryGetValue(key, out n); counts[key] = n + 1;
+    }
+    int background = 0, most = -1;
+    foreach (var pair in counts) if (pair.Value > most) { most = pair.Value; background = pair.Key; }
+    Color bg = Color.FromArgb(background);
+    var ratios = new List<KeyValuePair<double, int>>();
+    foreach (var pair in counts) if (pair.Key != background) ratios.Add(new KeyValuePair<double, int>(Ratio(Color.FromArgb(pair.Key), bg), pair.Key));
+    if (ratios.Count == 0) return "";
+    ratios.Sort((p, q) => q.Key.CompareTo(p.Key));
+    int seen = 0;
+    foreach (var pair in ratios) {
+      seen += counts[pair.Value];
+      if (seen >= 3) return Hex(bg) + " " + Hex(Color.FromArgb(pair.Value)) + " " + pair.Key.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+    }
+    return "";
+  }
+}
+"@
 $UIA = [System.Windows.Automation.AutomationElement]
 $Scope = [System.Windows.Automation.TreeScope]
 $NameProperty = $UIA::NameProperty
@@ -63,12 +118,53 @@ function Fingerprint {
   $bitmap.Dispose(); $small.Dispose(); $stream.Dispose()
   return $hash
 }
-function Save-Picture([string]$name) {
+# A picture of the screen, and of the page alone (<name>-page.png, cut where the rail shows the page is: the team guide
+# and the review use it). Gives the file and what the look check reads on the canvas (Look-Texts).
+function Save-Picture([string]$name, [switch]$Look) {
   $bitmap = Screen-Bitmap
   $file = Join-Path $Out "$name.png"
   $bitmap.Save($file, [System.Drawing.Imaging.ImageFormat]::Png)
+  $look = $null
+  if ($Look) {
+    $canvas = [PictureLook]::Canvas($bitmap, 1280, 188)
+    if ($canvas.Length -eq 4) {
+      $rect = New-Object System.Drawing.Rectangle($canvas[0], $canvas[1], [math]::Min($canvas[2], $bitmap.Width - $canvas[0]), [math]::Min($canvas[3], $bitmap.Height - $canvas[1]))
+      $page = $bitmap.Clone($rect, $bitmap.PixelFormat)
+      $page.Save((Join-Path $Out "$name-page.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+      $page.Dispose()
+      $look = [ordered]@{ canvas = $canvas; texts = @(Look-Texts (Window) $bitmap $canvas) }
+    } else { $look = [ordered]@{ canvas = @(); texts = @() } }
+  }
   $bitmap.Dispose()
-  return $file
+  return @($file, $look)
+}
+# Every text of the canvas as drawn (LOOK rules 1, 2 and 8, build D6, D328): its words, its box in points of the page
+# (1280 × 720), and the background, the text colour and their contrast measured on the picture. Only the words
+# Desktop draws on the page: its own menus and panes are outside the box of the page.
+function Look-Texts($root, $bitmap, $canvas) {
+  $scale = $canvas[2] / 1280.0
+  $out = @()
+  $seen = New-Object System.Collections.Generic.HashSet[string]
+  $text = [System.Windows.Automation.ControlType]::Text
+  foreach ($element in $root.FindAll($Scope::Descendants, (New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::ControlTypeProperty, $text)))) {
+    $name = $element.Current.Name
+    if (-not $name -or -not $name.Trim()) { continue }
+    $r = $element.Current.BoundingRectangle
+    if ($r.IsEmpty -or $element.Current.IsOffscreen) { continue }
+    if ($r.X -lt $canvas[0] -or $r.Y -lt $canvas[1] -or ($r.X + $r.Width) -gt ($canvas[0] + $canvas[2]) -or ($r.Y + $r.Height) -gt ($canvas[1] + $canvas[3])) { continue }
+    if ($r.Height -lt 6 -or $r.Height -gt (60 * $scale) -or $r.Width -lt 4) { continue }
+    $key = "$name|$([int]$r.X)|$([int]$r.Y)"
+    if (-not $seen.Add($key)) { continue }
+    $measured = [PictureLook]::Contrast($bitmap, [int][math]::Floor($r.X), [int][math]::Floor($r.Y), [int][math]::Ceiling($r.Width), [int][math]::Ceiling($r.Height))
+    $parts = if ($measured) { $measured.Split(' ') } else { @($null, $null, $null) }
+    $out += [ordered]@{
+      text = $name.Trim()
+      x = [math]::Round(($r.X - $canvas[0]) / $scale); y = [math]::Round(($r.Y - $canvas[1]) / $scale)
+      width = [math]::Round($r.Width / $scale); height = [math]::Round($r.Height / $scale)
+      background = $parts[0]; colour = $parts[1]; ratio = if ($parts[2]) { [double]$parts[2] } else { $null }
+    }
+  }
+  return $out
 }
 # The page tab of a page: the element with its name lowest in the window (the tabs sit at the bottom). A hidden page's tab
 # carries the same name with an icon; Desktop may add words, so a name that starts with the page name counts too.
@@ -189,7 +285,7 @@ while ((Get-Date) -lt $deadline) {
   Start-Sleep 15
 }
 if (-not (Find-Tab $root $first)) {
-  $file = Save-Picture "00-not-open"
+  $file = (Save-Picture "00-not-open")[0]
   '{"taken": false, "why": "the tab of the first page did not appear in 15 minutes", "pages": []}' | Out-File -Encoding utf8NoBOM (Join-Path $Out "pictures.json")
   Say "The report did not open: $file"; exit 0
 }
@@ -237,7 +333,8 @@ foreach ($page in $list) {
   Open-Tab $tab
   Start-Sleep -Milliseconds 300
   $seconds = Wait-Drawn $clock
-  $file = Save-Picture $slug
+  $saved = Save-Picture $slug -Look
+  $file = $saved[0]
   $words = Words (Window)
   $broken = @(Broken-Words $words)
   # The status bar says which page is open ("Page 14 of 17"): the judge compares it with the place of the page.
@@ -259,13 +356,14 @@ foreach ($page in $list) {
     [PictureWin]::keybd_event(0x11, 0, 2, 0)
     Start-Sleep -Milliseconds 300
     $tabSeconds = Wait-Drawn $tabClock
-    $tabFile = Save-Picture $tabSlug
+    $tabSaved = Save-Picture $tabSlug -Look
+    $tabFile = $tabSaved[0]
     $tabBroken = @(Broken-Words (Words (Window)))
     Say "$($page.displayName), tab ${label}: drawn in $tabSeconds s, $tabFile$(if ($tabBroken.Count) { ', shows: ' + ($tabBroken -join '; ') })"
-    $tabs += [ordered]@{ tab = $label; found = $true; seconds = $tabSeconds; file = (Split-Path $tabFile -Leaf); broken = $tabBroken }
+    $tabs += [ordered]@{ tab = $label; found = $true; seconds = $tabSeconds; file = (Split-Path $tabFile -Leaf); broken = $tabBroken; look = $tabSaved[1] }
   }
-  $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken; status = $status; tabs = $tabs }
+  $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken; status = $status; tabs = $tabs; look = $saved[1] }
 }
-[ordered]@{ taken = $true; minutes = [math]::Round(((Get-Date) - $started).TotalMinutes, 1); pages = $results } | ConvertTo-Json -Depth 5 |
+[ordered]@{ taken = $true; minutes = [math]::Round(((Get-Date) - $started).TotalMinutes, 1); pages = $results } | ConvertTo-Json -Depth 8 |
   Out-File -Encoding utf8NoBOM (Join-Path $Out "pictures.json")
 Say "$($results.Count) pages, pictures in $Out"

@@ -20,6 +20,10 @@
 //      what its visuals show (never the filters, so a drill-through keeps its CI, card or person), the visuals of the
 //      first tab show when the page opens and the others are hidden. Two visuals of one group may sit at the same place
 //      when no tab shows both.
+//  11. Words (build D6, D328): every text the files write (titles, the lines under them, buttons, headers, the tabs) has no
+//      word in capitals (LOOK rule 1) and no three dots (rule 2); a button has at most two words (rule 4, a number or a
+//      sign is no word), apart from the longer ones LOOK agrees. The same rules on the pages as drawn, and the contrast of
+//      every text (rule 8), are checked on the pictures of the Desktop check (desktop.ts, judgeLook).
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { APP_SLOTS, CELL_PADDING, GRID, MIN_TEXT_POINTS, TABLE_CHROME, TEXT, textWidth } from './tokens.ts';
@@ -141,6 +145,37 @@ const CHART_TYPES = new Set(['lineChart', 'barChart', 'columnChart', 'clusteredB
 const RAIL_VISUAL = /^rail/;
 
 const literal = (entry: Literal | undefined): string | undefined => entry?.expr?.Literal?.Value;
+
+/** The longer button words LOOK rule 4 agrees (docs/LOOK.md §1), with N for a number. */
+export const LONG_BUTTONS = ['Escalate to (name)', 'Mark N fixed', 'Mapping done: ask owner', 'Ask the owner', 'Send from mailbox', 'Hand over to (name)', 'Try the demo', 'Tell Process Management'];
+/** Words in capitals that are the team's short names, not shouting (LOOK rule 1). */
+export const NAMES_IN_CAPITALS = new Set(['SACM', 'CMDB', 'CIAA', 'EPO', 'CSV', 'CI', 'CIS', 'ID', 'BI', 'HTML']);
+/** The problems of one text against LOOK rules 1, 2 and (for a button) 4. */
+export function wordProblems(text: string, button: boolean): string[] {
+  const problems: string[] = [];
+  const capitals = (text.match(/\b[A-Z]{2,}\b/g) ?? []).filter((word) => !NAMES_IN_CAPITALS.has(word));
+  if (capitals.length) problems.push(`the word ${capitals[0]} is in capitals (LOOK rule 1)`);
+  if (/\.\.\.|…/.test(text)) problems.push('three dots (LOOK rule 2)');
+  if (button) {
+    const words = text.split(/\s+/).filter((word) => /[A-Za-z]/.test(word));
+    const agreed = LONG_BUTTONS.some((long) => new RegExp(`^${long.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace('\\(name\\)', '.+').replace(/\bN\b/, '\\d+')}$`).test(text));
+    if (words.length > 2 && !agreed) problems.push(`${words.length} words on a button, at most 2 (LOOK rule 4)`);
+  }
+  return problems;
+}
+/** Every literal text of a visual: its title and the line under it, a button's text, a text box, the column headers. */
+function textsOf(visual: Visual): Array<{ text: string; button: boolean }> {
+  const out: Array<{ text: string; button: boolean }> = [];
+  const button = visual.visual?.visualType === 'actionButton';
+  for (const [group, isObjects] of [[visual.visual?.objects, true], [visual.visual?.visualContainerObjects, false]] as const) {
+    for (const [object, entries] of Object.entries(group ?? {})) for (const entry of entries) {
+      const value = literal(entry.properties?.text);
+      if (value?.startsWith("'")) out.push({ text: value.slice(1, -1).replace(/''/g, "'"), button: button && isObjects && object === 'text' });
+    }
+  }
+  for (const projection of projectionsOf(visual)) if (projection.displayName) out.push({ text: projection.displayName, button: false });
+  return out;
+}
 const projectionsOf = (visual: Visual): Projection[] => Object.values(visual.visual?.query?.queryState ?? {}).flatMap((role) => role.projections ?? []);
 const header = (projection: Projection): string => projection.displayName ?? Object.values(projection.field)[0]?.Property ?? projection.queryRef;
 const overlap = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): boolean =>
@@ -210,6 +245,8 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
           }
         }
       }
+      // 11. Words.
+      for (const { text, button } of textsOf(visual)) for (const problem of wordProblems(text, button)) problems.push(`${at}: "${text}": ${problem}`);
       // 6. Titles and the line under them.
       const container = visual.visual?.visualContainerObjects ?? {};
       const title = container.title?.[0]?.properties;
@@ -262,6 +299,7 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
         const hiddenNow = visual.isHidden === true;
         if (first.has(visual.name) === hiddenNow) problems.push(`${at}: ${visual.name} ${hiddenNow ? 'is hidden, but the first tab shows it' : 'shows, but the first tab hides it'}`);
       }
+      for (const tab of group.tabs) for (const problem of wordProblems(tab.label, false)) problems.push(`${at}: the tab "${tab.label}": ${problem}`);
       const navigator = visuals.some((visual) => visual.visual?.visualType === 'bookmarkNavigator' && literal(visual.visual.objects?.bookmarks?.[0]?.properties?.bookmarkGroup) === `'${group.name}'`);
       if (!navigator) problems.push(`${at}: no bookmark navigator shows the tabs of this group`);
     }
