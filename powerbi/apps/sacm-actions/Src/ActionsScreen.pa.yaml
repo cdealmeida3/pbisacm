@@ -264,7 +264,7 @@ Screens:
                                           At: Now(),
                                           By: Lower(User().Email),
                                           ByName: MeName,
-                                          Type: "assign",
+                                          EntryType: "assign",
                                           Keys: Concat(Filter(ShareLines, ShareTo = member.Value), Key, Char(10)),
                                           Text: member.Value
                                       }
@@ -278,7 +278,7 @@ Screens:
                                       At: Now(),
                                       By: Lower(User().Email),
                                       ByName: MeName,
-                                      Type: action.Type,
+                                      EntryType: action.Type,
                                       Keys: Switch(action.Scope, "mine", KeysFor.mine, "person", "", KeysFor.lines),
                                       Text: Switch(
                                           action.Id,
@@ -367,12 +367,12 @@ Screens:
               =If(
                   LineCount = 0 || IsBlank(ActionPick.Selected.Id) || ActionPick.Selected.Id in ["note", "person-note"], "",
                   With(
-                      { last: First(Sort(Filter(PendingEvents, Type = ActionPick.Selected.Type), At, SortOrder.Descending)) },
+                      { last: First(Sort(Filter(PendingEvents, EntryType = ActionPick.Selected.Type), At, SortOrder.Descending)) },
                       If(
                           IsBlank(last.At), "",
                           Coalesce(last.ByName, last.By) & " saved " &
                           Switch(
-                              last.Type,
+                              last.EntryType,
                               "assign", If(IsBlank(last.Text), "an assign to nobody", "an assign to " & last.Text),
                               "status", "the status " & last.Text,
                               "request", "the request " & last.Text,
@@ -382,7 +382,7 @@ Screens:
                               "stage", "a stage",
                               "no-process", "the process mark",
                               "handover", "a hand-over",
-                              last.Type) &
+                              last.EntryType) &
                           " on " & CountRows(Filter(Split(last.Keys, Char(10)) As key, Trim(key.Value) in SelectedKeys.Value)) &
                           " of these lines at " & Text(last.At, "hh:mm") & ". The report shows it after the next refresh.")))
             Visible: =false
@@ -473,7 +473,7 @@ Screens:
                 Properties:
                   Text: |-
                     =Text(ThisItem.At, "d mmm hh:mm") & " · " & Coalesce(ThisItem.ByName, ThisItem.By) & Char(10) &
-                    ThisItem.Type & If(IsBlank(ThisItem.Text), "", ": " & ThisItem.Text)
+                    ThisItem.EntryType & If(IsBlank(ThisItem.Text), "", ": " & ThisItem.Text)
                   Font: =AppFont
                   Size: =9
                   Color: =ColourInk
@@ -614,7 +614,7 @@ Screens:
                   With(
                       {
                           done: First(Sort(
-                              Filter(PendingEvents As event, event.Type = "status" && (event.Text = "Answered" || event.Text = "Fix in progress") &&
+                              Filter(PendingEvents As event, event.EntryType = "status" && (event.Text = "Answered" || event.Text = "Fix in progress") &&
                                   event.At >= ReplyPick.Selected.Received &&
                                   CountRows(Filter(Split(event.Keys, Char(10)) As key, Trim(key.Value) in replyKeys.Key)) > 0),
                               At, SortOrder.Descending))
@@ -736,8 +736,8 @@ Screens:
                       note: "Waiting until " & Text(WaitDate.SelectedDate, "d mmm yyyy", "en-GB") & " (reply of " & ReplyPick.Selected.From & ")" & If(IsBlank(Trim(ReplyNote.Text)), "", ": " & Trim(ReplyNote.Text))
                   },
                   IfError(
-                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "status", Keys: keys, Text: "Fix in progress" });
-                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: keys, Text: note });
+                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, EntryType: "status", Keys: keys, Text: "Fix in progress" });
+                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, EntryType: "note", Keys: keys, Text: note });
                       Notify("Saved: Fix in progress, waiting until " & Text(WaitDate.SelectedDate, "d mmm") & ". The report shows it after the next refresh.", NotificationType.Success);
                       Reset(ReplyNote),
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)
@@ -762,7 +762,7 @@ Screens:
               =If(CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || IsBlank(Trim(ReplyNote.Text)), DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =IfError(
-                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: Concat(Filter(ReplyGallery.AllItems, LineCheck.Checked), Key, Char(10)), Text: Trim(ReplyNote.Text) });
+                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, EntryType: "note", Keys: Concat(Filter(ReplyGallery.AllItems, LineCheck.Checked), Key, Char(10)), Text: Trim(ReplyNote.Text) });
                   Notify("Note saved. The report shows it after the next refresh.", NotificationType.Success);
                   Reset(ReplyNote),
                   Notify("Not saved: " & FirstError.Message, NotificationType.Error)
@@ -793,8 +793,8 @@ Screens:
               =With(
                   { keys: Concat(Filter(ReplyGallery.AllItems, LineCheck.Checked), Key, Char(10)), note: Trim(ReplyNote.Text) },
                   IfError(
-                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "status", Keys: keys, Text: "Answered" });
-                      If(!IsBlank(note), Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: keys, Text: note }));
+                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, EntryType: "status", Keys: keys, Text: "Answered" });
+                      If(!IsBlank(note), Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, EntryType: "note", Keys: keys, Text: note }));
                       Notify("Marked answered. The report shows it after the next refresh.", NotificationType.Success);
                       Reset(ReplyNote),
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)

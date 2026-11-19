@@ -716,15 +716,15 @@ Screens:
                           IfError(
                               If(
                                   !IsBlank(still),
-                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: still, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: d.Kind, Channel: "mailbox" })
+                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: still, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: d.Kind, Channel: "mailbox" })
                               );
                               If(
                                   !IsBlank(d.NewKeys),
-                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: d.NewKeys, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: "first", Channel: "mailbox" })
+                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: d.NewKeys, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: "first", Channel: "mailbox" })
                               );
                               If(
                                   !IsBlank(d.FreeKeys) && !IsBlank(MeName),
-                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "assign", Keys: d.FreeKeys, Text: MeName })
+                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "assign", Keys: d.FreeKeys, Text: MeName })
                               );
                               Notify("Sent from the shared mailbox to " & to & ". It leaves the list after the next refresh.", NotificationType.Success),
                               Notify("Sent, but not recorded: " & FirstError.Message & ". Add a note on the cases.", NotificationType.Error)
@@ -823,15 +823,15 @@ Screens:
                   IfError(
                       If(
                           !IsBlank(still),
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: still, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: sent.Kind, Channel: sent.Channel, Text: sent.Text })
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: still, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: sent.Kind, Channel: sent.Channel, Text: sent.Text })
                       );
                       If(
                           !IsBlank(sent.NewKeys),
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "message", Keys: sent.NewKeys, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: "first", Channel: sent.Channel, Text: sent.Text })
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: sent.NewKeys, Ref: sent.Ref, To: sent.To, Cc: sent.Cc, Subject: sent.Subject, Kind: "first", Channel: sent.Channel, Text: sent.Text })
                       );
                       If(
                           !IsBlank(sent.FreeKeys) && !IsBlank(MeName),
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "assign", Keys: sent.FreeKeys, Text: MeName })
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "assign", Keys: sent.FreeKeys, Text: MeName })
                       );
                       Notify(If(sent.Channel = "teams", "Recorded: the Teams chat.", "Recorded as sent from Outlook.") & " The report shows it after the next refresh.", NotificationType.Success);
                       Set(varSentIds, varSentIds & sent.SentKey);

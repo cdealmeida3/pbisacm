@@ -21,8 +21,8 @@ ReportCurrentLines = Sort(Filter(Lines, IsCurrent), Order);
 NextLines = Sort(Filter(Lines, IsNext), Order);
 // A review is known by the day it starts: "2026-11-12_lifecycle" (reviewId of the HTML app).
 TodayId = Text(Today(), "yyyy-mm-dd") & "_lifecycle";
-// The review of today is in the journal (Type and Ref are tested in SharePoint, so they are delegated).
-TodayInJournal = !IsEmpty(Filter('SACM Journal', Type = "review" && Ref = TodayId));
+// The review of today is in the journal (EntryType and Ref are tested in SharePoint, so they are delegated).
+TodayInJournal = !IsEmpty(Filter('SACM Journal', EntryType = "review" && Ref = TodayId));
 // A review started today is never started again: it is in the report, or in the journal before the refresh shows it.
 StartedToday = First(ReportCurrentLines).Review = TodayId || TodayInJournal;
 // The review of today before the refresh shows it (build 0.52.0, D334): the journal has it, the report's newest review is
@@ -32,9 +32,9 @@ ReviewPending = TodayInJournal && First(ReportCurrentLines).Review <> TodayId;
 CurrentLines = If(ReviewPending, NextLines, ReportCurrentLines);
 CurrentId = If(ReviewPending, TodayId, First(ReportCurrentLines).Review);
 // The marks saved on the review since the report's data, by anyone (D334): the report shows them after the next
-// refresh. ForAll keeps them in the app (Type, Ref and At are tested in SharePoint, so they are delegated).
+// refresh. ForAll keeps them in the app (EntryType, Ref and At are tested in SharePoint, so they are delegated).
 MarksSince = ForAll(
-    Filter('SACM Journal', Type = "review" && Ref = CurrentId && At >= PendingSince) As row,
+    Filter('SACM Journal', EntryType = "review" && Ref = CurrentId && At >= PendingSince) As row,
     { CiKey: row.CiKey, Reason: row.Reason, At: row.At, ByName: Coalesce(row.ByName, row.By) });
 MarkedSince = Filter(MarksSince, !IsBlank(CiKey));
 // The header line (D334): every journal row of the team saved since the report's data.

@@ -26,19 +26,19 @@ DoubleContactHours = 24;
 // The letters of a new reference: no I, O, 0 or 1, which are easy to mistake (newRef of the HTML app).
 RefLetters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-// The messages a colleague sent in the last 24 hours (Type, By and At are tested in SharePoint, so they are delegated;
+// The messages a colleague sent in the last 24 hours (EntryType, By and At are tested in SharePoint, so they are delegated;
 // the apps write By in lower case). The screen keeps those to one of the addresses of the email, or about one of its
 // cases (doubleContacts of src/core/team/team.ts).
 RecentMessages = Filter(
     'SACM Journal',
-    Type = "message" && At >= DateAdd(Now(), -DoubleContactHours, TimeUnit.Hours) && By <> MeEmail);
+    EntryType = "message" && At >= DateAdd(Now(), -DoubleContactHours, TimeUnit.Hours) && By <> MeEmail);
 
 // The emails recorded since the time of the report's data (build 0.52.0, D334): the journal rows of type message from
-// ReportSince on, by anyone (Type and At are tested in SharePoint, so they are delegated; ForAll keeps them in the app).
+// ReportSince on, by anyone (EntryType and At are tested in SharePoint, so they are delegated; ForAll keeps them in the app).
 // The report shows an email in the list until the next refresh, which can be two hours away: an email whose cases one of
 // these rows names is Sent for everyone (the buttons are off), not only in the session that sent it.
 SentRows = ForAll(
-    Filter('SACM Journal', Type = "message" && At >= PendingSince) As row,
+    Filter('SACM Journal', EntryType = "message" && At >= PendingSince) As row,
     { Keys: row.Keys, At: row.At, ByName: Coalesce(row.ByName, row.By) });
 // The header line (D334): every journal row of the team saved since the report's data.
 PendingCount = CountRows(Filter('SACM Journal', At >= PendingSince));

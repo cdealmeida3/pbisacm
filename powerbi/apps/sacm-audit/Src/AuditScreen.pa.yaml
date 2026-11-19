@@ -135,7 +135,7 @@ Screens:
               =If(StartedToday || IsEmpty(NextLines) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =IfError(
-                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: TodayId, Text: NewReviewText, Items: NewReviewItems });
+                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "review", Ref: TodayId, Text: NewReviewText, Items: NewReviewItems });
                   Notify("The review is started: " & CountRows(NextLines) & " CIs. Mark them here now; the report shows the review after the next refresh.", NotificationType.Success),
                   Notify("Not started: " & FirstError.Message, NotificationType.Error)
               )
@@ -269,7 +269,7 @@ Screens:
                   IfError(
                       ForAll(
                           ticked As line,
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: result, Text: note })
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: result, Text: note })
                       );
                       Notify(CountRows(ticked) & If(CountRows(ticked) = 1, " CI marked ", " CIs marked ") & ResultPick.Selected.Label & ". The list shows it now; the report after the next refresh.", NotificationType.Success);
                       Reset(NoteText),
@@ -299,7 +299,7 @@ Screens:
                   IfError(
                       ForAll(
                           agreeing As line,
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: "same", Text: note })
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "review", Ref: CurrentId, CiKey: line.CiKey, CiName: line.CiName, Reason: "same", Text: note })
                       );
                       Notify(CountRows(agreeing) & " CIs marked Same in EPO. The list shows it now; the report after the next refresh.", NotificationType.Success),
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)
@@ -416,7 +416,7 @@ Screens:
                       Notify("Nothing changed.", NotificationType.Information),
                       IfError(
                           ForAll(changed As setting, Patch('SACM Settings', Defaults('SACM Settings'), { Title: setting.Key, Value: setting.After }));
-                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, Type: "settings", Text: "Team settings changed. " & Concat(changed, Label & ": " & Before & " → " & After, "; ") });
+                          Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "settings", Text: "Team settings changed. " & Concat(changed, Label & ": " & Before & " → " & After, "; ") });
                           Notify("Saved. The numbers count in the report after the next refresh.", NotificationType.Success),
                           Notify("Not saved: " & FirstError.Message, NotificationType.Error)
                       )

@@ -58,7 +58,7 @@ export const HISTORY_FILES = [
  * names (powerbi/README.md says how to make them).
  */
 export const STATE_LISTS = {
-  journal: { list: 'SACM Journal', file: 'journal.csv', columns: ['Title', 'At', 'By', 'ByName', 'Type', 'Keys', 'Text', 'Ref', 'To', 'Cc', 'Subject', 'Kind', 'Channel', 'Person', 'Reason', 'ReviewOn', 'RetireOn', 'CheckId', 'CiKey', 'CiName', 'Items'] },
+  journal: { list: 'SACM Journal', file: 'journal.csv', columns: ['Title', 'At', 'By', 'ByName', 'EntryType', 'Keys', 'Text', 'Ref', 'To', 'Cc', 'Subject', 'Kind', 'Channel', 'Person', 'Reason', 'ReviewOn', 'RetireOn', 'CheckId', 'CiKey', 'CiName', 'Items'] },
   replies: { list: 'SACM Replies', file: 'replies.csv', columns: ['Title', 'From', 'Received', 'Subject', 'Body'] },
   settings: { list: 'SACM Settings', file: 'settings.csv', columns: ['Title', 'Value'] },
   team: { list: 'SACM Team', file: 'team.csv', columns: ['Title', 'Email', 'Active'] }
@@ -78,7 +78,7 @@ export const keysOf = (text: string): string[] => text.split(/\r?\n/).map((key) 
 
 /** A row of the list SACM Journal as the event of the app's journal (DATA-MODEL §3). Empty columns are left out. */
 export function journalEvent(row: Record<string, string>): CaseEvent {
-  const event: CaseEvent = { id: row.Title ?? '', at: row.At ?? '', by: (row.By ?? '').toLowerCase(), byName: row.ByName ?? '', type: (row.Type ?? '') as EventType, keys: keysOf(row.Keys ?? '') };
+  const event: CaseEvent = { id: row.Title ?? '', at: row.At ?? '', by: (row.By ?? '').toLowerCase(), byName: row.ByName ?? '', type: (row.EntryType ?? '') as EventType, keys: keysOf(row.Keys ?? '') };
   const optional: Array<[keyof CaseEvent, string]> = [['text', 'Text'], ['ref', 'Ref'], ['to', 'To'], ['cc', 'Cc'], ['subject', 'Subject'], ['kind', 'Kind'], ['channel', 'Channel'],
     ['person', 'Person'], ['reason', 'Reason'], ['reviewOn', 'ReviewOn'], ['checkId', 'CheckId'], ['ciKey', 'CiKey'], ['ciName', 'CiName']];
   for (const [field, column] of optional) if (row[column]) (event as unknown as Record<string, string>)[field] = row[column]!;

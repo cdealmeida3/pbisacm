@@ -203,14 +203,15 @@ report reads them; the Power Apps add rows to *SACM Journal* and *SACM Settings*
 
 In the site: **New → List → Blank list**, the name, then **Add column** for each column below. *Title* is there already.
 
-**"This column already exists"?** A list has some columns of its own that it does not show, and one may have the name you
-type (for example *Type*). Look first: **Add column → Show/hide columns**. If the column is there, tick it, and it is the
-right one when **List settings →** the column shows `Field=` and the exact name at the end of the address of the page (for
-example `Field=Type`). If the address shows another name (for example `Type0`), tell the developer before you go on.
+**"This column already exists"?** A list has columns of its own that it does not show, such as *Type* (the file icon).
+Do not show them and do not use them: they are not text columns. That is why the type of a journal row is the column
+**EntryType** (build 0.52.0, D338). If you showed the hidden *Type* column, hide it again (**Show/hide columns**). If
+SharePoint says that another column of this section already exists, tell the developer: the lint checks every name
+against the names SharePoint has.
 
 | List | Columns (type) | One row is |
 |---|---|---|
-| **SACM Journal** | Title (the event id), At (Date and time), By (Single line: the email), ByName, Type, Keys (Multiple lines: one finding key per line), Text (Multiple lines), Ref, To, Cc, Subject, Kind, Channel, Person, Reason, ReviewOn (Date), RetireOn (Date), CheckId, CiKey, CiName, Items (Multiple lines, plain text: the sample of a lifecycle review, build B8): all Single line of text unless said | One action of a manager: a message, a reminder, an escalation, a note, fixed, not followed up, assigned, the start of a lifecycle review and its marks, a change of the settings, … (the events of [DATA-MODEL.md](../docs/DATA-MODEL.md) §3). **Items**: if you made the list before B8, add this column |
+| **SACM Journal** | Title (the event id), At (Date and time), By (Single line: the email), ByName, **EntryType** (the type of the event: message, note, status, …), Keys (Multiple lines: one finding key per line), Text (Multiple lines), Ref, To, Cc, Subject, Kind, Channel, Person, Reason, ReviewOn (Date), RetireOn (Date), CheckId, CiKey, CiName, Items (Multiple lines, plain text: the sample of a lifecycle review, build B8): all Single line of text unless said | One action of a manager: a message, a reminder, an escalation, a note, fixed, not followed up, assigned, the start of a lifecycle review and its marks, a change of the settings, … (the events of [DATA-MODEL.md](../docs/DATA-MODEL.md) §3). **Items**: if you made the list before B8, add this column |
 | **SACM Replies** | Title (the reference, `SACM-…`), From, Received (Date and time), Subject, Body (Multiple lines, plain text), ConversationId (for the flows of stage 2; not read yet) | One reply that came to the shared mailbox |
 | **SACM Settings** | Title (the setting, for example `reminderDays`), Value | One setting of the team. **The last row of a setting counts** (D308): the app *SACM audit* adds a row for each change, so the list keeps the history. A number outside its range is not used, its default is. The report reads the six numbers (section 6.8) and the settings of the messages (section 6.7) |
 | **SACM Team** | Title (the name), Email, Active (Yes/No) | One manager of the team |

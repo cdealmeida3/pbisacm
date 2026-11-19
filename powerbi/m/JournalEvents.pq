@@ -2,10 +2,12 @@
 // first (by At, then by id), every field as text ("" when empty). By is lower case; Keys is the list of the finding
 // keys of the event, one per line of the column Keys. Read by the tables Journal, JournalKeys and Activity, and by the
 // parts CaseLines and Exceptions of the table Run.
+// The type of an event is the column EntryType of the list (D338): a list has a hidden column of its own named Type
+// (the file icon), so a text column Type cannot be made. The events keep the name Type, as in the app's journal.
 let
     rows = Table.ToRecords(fnStateList("journal")),
     events = List.Transform(rows, (row) => [
-        Id = row[Title], At = row[At], By = Text.Lower(row[By], "en-US"), ByName = row[ByName], Type = row[Type],
+        Id = row[Title], At = row[At], By = Text.Lower(row[By], "en-US"), ByName = row[ByName], Type = row[EntryType],
         Keys = List.Select(List.Transform(Text.SplitAny(row[Keys], "#(cr)#(lf)"), Text.Trim), (key) => key <> ""),
         Text = row[Text], Ref = row[Ref], To = row[To], Cc = row[Cc], Subject = row[Subject], Kind = row[Kind], Channel = row[Channel],
         Person = row[Person], Reason = row[Reason], ReviewOn = row[ReviewOn], RetireOn = row[RetireOn], CheckId = row[CheckId], CiKey = row[CiKey], CiName = row[CiName],

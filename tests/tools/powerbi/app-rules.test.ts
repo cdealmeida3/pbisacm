@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { appActions } from '../../../tools/powerbi/actions.ts';
-import { appFlows, callProblems, catalogueProblems, controlProblems, flowProblems } from '../../../tools/powerbi/app-rules.ts';
+import { appFlows, callProblems, catalogueProblems, columnProblems, controlProblems, flowProblems } from '../../../tools/powerbi/app-rules.ts';
 import type { Flow, Formula } from '../../../tools/powerbi/app-rules.ts';
 
 const root = join(import.meta.dirname, '..', '..', '..');
@@ -160,7 +160,7 @@ test('changing or removing a row, another list, an unknown column, another conne
 
 test('the app SACM audit adds rows to SACM Settings with Title and Value only, and changes none (build B8, D308)', () => {
   const audit = (calls: Formula['calls']): Formula => ({ ...formula('audit', calls), file: 'powerbi/apps/sacm-audit/Src/AuditScreen.pa.yaml' });
-  assert.deepEqual(callProblems([audit([patch(['Title', 'Value'], 'Defaults', 'SACM Settings'), patch(['Title', 'Type', 'Items'])])]), []);
+  assert.deepEqual(callProblems([audit([patch(['Title', 'Value'], 'Defaults', 'SACM Settings'), patch(['Title', 'EntryType', 'Items'])])]), []);
   const problems = callProblems([audit([patch(['Title', 'Colour'], 'Defaults', 'SACM Settings'), patch(['Title'], null, 'SACM Settings'), patch(['Title'])])]);
   assert.ok(problems.some((line) => line.includes('column Colour, which SACM Settings does not have')));
   assert.ok(problems.some((line) => line.includes('Patch(SACM Settings, …)')));
@@ -202,4 +202,14 @@ test('the three screens use only modern controls with their own properties, or t
       .filter(({ line }) => /^\s+[A-Za-z]+: =/.test(line) && /: |\s#/.test(line.slice(line.indexOf(': =') + 3)));
     assert.deepEqual(plain.map(({ at }) => `${app}:${at}`), [], 'a one-line formula with ": " or " #" must be a block (|-)');
   }
+});
+
+test('no list column has the name of a column SharePoint has already, such as Type (D338)', () => {
+  assert.deepEqual(columnProblems(), []);
+  const problems = columnProblems({ journal: { list: 'SACM Journal', columns: ['Title', 'Type', 'EntryType', 'Content Type'] } }, []);
+  assert.equal(problems.length, 2);
+  assert.match(problems[0]!, /column Type of SACM Journal/);
+  const flow = appFlows()[0]!;
+  const extra: Flow = { ...flow, steps: [{ action: 'Create item', fields: { 'List Name': 'SACM Replies', Title: '=x', Modified: '=y' } } as never] };
+  assert.match(columnProblems({}, [extra]).join(), /column Modified of SACM Replies/);
 });

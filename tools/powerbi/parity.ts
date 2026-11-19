@@ -346,10 +346,10 @@ export async function parityProblems(folder: string): Promise<string[]> {
   const activity = activityRows();
   problems.push(...compare('Activity', withTimes(rows('Activity'), ['At']), activity, 'Id', ['At', 'Type', 'Icon', 'What', 'By', 'Text', 'Cards', 'CIs', 'Keys', 'Find']));
   const journal = stateRows('journal');
-  problems.push(...compare('Journal', withTimes(rows('Journal'), ['At']), journal.map((row) => ({ Id: row.Title, At: row.At, Type: row.Type, KeyCount: (row.Keys ?? '').split(/\r?\n/).filter((line) => line.trim()).length, ReviewOn: row.ReviewOn })), 'Id', ['At', 'Type', 'KeyCount', 'ReviewOn']));
+  problems.push(...compare('Journal', withTimes(rows('Journal'), ['At']), journal.map((row) => ({ Id: row.Title, At: row.At, Type: row.EntryType, KeyCount: (row.Keys ?? '').split(/\r?\n/).filter((line) => line.trim()).length, ReviewOn: row.ReviewOn })), 'Id', ['At', 'Type', 'KeyCount', 'ReviewOn']));
   const keyCount = journal.reduce((sum, row) => sum + (row.Keys ?? '').split(/\r?\n/).filter((line) => line.trim()).length, 0);
   if (rows('JournalKeys').length !== keyCount) problems.push(`JournalKeys: ${rows('JournalKeys').length} rows, expected ${keyCount}`);
-  const refs = new Set(journal.filter((row) => row.Type === 'message').map((row) => row.Ref));
+  const refs = new Set(journal.filter((row) => row.EntryType === 'message').map((row) => row.Ref));
   problems.push(...compare('Replies', withTimes(rows('Replies'), ['Received']), stateRows('replies').map((row) => ({ Ref: row.Title, Received: row.Received, Matched: refs.has(row.Title) })), 'Ref', ['Received', 'Matched']));
   problems.push(...compare('Team', rows('Team'), stateRows('team').map((row, at) => ({ Name: row.Title, Email: row.Email!.toLowerCase(), Active: !/^(no|false|0)$/i.test(row.Active!.trim()), SampleMe: at === 0 })), 'Name', ['Email', 'Active', 'SampleMe']));
   problems.push(...compare('Settings', rows('Settings'), settingsRows(stateRows('settings')), 'Key', ['Value', 'Used']));

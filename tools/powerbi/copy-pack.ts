@@ -233,7 +233,7 @@ ${css}</style>
   <ol>
    <li>The report is published to <b>My workspace</b> and refreshes with real data. My workspace allows <b>${rule.dailyLimit} refreshes a day</b>, the flows included. The rule: ${esc(refreshRuleText(rule))} Never press Refresh now many times to test it.</li>
    <li>The five SharePoint lists exist: SACM Journal, SACM Replies, SACM Settings, SACM Team (you are in it) and <b>SACM Refreshes</b> (Title, By, Source), with <b>List settings → Title → Enforce unique values: Yes</b>.</li>
-   <li>A column that says it already exists (for example <b>Type</b>) is a hidden column of the list: <b>Add column → Show/hide columns</b>, tick it. In <b>List settings</b>, the address of the column must end with <code>Field=</code> and the same name (<code>Field=Type</code>); if not, stop and ask.</li>
+   <li>The type of a journal row is the column <b>EntryType</b> (Single line of text), not <i>Type</i>: a list has a hidden column <i>Type</i> of its own (the file icon). Never show or use it (D338).</li>
    <li>The scheduled refresh is on: one time, ${esc(rule.scheduled.join(', '))}, in the time zone you type above.</li>
    <li>All flows go in the <b>same environment</b> as the apps (normally the default one). Names must be exact. Concurrency control: on (1) for every flow except <b>SACMRefresh</b> and <b>SACMDraft</b>, which answer the app: off.</li>
   </ol>

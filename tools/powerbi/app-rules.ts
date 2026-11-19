@@ -138,6 +138,37 @@ const SEND_FIELDS: Record<string, { input: string; or?: string; optional?: boole
 const SEND_OTHER = new Set(['Original Mailbox Address', 'Importance']);
 const REPLIES = STATE_LISTS.replies.list as string;
 
+/**
+ * The names a SharePoint list already has for columns of its own, most of them hidden (D338): a column of that name
+ * cannot be made ("already exists"), and showing the hidden one gives the wrong column (Type is the file icon). Title is
+ * the one the lists use as it is. Compared without case and spaces.
+ */
+export const SHAREPOINT_NAMES = ['ID', 'Title', 'Type', 'Name', 'Path', 'Order', 'Level', 'Version', 'Created', 'Modified', 'Author', 'Editor',
+  'Created By', 'Modified By', 'Attachments', 'Edit', 'Select', 'Content Type', 'ContentType', 'Item Type', 'File Type', 'DocIcon',
+  'Item Child Count', 'Folder Child Count', 'App Created By', 'App Modified By', 'Compliance Asset Id', 'Color Tag', 'Label setting',
+  'Retention label', 'Sensitivity', 'Encoded Absolute URL', 'URL Path', 'Unique Id', 'Property Bag', 'Server Relative URL',
+  'Effective Permissions Mask', 'Is Current Version', 'Workflow Version', 'Workflow Instance ID', 'Instance ID', 'Restricted',
+  'Approval Status', 'Approver Comments', 'Sort Type', 'Client Id', 'ProgId', 'HTML File Type', 'Has Copy Destinations', 'Copy Source',
+  'UI Version', 'ScopeId', 'owshiddenversion', 'FileRef', 'FileLeafRef', 'FileDirRef', 'GUID', 'MetaInfo', 'LinkTitle'];
+
+/** The problems of the column names of the lists (D338): every column but Title must be a name SharePoint does not have. */
+export function columnProblems(lists: Record<string, { list: string; columns: readonly string[] }> = STATE_LISTS, flows: Flow[] = appFlows()): string[] {
+  const own = new Set(SHAREPOINT_NAMES.map((name) => name.replace(/\s/g, '').toLowerCase()));
+  const columns = new Map<string, Set<string>>();
+  const add = (list: string, column: string): void => { columns.set(list, (columns.get(list) ?? new Set()).add(column)); };
+  for (const spec of Object.values(lists)) for (const column of spec.columns) add(spec.list, column);
+  for (const column of REFRESH_FIELDS) if (column !== 'List Name') add(REFRESHES, column);
+  for (const flow of flows) for (const step of flow.steps) {
+    const list = step.fields['List Name'];
+    if (step.action === 'Create item' && list) for (const field of Object.keys(step.fields)) if (field !== 'List Name' && field !== 'Site Address') add(list, field);
+  }
+  const problems: string[] = [];
+  for (const [list, names] of columns) for (const column of names) {
+    if (column !== 'Title' && own.has(column.replace(/\s/g, '').toLowerCase())) problems.push(`Lists: the column ${column} of ${list} has the name of a column SharePoint has already (D338): choose another name`);
+  }
+  return problems;
+}
+
 /** The problems of the flows: what triggers them and what they do. */
 export function flowProblems(flows: Flow[] = appFlows()): string[] {
   const problems: string[] = [];
