@@ -38,27 +38,12 @@
                       "Entity": "History"
                     }
                   },
-                  "Property": "Trend"
-                }
-              },
-              "queryRef": "History.Trend",
-              "nativeQueryRef": "Trend",
-              "displayName": "Trend"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "History"
-                    }
-                  },
                   "Property": "State bar"
                 }
               },
               "queryRef": "History.State bar",
               "nativeQueryRef": "State bar",
-              "displayName": "New · solved · open"
+              "displayName": "New · solved · open · trend"
             }
           ]
         }
@@ -89,7 +74,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "92D"
+                  "Value": "96D"
                 }
               }
             }
@@ -103,21 +88,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "64D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "History.Trend"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "184D"
+                  "Value": "244D"
                 }
               }
             }
@@ -134,6 +105,13 @@
               "expr": {
                 "Literal": {
                   "Value": "32D"
+                }
+              }
+            },
+            "imageWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "240D"
                 }
               }
             }
@@ -202,5 +180,73 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "withSection",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Checks"
+              }
+            },
+            "Property": "Section"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "k",
+              "Entity": "Checks",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "k"
+                              }
+                            },
+                            "Property": "Section"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "null"
+                            }
+                          }
+                        ],
+                        [
+                          {
+                            "Literal": {
+                              "Value": "''"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

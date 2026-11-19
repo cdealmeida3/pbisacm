@@ -136,6 +136,13 @@
                   "Value": "24D"
                 }
               }
+            },
+            "imageWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "24D"
+                }
+              }
             }
           }
         }

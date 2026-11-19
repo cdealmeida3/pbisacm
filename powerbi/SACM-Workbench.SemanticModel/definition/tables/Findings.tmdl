@@ -247,7 +247,7 @@ table Findings
 			RETURN solved & " solved · " & ask & IF ( ask = 1, " person to ask", " people to ask" )
 		displayFolder: My day
 
-	/// The step or state of the person in view (My day) or of the line (Work queue) as a chip: word, icon and colour (LOOK rule 5), one meaning per colour. Its class starts with the step and the name, so a table sorted on it keeps the order of the team's rules.
+	/// The step or state of the person in view (My day) or of the line (Work queue) as a chip: word, icon and colour (LOOK rule 5), one meaning per colour. The picture is 128 × 24 (a table gives all its pictures one size), the chip at its left. Its class starts with the step and the name, so a table sorted on it keeps the order of the team's rules.
 	measure 'State chip' =
 			VAR byLine = ISINSCOPE ( CaseLines[ContactName] )
 			VAR kind = IF ( byLine, [Queue state], [Person state] )
@@ -255,31 +255,15 @@ table Findings
 			VAR ink = SWITCH ( kind, 1, "#5925dc", 2, "#b42318", 3, "#7d5700", 6, "#107569", "#175cd3" )
 			VAR paper = SWITCH ( kind, 1, "#f4f3ff", 2, "#fef3f2", 3, "#fffaeb", 6, "#f0fdf9", "#eff8ff" )
 			VAR glyph = SWITCH ( kind, 1, "<path d='M9 14L4 9l5-5'/><path d='M4 9h11a5 5 0 0 1 5 5v5'/>", 2, "<path d='M12 19V5'/><path d='M5 12l7-7 7 7'/>", 3, "<path d='M6 16V11a6 6 0 1 1 12 0v5l2 2H4z'/><path d='M10 20a2 2 0 0 0 4 0'/>", 5, "<rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3.5 6.5L12 13l8.5-6.5'/>", 6, "<path d='M5 12.5l4.5 4.5L19 7'/>", "<circle cx='12' cy='12' r='4'/>" )
-			VAR wide = ROUND ( LEN ( word ) * 7 + 34, 0 )
-			VAR name = IF ( byLine, SELECTEDVALUE ( CaseLines[ContactName] ), SELECTEDVALUE ( Findings[ContactName] ) )
-			VAR who = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( name, "&", "and" ), "<", "" ), "'", "" )
+			VAR wide = MIN ( ROUND ( LEN ( word ) * 7 + 34, 0 ), 128 )
+			VAR person = IF ( byLine, SELECTEDVALUE ( CaseLines[ContactName] ), SELECTEDVALUE ( Findings[ContactName] ) )
+			VAR who = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( person, "&", "and" ), "<", "" ), "'", "" )
 			VAR picture =
-			    "<svg xmlns='http://www.w3.org/2000/svg' class='k" & kind & " " & who & "' width='" & wide & "' height='24' viewBox='0 0 " & wide & " 24'>"
+			    "<svg xmlns='http://www.w3.org/2000/svg' class='k" & kind & " " & who & "' width='128' height='24' viewBox='0 0 128 24'>"
 			        & "<rect x='0' y='2' width='" & wide & "' height='20' rx='10' fill='" & paper & "'/>"
 			        & "<g transform='translate(8 6) scale(0.5)' fill='none' stroke='" & ink & "' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'>" & glyph & "</g>"
 			        & "<text x='24' y='16.5' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='" & ink & "'>" & word & "</text></svg>"
 			RETURN IF ( NOT ISBLANK ( kind ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
-		displayFolder: Pictures
-		dataCategory: ImageUrl
-
-	/// On a line of Your next steps: the button of the step (Read for a reply, Open for the others). The line opens the person: select it and press Open, or right-click, Drill through, Person.
-	measure 'Step button' =
-			VAR kind = [Person state]
-			VAR word = IF ( kind = 1, "Read", "Open" )
-			VAR strong = kind = 1
-			VAR wide = ROUND ( LEN ( word ) * 7 + 40, 0 )
-			VAR ink = IF ( strong, "#ffffff", "#0c1c49" )
-			VAR picture =
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='" & wide & "' height='24' viewBox='0 0 " & wide & " 24'>"
-			        & "<rect x='0.5' y='0.5' width='" & ( wide - 1 ) & "' height='23' rx='6' fill='" & IF ( strong, "#0c1c49", "#ffffff" ) & "' stroke='" & IF ( strong, "#0c1c49", "#cfc3b4" ) & "'/>"
-			        & "<text x='12' y='16.5' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='" & ink & "'>" & word & "</text>"
-			        & "<path d='M" & ( wide - 18 ) & " 8l4 4-4 4' fill='none' stroke='" & ink & "' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>"
-			RETURN IF ( NOT ISBLANK ( kind ) && kind <= 4, "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 

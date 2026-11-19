@@ -105,11 +105,6 @@
           "name": "rail-selfcheck.svg",
           "path": "rail-selfcheck.svg",
           "type": "Image"
-        },
-        {
-          "name": "rail-lab.svg",
-          "path": "rail-lab.svg",
-          "type": "Image"
         }
       ]
     }

@@ -59,21 +59,6 @@
               "queryRef": "Findings.Step",
               "nativeQueryRef": "Step",
               "displayName": "What to do"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "Step button"
-                }
-              },
-              "queryRef": "Findings.Step button",
-              "nativeQueryRef": "Step button",
-              "displayName": " "
             }
           ]
         }
@@ -118,7 +103,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "128D"
+                  "Value": "136D"
                 }
               }
             }
@@ -132,27 +117,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "264D"
+                  "Value": "328D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "Findings.Step"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "72D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.Step button"
           }
         }
       ],
@@ -163,6 +134,13 @@
               "expr": {
                 "Literal": {
                   "Value": "24D"
+                }
+              }
+            },
+            "imageWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "128D"
                 }
               }
             }

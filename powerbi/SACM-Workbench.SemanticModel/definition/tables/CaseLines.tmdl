@@ -140,9 +140,9 @@ table CaseLines
 	measure 'Queue why' =
 			VAR keys = VALUES ( CaseLines[Key] )
 			VAR via = CALCULATE ( MAX ( Findings[ContactVia] ), TREATAS ( keys, Findings[Key] ) )
-			VAR address = CALCULATE ( MAX ( Findings[ContactEmail] ), TREATAS ( keys, Findings[Key] ) )
+			VAR mail = CALCULATE ( MAX ( Findings[ContactEmail] ), TREATAS ( keys, Findings[Key] ) )
 			VAR said = UPPER ( LEFT ( via, 1 ) ) & MID ( via, 2, 200 )
-			RETURN IF ( via <> "" || address <> "", said & IF ( via <> "" && address <> "", " · " ) & address )
+			RETURN IF ( via <> "" || mail <> "", said & IF ( via <> "" && mail <> "", " · " ) & mail )
 		displayFolder: Work queue
 
 	/// On a line of the Work queue: the cards of the open lines with the person, three at most.
@@ -175,12 +175,12 @@ table CaseLines
 	/// Under the title of the people to ask (Work queue): how many lines with how many people, or why the box is empty.
 	measure 'Queue note' =
 			VAR people = [Queue people]
-			VAR open = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( CaseLines[ContactName] <> "" ) ) + 0
+			VAR lines = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( CaseLines[ContactName] <> "" ) ) + 0
 			RETURN
 			    IF (
 			        people = 0,
 			        "Nobody to ask in the status chosen: choose another status, or none.",
-			        open & IF ( open = 1, " open line", " open lines" ) & " with " & people & IF ( people = 1, " person", " people" ) & ", in the order of the team's rules. Select lines for the app at the right."
+			        lines & IF ( lines = 1, " open line", " open lines" ) & " with " & people & IF ( people = 1, " person", " people" ) & ", in the order of the team's rules. Select lines for the app at the right."
 			    )
 		displayFolder: Page notes
 

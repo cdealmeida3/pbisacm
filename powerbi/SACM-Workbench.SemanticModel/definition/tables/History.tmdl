@@ -246,28 +246,16 @@ table History
 		formatString: #,0
 		displayFolder: My day
 
-	/// On a section of My day: the words new, solved and open, and a bar of what is open (open before in navy, new in coral), on the scale of the biggest section.
+	/// On a section of My day: the words new, solved and open, a bar of what is open (open before in navy, new in coral) on the scale of the biggest section, and at the right a small line of what was open on each CI report date, oldest first, the newest a coral dot. One picture of 240 × 32: a table gives all its pictures one size.
 	measure 'State bar' =
 			VAR openNow = [Section open]
 			VAR fresh = [New (daily)] + 0
 			VAR solved = [Solved (daily)] + 0
 			VAR most = MAXX ( ALL ( Checks[Section] ), [Section open] )
-			VAR unit = 176 / MAX ( most, 1 )
+			VAR unit = 160 / MAX ( most, 1 )
 			VAR older = ROUND ( MAX ( openNow - fresh, 0 ) * unit, 0 )
 			VAR added = ROUND ( MIN ( fresh, openNow ) * unit, 0 )
 			VAR words = "+" & fresh & " new · " & solved & " solved · " & openNow & " open"
-			VAR picture =
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='32' viewBox='0 0 180 32'>"
-			        & "<text x='0' y='12' font-family='Segoe UI, sans-serif' font-size='12' fill='#655a52'>" & words & "</text>"
-			        & "<rect x='0' y='20' width='176' height='8' rx='4' fill='#f2f4f7'/>"
-			        & "<rect x='0' y='20' width='" & older & "' height='8' fill='#0c1c49'/>"
-			        & "<rect x='" & older & "' y='20' width='" & added & "' height='8' fill='#fd472c'/></svg>"
-			RETURN IF ( NOT ISBLANK ( [Newest report date] ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
-		displayFolder: Pictures
-		dataCategory: ImageUrl
-
-	/// A small line of what was to solve on each CI report date, oldest first, the newest as a coral dot (the daily cards of the rows in view).
-	measure Trend =
 			VAR points =
 			    ADDCOLUMNS (
 			        CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ),
@@ -275,14 +263,19 @@ table History
 			    )
 			VAR n = COUNTROWS ( points )
 			VAR highest = MAX ( MAXX ( points, [@open] ), 1 )
-			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 3 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 54 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 21 - [@open] * 18 / highest, 0 ) )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 180 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 54 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 28 - [@open] * 22 / highest, 0 ) )
 			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
-			VAR line = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
+			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
 			VAR picture =
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='24' viewBox='0 0 60 24'>"
-			        & "<polyline points='" & line & "' fill='none' stroke='#0c1c49' stroke-width='1.6' stroke-linejoin='round'/>"
-			        & "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='2.5' fill='#fd472c'/></svg>"
-			RETURN IF ( n > 0, "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='240' height='32' viewBox='0 0 240 32'>"
+			        & "<text x='0' y='12' font-family='Segoe UI, sans-serif' font-size='12' fill='#655a52'>" & words & "</text>"
+			        & "<rect x='0' y='20' width='160' height='8' rx='4' fill='#f2f4f7'/>"
+			        & "<rect x='0' y='20' width='" & older & "' height='8' fill='#0c1c49'/>"
+			        & "<rect x='" & older & "' y='20' width='" & added & "' height='8' fill='#fd472c'/>"
+			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#0c1c49' stroke-width='1.6' stroke-linejoin='round'/>" )
+			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='2.5' fill='#fd472c'/>" )
+			        & "</svg>"
+			RETURN IF ( NOT ISBLANK ( [Newest report date] ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
