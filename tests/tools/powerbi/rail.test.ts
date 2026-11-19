@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { AUDIT_PARTS, RAIL_ITEMS, railFiles, railSvg, railVisuals, REPORT_FILE, staleRail } from '../../../tools/powerbi/rail.ts';
+import { join } from 'node:path';
+import { AUDIT_PARTS, PAGES, RAIL_ITEMS, railFiles, railSvg, railVisuals, REPORT_FILE, staleRail } from '../../../tools/powerbi/rail.ts';
 import { lightColours } from '../../../tools/powerbi/tokens.ts';
 
 /*
@@ -14,7 +15,7 @@ test('the rail of the repository is the one rail.ts writes, with no part left ov
 });
 
 test('every page of the rail opens a page of the report, and every rail picture is registered in report.json', () => {
-  const pages = (JSON.parse(readFileSync(REPORT_FILE.replace('report.json', 'pages/pages.json'), 'utf8')) as { pageOrder: string[] }).pageOrder;
+  const pages = (JSON.parse(readFileSync(join(PAGES, 'pages.json'), 'utf8')) as { pageOrder: string[] }).pageOrder;
   for (const { page } of [...RAIL_ITEMS, ...AUDIT_PARTS]) assert.ok(pages.includes(page), `${page} is not a page`);
   const report = JSON.parse(readFileSync(REPORT_FILE, 'utf8')) as { resourcePackages: Array<{ items: Array<{ name: string; type: string }> }> };
   const registered = report.resourcePackages.flatMap((entry) => entry.items);

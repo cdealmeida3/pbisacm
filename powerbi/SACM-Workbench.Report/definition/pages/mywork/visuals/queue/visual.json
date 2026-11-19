@@ -3,9 +3,9 @@
   "name": "queue",
   "position": {
     "x": 224,
-    "y": 136,
+    "y": 144,
     "z": 4000,
-    "height": 568,
+    "height": 560,
     "width": 720,
     "tabOrder": 4000
   },

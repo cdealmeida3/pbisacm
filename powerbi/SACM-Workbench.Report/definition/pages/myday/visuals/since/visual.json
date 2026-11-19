@@ -5,7 +5,7 @@
     "x": 876,
     "y": 204,
     "z": 6000,
-    "height": 236,
+    "height": 268,
     "width": 380,
     "tabOrder": 6000
   },
@@ -38,11 +38,11 @@
                       "Entity": "History"
                     }
                   },
-                  "Property": "State bar"
+                  "Property": "Section bar"
                 }
               },
-              "queryRef": "History.State bar",
-              "nativeQueryRef": "State bar",
+              "queryRef": "History.Section bar",
+              "nativeQueryRef": "Section bar",
               "displayName": "New · solved · open · trend"
             }
           ]
@@ -94,7 +94,7 @@
             }
           },
           "selector": {
-            "metadata": "History.State bar"
+            "metadata": "History.Section bar"
           }
         }
       ],

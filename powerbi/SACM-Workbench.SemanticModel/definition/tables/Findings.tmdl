@@ -60,11 +60,12 @@ table Findings
 	measure 'Open with note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers." )
 		displayFolder: Page notes
 
-	/// The next step with the person in view (My day, Work queue, D2): 1 a reply to read, 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked and not due yet, 6 marked fixed; blank when nothing is open with them. A reminder, an escalation and a new line count on the daily cards only (D182), from Today, so right between two refreshes.
+	/// The next step with the person in view (My day, Work queue, D2): 1 a reply to read (RepliesToRead, from their address), 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked and not due yet, 6 marked fixed; blank when nothing is open with them. Replies, reminders, escalations and new lines count on the daily cards only (D182), from Today, so right between two refreshes. The order is the one of nextStep in src/app/view/groups.ts.
 	measure 'Person state' =
 			VAR asOf = [Today]
 			VAR keys = VALUES ( Findings[Key] )
-			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] = "Answered" )
+			VAR mails = CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), Findings[ContactEmail] <> "" )
+			VAR answered = CALCULATE ( COUNTROWS ( RepliesToRead ), TREATAS ( mails, RepliesToRead[From] ), RepliesToRead[Daily] = TRUE () )
 			VAR escalation = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) )
 			VAR reminder = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) )
 			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] = "New", CaseLines[State] = "open", KEEPFILTERS ( Checks[Priority] <> "later" ) )
@@ -89,7 +90,32 @@ table Findings
 		formatString: 0
 		displayFolder: My day
 
-	/// On a line of Your next steps: what to do with the person and why, in a few words ("Read the reply · 2 CIs · Description, Support group").
+	/// The CIs of the next step with the person in view: the CIs of their replies to read, or of the lines to escalate, to remind or to ask about.
+	measure 'Step CIs' =
+			VAR kind = [Person state]
+			VAR asOf = [Today]
+			VAR mails = CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), Findings[ContactEmail] <> "" )
+			VAR mine = CALCULATETABLE ( CaseLines, TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ) )
+			VAR lines =
+			    FILTER (
+			        mine,
+			        SWITCH (
+			            kind,
+			            2, CaseLines[Remind] = "escalation" && CaseLines[ReminderFrom] <= asOf && RELATED ( Checks[Priority] ) <> "later",
+			            3, CaseLines[Remind] = "reminder" && CaseLines[ReminderFrom] <= asOf && RELATED ( Checks[Priority] ) <> "later",
+			            4, CaseLines[Status] = "New" && CaseLines[State] = "open" && RELATED ( Checks[Priority] ) <> "later"
+			        )
+			    )
+			RETURN
+			    IF (
+			        kind = 1,
+			        CALCULATE ( SUM ( RepliesToRead[CIs] ), TREATAS ( mails, RepliesToRead[From] ), RepliesToRead[Daily] = TRUE () ),
+			        IF ( kind <= 4, COUNTROWS ( DISTINCT ( SELECTCOLUMNS ( lines, "@ci", CaseLines[CiKey] ) ) ) )
+			    )
+		formatString: #,0
+		displayFolder: My day
+
+	/// On a line of Your next steps: what to do with the person and why, in a few words ("Read the reply of 6 Nov · 2 CIs").
 	measure Step =
 			VAR kind = [Person state]
 			VAR asOf = [Today]
@@ -106,7 +132,8 @@ table Findings
 			            CaseLines[Status] = "New" && CaseLines[State] = "open" && RELATED ( Checks[Priority] ) <> "later"
 			        )
 			    )
-			VAR cis = COUNTROWS ( DISTINCT ( SELECTCOLUMNS ( lines, "@ci", CaseLines[CiKey] ) ) )
+			VAR cis = [Step CIs] + 0
+			VAR replyOn = CALCULATE ( MAX ( RepliesToRead[Received] ), TREATAS ( CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), Findings[ContactEmail] <> "" ), RepliesToRead[From] ), RepliesToRead[Daily] = TRUE () )
 			VAR cards = DISTINCT ( SELECTCOLUMNS ( lines, "@card", RELATED ( Checks[CardLabel] ) ) )
 			VAR cardCount = COUNTROWS ( cards )
 			VAR named = CONCATENATEX ( TOPN ( 2, cards, [@card], ASC ), [@card], ", ", [@card], ASC ) & IF ( cardCount > 2, " and " & ( cardCount - 2 ) & " more" )
@@ -117,7 +144,7 @@ table Findings
 			RETURN
 			    SWITCH (
 			        kind,
-			        1, "Read the reply · " & ciWords & " · " & named,
+			        1, "Read the reply of " & FORMAT ( replyOn, "d mmm" ) & " · " & ciWords,
 			        2, "Escalate" & IF ( manager <> "", " to " & manager ) & " · asked " & times & IF ( times = 1, " time", " times" ) & ", last " & FORMAT ( lastSent, "d mmm" ),
 			        3, "Send a reminder · asked " & FORMAT ( lastSent, "d mmm" ) & " · " & ciWords,
 			        4, "Ask them · " & ciWords & " · " & cardCount & IF ( cardCount = 1, " kind of problem", " kinds of problem" )
@@ -148,15 +175,15 @@ table Findings
 		formatString: #,0
 		displayFolder: My day
 
-	/// The words of the last step of My day: the lines SACM fixes itself, on the fix lists of the cards.
+	/// The words of the button under the next steps of My day (LOOK rule 4: two words and a number): the lines SACM fixes itself in ServiceNow. The button opens All cards, where each card has its SACM fix list.
 	measure 'SACM fix line' =
 			VAR n = [SACM fix lines]
-			RETURN IF ( n = 0, "No line for SACM to fix in ServiceNow today", "Fix " & n & IF ( n = 1, " line", " lines" ) & " yourself in ServiceNow: the SACM fix lists, on All cards" )
+			RETURN IF ( n = 0, "Nothing to fix", "Fix " & n & IF ( n = 1, " line", " lines" ) )
 		displayFolder: My day
 
-	/// The next steps of today (My day): each person with a step, and one more for the SACM fixes when there are any.
+	/// The people with a next step today (My day): the lines of Your next steps.
 	measure Steps =
-			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Step mark] = 1 ) ) + IF ( [SACM fix lines] > 0, 1, 0 )
+			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Step mark] = 1 ) ) + 0
 		formatString: #,0
 		displayFolder: My day
 
@@ -164,11 +191,12 @@ table Findings
 	measure 'Steps note' =
 			VAR n = [Steps]
 			VAR me = [Me]
+			VAR fixes = IF ( [SACM fix lines] > 0, " The lines SACM fixes itself are below." )
 			RETURN
 			    IF (
 			        n = 0,
-			        "Nothing to do today: no reply to read, no reminder due and nobody new to ask.",
-			        n & IF ( n = 1, " step", " steps" ) & " for " & FORMAT ( [Today], "dddd d mmmm" ) & IF ( NOT ISBLANK ( me ), " · " & me ) & ", in the order of the team's rules. Select one, then Open."
+			        "Nobody to write to today: no reply to read, no reminder due and nobody new to ask." & fixes,
+			        n & IF ( n = 1, " step", " steps" ) & " for " & FORMAT ( [Today], "dddd d mmmm" ) & IF ( NOT ISBLANK ( me ), " · " & me ) & ", in the order of the team's rules. Select one, then Open person." & fixes
 			    )
 		displayFolder: Page notes
 
@@ -183,25 +211,25 @@ table Findings
 			IF ( [Waiting people] = 0, "Nobody to wait for: nobody was asked and has still to answer.", "Asked, or marked fixed: nothing to do until a reminder is due." )
 		displayFolder: Page notes
 
-	/// The first number of My day: the people whose reply is to read (Person state 1).
+	/// A number of My day: the people whose reply is to read (Person state 1).
 	measure 'Replies tile' =
 			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 1 ) ) + 0
 		formatString: #,0
 		displayFolder: My day
 
-	/// The first number of My day: the people to escalate (Person state 2).
+	/// A number of My day: the people to escalate (Person state 2).
 	measure 'Escalations tile' =
 			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 2 ) ) + 0
 		formatString: #,0
 		displayFolder: My day
 
-	/// The first number of My day: the people to remind (Person state 3).
+	/// A number of My day: the people to remind (Person state 3).
 	measure 'Reminders tile' =
 			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 3 ) ) + 0
 		formatString: #,0
 		displayFolder: My day
 
-	/// The first number of My day: the people never asked who have new lines (Person state 4).
+	/// A number of My day: the people never asked who have new lines (Person state 4).
 	measure 'People to ask' =
 			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 4 ) ) + 0
 		formatString: #,0
@@ -212,7 +240,7 @@ table Findings
 			VAR people = FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 1 )
 			VAR n = COUNTROWS ( people )
 			VAR who = CONCATENATEX ( TOPN ( 1, people, Findings[ContactName], ASC ), Findings[ContactName] )
-			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), people )
+			VAR cis = SUMX ( people, [Step CIs] )
 			RETURN IF ( n = 0, "No reply to read", who & IF ( n > 1, " and " & ( n - 1 ) & " more" ) & " · " & cis & IF ( cis = 1, " CI", " CIs" ) )
 		displayFolder: My day
 
@@ -221,7 +249,7 @@ table Findings
 			VAR people = FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 2 )
 			VAR n = COUNTROWS ( people )
 			VAR who = CONCATENATEX ( TOPN ( 1, people, Findings[ContactName], ASC ), Findings[ContactName] )
-			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), people )
+			VAR cis = SUMX ( people, [Step CIs] )
 			RETURN IF ( n = 0, "Nobody to escalate", who & IF ( n > 1, " and " & ( n - 1 ) & " more" ) & " · " & cis & IF ( cis = 1, " CI", " CIs" ) )
 		displayFolder: My day
 
@@ -230,7 +258,7 @@ table Findings
 			VAR people = FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 3 )
 			VAR n = COUNTROWS ( people )
 			VAR who = CONCATENATEX ( TOPN ( 1, people, Findings[ContactName], ASC ), Findings[ContactName] )
-			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), people )
+			VAR cis = SUMX ( people, [Step CIs] )
 			RETURN IF ( n = 0, "Nobody to remind", who & IF ( n > 1, " and " & ( n - 1 ) & " more" ) & " · " & cis & IF ( cis = 1, " CI", " CIs" ) )
 		displayFolder: My day
 
@@ -252,8 +280,8 @@ table Findings
 			VAR byLine = ISINSCOPE ( CaseLines[ContactName] )
 			VAR kind = IF ( byLine, [Queue state], [Person state] )
 			VAR word = SWITCH ( kind, 1, "Reply to read", 2, "Escalate", 3, "Reminder due", 4, "New", 5, "Asked", 6, "Marked fixed" )
-			VAR ink = SWITCH ( kind, 1, "#5925dc", 2, "#b42318", 3, "#7d5700", 6, "#107569", "#175cd3" )
-			VAR paper = SWITCH ( kind, 1, "#f4f3ff", 2, "#fef3f2", 3, "#fffaeb", 6, "#f0fdf9", "#eff8ff" )
+			VAR ink = SWITCH ( kind, 1, "#5925dc", 2, "#b42318", 3, "#7d5700", 5, "#475467", 6, "#107569", "#175cd3" )
+			VAR paper = SWITCH ( kind, 1, "#f4f3ff", 2, "#fef3f2", 3, "#fffaeb", 5, "#f2f4f7", 6, "#f0fdf9", "#eff8ff" )
 			VAR glyph = SWITCH ( kind, 1, "<path d='M9 14L4 9l5-5'/><path d='M4 9h11a5 5 0 0 1 5 5v5'/>", 2, "<path d='M12 19V5'/><path d='M5 12l7-7 7 7'/>", 3, "<path d='M6 16V11a6 6 0 1 1 12 0v5l2 2H4z'/><path d='M10 20a2 2 0 0 0 4 0'/>", 5, "<rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3.5 6.5L12 13l8.5-6.5'/>", 6, "<path d='M5 12.5l4.5 4.5L19 7'/>", "<circle cx='12' cy='12' r='4'/>" )
 			VAR wide = MIN ( ROUND ( LEN ( word ) * 7 + 34, 0 ), 128 )
 			VAR person = IF ( byLine, SELECTEDVALUE ( CaseLines[ContactName] ), SELECTEDVALUE ( Findings[ContactName] ) )
@@ -279,9 +307,9 @@ table Findings
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// On the rail, beside its page: the next steps of today in a small pill (D2).
+	/// On the rail, beside its page: the next steps of today (the people, and the SACM fixes as one) in a small pill, the same on every page (no filter of the page counts).
 	measure 'Rail badge my day' =
-			VAR n = [Steps] + 0
+			VAR n = CALCULATE ( [Steps] + IF ( [SACM fix lines] > 0, 1, 0 ), REMOVEFILTERS () ) + 0
 			VAR words = FORMAT ( n, "0" )
 			VAR wide = LEN ( words ) * 7 + 14
 			VAR picture =
@@ -292,9 +320,9 @@ table Findings
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// On the rail, beside its page: the open lines in a small pill (D2).
+	/// On the rail, beside its page: the open lines with a person to ask in a small pill, the same on every page (no filter of the page counts).
 	measure 'Rail badge work queue' =
-			VAR n = [Open cases] + 0
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), REMOVEFILTERS (), NOT CaseLines[Status] IN { "Verified", "Not followed up" }, CaseLines[ContactName] <> "" ) + 0
 			VAR words = FORMAT ( n, "0" )
 			VAR wide = LEN ( words ) * 7 + 14
 			VAR picture =

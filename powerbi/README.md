@@ -27,7 +27,7 @@ The report opens on the **My day** page. Look at:
 
 | Page | What you should see |
 |---|---|
-| **My day** | The chip of the reports at the top right ("✓ 5 reports · 11 Nov · up to date"; a press opens Reports). Four numbers: for the samples 1 reply to read (Dee Owner), 1 person to escalate (Ada Example), 1 reminder due (Cy Keeper) and the findings new since the report before (the samples have two CI reports: 4 and 11 November). Below, **Your next steps**: one line per person, in the order of the team's rules (the reply first, then the escalation, the reminder, the people never asked). Select a step and press **Open the step** (or right-click, **Drill through**, **Person**). At the right, **Since the last report** per section and **Waiting on others**. |
+| **My day** | The chip of the reports at the top right ("✓ 5 reports · 11 Nov · up to date"; a press opens Reports). Four numbers: for the samples 1 reply to read (Dee Owner), 1 person to escalate (Ada Example), 1 reminder due (Cy Keeper) and the findings new since the report before (the samples have two CI reports: 4 and 11 November). Below, **Your next steps**: one line per person, in the order of the team's rules (the reply first, then the escalation, the reminder, the people never asked). Select a step and press **Open person** (or right-click, **Drill through**, **Person**). At the right, **Since the last report** per section and **Waiting on others**. |
 | **Work queue** | One line per person asked, with the next step, the open lines, the cards, the last message and who has them. The buttons at the top choose a status. The app *SACM actions* sits at the right (section 6.4). |
 | **Activity** | The 22 events of the sample journal, newest first, in the words of the app. **Day**, **Who** and **Type** filter them. |
 | **History** | To solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. **Card** filters one card. |
@@ -357,8 +357,8 @@ not while you edit it. Publish the report first (section 4).
     to the SharePoint connection the first time they open it.
 11. Back in the report: the visual shows the app. **Save** the report.
 12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **Work queue** (Ctrl+V). It keeps the same app. Set
-    its size and position as in the table below. On *Work queue* change the filter of the visual to **CaseLines → My CIs**
-    *is not blank*, so it gets your open lines.
+    its size and position as in the table below. On *Work queue* change the filter of the visual to **CaseLines → Queue
+    lines** *is not blank*, so it gets every open line of the page (the free ones too, for **Share out**).
 13. In Desktop, to keep the visual in the repository: download the report (**File → Download this file → A copy of
     your report**), open it, **File → Save as** the `.pbip` over your copy of `powerbi/`, and send the changed files of
     `SACM-Workbench.Report/` (the commit must not hold a `.pbix`).

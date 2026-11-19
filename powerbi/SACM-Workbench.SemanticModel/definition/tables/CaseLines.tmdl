@@ -118,7 +118,8 @@ table CaseLines
 	/// The next step with the person of a line of the Work queue (the same steps as Person state, from the lines in view, every card, not only the daily ones): 1 a reply to read, 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked, 6 marked fixed. The status chosen above the table keeps its lines only.
 	measure 'Queue state' =
 			VAR asOf = [Today]
-			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "Answered" ) )
+			VAR mails = CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), TREATAS ( VALUES ( CaseLines[Key] ), Findings[Key] ), Findings[ContactEmail] <> "" )
+			VAR answered = CALCULATE ( COUNTROWS ( RepliesToRead ), TREATAS ( mails, RepliesToRead[From] ) )
 			VAR escalation = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "escalation" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ) )
 			VAR reminder = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "reminder" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ) )
 			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "New" ), KEEPFILTERS ( CaseLines[State] = "open" ) )

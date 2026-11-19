@@ -10,22 +10,23 @@
 // every visual whose name starts with rail as one (pages.ts rule 2). Same repository, same bytes.
 import { existsSync, readdirSync, readFileSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { FONT } from './tokens.ts';
+import { FONT, lightColours } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const REPORT = join(root, 'powerbi', 'SACM-Workbench.Report');
-const PAGES = join(REPORT, 'definition', 'pages');
+export const PAGES = join(REPORT, 'definition', 'pages');
 export const REPORT_FILE = join(REPORT, 'definition', 'report.json');
 export const RESOURCES = join(REPORT, 'StaticResources', 'RegisteredResources');
 const VISUAL_SCHEMA = 'https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json';
 
 /** The colours of the rail (docs/LOOK.md): the navy accent, white, the soft accent for the words, the coral line. */
-const NAVY = '#0c1c49';
-const WHITE = '#ffffff';
-const SOFT = '#e6e9f4';
-const CORAL = '#fd472c';
+const LOOK = lightColours();
+const NAVY = LOOK.accent!;
+const WHITE = LOOK.surface!;
+const SOFT = LOOK['accent-soft']!;
+const CORAL = LOOK.deco!;
 
-/** The icons of the rail, 24 × 24 strokes (the mockups' shared.js). */
+/** The icons of the rail, 24 × 24 strokes, as the mockups of design A draw them (D310). */
 const ICONS: Record<string, string> = {
   home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   inbox: '<path d="M3 13h5l2 3h4l2-3h5"/><path d="M5 5h14l2 8v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6z"/>',
@@ -70,14 +71,15 @@ const RAIL = { width: 188, first: 52, pitch: 36, height: 32, partPitch: 32, part
 
 /** Each place on the rail: an item, or a part of the Audit (on the Audit pages only). */
 type Place = { page: string; label: string; icon?: string; badge?: Badge; y: number; height: number; part: boolean };
+/** Whether the page is one of the four of the Audit. */
+const inAudit = (page: string): boolean => AUDIT_PARTS.some((part) => part.page === page);
 function places(page: string): Place[] {
-  const inAudit = AUDIT_PARTS.some((part) => part.page === page);
   const out: Place[] = [];
   let y = RAIL.first;
   for (const item of RAIL_ITEMS) {
     out.push({ ...item, y, height: RAIL.height, part: false });
     y += RAIL.pitch;
-    if (item.page === 'audit' && inAudit) {
+    if (item.page === 'audit' && inAudit(page)) {
       for (const part of AUDIT_PARTS) { out.push({ ...part, y, height: RAIL.partHeight, part: true }); y += RAIL.partPitch; }
       y += RAIL.pitch - RAIL.partPitch;
     }
@@ -88,8 +90,7 @@ function places(page: string): Place[] {
 /** The place the page lights: its own part of the Audit, else its item, else the item it belongs to (none for the Self-check). */
 function lit(page: string, place: Place): boolean {
   if (place.part) return place.page === page;
-  const inAudit = AUDIT_PARTS.some((part) => part.page === page);
-  if (inAudit) return false;
+  if (inAudit(page)) return false;
   return place.page === (BELONGS[page] ?? page);
 }
 
@@ -104,10 +105,9 @@ export function railSvg(page: string, height: number): string {
     `<g transform="translate(16 15) scale(0.8333)" fill="none" stroke="${WHITE}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS.logo}</g>`,
     `<text x="44" y="30" ${font} font-size="14" font-weight="700" fill="${WHITE}">SACM Workbench</text>`
   ];
-  const inAudit = AUDIT_PARTS.some((part) => part.page === page);
   for (const place of places(page)) {
     const on = lit(page, place);
-    const open = !place.part && place.page === 'audit' && inAudit;
+    const open = !place.part && place.page === 'audit' && inAudit(page);
     if (on) {
       parts.push(`<rect x="${RAIL.x}" y="${place.y}" width="${RAIL.itemWidth}" height="${place.height}" rx="8" fill="${WHITE}" fill-opacity="0.12"/>`);
       parts.push(`<rect x="${RAIL.x}" y="${place.y + 4}" width="3" height="${place.height - 8}" rx="1.5" fill="${CORAL}"/>`);

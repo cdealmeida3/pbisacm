@@ -6,7 +6,7 @@
     "y": 664,
     "z": 5200,
     "height": 40,
-    "width": 452,
+    "width": 200,
     "tabOrder": 5200
   },
   "visual": {
@@ -41,14 +41,14 @@
             "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segoe UI'"
+                  "Value": "'Segoe UI Semibold'"
                 }
               }
             },
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "10D"
                 }
               }
             },
@@ -66,7 +66,7 @@
             "horizontalAlignment": {
               "expr": {
                 "Literal": {
-                  "Value": "'left'"
+                  "Value": "'center'"
                 }
               }
             },
@@ -288,7 +288,7 @@
             "tooltip": {
               "expr": {
                 "Literal": {
-                  "Value": "'Open All cards'"
+                  "Value": "'The lines SACM fixes itself in ServiceNow: open the fix lists on All cards'"
                 }
               }
             }

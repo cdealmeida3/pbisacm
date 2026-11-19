@@ -247,7 +247,7 @@ table History
 		displayFolder: My day
 
 	/// On a section of My day: the words new, solved and open, a bar of what is open (open before in navy, new in coral) on the scale of the biggest section, and at the right a small line of what was open on each CI report date, oldest first, the newest a coral dot. One picture of 240 × 32: a table gives all its pictures one size.
-	measure 'State bar' =
+	measure 'Section bar' =
 			VAR openNow = [Section open]
 			VAR fresh = [New (daily)] + 0
 			VAR solved = [Solved (daily)] + 0

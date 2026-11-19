@@ -29,7 +29,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Open the step'"
+                  "Value": "'Open person'"
                 }
               }
             },
