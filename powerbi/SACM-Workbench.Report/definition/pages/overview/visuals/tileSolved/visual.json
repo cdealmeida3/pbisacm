@@ -254,6 +254,13 @@
                   "Value": "'Right'"
                 }
               }
+            },
+            "imageAreaSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "30L"
+                }
+              }
             }
           },
           "selector": {

@@ -12,7 +12,7 @@
 // nothing. Only invented data: the job runs in Sample mode.
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { readTabGroups } from './pages.ts';
+import { readPages, readTabGroups, textsOf } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -206,7 +206,7 @@ export function drillColumns(): string[] {
 }
 
 /** One page for the picture step (pictures.ps1, D318): its folder name, its tab, whether the team sees its tab. */
-export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number; tabs: string[] }
+export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number; tabs: string[]; words: string[] }
 
 /** The tabs of each page (D323) after its first one, by their words: the picture step presses each and takes a picture. */
 function tabsByPage(): Map<string, string[]> {
@@ -215,13 +215,31 @@ function tabsByPage(): Map<string, string[]> {
   return out;
 }
 
+/**
+ * The words a page writes itself (D328): the titles, the lines a file writes, the buttons, the text boxes, the headers
+ * and the tabs. The look step measures these texts on the picture: Desktop also lists the texts of its own panes
+ * (hidden behind the canvas) and the data of the samples, and only the report's own words are sure to be drawn.
+ */
+function wordsOf(visuals: Parameters<typeof textsOf>[0][], tabs: string[]): string[] {
+  const words = new Set<string>(tabs);
+  for (const visual of visuals) {
+    // A chart names its legend and its bars with the names of its series: their boxes hold the colour of the series,
+    // not the text alone, so a chart gives only its title (its colours are checked by the lint).
+    const chart = /chart/i.test(visual.visual?.visualType ?? '');
+    const own = chart && visual.visual ? { ...visual, visual: { ...visual.visual, query: undefined } } : visual;
+    for (const { text } of textsOf(own)) if (text.trim()) words.add(text.trim());
+  }
+  return [...words].sort();
+}
+
 /** Every page in the order of pages.json: the picture step opens each from its tab (a drill-through page shows its empty state). */
 export function pageList(): PageEntry[] {
   const order = readJson<{ pageOrder: string[] }>(join(PAGES, 'pages.json')).pageOrder;
   const tabs = tabsByPage();
+  const report = readPages();
   return order.map((name) => {
     const page = readJson<{ displayName: string; visibility?: string; width: number; height: number; pageBinding?: { type?: string } }>(join(PAGES, name, 'page.json'));
-    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height, tabs: tabs.get(name) ?? [] };
+    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height, tabs: tabs.get(name) ?? [], words: wordsOf(report.pages.find((entry) => entry.page.name === name)?.visuals ?? [], tabs.get(name) ?? []) };
   });
 }
 
@@ -232,7 +250,18 @@ export interface QueryResult { query: VisualQuery; error?: string; rows?: Array<
 /** What the runner gives back: the model's own errors (TOM), the open and refresh, and each query. */
 export interface Results { opened: boolean; openError?: string; refreshError?: string; modelErrors: string[]; results: QueryResult[] }
 /** What the picture step gives back (pictures.ps1): per page the seconds it took to draw and the words of a broken visual it shows. */
-export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] | null; status?: string | null; tabs?: Array<{ tab: string; found: boolean; seconds?: number | null; file: string | null; broken?: string[] }> }> }
+export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] | null; status?: string | null; look?: Look | null; tabs?: Array<{ tab: string; found: boolean; seconds?: number | null; file: string | null; broken?: string[]; look?: Look | null }> }> }
+/**
+ * What the picture step reads on the page as drawn (build D6, D328): where the page is on the screen (x, y, width,
+ * height in pixels; empty when the navy rail was not seen), and every text of the page with its box in points of the
+ * page, the background and the text colour measured on the picture, and their contrast.
+ */
+export interface Look { canvas: number[]; texts: LookText[] }
+export interface LookText { text: string; x: number; y: number; width: number; height: number; background: string | null; colour: string | null; ratio: number | null }
+
+/** The contrast every text needs (LOOK rule 8: 4.5:1 or more for every text, large text too). */
+export const CONTRAST = 4.5;
+
 /** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
 export const DRAW_SECONDS = 3;
 
@@ -250,7 +279,7 @@ const where = (query: VisualQuery): string => `${query.page} › ${query.visual}
 export function judge(results: Results, pictures?: Pictures): { problems: string[]; notes: string[] } {
   const problems: string[] = [];
   const notes: string[] = [];
-  if (pictures) problems.push(...judgePictures(pictures, notes));
+  if (pictures) problems.push(...judgePictures(pictures, notes), ...judgeLook(pictures, notes));
   if (!results.opened) { problems.push(`Desktop did not open the project: ${results.openError ?? 'no reason given'}`); return { problems, notes }; }
   if (results.refreshError) problems.push(`The refresh failed: ${results.refreshError}`);
   for (const error of results.modelErrors) problems.push(`Model: ${error}`);
@@ -304,6 +333,43 @@ export function judgePictures(pictures: Pictures, notes: string[] = []): string[
     }
     if (page.seconds !== null && page.seconds > DRAW_SECONDS) problems.push(`${page.displayName}: the page took ${page.seconds} s to draw, more than ${DRAW_SECONDS} s (picture ${page.file})`);
     else notes.push(`${page.displayName}: drawn in ${page.seconds} s (picture ${page.file})`);
+  }
+  return problems;
+}
+
+/**
+ * The rules of LOOK §1 on the pages as Desktop draws them (build D6, D328), for every picture of a page and of a tab:
+ *   - the page was found on the picture (the navy rail), and its texts were read: a picture without them is a problem,
+ *     never a silent pass;
+ *   - rule 8: every text has a contrast of 4.5:1 or more on what is behind it;
+ *   - rule 2: no text ends with three dots (Power BI cut it).
+ * Capitals (rule 1) and the words on a button (rule 4) are checked on the words of the files (pages.ts, rule 11): on a
+ * picture most words are data, and a CI name may be in capitals. A text whose box shows one colour only cannot be
+ * measured; the notes count those.
+ */
+export function judgeLook(pictures: Pictures, notes: string[] = []): string[] {
+  const problems: string[] = [];
+  if (!pictures.taken) return problems;
+  const shots = pictures.pages.filter((page) => page.found).flatMap((page) => [
+    { where: page.displayName, file: page.file, look: page.look },
+    ...(page.tabs ?? []).filter((tab) => tab.found).map((tab) => ({ where: `${page.displayName}, tab ${tab.tab}`, file: tab.file, look: tab.look }))
+  ]);
+  for (const { where, file, look } of shots) {
+    if (!look) { problems.push(`${where}: the picture step gave no look of the page, so its look was not checked (picture ${file})`); continue; }
+    if (look.canvas.length !== 4) { problems.push(`${where}: the picture step did not find the page on the screen (no navy rail, or the look step failed: see the log), so its look was not checked (picture ${file})`); continue; }
+    if (!look.texts.length) { problems.push(`${where}: no text of the page was read, so its look was not checked (picture ${file})`); continue; }
+    let lowest: LookText | undefined;
+    let unmeasured = 0;
+    for (const text of look.texts) {
+      const at = `${where}: "${text.text.slice(0, 60)}" at ${text.x}, ${text.y}`;
+      if (text.ratio === null) unmeasured++;
+      else {
+        if (text.ratio < CONTRAST) problems.push(`${at} has a contrast of ${text.ratio}:1 (${text.colour} on ${text.background}), under ${CONTRAST}:1 (LOOK rule 8, picture ${file})`);
+        if (!lowest || text.ratio < lowest.ratio!) lowest = text;
+      }
+      if (/(\.\.\.|…)$/.test(text.text.trim())) problems.push(`${at} ends with three dots: Power BI cut it (LOOK rule 2, picture ${file})`);
+    }
+    notes.push(`${where}: ${look.texts.length} texts read${unmeasured ? ` (${unmeasured} of one colour, not measured)` : ''}${lowest ? `, the lowest contrast ${lowest.ratio}:1 ("${lowest.text.slice(0, 40)}", ${lowest.colour} on ${lowest.background})` : ''}`);
   }
   return problems;
 }

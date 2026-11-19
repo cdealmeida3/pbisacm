@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { boundTexts, daxLiteral, judge, judgePictures, pageList, queriesOf, queryOf } from '../../../tools/powerbi/desktop.ts';
+import { boundTexts, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf } from '../../../tools/powerbi/desktop.ts';
 import type { Pictures, Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
 
 /*
@@ -118,4 +118,33 @@ test('a slicer with a blank value shows a button "(Blank)": the judge finds it',
   ] });
   assert.equal(problems.length, 1);
   assert.match(problems[0]!, /slicer shows "\(Blank\)" \(Topic\)/);
+});
+
+test('the look of the pages as drawn (D328): low contrast, a cut text; a page not found, with no text or no look is not passed', () => {
+  const text = (words: string, ratio: number | null, height = 16) => ({ text: words, x: 240, y: 100, width: 120, height, background: '#ffffff', colour: '#98a2b3', ratio });
+  const look = (texts: ReturnType<typeof text>[], canvas = [41, 196, 1316, 740]) => ({ canvas, texts });
+  const pictures: Pictures = {
+    taken: true,
+    pages: [
+      { page: 'myday', displayName: 'My day', found: true, seconds: 1, file: '01-myday.png', broken: [], look: look([text('Your next steps', 12.6), text('Waiting since 3 days', 2.4), text('42', 3.2, 36)]) },
+      { page: 'people', displayName: 'People', found: true, seconds: 1, file: '02-people.png', broken: [], look: look([text('Owned by Ada Ow…', 9), text('Index Tool - PROD', 9), text('One colour', null)]) },
+      { page: 'cards', displayName: 'Cards', found: true, seconds: 1, file: '03-cards.png', broken: [], look: look([], []),
+        tabs: [{ tab: 'List', found: true, seconds: 1, file: '03-cards-tab1.png', broken: [], look: look([]) }] },
+      { page: 'reports', displayName: 'Reports', found: true, seconds: 1, file: '04-reports.png', broken: [] }
+    ]
+  };
+  const notes: string[] = [];
+  const problems = judgeLook(pictures, notes).join('\n');
+  assert.match(problems, /My day: "Waiting since 3 days" at 240, 100 has a contrast of 2\.4:1 \(#98a2b3 on #ffffff\), under 4\.5:1/);
+  assert.match(problems, /My day: "42" .* 3\.2:1/, 'LOOK rule 8: 4.5:1 for every text, large text too');
+  assert.match(problems, /People: "Owned by Ada Ow…".*three dots/);
+  assert.doesNotMatch(problems, /PROD/, 'capitals in data are not a problem on a picture');
+  assert.match(problems, /Cards: the picture step did not find the page/);
+  assert.match(problems, /Cards, tab List: no text of the page was read/);
+  assert.match(problems, /Reports: the picture step gave no look/);
+  assert.equal(problems.split('\n').length, 6);
+  assert.ok(notes.some((note) => /People: 3 texts read \(1 of one colour, not measured\)/.test(note)));
+  assert.ok(notes.some((note) => /My day: 3 texts read, the lowest contrast 2\.4:1/.test(note)));
+  // The judge runs it with the other checks of the pictures.
+  assert.match(judge({ opened: true, modelErrors: [], results: [] }, pictures).problems.join('\n'), /Waiting since 3 days/);
 });

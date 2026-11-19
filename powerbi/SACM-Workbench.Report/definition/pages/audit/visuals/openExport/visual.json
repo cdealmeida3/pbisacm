@@ -29,7 +29,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Export for the auditor'"
+                  "Value": "'Auditor export'"
                 }
               }
             },

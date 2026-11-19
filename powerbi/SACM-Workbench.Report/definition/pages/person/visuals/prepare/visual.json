@@ -29,7 +29,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Prepare the email'"
+                  "Value": "'Prepare email'"
                 }
               }
             },
