@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { appActions } from '../../../tools/powerbi/actions.ts';
-import { appFlows, callProblems, catalogueProblems, controlProblems, flowProblems } from '../../../tools/powerbi/app-rules.ts';
+import { appFlows, callProblems, catalogueProblems, columnProblems, controlProblems, flowProblems } from '../../../tools/powerbi/app-rules.ts';
 import type { Flow, Formula } from '../../../tools/powerbi/app-rules.ts';
 
 const root = join(import.meta.dirname, '..', '..', '..');
@@ -34,6 +34,9 @@ test('the flows only refresh, wait, file or send what a manager pressed, one at 
   assert.ok(problems.some((line) => line.includes('one at a time')));
   assert.ok(problems.some((line) => line.includes('sends what a manager pressed Send on')));
   assert.ok(problems.some((line) => line.includes('does not refresh')));
+  // A flow that answers the app cannot have concurrency control (Power Automate refuses to save it, D337).
+  const f5 = appFlows().find((flow) => flow.id === 'F5')!;
+  assert.ok(flowProblems([{ ...f5, concurrency: 1 }]).some((line) => line.includes('must be off')));
 });
 
 test('a flow sends only from the app, one message, exactly the inputs the manager sends; it files replies only in SACM Replies', () => {
@@ -93,8 +96,53 @@ test('the apps use the modern controls, with only the properties Microsoft gives
   assert.ok(problems.some((line) => line.includes('has the property FontSize')));
 });
 
-test('the app may add a row to the journal with its columns, and run the refresh flow', () => {
-  assert.deepEqual(callProblems([formula('ok', [patch(['Title', 'At', 'Keys']), { name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }])]), []);
+test('the app may add a row to the journal with its columns, and run the refresh flow from its button Refresh now', () => {
+  const button: Formula = { ...formula('ok', [{ name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }]), where: '/Screens/S/Children/3/RefreshButton/Properties/OnSelect' };
+  assert.deepEqual(callProblems([formula('ok', [patch(['Title', 'At', 'Keys'])]), button]), []);
+});
+
+test('a Save, or any other control or a named formula, that runs the refresh flow is a problem (D332)', () => {
+  const save: Formula = { ...formula('save', [patch(['Title']), { name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }]), where: '/Screens/S/Children/9/SaveButton/Properties/OnSelect' };
+  const named: Formula = { ...formula('named', [{ name: 'Run', namespace: 'SACMRefresh', source: null, second: null, fields: [] }]), where: '/App/Properties/Formulas/Refresh' };
+  const problems = callProblems([save, named]);
+  assert.equal(problems.filter((line) => line.includes('only the button Refresh now')).length, 2);
+  // Another flow may run from any button.
+  const send: Formula = { ...formula('send', [patch(['Title']), { name: 'Run', namespace: 'SACMSend', source: null, second: null, fields: [] }]), file: 'powerbi/apps/sacm-messages/Src/X.pa.yaml', where: '/Screens/S/Children/9/SendButton/Properties/OnSelect' };
+  assert.deepEqual(callProblems([send]), []);
+});
+
+test('a refresh goes through the gate: Now, Minutes, Open, Window, the row in SACM Refreshes, and only then the refresh (D333)', () => {
+  const f5 = appFlows().find((flow) => flow.id === 'F5')!;
+  const f3 = appFlows().find((flow) => flow.id === 'F3')!;
+  const f1 = appFlows().find((flow) => flow.id === 'F1')!;
+  assert.deepEqual(flowProblems([f5, f3, f1]), []);
+  assert.ok(!f1.steps.some((step) => step.action === 'Refresh a dataset'), 'F1 does not refresh (D332)');
+  // The old F5: a refresh and a Delay, no gate.
+  const old: Flow = { ...f5, steps: [
+    { action: 'Refresh a dataset', connector: 'Power BI', fields: { Workspace: 'SACM Workbench', Dataset: 'SACM-Workbench' } },
+    { action: 'Delay', connector: 'Schedule', fields: { Count: '2', Unit: 'Minute' } }
+  ] };
+  const problems = flowProblems([old]);
+  assert.ok(problems.some((line) => line.includes('the step "Delay"')));
+  assert.ok(problems.some((line) => line.includes('without the step Now')));
+  assert.ok(problems.some((line) => line.includes('without the condition Open')));
+  assert.ok(problems.some((line) => line.includes('without first adding the window to SACM Refreshes')));
+  assert.ok(problems.some((line) => line.includes('the workspace "SACM Workbench"')));
+  assert.ok(problems.some((line) => line.includes('never answers the app taken')));
+  // A refresh that does not wait for the lock, other hours, another field in the list, a flow that files reports and refreshes.
+  const loose: Flow = { ...f5, steps: f5.steps.map((step) => {
+    if (step.action === 'Refresh a dataset') return { ...step, if: 'Open is Yes' };
+    if (step.fields.Name === 'Open') return { ...step, fields: { ...step.fields, Expression: step.fields.Expression!.replace('1080', '1200') } };
+    if (step.action === 'Create item') return { ...step, fields: { ...step.fields, Note: 'x' } };
+    if (step.action === 'Respond to a PowerApp or flow' && step.fields.Result === 'closed') return { ...step, fields: { Result: 'closed' } };
+    return step;
+  }) };
+  const more = flowProblems([loose, { ...f1, steps: [...f1.steps, ...f5.steps.filter((step) => step.action !== 'Respond to a PowerApp or flow')], trigger: f1.trigger }]);
+  assert.ok(more.some((line) => line.includes('refreshes even when the window is taken')));
+  assert.ok(more.some((line) => line.includes('the condition Open is')));
+  assert.ok(more.some((line) => line.includes('the field Note to SACM Refreshes')));
+  assert.ok(more.some((line) => line.includes('every answer must give the outputs Result, At, By, Message')));
+  assert.ok(more.some((line) => line.includes('files reports and refreshes')));
 });
 
 test('changing or removing a row, another list, an unknown column, another connector or no journal row at all is a problem', () => {
@@ -112,7 +160,7 @@ test('changing or removing a row, another list, an unknown column, another conne
 
 test('the app SACM audit adds rows to SACM Settings with Title and Value only, and changes none (build B8, D308)', () => {
   const audit = (calls: Formula['calls']): Formula => ({ ...formula('audit', calls), file: 'powerbi/apps/sacm-audit/Src/AuditScreen.pa.yaml' });
-  assert.deepEqual(callProblems([audit([patch(['Title', 'Value'], 'Defaults', 'SACM Settings'), patch(['Title', 'Type', 'Items'])])]), []);
+  assert.deepEqual(callProblems([audit([patch(['Title', 'Value'], 'Defaults', 'SACM Settings'), patch(['Title', 'EntryType', 'Items'])])]), []);
   const problems = callProblems([audit([patch(['Title', 'Colour'], 'Defaults', 'SACM Settings'), patch(['Title'], null, 'SACM Settings'), patch(['Title'])])]);
   assert.ok(problems.some((line) => line.includes('column Colour, which SACM Settings does not have')));
   assert.ok(problems.some((line) => line.includes('Patch(SACM Settings, …)')));
@@ -154,4 +202,14 @@ test('the three screens use only modern controls with their own properties, or t
       .filter(({ line }) => /^\s+[A-Za-z]+: =/.test(line) && /: |\s#/.test(line.slice(line.indexOf(': =') + 3)));
     assert.deepEqual(plain.map(({ at }) => `${app}:${at}`), [], 'a one-line formula with ": " or " #" must be a block (|-)');
   }
+});
+
+test('no list column has the name of a column SharePoint has already, such as Type (D338)', () => {
+  assert.deepEqual(columnProblems(), []);
+  const problems = columnProblems({ journal: { list: 'SACM Journal', columns: ['Title', 'Type', 'EntryType', 'Content Type'] } }, []);
+  assert.equal(problems.length, 2);
+  assert.match(problems[0]!, /column Type of SACM Journal/);
+  const flow = appFlows()[0]!;
+  const extra: Flow = { ...flow, steps: [{ action: 'Create item', fields: { 'List Name': 'SACM Replies', Title: '=x', Modified: '=y' } } as never] };
+  assert.match(columnProblems({}, [extra]).join(), /column Modified of SACM Replies/);
 });

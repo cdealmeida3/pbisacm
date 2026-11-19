@@ -35,7 +35,7 @@ import { lightColours } from './tokens.ts';
 import { connectorSource } from './connector.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
 import { APP_FOLDERS } from './actions.ts';
-import { callProblems, catalogueProblems, controlProblems, flowProblems } from './app-rules.ts';
+import { callProblems, catalogueProblems, columnProblems, controlProblems, flowProblems } from './app-rules.ts';
 import type { Formula } from './app-rules.ts';
 import { pageProblems, readCatalogue, readPages, THEME_SCHEMA_FILE, themeProblems } from './pages.ts';
 
@@ -295,7 +295,7 @@ for (const expression of expressions) if (/^(?:Time|RealSize|Probe)/.test(expres
 done.push(`Run: ${calculatedTables.length} calculated tables take their part of Run or HistoryRun, both hidden`);
 
 /* 9. App */
-problems.push(...catalogueProblems(undefined, expressions.find((expression) => expression.name === 'fnCaseActions')?.m ?? ''), ...flowProblems());
+problems.push(...catalogueProblems(undefined, expressions.find((expression) => expression.name === 'fnCaseActions')?.m ?? ''), ...flowProblems(), ...columnProblems());
 const appFiles = APP_FOLDERS.flatMap((folder) => filesUnder(folder, /(\.pa\.yaml|App-Formulas\.fx)$/));
 if (process.argv.includes('--no-dotnet')) {
   done.push('App: catalogue and flows checked; the app source NOT PARSED (--no-dotnet). The CI parses it.');
@@ -320,7 +320,7 @@ if (process.argv.includes('--no-dotnet')) {
     done.push(`App: ${sources.length} files of the app source valid, ${read.formulas.filter((formula) => formula.file !== schema!.file).length} Power Fx formulas parse, the apps only add journal rows and run only the flows of flows.json`);
   }
 }
-done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait, file, or send what a manager pressed');
+done.push('App: the actions agree with fnCaseActions; the flows refresh only through the refresh rule, file, or send what a manager pressed');
 
 /* 10. Pages */
 const report = readPages();

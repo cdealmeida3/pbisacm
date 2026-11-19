@@ -54,7 +54,7 @@ export function reviewsOf(rows: Array<Record<string, string>>): Review[] {
   const reviews = new Map<string, Review>();
   const sorted = rows.slice().sort((a, b) => ordinal(a.At ?? '', b.At ?? '') || ordinal(a.Title ?? '', b.Title ?? ''));
   for (const row of sorted) {
-    if (row.Type !== 'review' || row.CiKey || !row.Ref || !row.Items || reviews.has(row.Ref)) continue;
+    if (row.EntryType !== 'review' || row.CiKey || !row.Ref || !row.Items || reviews.has(row.Ref)) continue;
     let body: { report?: string; reportDate?: string; items?: Array<Record<string, unknown>> };
     try { body = JSON.parse(row.Items) as typeof body; } catch { continue; }
     if (!body || !Array.isArray(body.items)) continue;

@@ -13,7 +13,8 @@ How the report is set up (the workspace, the lists, the apps and the flows) is i
 
 - **The navy rail at the left** opens the pages. The page you are on is lighter, with a coral line. The number beside
   *My day* is how many next steps you have today. The number beside *Work queue* is how many open lines wait for a person. At the
-  foot: the version, where the data comes from and when it was refreshed.
+  foot: the version, where the data comes from and how old it is ("refreshed 2 h ago"). On *My day* and *Reports* the
+  rail also has **Refresh now** and its rule (part 2A).
 - **The chip at the top right** says whether the reports are up to date. Green: every report arrived in time. Amber:
   one is old or missing. Press it to open *Reports*.
 - **The grey line under every title** says how many lines a box shows, or why it shows none ("Nobody to wait for").
@@ -32,13 +33,26 @@ How the report is set up (the workspace, the lists, the apps and the flows) is i
 3. **Press *Prepare email*.** The page *Messages* opens with the email studio: the list of emails on the left, the email
    as it will arrive in the middle, and From, To, Cc and Subject on the right.
 4. **Press *Send*.** The email goes out from the shared SACM mailbox, with the full list as a CSV file when it is long.
-   The cases are recorded and the report refreshes. *Test to me* sends it to you only. *Outlook draft* puts it in your
-   own Drafts, From the shared mailbox, to change it first.
+   The cases are recorded at once; the report shows them after the next refresh (part 2A). *Test to me* sends it to
+   you only. *Outlook draft* puts it in your own Drafts, From the shared mailbox, to change it first.
 5. **When a reply comes,** *My day* shows it first. Open the person: the app at the right opens on the tab *Reply*, with
    what they wrote next to their open lines. Tick the lines it answers and press *Mark answered*, or set *Waiting until*
    a date.
 
 Nothing is sent on its own. Every email, reminder and escalation is a button you press.
+
+## 2A. When does the report change?
+
+The report refreshes **at 07:00**, after the morning reports. During the day it refreshes when somebody asks, **once
+every 2 hours, from 08:00 to 18:00**: press **Refresh now** in an app, or on the rail of *My day* or *Reports*. A reply
+that comes in asks too. The first ask in each 2 hours refreshes; the app tells the others who asked and when the next
+refresh can start. Power BI allows only a few refreshes a day, so a Save does not refresh.
+
+- **What you did is saved at once.** The apps show it straight away: *Done lately* and the marks say *not in the
+  report yet*, an email you sent stays in the list as *Sent* for everyone, and the top line of each app says "Report
+  data from 07:05. 3 changes since then are not in it yet."
+- **After a refresh**, press **Refresh** in the report's top bar (or reload the page): the pages do not reload by
+  themselves.
 
 ## 3. The pages
 
@@ -109,6 +123,6 @@ them.
 - **The chip is amber.** A report is old or missing. Open *Reports*: it says which one. The numbers still show, from the
   reports that are there.
 - **A box says why it is empty.** Read the grey line under its title: it is often fine ("No reply to read").
-- **The numbers look old.** Look at the foot of the rail: it says when the data was refreshed. A refresh runs on its
-  schedule and after a new report arrives.
+- **The numbers look old.** Look at the foot of the rail: it says how old the data is. Press **Refresh** in the
+  report's top bar first. Then press **Refresh now** (part 2A); outside 08:00 to 18:00 the next refresh is at 07:00.
 - **A button stays grey.** Select a line first. In the app, the grey button says why under it.

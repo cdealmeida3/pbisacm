@@ -150,6 +150,14 @@ export function scaledSampleFiles(copies = REAL_SIZE_COPIES, history = 0): Scale
   ].sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/**
+ * The first day the history of the scaled samples needs (RangeStart): the oldest of the `history` earlier dates. Without
+ * it the parameter RangeStart (1 November) leaves out every earlier date, and a timing with history 10 times 2 dates.
+ */
+export function historyStart(history: number): string {
+  return daysBefore(RECORD_DATE, 7 * history);
+}
+
 /** How many CIs, relationships, EPO systems and contracts (Solusi, ServiceNow) the scaled samples hold. */
 export function scaledSizes(copies = REAL_SIZE_COPIES): { cis: number; relationships: number; epoSystems: number; solusiContracts: number; servicenowContracts: number } {
   return {

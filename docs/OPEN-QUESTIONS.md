@@ -28,6 +28,7 @@ These are not questions, but the app waits for them.
 | Q9 | **The double-contact look-back of 24 hours**: right after the pilot measured the OneDrive delay? | Too short misses a colleague's message; too long blocks real reminders | 24 hours (28) |
 | Q10 | **The lifecycle review sample:** the instruction says "50 per category"; the app draws 50 in total, plus 20 Under retirement | The size of the evidence | 50 in total (42) |
 | Q11 | **Is a daily responsible mandatory on a contract?** | Today it is only counted on Contract changes | Not asked (64) |
+| Q35 | **How many CI reports (dates) are in the reports folder now, and does one come every working day?** (the Power BI report in My workspace, D336) | The first refresh after each publish computes the whole history and must finish in 2 hours on shared capacity | Fewer than the number README §4A gives; older reports go into the sub-folder *Archive* |
 
 ## 3. Checks still waiting for a rule
 

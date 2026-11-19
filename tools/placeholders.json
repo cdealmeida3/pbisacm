@@ -6,6 +6,7 @@
     { "id": "doc.format-example", "group": "examples", "invented": ["Jane Doe"], "use": "stays-invented", "label": "A format example of a person's name in a comment" },
     { "id": "test.private-word", "group": "examples", "invented": ["Acme"], "use": "stays-invented", "label": "The private word of the privacy guard test" },
     { "id": "department.sample", "group": "samples", "invented": ["D-100", "D-200", "D-300"], "use": "stays-invented", "label": "Invented departments of the EPO sample" },
+    { "id": "powerbi.time-zone", "group": "configuration", "invented": ["<the time zone of the team>"], "use": "stays-invented", "label": "The time zone of the gate of the flows F3, F5 and F6 (D333). Carlos picks the Windows name of the zone in each flow, the same as the time zone of the scheduled refresh; the real zone is never written here (powerbi/README.md §6.3)" },
     { "id": "powerbi.reports-folder", "group": "addresses", "invented": ["Shared Documents/Workbench/Reports"], "use": "stays-invented", "label": "Default of the Power BI parameter ReportsFolder: the folder of the report files in the SharePoint site. The real folder is typed in Power BI Desktop or in the workspace, never here (powerbi/README.md)" }
   ],
   "shapes": [

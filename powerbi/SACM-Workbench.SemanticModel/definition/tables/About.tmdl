@@ -5,11 +5,38 @@ table About
 	measure Today = IF ( SELECTEDVALUE ( About[SourceMode] ) = "Sample", MAX ( About[SampleDate] ), TODAY () )
 		formatString: d mmm yyyy
 
-	/// The line at the foot of every page.
-	measure 'About line' = "SACM Workbench " & SELECTEDVALUE ( About[Version] ) & " · " & SELECTEDVALUE ( About[Data] ) & " · refreshed " & FORMAT ( MAX ( About[RefreshedAt] ), "d mmm yyyy hh:nn" )
+	/// How long ago the report was refreshed, in words (D335): "refreshed 40 min ago". From the refresh time in UTC and
+	/// UTCNOW, so it needs no time zone: in the service the engine's clock is UTC. Blank when the time is not known.
+	measure 'Refresh age' =
+			VAR refreshed = MAX ( About[RefreshedUtc] )
+			VAR minutes = DATEDIFF ( refreshed, UTCNOW (), MINUTE )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( refreshed ), BLANK (),
+			        minutes < 1, "refreshed just now",
+			        minutes < 60, "refreshed " & minutes & " min ago",
+			        minutes < 1440, "refreshed " & INT ( minutes / 60 ) & " h ago",
+			        minutes < 2880, "refreshed yesterday",
+			        "refreshed " & INT ( minutes / 1440 ) & " days ago"
+			    )
+		displayFolder: Page notes
 
-	/// The line at the foot of the rail of every page (design pass §3.2): the version, where the data comes from, when it was refreshed.
-	measure 'Rail line' = SELECTEDVALUE ( About[Version] ) & " · " & IF ( SELECTEDVALUE ( About[SourceMode] ) = "Sample", "Sample data", "SharePoint" ) & " · refreshed " & FORMAT ( MAX ( About[RefreshedAt] ), "d mmm hh:nn" )
+	/// The line at the foot of every page.
+	measure 'About line' = "SACM Workbench " & SELECTEDVALUE ( About[Version] ) & " · " & SELECTEDVALUE ( About[Data] ) & " · " & [Refresh age]
+
+	/// The line at the foot of the rail of every page (design pass §3.2): the version, where the data comes from, how long ago it was refreshed (D335). Blank when the refresh time is not known, so the Desktop check sees it.
+	measure 'Rail line' = IF ( ISBLANK ( [Refresh age] ), BLANK (), SELECTEDVALUE ( About[Version] ) & " · " & IF ( SELECTEDVALUE ( About[SourceMode] ) = "Sample", "Sample data", "SharePoint" ) & " · " & [Refresh age] )
+		displayFolder: Page notes
+
+	/// The time of the refresh in UTC as text, yyyy-mm-ddThh:nn:ssZ (D334): a field of the visual of each Power App, which
+	/// reads it with DateTimeValue in the browser's time, so the time zone is never guessed on the way. The locale en-US
+	/// keeps the separators ":" whatever the language of the model (a time separator of FORMAT follows the locale).
+	measure 'Report at' = VAR refreshed = MAX ( About[RefreshedUtc] ) RETURN IF ( ISBLANK ( refreshed ), BLANK (), FORMAT ( refreshed, "yyyy-mm-dd", "en-US" ) & "T" & FORMAT ( refreshed, "hh:nn:ss", "en-US" ) & "Z" )
+		displayFolder: Page notes
+
+	/// The refresh rule in words (powerbi/apps/refresh.json, D333), on the rail of My day and Reports above the button Refresh now.
+	measure 'Refresh rule' = SELECTEDVALUE ( About[RefreshRule] )
 		displayFolder: Page notes
 
 	column Version
@@ -35,6 +62,17 @@ table About
 		formatString: d mmm yyyy hh:nn
 		summarizeBy: none
 		sourceColumn: RefreshedAt
+
+	/// The time of the refresh in UTC (D335).
+	column RefreshedUtc
+		dataType: dateTime
+		formatString: d mmm yyyy hh:nn
+		summarizeBy: none
+		sourceColumn: RefreshedUtc
+
+	column RefreshRule
+		dataType: string
+		sourceColumn: RefreshRule
 
 	partition About = m
 		mode: import

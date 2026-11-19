@@ -1,4 +1,4 @@
-Title,At,By,ByName,Type,Keys,Text,Ref,To,Cc,Subject,Kind,Channel,Person,Reason,ReviewOn,RetireOn,CheckId,CiKey,CiName,Items
+Title,At,By,ByName,EntryType,Keys,Text,Ref,To,Cc,Subject,Kind,Channel,Person,Reason,ReviewOn,RetireOn,CheckId,CiKey,CiName,Items
 J0001,2026-10-26T09:30:00,alex@example.com,Alex Example,message,"DESC-QUALITY:members:description
 RESP-MISSING:members:managed_by
 NAME-STANDARD:members:bs-suffix",2026-10-26_SACM-EF56GH.eml,SACM-EF56GH,ada@example.com,,Members: 3 points to fix [SACM-EF56GH],first,mailbox,,,,,,,,

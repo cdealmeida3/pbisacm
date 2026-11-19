@@ -19,6 +19,7 @@ Some words of this repository stand in for a real value on purpose: the samples 
 | `doc.format-example` | examples | `Jane Doe` | A format example of a person's name in a comment | Stays invented |
 | `test.private-word` | examples | `Acme` | The private word of the privacy guard test | Stays invented |
 | `department.sample` | samples | `D-100`, `D-200`, `D-300` | Invented departments of the EPO sample | Stays invented |
+| `powerbi.time-zone` | configuration | `<the time zone of the team>` | The time zone of the gate of the flows F3, F5 and F6 (D333). Carlos picks the Windows name of the zone in each flow, the same as the time zone of the scheduled refresh; the real zone is never written here (powerbi/README.md §6.3) | Stays invented |
 | `powerbi.reports-folder` | addresses | `Shared Documents/Workbench/Reports` | Default of the Power BI parameter ReportsFolder: the folder of the report files in the SharePoint site. The real folder is typed in Power BI Desktop or in the workspace, never here (powerbi/README.md) | Stays invented |
 
 ## Shapes

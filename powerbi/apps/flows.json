@@ -1,15 +1,146 @@
 {
-  "note": "The Power Automate flows of builds B6, B7 and D5 (D295, D301, D315), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power Apps call a flow by it), the trigger, the inputs a Power App gives it, the concurrency of the trigger (1: one run at a time; the others wait) and the steps in order. A flow refreshes, waits, files a report or a reply, sends exactly the message a manager pressed Send or Test on (its To, Cc, Subject, Body and file are the inputs of the trigger, never made by the flow, D2, D301), or makes the Outlook draft a manager pressed Outlook draft on in the manager's own Drafts, which sends nothing (F7, D315). None runs on a timer (D269). npm run powerbi:lint checks these rules and that the apps call only flows of this file. The workspace and the semantic model are picked from a list in the step: the workspace is the one Carlos made (README section 4), the semantic model has the name of the .pbip.",
+  "note": "The Power Automate flows of builds B6, B7, D5 and 0.52.0 (D295, D301, D315, D333), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power Apps call a flow by it), the trigger, the inputs a Power App gives it, the outputs it answers the app with, the concurrency of the trigger (1: one run at a time, the others wait; 0: off, for a flow that answers the app, because Power Automate refuses concurrency control with a Respond step, D337) and the steps in order. A step with 'if' runs only on that branch, or after that step (Configure run after). A flow refreshes through the gate, files a report or a reply, sends exactly the message a manager pressed Send or Test on (its To, Cc, Subject, Body and file are the inputs of the trigger, never made by the flow, D2, D301), or makes the Outlook draft a manager pressed Outlook draft on in the manager's own Drafts, which sends nothing (F7, D315). The gate (D333): a refresh on demand runs at most once in each window of powerbi/apps/refresh.json, because each window is one row of the list SACM Refreshes, whose Title is unique; the expressions of its steps are those of tools/powerbi/refresh.ts (gateExpressions). None runs on a timer (D269): the one scheduled refresh is set on the semantic model in the service. npm run powerbi:lint checks these rules and that the apps call only flows of this file. The workspace is My workspace (README section 4A, D331); the semantic model has the name of the .pbip. <the time zone of the team> is the Windows name of the team's time zone, the same as the scheduled refresh: Carlos writes it in the flows, never here.",
   "flows": [
     {
       "id": "F5",
       "name": "SACMRefresh",
-      "purpose": "Refresh the report after a manager saved an action in the Power App, or pressed Refresh now in it.",
+      "purpose": "Refresh the report when a manager presses Refresh now in a Power App, at most once in each window of the refresh rule (powerbi/apps/refresh.json, D333), and answer the app: started, taken (when and by whom the window was used), closed (outside the hours), refused (Power BI did not start it, with its message) or error. No Save calls it (D332).",
       "trigger": "Power Apps (V2)",
-      "concurrency": 1,
+      "concurrency": 0,
       "steps": [
-        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "the workspace of README section 4", "Dataset": "SACM-Workbench" } },
-        { "action": "Delay", "connector": "Schedule", "fields": { "Count": "2", "Unit": "Minute" }, "runAfter": ["Succeeded", "Failed"] }
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "fields": {
+            "Name": "Now",
+            "Inputs": "convertFromUtc(utcNow(), '<the time zone of the team>')"
+          }
+        },
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "fields": {
+            "Name": "Minutes",
+            "Inputs": "add(mul(int(formatDateTime(outputs('Now'), 'HH')), 60), int(formatDateTime(outputs('Now'), 'mm')))"
+          }
+        },
+        {
+          "action": "Condition",
+          "connector": "Control",
+          "fields": {
+            "Name": "Open",
+            "Expression": "and(greaterOrEquals(outputs('Minutes'), 480), less(outputs('Minutes'), 1080))"
+          }
+        },
+        {
+          "action": "Respond to a PowerApp or flow",
+          "connector": "Power Apps",
+          "if": "Open is No",
+          "fields": {
+            "Result": "closed",
+            "At": "",
+            "By": "",
+            "Message": ""
+          }
+        },
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "if": "Open is Yes",
+          "fields": {
+            "Name": "Window",
+            "Inputs": "concat(formatDateTime(outputs('Now'), 'yyyy-MM-dd'), ' ', formatDateTime(addMinutes(startOfDay(outputs('Now')), add(480, mul(div(sub(outputs('Minutes'), 480), 120), 120))), 'HH:mm'))"
+          }
+        },
+        {
+          "action": "Create item",
+          "connector": "SharePoint",
+          "if": "Open is Yes",
+          "fields": {
+            "List Name": "SACM Refreshes",
+            "Title": "=output Window",
+            "By": "=the user who ran it",
+            "Source": "app"
+          }
+        },
+        {
+          "action": "Refresh a dataset",
+          "connector": "Power BI",
+          "if": "Create item is successful",
+          "fields": {
+            "Workspace": "My workspace",
+            "Dataset": "SACM-Workbench"
+          }
+        },
+        {
+          "action": "Respond to a PowerApp or flow",
+          "connector": "Power Apps",
+          "if": "Refresh a dataset is successful",
+          "fields": {
+            "Result": "started",
+            "At": "=the time of Now",
+            "By": "=the user who ran it",
+            "Message": ""
+          }
+        },
+        {
+          "action": "Respond to a PowerApp or flow",
+          "connector": "Power Apps",
+          "if": "Refresh a dataset has failed",
+          "fields": {
+            "Result": "refused",
+            "At": "=the time of Now",
+            "By": "=the user who ran it",
+            "Message": "=the error of Refresh a dataset"
+          }
+        },
+        {
+          "action": "Get items",
+          "connector": "SharePoint",
+          "if": "Create item has failed",
+          "fields": {
+            "List Name": "SACM Refreshes",
+            "Filter Query": "Title eq '@{outputs('Window')}'",
+            "Top Count": "1"
+          }
+        },
+        {
+          "action": "Condition",
+          "connector": "Control",
+          "if": "Get items is successful or has failed",
+          "fields": {
+            "Name": "Found",
+            "Expression": "greater(length(coalesce(body('Get_items')?['value'], json('[]'))), 0)"
+          }
+        },
+        {
+          "action": "Respond to a PowerApp or flow",
+          "connector": "Power Apps",
+          "if": "Found is Yes",
+          "fields": {
+            "Result": "taken",
+            "At": "=the time the row was made",
+            "By": "=By of the row",
+            "Message": ""
+          }
+        },
+        {
+          "action": "Respond to a PowerApp or flow",
+          "connector": "Power Apps",
+          "if": "Found is No",
+          "fields": {
+            "Result": "error",
+            "At": "",
+            "By": "",
+            "Message": "=the error of Create item"
+          }
+        }
+      ],
+      "outputs": [
+        "Result",
+        "At",
+        "By",
+        "Message"
       ]
     },
     {
@@ -17,10 +148,29 @@
       "name": "SACMSend",
       "purpose": "Send the email a manager pressed Send on in the Power App SACM messages, from the shared mailbox, exactly as the app gives it: the email of the template (Drafts[Html], D313) and, for a long list, its CSV file (Drafts[Csv], D314). The app records it in the journal after the flow answers.",
       "trigger": "Power Apps (V2)",
-      "inputs": ["To", "Cc", "Subject", "Body", "Csv", "FileName"],
+      "inputs": [
+        "To",
+        "Cc",
+        "Subject",
+        "Body",
+        "Csv",
+        "FileName"
+      ],
       "concurrency": 1,
       "steps": [
-        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=input To", "CC": "=input Cc", "Subject": "=input Subject", "Body": "=input Body", "Attachments": "=input Csv as the file FileName", "Importance": "Normal" } }
+        {
+          "action": "Send an email from a shared mailbox (V2)",
+          "connector": "Office 365 Outlook",
+          "fields": {
+            "Original Mailbox Address": "the shared SACM mailbox",
+            "To": "=input To",
+            "CC": "=input Cc",
+            "Subject": "=input Subject",
+            "Body": "=input Body",
+            "Attachments": "=input Csv as the file FileName",
+            "Importance": "Normal"
+          }
+        }
       ]
     },
     {
@@ -28,10 +178,26 @@
       "name": "SACMTest",
       "purpose": "Send a test of an email to the manager who pressed Test to me, from the shared mailbox, with its file when it has one. Nobody else gets it, and the cases are not changed.",
       "trigger": "Power Apps (V2)",
-      "inputs": ["Subject", "Body", "Csv", "FileName"],
+      "inputs": [
+        "Subject",
+        "Body",
+        "Csv",
+        "FileName"
+      ],
       "concurrency": 1,
       "steps": [
-        { "action": "Send an email from a shared mailbox (V2)", "connector": "Office 365 Outlook", "fields": { "Original Mailbox Address": "the shared SACM mailbox", "To": "=the user who ran it", "Subject": "=input Subject", "Body": "=input Body", "Attachments": "=input Csv as the file FileName", "Importance": "Normal" } }
+        {
+          "action": "Send an email from a shared mailbox (V2)",
+          "connector": "Office 365 Outlook",
+          "fields": {
+            "Original Mailbox Address": "the shared SACM mailbox",
+            "To": "=the user who ran it",
+            "Subject": "=input Subject",
+            "Body": "=input Body",
+            "Attachments": "=input Csv as the file FileName",
+            "Importance": "Normal"
+          }
+        }
       ]
     },
     {
@@ -39,46 +205,214 @@
       "name": "SACMDraft",
       "purpose": "Make an Outlook draft of the email a manager pressed Outlook draft on in the Power App SACM messages, in the manager's own Drafts, with From set to the shared SACM mailbox (D315, the manager needs Send as on it), and give the app its link. It sends nothing: the manager checks the draft and sends it from Outlook, then tells the app (Sent from Outlook? Yes records it).",
       "trigger": "Power Apps (V2)",
-      "inputs": ["Message", "Csv"],
-      "concurrency": 1,
+      "inputs": [
+        "Message",
+        "Csv"
+      ],
+      "concurrency": 0,
       "steps": [
-        { "action": "Send an HTTP request", "connector": "Office 365 Outlook", "fields": { "URI": "https://graph.microsoft.com/v1.0/me/messages", "Method": "POST", "Body": "=input Message with the file Csv and the shared SACM mailbox as From", "ContentType": "application/json" } },
-        { "action": "Respond to a PowerApp or flow", "connector": "Power Apps", "fields": { "Link": "=the webLink of the draft" } }
+        {
+          "action": "Send an HTTP request",
+          "connector": "Office 365 Outlook",
+          "fields": {
+            "URI": "https://graph.microsoft.com/v1.0/me/messages",
+            "Method": "POST",
+            "Body": "=input Message with the file Csv and the shared SACM mailbox as From",
+            "ContentType": "application/json"
+          }
+        },
+        {
+          "action": "Respond to a PowerApp or flow",
+          "connector": "Power Apps",
+          "fields": {
+            "Link": "=the webLink of the draft"
+          }
+        }
+      ],
+      "outputs": [
+        "Link"
       ]
     },
     {
       "id": "F6",
       "name": "SACM refresh now",
-      "purpose": "The button Refresh now on the pages My day and Reports (the Power Automate visual).",
+      "purpose": "The button Refresh now on the rail of the pages My day and Reports (the Power Automate visual): refresh the report through the same gate as F5 (D333). The visual cannot show an answer: the rule is written above the button (About[Refresh rule]).",
       "trigger": "Power BI button clicked",
       "concurrency": 1,
       "steps": [
-        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "the workspace of README section 4", "Dataset": "SACM-Workbench" } },
-        { "action": "Delay", "connector": "Schedule", "fields": { "Count": "2", "Unit": "Minute" }, "runAfter": ["Succeeded", "Failed"] }
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "fields": {
+            "Name": "Now",
+            "Inputs": "convertFromUtc(utcNow(), '<the time zone of the team>')"
+          }
+        },
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "fields": {
+            "Name": "Minutes",
+            "Inputs": "add(mul(int(formatDateTime(outputs('Now'), 'HH')), 60), int(formatDateTime(outputs('Now'), 'mm')))"
+          }
+        },
+        {
+          "action": "Condition",
+          "connector": "Control",
+          "fields": {
+            "Name": "Open",
+            "Expression": "and(greaterOrEquals(outputs('Minutes'), 480), less(outputs('Minutes'), 1080))"
+          }
+        },
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "if": "Open is Yes",
+          "fields": {
+            "Name": "Window",
+            "Inputs": "concat(formatDateTime(outputs('Now'), 'yyyy-MM-dd'), ' ', formatDateTime(addMinutes(startOfDay(outputs('Now')), add(480, mul(div(sub(outputs('Minutes'), 480), 120), 120))), 'HH:mm'))"
+          }
+        },
+        {
+          "action": "Create item",
+          "connector": "SharePoint",
+          "if": "Open is Yes",
+          "fields": {
+            "List Name": "SACM Refreshes",
+            "Title": "=output Window",
+            "By": "=the user who pressed, when the trigger gives it, else button",
+            "Source": "button"
+          }
+        },
+        {
+          "action": "Refresh a dataset",
+          "connector": "Power BI",
+          "if": "Create item is successful",
+          "fields": {
+            "Workspace": "My workspace",
+            "Dataset": "SACM-Workbench"
+          }
+        },
+        {
+          "action": "Terminate",
+          "connector": "Control",
+          "if": "Create item has failed",
+          "fields": {
+            "Status": "Succeeded"
+          }
+        }
       ]
     },
     {
       "id": "F1",
       "name": "SACM - File reports",
-      "purpose": "File each report the shared mailbox gets in the reports folder of the team site, then refresh the report.",
+      "purpose": "File each report the shared mailbox gets in the reports folder of the team site. It does not refresh (D332): the one scheduled refresh of the morning comes after the reports; a late report waits for Refresh now.",
       "trigger": "When a new email arrives in a shared mailbox (V2)",
       "concurrency": 1,
       "steps": [
-        { "action": "Create file", "connector": "SharePoint", "fields": { "Folder Path": "the folder of ReportsFolder", "File Name": "the date of today, an underscore and the name of the attachment" }, "forEach": "Attachments" },
-        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "the workspace of README section 4", "Dataset": "SACM-Workbench" } }
+        {
+          "action": "Create file",
+          "connector": "SharePoint",
+          "fields": {
+            "Folder Path": "the folder of ReportsFolder",
+            "File Name": "the date of today, an underscore and the name of the attachment"
+          },
+          "forEach": "Attachments"
+        }
       ]
     },
     {
       "id": "F3",
       "name": "SACM - File replies",
-      "purpose": "File each reply to a SACM message that comes to the shared mailbox (its subject holds [SACM-…]) in the list SACM Replies, then refresh the report.",
+      "purpose": "File each reply to a SACM message that comes to the shared mailbox (its subject holds [SACM-…]) in the list SACM Replies, then refresh the report through the gate of F5 (D333): when the window of now is used, the reply waits for the next refresh (the app SACM actions reads it from the list at once).",
       "trigger": "When a new email arrives in a shared mailbox (V2)",
-      "triggerFields": { "Subject Filter": "[SACM-", "Include Attachments": "No" },
+      "triggerFields": {
+        "Subject Filter": "[SACM-",
+        "Include Attachments": "No"
+      },
       "concurrency": 1,
       "steps": [
-        { "action": "Html to text", "connector": "Content Conversion", "fields": { "Content": "the Body of the email" } },
-        { "action": "Create item", "connector": "SharePoint", "fields": { "List Name": "SACM Replies", "Title": "the reference in the subject: the text from [SACM- to the next ]", "From": "the From of the email", "Received": "the Received Time of the email", "Subject": "the Subject of the email", "Body": "the text of the step Html to text", "ConversationId": "the Conversation Id of the email" } },
-        { "action": "Refresh a dataset", "connector": "Power BI", "fields": { "Workspace": "the workspace of README section 4", "Dataset": "SACM-Workbench" } }
+        {
+          "action": "Html to text",
+          "connector": "Content Conversion",
+          "fields": {
+            "Content": "the Body of the email"
+          }
+        },
+        {
+          "action": "Create item",
+          "connector": "SharePoint",
+          "fields": {
+            "List Name": "SACM Replies",
+            "Title": "the reference in the subject: the text from [SACM- to the next ]",
+            "From": "the From of the email",
+            "Received": "the Received Time of the email",
+            "Subject": "the Subject of the email",
+            "Body": "the text of the step Html to text",
+            "ConversationId": "the Conversation Id of the email"
+          }
+        },
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "fields": {
+            "Name": "Now",
+            "Inputs": "convertFromUtc(utcNow(), '<the time zone of the team>')"
+          }
+        },
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "fields": {
+            "Name": "Minutes",
+            "Inputs": "add(mul(int(formatDateTime(outputs('Now'), 'HH')), 60), int(formatDateTime(outputs('Now'), 'mm')))"
+          }
+        },
+        {
+          "action": "Condition",
+          "connector": "Control",
+          "fields": {
+            "Name": "Open",
+            "Expression": "and(greaterOrEquals(outputs('Minutes'), 480), less(outputs('Minutes'), 1080))"
+          }
+        },
+        {
+          "action": "Compose",
+          "connector": "Data Operation",
+          "if": "Open is Yes",
+          "fields": {
+            "Name": "Window",
+            "Inputs": "concat(formatDateTime(outputs('Now'), 'yyyy-MM-dd'), ' ', formatDateTime(addMinutes(startOfDay(outputs('Now')), add(480, mul(div(sub(outputs('Minutes'), 480), 120), 120))), 'HH:mm'))"
+          }
+        },
+        {
+          "action": "Create item",
+          "connector": "SharePoint",
+          "if": "Open is Yes",
+          "fields": {
+            "List Name": "SACM Refreshes",
+            "Title": "=output Window",
+            "By": "reply",
+            "Source": "reply"
+          }
+        },
+        {
+          "action": "Refresh a dataset",
+          "connector": "Power BI",
+          "if": "Create item in SACM Refreshes is successful",
+          "fields": {
+            "Workspace": "My workspace",
+            "Dataset": "SACM-Workbench"
+          }
+        },
+        {
+          "action": "Terminate",
+          "connector": "Control",
+          "if": "Create item in SACM Refreshes has failed",
+          "fields": {
+            "Status": "Succeeded"
+          }
+        }
       ]
     }
   ]
