@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { loadPackFiles } from '../../../src/hosts/cli.ts';
 import { mText, queries, readingRules, staleQueries, theme, THEME_FILE } from '../../../tools/powerbi/generate.ts';
 import { lightColours } from '../../../tools/powerbi/tokens.ts';
-import { readExpressions, readTables } from '../../../tools/powerbi/tmdl.ts';
+import { queryColumns, readExpressions, readTables } from '../../../tools/powerbi/tmdl.ts';
 import { evaluatedNames, PARITY_QUERIES } from '../../../tools/powerbi/connector.ts';
 import { UNIT_PAGE_SIZE, unitCases, unitQuery, unitQueryNames } from '../../../tools/powerbi/units.ts';
 
@@ -47,7 +47,7 @@ test('every table reads from its own query <Table>Rows or is a part of Run, and 
     // A calculated table (D284) takes its rows from Run: its part, its columns in order.
     if (table.partitionKind === 'calculated') {
       assert.equal(table.calculated!.part, table.name);
-      assert.deepEqual(table.calculated!.columns, table.columns.map((column) => [column.name, `${table.name}.${column.name}`]));
+      assert.deepEqual(table.calculated!.columns, queryColumns(table).map((column) => [column.name, `${table.name}.${column.name}`]));
       continue;
     }
     // HistoryRun names RangeStart and RangeEnd itself: Power BI Desktop refuses its refresh policy otherwise (D290).

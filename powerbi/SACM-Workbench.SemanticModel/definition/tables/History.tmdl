@@ -412,21 +412,19 @@ table History
 	measure 'Overview trend note' = IF ( [Report dates] + 0 < 2, "One CI report so far: the lines show from the second.", "Each CI report date: the lines that wait for a person, and the ones SACM fixes itself." )
 		displayFolder: Page notes
 
-	/// A column of Found and closed (Audit): the new findings of a CI report date in the period chosen.
+	/// A column of Found and closed per week (Audit): the new findings of the CI report dates of the week (or of one date) in the period chosen.
 	measure 'Found in the period' =
-			VAR d = MAX ( Runs[ReportDate] )
 			VAR fromDate = [Period from]
 			VAR toDate = [Period to]
-			RETURN IF ( d >= fromDate && d <= toDate, [New] )
+			RETURN SUMX ( FILTER ( VALUES ( Runs[ReportDate] ), Runs[ReportDate] >= fromDate && Runs[ReportDate] <= toDate ), [New] )
 		formatString: #,0
 		displayFolder: Audit
 
-	/// A column of Found and closed (Audit): the findings a CI report date of the period verified as solved.
+	/// A column of Found and closed per week (Audit): the findings the CI report dates of the week in the period verified as solved.
 	measure 'Closed in the period' =
-			VAR d = MAX ( Runs[ReportDate] )
 			VAR fromDate = [Period from]
 			VAR toDate = [Period to]
-			RETURN IF ( d >= fromDate && d <= toDate, [Solved] )
+			RETURN SUMX ( FILTER ( VALUES ( Runs[ReportDate] ), Runs[ReportDate] >= fromDate && Runs[ReportDate] <= toDate ), [Solved] )
 		formatString: #,0
 		displayFolder: Audit
 
@@ -446,7 +444,7 @@ table History
 		displayFolder: Audit
 
 	/// Under the title of Found and closed (Audit).
-	measure 'Found closed note' = IF ( [Report dates] + 0 < 2, "One CI report so far: found and closed show from the second.", "Each CI report date of the period: the new findings, and the ones it verified as solved." )
+	measure 'Found closed note' = IF ( [Report dates] + 0 < 2, "One CI report so far: found and closed show from the second.", "Each week of the period: the new findings of its CI reports, and the ones they verified as solved." )
 		displayFolder: Page notes
 
 	column ReportDate

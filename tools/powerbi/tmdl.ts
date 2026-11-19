@@ -12,7 +12,8 @@ import { join } from 'node:path';
 export const MODEL = join(import.meta.dirname, '..', '..', 'powerbi', 'SACM-Workbench.SemanticModel', 'definition');
 
 export interface Expression { name: string; m: string; description: string; queryGroup: string }
-export interface Column { name: string; dataType: string; sourceColumn: string; formatString?: string }
+/** A column of a table; a calculated column (build D3: `column Step = …`) has its DAX and no source column of the query. */
+export interface Column { name: string; dataType: string; sourceColumn: string; formatString?: string; dax?: string }
 export interface Measure { name: string; dax: string }
 export interface Table { name: string; file: string; columns: Column[]; measures: Measure[]; partitionM: string; partitionKind: string; dax?: string; calculated?: Calculated }
 /**
@@ -108,9 +109,10 @@ export function readTable(file: string): Table {
   const table: Table = { name: unquote(head.slice(6).trim()), file, columns: [], measures: [], partitionM: '', partitionKind: '' };
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
-    const column = /^\tcolumn\s+('(?:[^']|'')*'|\S+)\s*$/.exec(line);
+    const column = /^\tcolumn\s+('(?:[^']|'')*'|[^\s=]+)\s*(=.*)?$/.exec(line);
     if (column) {
       const name = unquote(column[1]!);
+      const dax = column[2] === undefined ? undefined : valueAt(lines, i, 1).text;
       let dataType = '';
       let sourceColumn = '';
       let formatString = '';
@@ -122,7 +124,7 @@ export function readTable(file: string): Table {
       }
       // A column of a calculated table names its DAX column in brackets: sourceColumn: [Key].
       const bare = /^\[(.*)\]$/.exec(sourceColumn)?.[1] ?? sourceColumn;
-      table.columns.push({ name, dataType, sourceColumn: bare || name, ...(formatString ? { formatString } : {}) });
+      table.columns.push({ name, dataType, sourceColumn: bare || name, ...(formatString ? { formatString } : {}), ...(dax === undefined ? {} : { dax }) });
       continue;
     }
     const partition = /^\tpartition\s+('(?:[^']|'')*'|\S+)\s*=\s*(\w+)\s*$/.exec(line);
@@ -136,6 +138,12 @@ export function readTable(file: string): Table {
   }
   return table;
 }
+
+/** The columns a table's query or calculated table gives: every column but the calculated ones. */
+export const queryColumns = (table: Table): Column[] => table.columns.filter((column) => column.dax === undefined);
+
+/** The DAX of a table: its measures and its calculated columns, by name. */
+export const daxParts = (table: Table): Measure[] => [...table.measures, ...table.columns.flatMap((column) => (column.dax === undefined ? [] : [{ name: column.name, dax: column.dax }]))];
 
 /** Every table of tables/, sorted by file name. */
 export function readTables(folder = join(MODEL, 'tables')): Table[] {

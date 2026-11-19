@@ -19,6 +19,9 @@ The types named here are in the code: `src/core/model/model.ts` (CI, check, find
 | **Power BI report** | The Power BI version of the Workbench in `powerbi/` (D268), built in builds B1 to B8 of the plan | In the repository; published to the team's workspace |
 | **Next step** | What the team does next with one person, in the order of the team's rules: read their reply, escalate, send a reminder, ask them (new lines). Then they wait: asked, or marked fixed. My day lists the next steps of today, one line per person (D320) | No: worked out at each refresh |
 | **Work queue** | The page of the Power BI report with every open line, one line per person asked (D320). In the HTML app the same work is on *My work* | No |
+| **People** | The page of the Power BI report with one line per person who has open lines, in the order of the team's rules (D321). *Kinds of problem* there are the cards (checks) of their open lines | No |
+| **Overview** | The page of the Power BI report with the state of the CMDB for the lead: the open, waiting and solved lines, where the work sits, who holds the most (D321) | No |
+| **Kind of event** | The group of an event of the journal on *What happened* (History): Emails, Replies, Reminders, Status, Assigned, Reports, Notes, Not followed, Reviews, Other (`Activity[Kind]`, D321, D325). Not a kind of problem (a check) | No |
 | **Sample mode** | The Power BI report reading the invented samples packed in its model; *SharePoint mode* reads the team's reports folder. The parameter `SourceMode` (D271) | A parameter of the report |
 | **Self-check** | The page of the Power BI report that compares its result on the samples with the recorded result of the HTML app (`tests/recorded/`, D270) | No, worked out on each refresh |
 | **Priority** | A check field: `daily` (the default) or `later`, work to clarify when there is time (D182) | In the check file |

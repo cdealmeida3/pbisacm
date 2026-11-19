@@ -23,11 +23,11 @@
                       "Entity": "Activity"
                     }
                   },
-                  "Property": "What"
+                  "Property": "Find"
                 }
               },
-              "queryRef": "Activity.What",
-              "nativeQueryRef": "What",
+              "queryRef": "Activity.Find",
+              "nativeQueryRef": "Find",
               "active": true
             }
           ]
@@ -41,7 +41,7 @@
             "placeholder": {
               "expr": {
                 "Literal": {
-                  "Value": "'Find a CI, a person or a card'"
+                  "Value": "'Find a CI, a person, a card or a reference'"
                 }
               }
             },
@@ -72,7 +72,7 @@
             "placeholder": {
               "expr": {
                 "Literal": {
-                  "Value": "'Find a CI, a person or a card'"
+                  "Value": "'Find a CI, a person, a card or a reference'"
                 }
               }
             },
@@ -116,7 +116,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Find a CI, a person or a card'"
+                  "Value": "'Find a CI, a person, a card or a reference'"
                 }
               }
             }
@@ -215,7 +215,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "whatNotBlank",
+        "name": "findNotBlank",
         "field": {
           "Column": {
             "Expression": {
@@ -223,7 +223,7 @@
                 "Entity": "Activity"
               }
             },
-            "Property": "What"
+            "Property": "Find"
           }
         },
         "type": "Categorical",
@@ -250,7 +250,7 @@
                                 "Source": "f"
                               }
                             },
-                            "Property": "What"
+                            "Property": "Find"
                           }
                         }
                       ],

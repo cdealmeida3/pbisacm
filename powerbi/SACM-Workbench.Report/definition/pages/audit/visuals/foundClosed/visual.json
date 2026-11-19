@@ -23,12 +23,12 @@
                       "Entity": "Runs"
                     }
                   },
-                  "Property": "ReportDate"
+                  "Property": "Week"
                 }
               },
-              "queryRef": "Runs.ReportDate",
-              "nativeQueryRef": "ReportDate",
-              "displayName": "CI report",
+              "queryRef": "Runs.Week",
+              "nativeQueryRef": "Week",
+              "displayName": "Week of",
               "active": true
             }
           ]
@@ -78,7 +78,7 @@
                     "Entity": "Runs"
                   }
                 },
-                "Property": "ReportDate"
+                "Property": "Week"
               }
             },
             "direction": "Ascending"
@@ -167,7 +167,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Found and closed per CI report of the period'"
+                  "Value": "'Found and closed per week of the period'"
                 }
               }
             }
@@ -187,7 +187,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Found and closed per CI report'"
+                  "Value": "'Found and closed per week'"
                 }
               }
             }

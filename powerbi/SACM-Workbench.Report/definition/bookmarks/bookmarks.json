@@ -15,7 +15,7 @@
       "children": [
         "cardLines",
         "cardFixList",
-        "cardProblems",
+        "cardToCheck",
         "cardExport"
       ]
     },

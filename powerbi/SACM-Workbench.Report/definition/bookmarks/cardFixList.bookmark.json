@@ -6,7 +6,7 @@
     "targetVisualNames": [
       "lines",
       "fixList",
-      "problems",
+      "toCheck",
       "export"
     ],
     "applyOnlyToTargetVisuals": true,
@@ -32,7 +32,7 @@
               "visualType": "tableEx"
             }
           },
-          "problems": {
+          "toCheck": {
             "singleVisual": {
               "visualType": "tableEx",
               "display": {

@@ -81,7 +81,7 @@ test('the list of the pages: the drill-through pages, Self-check and the parts o
   const pages = pageList();
   assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['auditexport', 'auditfollow', 'auditrecord', 'auditreview', 'card', 'case', 'person', 'selfcheck']);
   assert.deepEqual(pages.filter((page) => page.drillThrough).map((page) => page.name).sort(), ['card', 'case', 'person']);
-  assert.deepEqual(pages.find((page) => page.name === 'card')?.tabs, ['SACM fix list', 'By kind of problem', 'Export'], 'the picture step presses each tab after the first');
+  assert.deepEqual(pages.find((page) => page.name === 'card')?.tabs, ['SACM fix list', 'To check', 'Export'], 'the picture step presses each tab after the first');
   for (const page of pages) assert.equal(page.width, 1280, page.name);
 });
 

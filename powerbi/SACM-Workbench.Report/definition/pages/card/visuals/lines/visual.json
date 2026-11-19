@@ -4,10 +4,10 @@
   "position": {
     "x": 224,
     "y": 136,
-    "z": 4500,
+    "z": 4400,
     "height": 568,
     "width": 720,
-    "tabOrder": 4500
+    "tabOrder": 4400
   },
   "visual": {
     "visualType": "tableEx",
@@ -15,6 +15,21 @@
       "queryState": {
         "Values": {
           "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "AskWho"
+                }
+              },
+              "queryRef": "Findings.AskWho",
+              "nativeQueryRef": "AskWho",
+              "displayName": "Person"
+            },
             {
               "field": {
                 "Column": {
@@ -68,27 +83,12 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "StateLabel"
+                  "Property": "Problem"
                 }
               },
-              "queryRef": "Findings.StateLabel",
-              "nativeQueryRef": "StateLabel",
-              "displayName": "State"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "AskWho"
-                }
-              },
-              "queryRef": "Findings.AskWho",
-              "nativeQueryRef": "AskWho",
-              "displayName": "Asked"
+              "queryRef": "Findings.Problem",
+              "nativeQueryRef": "Problem",
+              "displayName": "Kind"
             },
             {
               "field": {
@@ -137,9 +137,35 @@
               }
             },
             "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Findings"
+                  }
+                },
+                "Property": "Problem"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Findings"
+                  }
+                },
+                "Property": "CiName"
+              }
+            },
+            "direction": "Ascending"
           }
         ],
-        "isDefaultSort": true
+        "isDefaultSort": false
       }
     },
     "objects": {
@@ -187,62 +213,6 @@
             }
           },
           "selector": {
-            "metadata": "Findings.CiName"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "80D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.ClassLabel"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "164D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.Detail"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "64D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.StateLabel"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "88D"
-                }
-              }
-            }
-          },
-          "selector": {
             "metadata": "Findings.AskWho"
           }
         },
@@ -257,6 +227,62 @@
             }
           },
           "selector": {
+            "metadata": "Findings.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "72D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ClassLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "150D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Detail"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "72D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Problem"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "98D"
+                }
+              }
+            }
+          },
+          "selector": {
             "metadata": "Findings.StateWhy"
           }
         },
@@ -265,7 +291,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "80D"
+                  "Value": "84D"
                 }
               }
             }
@@ -290,7 +316,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Lines of the card'"
+                  "Value": "'To solve with a person'"
                 }
               }
             }
@@ -337,5 +363,66 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "notToCheck",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Findings"
+              }
+            },
+            "Property": "State"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f",
+              "Entity": "Findings",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "f"
+                              }
+                            },
+                            "Property": "State"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "'review'"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

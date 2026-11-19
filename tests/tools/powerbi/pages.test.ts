@@ -84,6 +84,10 @@ test('a custom visual, too many visuals, a visual over the place of a Power App,
   assert.ok(pageProblems(page(many), catalogue).some((line) => /not a native visual/.test(line)));
   const messages: ReportPages = { order: ['messages'], pages: [{ page: { name: 'messages', displayName: 'Messages', width: 1280, height: 720, displayOption: 'FitToPage' }, visuals: [table('wide', { x: 224, y: 84, width: 1032, height: 300 }, [200, 200])] }] };
   assert.ok(pageProblems(messages, catalogue).some((line) => /over the place of the Power Apps visual SACM messages/.test(line)));
+  // The Power App placed by hand in the slot of a page counts: 12 visuals and the app are 13.
+  const twelve = Array.from({ length: 12 }, (_, index) => table(`t${index}`, { x: 224, y: 84 + index * 52, width: 508, height: 48 }, [200, 200]));
+  const withApp: ReportPages = { order: ['messages'], pages: [{ page: { name: 'messages', displayName: 'Messages', width: 1280, height: 720, displayOption: 'FitToPage' }, visuals: twelve }] };
+  assert.ok(pageProblems(withApp, catalogue).some((line) => /13 visuals with the Power App placed by hand/.test(line)));
   const card: ReportPages = { order: ['backlog', 'card'], pages: [page([]).pages[0]!, { page: { name: 'card', displayName: 'Card', width: 1280, height: 720, displayOption: 'FitToPage', pageBinding: { type: 'Drillthrough' } }, visuals: [] }] };
   assert.ok(pageProblems(card, catalogue).some((line) => /hidden from the team's tabs/.test(line)));
 });
@@ -98,13 +102,13 @@ test('the theme sets only formatting Power BI has; a matrix has no total row of 
 test('tabs: two tables at one place on two tabs are fine; a tab that sets filters, a wrong first tab or no navigator is a problem', () => {
   const navigator: Visual = { name: 'tabs', position: { x: 224, y: 84, width: 300, height: 40 }, visual: { visualType: 'bookmarkNavigator', objects: { bookmarks: [{ properties: { bookmarkGroup: lit("'backlogTabs'") } }] } } };
   const lines = table('lines', { x: 224, y: 136, width: 508, height: 300 }, [200, 200]);
-  const other = { ...table('other', { x: 224, y: 136, width: 508, height: 300 }, [200, 200]), isHidden: true } as Visual;
+  const other: Visual = { ...table('other', { x: 224, y: 136, width: 508, height: 300 }, [200, 200]), isHidden: true };
   const tabGroups = (onlyDisplay: boolean): ReportPages['tabGroups'] => [{
     name: 'backlogTabs', page: 'backlog',
-    tabs: [{ name: 'a', targets: ['lines', 'other'], shown: ['lines'], onlyDisplay }, { name: 'b', targets: ['lines', 'other'], shown: ['other'], onlyDisplay }]
+    tabs: [{ name: 'a', label: 'A', targets: ['lines', 'other'], shown: ['lines'], onlyDisplay }, { name: 'b', label: 'B', targets: ['lines', 'other'], shown: ['other'], onlyDisplay }]
   }];
   assert.deepEqual(pageProblems({ ...page([navigator, lines, other]), tabGroups: tabGroups(true) }, catalogue), []);
-  const problems = pageProblems({ ...page([lines, { ...other, isHidden: false } as Visual]), tabGroups: tabGroups(false) }, catalogue).join('\n');
+  const problems = pageProblems({ ...page([lines, { ...other, isHidden: false }]), tabGroups: tabGroups(false) }, catalogue).join('\n');
   assert.match(problems, /must change only what its visuals show/);
   assert.match(problems, /other shows, but the first tab hides it/);
   assert.match(problems, /no bookmark navigator/);

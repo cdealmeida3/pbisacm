@@ -1,8 +1,10 @@
-// Table Activity (the Activity page, D293): every event of the journal in words, newest first, as the app's Activity
-// page says it (src/app/view/activity.ts, describeEvent): What it did, By who, Text (the reason, the note, how a message
-// left), the cards it touched (every name up to three, else "4 cards") and the number of CIs. One line per row of the
-// list: a reminder with new points is two rows (the app shows it once). Every email of the shared mailbox counts as sent
-// (the outbox is the app's, D162).
+// Table Activity (the tab What happened of History, D293, D321): every event of the journal in words, newest first, as the
+// app's Activity page says it (src/app/view/activity.ts, describeEvent): What it did, By who, Text (the reason, the note,
+// how a message left), the cards it touched (every name up to three, else "4 cards") and the number of CIs. One line per
+// row of the list: a reminder with new points is two rows (the app shows it once). Every email of the shared mailbox
+// counts as sent (the outbox is the app's, D162). Since build D3 also every reply of the list SACM Replies that has a time
+// (Kind Replies: who wrote, the subject, the cards of the messages it answers), and Find: the words the search box of
+// History looks in (what, the cards, the text, who).
 let
     labels = Record.FromList(ChecksRows[CardLabel], ChecksRows[CheckId]),
     labelOf = (id as text) as text => Record.FieldOrDefault(labels, id, id),
@@ -58,6 +60,23 @@ let
                 if event[ByName] <> "" then event[ByName] else event[By], said[Text], cardWords(checks),
                 List.Count(List.Distinct(List.Select(List.Transform(event[Keys], ciOf), (key) => key <> ""))), List.Count(event[Keys]), kindOf(said[Icon])
             },
-    lines = List.Transform(List.Reverse(JournalEvents), line)
+    // The keys of the messages of each reference: a reply touches the cases of the message it answers.
+    asked = List.Select(JournalEvents, (event) => event[Type] = "message" and event[Ref] <> ""),
+    keysByRef = let grouped = Table.Group(Table.FromRows(List.Transform(asked, (event) => {event[Ref], event[Keys]}), type table [Ref = text, Keys = list]),
+        {"Ref"}, {{"Keys", (rows) => List.Distinct(List.Combine(rows[Keys])), type list}}) in Record.FromList(grouped[Keys], grouped[Ref]),
+    reply = (item as record) as list =>
+        let
+            keys = Record.FieldOrDefault(keysByRef, item[Ref], {}),
+            at = DateTime.FromText(item[Received], [Format = "yyyy-MM-ddTHH:mm:ss", Culture = "en-US"])
+        in
+            {
+                "reply|" & item[Ref] & "|" & item[Received], at, Date.From(at), "reply", "reply", "Reply from " & item[From], item[From], item[Subject],
+                cardWords(List.Transform(keys, checkOf)), List.Count(List.Distinct(List.Select(List.Transform(keys, ciOf), (key) => key <> ""))), List.Count(keys), "Replies"
+            },
+    replies = List.Transform(List.Select(ReplyItems, (item) => item[Received] <> ""), reply),
+    lines = List.Transform(List.Reverse(JournalEvents), line) & replies,
+    withFind = List.Transform(lines, (row) => row & {Text.Combine(List.Select({row{5}, row{8}, row{7}, row{6}}, (part) => part <> ""), " · ")})
 in
-    #table(type table [Id = text, At = datetime, Day = date, Type = text, Icon = text, What = text, By = text, Text = text, Cards = text, CIs = Int64.Type, Keys = Int64.Type, Kind = text], lines)
+    Table.Sort(
+        #table(type table [Id = text, At = datetime, Day = date, Type = text, Icon = text, What = text, By = text, Text = text, Cards = text, CIs = Int64.Type, Keys = Int64.Type, Kind = text, Find = text], withFind),
+        {{"At", Order.Descending}, {"Id", Order.Descending}})

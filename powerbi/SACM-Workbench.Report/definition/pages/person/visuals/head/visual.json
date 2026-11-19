@@ -6,7 +6,7 @@
     "y": 16,
     "z": 4200,
     "height": 56,
-    "width": 388,
+    "width": 528,
     "tabOrder": 4200
   },
   "visual": {
@@ -28,7 +28,7 @@
               },
               "queryRef": "Findings.Person title",
               "nativeQueryRef": "Person title",
-              "displayName": "The person"
+              "displayName": "The person and the next step with them"
             }
           ]
         }
@@ -205,6 +205,55 @@
                   }
                 }
               }
+            },
+            "textWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
+          }
+        }
+      ],
+      "image": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "imageType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'imageData'"
+                }
+              }
+            },
+            "imageData": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "State chip"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Right'"
+                }
+              }
             }
           },
           "selector": {
@@ -220,7 +269,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'The person'"
+                  "Value": "'The person and the next step with them'"
                 }
               }
             }

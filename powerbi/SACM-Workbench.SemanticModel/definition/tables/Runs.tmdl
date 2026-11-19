@@ -101,6 +101,12 @@ table Runs
 		isNameInferred
 		sourceColumn: [ContractFile]
 
+	/// The Monday of the week of the CI report date (Found and closed per week, Audit; build D3).
+	column Week = Runs[ReportDate] - WEEKDAY ( Runs[ReportDate], 2 ) + 1
+		dataType: dateTime
+		formatString: d mmm
+		summarizeBy: none
+
 	partition Runs = calculated
 		mode: import
 		source =

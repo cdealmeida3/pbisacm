@@ -48,7 +48,7 @@
             "columnCount": {
               "expr": {
                 "Literal": {
-                  "Value": "9L"
+                  "Value": "10L"
                 }
               }
             }

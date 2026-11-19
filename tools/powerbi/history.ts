@@ -263,14 +263,19 @@ export function exceptionRows(key: HistoryKey): Array<Record<string, string | nu
   }));
 }
 
-/** The lines of the table Activity: every journal row in words, newest first. Every mailbox email counts as sent. */
+/**
+ * The lines of the table Activity: every journal row in words, then every reply of the list SACM Replies with a time
+ * (build D3: who wrote, the subject, the cards of the messages it answers), newest first. Every mailbox email counts as
+ * sent. Find holds the words the search box of History looks in.
+ */
 export function activityRows(packs = loadPacks()): Array<Record<string, string | number>> {
   const events = sampleEvents().sort((a, b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id)).reverse();
   const label = new Map(packs.map((pack) => [pack.id, pack.cardLabel ?? pack.title]));
   const sent = new Set(events.map((event) => event.text ?? ''));
   const checkOf = (id: string): string => (id.includes(':') ? id.slice(0, id.indexOf(':')) : id);
   const ciOf = (id: string): string => { const first = id.indexOf(':'); const last = id.lastIndexOf(':'); return first < 0 || last <= first ? '' : id.slice(first + 1, last); };
-  return events.map((event) => {
+  const find = (row: Record<string, string | number>): string => [row.What, row.Cards, row.Text, row.By].filter((part) => part !== '').join(' · ');
+  const journal = events.map((event) => {
     const line = describeEvent(event, sent);
     const checks = event.keys.map(checkOf).concat(!event.keys.length && event.checkId && event.checkId !== '*' ? [event.checkId] : []);
     return {
@@ -278,6 +283,19 @@ export function activityRows(packs = loadPacks()): Array<Record<string, string |
       Cards: cardWords(checks.map((id) => label.get(id) ?? id)), CIs: new Set(event.keys.map(ciOf).filter(Boolean)).size, Keys: event.keys.length
     };
   });
+  const keysByRef = new Map<string, string[]>();
+  for (const event of sampleEvents()) {
+    if (event.type !== 'message' || !event.ref) continue;
+    keysByRef.set(event.ref, Array.from(new Set([...(keysByRef.get(event.ref) ?? []), ...event.keys])));
+  }
+  const replies = sampleReplies().filter((reply) => reply.received !== '').map((reply) => {
+    const keys = keysByRef.get(reply.ref) ?? [];
+    return {
+      Id: `reply|${reply.ref}|${reply.received}`, At: reply.received, Type: 'reply', Icon: 'reply', What: `Reply from ${reply.from}`, By: reply.from, Text: reply.subject,
+      Cards: cardWords(keys.map(checkOf).map((id) => label.get(id) ?? id)), CIs: new Set(keys.map(ciOf).filter(Boolean)).size, Keys: keys.length
+    };
+  });
+  return [...journal, ...replies].map((row) => ({ ...row, Find: find(row) }));
 }
 
 /** The rows of the part History of HistoryRun: every finding of every report date. */

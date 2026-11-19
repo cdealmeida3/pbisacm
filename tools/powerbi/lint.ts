@@ -27,7 +27,7 @@ import { join, relative } from 'node:path';
 import * as PQP from '@microsoft/powerquery-parser';
 import Ajv from 'ajv';
 import type { AnySchema } from 'ajv';
-import { MODEL, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
+import { daxParts, MODEL, queryColumns, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
 import { EXPECTED_HISTORY, staleQueries, THEME_FILE } from './generate.ts';
 import { lightColours } from './tokens.ts';
 import { connectorSource } from './connector.ts';
@@ -142,7 +142,7 @@ const visit = (value: unknown, where: string): void => {
 };
 for (const file of filesUnder(join(REPORT, 'definition'), /visual\.json$/)) visit(JSON.parse(readFileSync(file, 'utf8')), relative(root, file));
 for (const table of tables) {
-  for (const measure of table.measures) {
+  for (const measure of daxParts(table)) {
     // A column a measure makes itself (ADDCOLUMNS ( …, "@days", … )) is named with @ and read as [@days].
     const made = new Set(Array.from(measure.dax.matchAll(/"(@[^"]+)"/g), (match) => match[1]!));
     const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
@@ -176,7 +176,7 @@ const DAX_KEYWORDS = ['define', 'evaluate', 'order', 'by', 'start', 'at', 'retur
 const daxCatalog = JSON.parse(readFileSync(join(root, '.claude', 'skills', 'dax-reference', 'generated', 'catalog.json'), 'utf8')) as { functions: Array<{ name: string }> };
 const kept = new Set([...DAX_KEYWORDS, ...daxCatalog.functions.map((entry) => entry.name.toLowerCase()), ...tables.map((table) => table.name.toLowerCase())]);
 for (const table of tables) {
-  for (const measure of table.measures) {
+  for (const measure of daxParts(table)) {
     const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
     const names = new Set<string>();
     for (const match of dax.matchAll(/\bVAR\s+([A-Za-z_][A-Za-z0-9_]*)/gi)) {
@@ -269,7 +269,7 @@ const madeBy: Record<string, string> = { Run: 'RunRows', HistoryRun: 'fnHistoryR
 for (const table of calculatedTables) {
   const { source, part, columns: taken } = table.calculated!;
   if (!partsOf(madeBy[source]!).has(part)) problems.push(`Run: table ${table.name} takes the part "${part}", which ${madeBy[source]} does not make`);
-  const want = table.columns.map((column) => column.name).join(', ');
+  const want = queryColumns(table).map((column) => column.name).join(', ');
   if (taken.map(([name]) => name).join(', ') !== want) problems.push(`Run: table ${table.name} takes the columns [${taken.map(([name]) => name).join(', ')}], its TMDL file declares [${want}]`);
   for (const [name, column] of taken) if (column !== `${part}.${name}`) problems.push(`Run: table ${table.name} takes ${name} from ${source}[${column}], not ${source}[${part}.${name}]`);
 }

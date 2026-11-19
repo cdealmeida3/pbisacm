@@ -332,6 +332,11 @@ table Checks
 		dataType: string
 		sourceColumn: Kind
 
+	/// The state of the card for the filter of All cards (build D3): the measure Card state at the refresh, with All marked as fixed counted as To solve. The buttons sort it from the last word down: To solve, To check, OK, Not tested.
+	column CardState = VAR state = [Card state] RETURN IF ( state = "All marked as fixed", "To solve", state )
+		dataType: string
+		summarizeBy: none
+
 	partition Checks = m
 		mode: import
 		source = ChecksRows

@@ -3,7 +3,8 @@
 // powerbi/SACM-Workbench.Report/definition/ and Microsoft's schema of report themes, which lists every formatting
 // property of every visual type:
 //   1. Every page is 1280 × 720 and fits the page (a page of GRID.tallest may be taller and fits the width).
-//   2. At most 12 visuals on a page (the rail counts as one); at most one Power Apps visual, and none on the first page.
+//   2. At most 12 visuals on a page (the rail counts as one, the Power App of the page's slot counts too); at most one
+//      Power Apps visual, and none on the first page.
 //   3. Native visuals only (D311): no custom visual, no R or Python visual, no picture from the web.
 //   4. The grid: every place and size on the 4 px grid, inside the page, inside the content frame (the rail apart),
 //      no two visuals over each other, and none over the place a Power Apps visual is set by hand (APP_SLOTS).
@@ -32,6 +33,8 @@ interface Entry { properties?: Record<string, Literal & Record<string, unknown>>
 interface Projection { queryRef: string; displayName?: string; field: Record<string, { Property?: string }> }
 export interface Visual {
   name: string;
+  /** Hidden when the page opens (a tab that is not the first, D323). */
+  isHidden?: boolean;
   position: { x: number; y: number; width: number; height: number };
   visual?: {
     visualType: string;
@@ -42,11 +45,12 @@ export interface Visual {
 }
 export interface Page { name: string; displayName: string; width: number; height: number; displayOption?: string; visibility?: string; pageBinding?: { type?: string } }
 /** A group of bookmarks that are the tabs of a page: each tab shows some of the targets and hides the others. */
-export interface TabGroup { name: string; page: string; tabs: Array<{ name: string; targets: string[]; shown: string[]; onlyDisplay: boolean }> }
+export interface TabGroup { name: string; page: string; tabs: Array<{ name: string; label: string; targets: string[]; shown: string[]; onlyDisplay: boolean }> }
 export interface ReportPages { order: string[]; pages: Array<{ page: Page; visuals: Visual[] }>; tabGroups?: TabGroup[] }
 
 interface BookmarkFile {
   name: string;
+  displayName: string;
   options?: { targetVisualNames?: string[]; applyOnlyToTargetVisuals?: boolean; suppressData?: boolean };
   explorationState: { activeSection: string; sections: Record<string, { visualContainers: Record<string, { singleVisual?: { display?: { mode?: string } } }> }> };
 }
@@ -66,6 +70,7 @@ export function readTabGroups(definition = REPORT_DEFINITION): TabGroup[] {
         const states = file.explorationState.sections[page]?.visualContainers ?? {};
         return {
           name: file.name,
+          label: file.displayName,
           targets,
           shown: targets.filter((target) => states[target]?.singleVisual?.display?.mode !== 'hidden'),
           onlyDisplay: file.options?.applyOnlyToTargetVisuals === true && file.options?.suppressData === true && file.explorationState.activeSection === page
@@ -160,9 +165,11 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     if (index === 0 && page.visibility === 'HiddenInViewMode') problems.push(`${where}: the first page is hidden`);
     // 2. How many.
     // The navy rail and what is on it (its picture, buttons, counts and foot line, tools/powerbi/rail.ts) count as one.
-    const counted = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name)).length + (visuals.some((visual) => RAIL_VISUAL.test(visual.name)) ? 1 : 0);
-    if (counted > GRID.maxVisuals) problems.push(`${where}: ${counted} visuals, more than ${GRID.maxVisuals} (design pass §8.1)`);
+    // The Power App of the page's slot counts too: Carlos places it by hand, so it is not in the files (build D3).
     const apps = visuals.filter((visual) => /powerapps/i.test(visual.visual?.visualType ?? ''));
+    const handPlaced = APP_SLOTS[page.name] && !apps.length ? 1 : 0;
+    const counted = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name)).length + (visuals.some((visual) => RAIL_VISUAL.test(visual.name)) ? 1 : 0) + handPlaced;
+    if (counted > GRID.maxVisuals) problems.push(`${where}: ${counted} visuals${handPlaced ? ' with the Power App placed by hand' : ''}, more than ${GRID.maxVisuals} (design pass §8.1)`);
     if (apps.length > 1) problems.push(`${where}: ${apps.length} Power Apps visuals; at most one on a page`);
     if (apps.length && index === 0) problems.push(`${where}: a Power Apps visual on the first page; it opens slowly`);
     const slot = APP_SLOTS[page.name];
@@ -220,7 +227,10 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
       if (type === 'tableEx' || type === 'pivotTable') {
         const objects = visual.visual?.objects ?? {};
         if (literal(objects.total?.[0]?.properties?.totals) === 'true') problems.push(`${at}: the total row is on (it adds up text; design pass §2.1)`);
-        for (const name of ['rowSubtotals', 'columnSubtotals']) if (literal(objects.subTotals?.[0]?.properties?.[name]) === 'true') problems.push(`${at}: subtotals are on`);
+        // A matrix may show the total of each row at its right (columnSubtotals, the column Open of the heat map, build D3):
+        // its values are counts. A total row is never on.
+        const allowed = type === 'pivotTable' ? ['columnSubtotals'] : [];
+        for (const name of ['rowSubtotals', 'columnSubtotals']) if (!allowed.includes(name) && literal(objects.subTotals?.[0]?.properties?.[name]) === 'true') problems.push(`${at}: subtotals are on`);
         if (literal(objects.values?.[0]?.properties?.wordWrap) === 'false') problems.push(`${at}: the values do not wrap: a long text is cut`);
       }
       if (type === 'tableEx') {
@@ -249,7 +259,7 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
       for (const target of targets) if (!names.has(target)) problems.push(`${at}: the visual ${target} is not on the page`);
       const first = new Set(group.tabs[0]?.shown ?? []);
       for (const visual of visuals.filter((entry) => targets.has(entry.name))) {
-        const hiddenNow = (visual as Visual & { isHidden?: boolean }).isHidden === true;
+        const hiddenNow = visual.isHidden === true;
         if (first.has(visual.name) === hiddenNow) problems.push(`${at}: ${visual.name} ${hiddenNow ? 'is hidden, but the first tab shows it' : 'shows, but the first tab hides it'}`);
       }
       const navigator = visuals.some((visual) => visual.visual?.visualType === 'bookmarkNavigator' && literal(visual.visual.objects?.bookmarks?.[0]?.properties?.bookmarkGroup) === `'${group.name}'`);

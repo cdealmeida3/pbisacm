@@ -1,12 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
-  "displayName": "Lines",
+  "displayName": "To solve with a person",
   "name": "cardLines",
   "options": {
     "targetVisualNames": [
       "lines",
       "fixList",
-      "problems",
+      "toCheck",
       "export"
     ],
     "applyOnlyToTargetVisuals": true,
@@ -32,7 +32,7 @@
               }
             }
           },
-          "problems": {
+          "toCheck": {
             "singleVisual": {
               "visualType": "tableEx",
               "display": {

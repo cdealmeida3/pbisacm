@@ -1,12 +1,12 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
-  "displayName": "By kind of problem",
-  "name": "cardProblems",
+  "displayName": "To check",
+  "name": "cardToCheck",
   "options": {
     "targetVisualNames": [
       "lines",
       "fixList",
-      "problems",
+      "toCheck",
       "export"
     ],
     "applyOnlyToTargetVisuals": true,
@@ -35,7 +35,7 @@
               }
             }
           },
-          "problems": {
+          "toCheck": {
             "singleVisual": {
               "visualType": "tableEx"
             }

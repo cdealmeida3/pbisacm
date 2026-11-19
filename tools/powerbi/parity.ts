@@ -22,7 +22,7 @@ import { loadPackFiles, loadReferences } from '../../src/hosts/cli.ts';
 import { EARLIER, RECORD_DATE, recordReports, SAMPLE_FILES } from '../../tests/sample-record.ts';
 import { numberArgument, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { pascal } from './generate.ts';
-import { readTables } from './tmdl.ts';
+import { queryColumns, readTables } from './tmdl.ts';
 import { unitCases, unitQueryNames } from './units.ts';
 import { recordSearch } from '../../src/core/cases/record-search.ts';
 import { buildGraph, CLASS_WORDS } from '../../src/core/checks/detectors/relationship-detectors.ts';
@@ -123,7 +123,7 @@ export async function parityProblems(folder: string): Promise<string[]> {
     const first = rows(table.name)[0];
     if (!first) continue;
     const got = Object.keys(first).sort().join(', ');
-    const declared = table.columns.map((column) => column.sourceColumn).sort().join(', ');
+    const declared = queryColumns(table).map((column) => column.sourceColumn).sort().join(', ');
     if (got !== declared) problems.push(`${table.name}: the query gives the columns [${got}], the TMDL file declares [${declared}]`);
   }
 
@@ -344,7 +344,7 @@ export async function parityProblems(folder: string): Promise<string[]> {
   const exceptions = exceptionRows(key);
   problems.push(...compare('Exceptions', withTimes(rows('Exceptions'), ['At']), exceptions, 'Order', Object.keys(exceptions[0] ?? {}).filter((field) => field !== 'Order')));
   const activity = activityRows();
-  problems.push(...compare('Activity', withTimes(rows('Activity'), ['At']), activity, 'Id', ['At', 'Type', 'Icon', 'What', 'By', 'Text', 'Cards', 'CIs', 'Keys']));
+  problems.push(...compare('Activity', withTimes(rows('Activity'), ['At']), activity, 'Id', ['At', 'Type', 'Icon', 'What', 'By', 'Text', 'Cards', 'CIs', 'Keys', 'Find']));
   const journal = stateRows('journal');
   problems.push(...compare('Journal', withTimes(rows('Journal'), ['At']), journal.map((row) => ({ Id: row.Title, At: row.At, Type: row.Type, KeyCount: (row.Keys ?? '').split(/\r?\n/).filter((line) => line.trim()).length, ReviewOn: row.ReviewOn })), 'Id', ['At', 'Type', 'KeyCount', 'ReviewOn']));
   const keyCount = journal.reduce((sum, row) => sum + (row.Keys ?? '').split(/\r?\n/).filter((line) => line.trim()).length, 0);

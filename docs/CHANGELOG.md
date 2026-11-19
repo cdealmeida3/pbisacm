@@ -5,10 +5,11 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 ## 0.48.0 — The Power BI report, the design pass part 3: the work pages (D3)
 
 - **People** (D321): one line per person with open lines, in the order of the team's rules: the next step, a bar of the open lines in the colours of their states, the kinds of problem, the cards and the last time asked. **Find a person** searches the names; **Open person** opens the one selected.
-- **Overview** (from design D): the open lines, the lines waiting on a person and the lines solved since the last report, each with a small line of the last reports; the reports as chips; where the work sits (section by status, darker is more); open lines per report; who holds the most.
-- **Audit** is now the summary of a period (from design D): the CI reports received, the problems found, closed and verified, the median days to an answer, found and closed per CI report, and every escalation. The verification record is its part **Record**.
+- **Overview** (from design D): the open lines, the lines waiting on a person and the lines solved since the last report, each with a small line of the last reports; the reports as chips; where the work sits (section by next step: new, asked, reminder due, escalate, reply to read, SACM fixes, with the total of each section; darker is more); open lines per report; who holds the most.
+- **Audit** is now the summary of a period (from design D): the CI reports received, the problems found, closed and verified, the median days to an answer, found and closed per week, and every escalation. The verification record is its part **Record**.
 - **All cards** has two tabs: **Sections** (each card with a badge and a small line) and **List** (the table as before). **Card** and **Case** show their tables as tabs (D323), with **Back** at the top left. **Case** now fits the screen (720 high): move its app to 956, 84, 300 × 620 (README §6.4). **Person** has three numbers, the lines open with them, their replies, **Prepare the email** and **Open CI**.
-- **Activity is the tab What happened of History**, with an icon per kind of event, a search box and a row of kinds.
+- **Activity is the tab What happened of History**, with an icon per kind of event, a search box (a CI, a person, a card or a reference) and a row of kinds. The replies of the list SACM Replies are lines there too (D325).
+- **All cards** chooses the state of the cards with a row of buttons (to solve, to check, OK, not tested); the topic is a list beside it. The tabs of **Card** are *To solve with a person*, *SACM fix list*, *To check* and *Export* (D325).
 - **The chip of the reports is on every page** (D322), at the top right; a press opens Reports.
 - A drill-through opens with a button on the row selected (**Open card**, **Open person**, **Open CI**); the card page opens on the card's label (D324).
 - No check, number or message changed; the HTML app is as before.

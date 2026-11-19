@@ -119,9 +119,9 @@ function Find-Button($root, [string]$name) {
   }
   return $null
 }
-# Waits until two fingerprints of the screen in a row are equal (at most 60 s).
-function Wait-Drawn {
-  $clock = [System.Diagnostics.Stopwatch]::StartNew()
+# Waits until two fingerprints of the screen in a row are equal (at most 60 s on the clock given), and gives the seconds
+# the page took to draw: the last change was a second (two equal steps) before.
+function Wait-Drawn($clock) {
   $before = Fingerprint
   $stable = 0
   while ($clock.Elapsed.TotalSeconds -lt 60) {
@@ -131,6 +131,12 @@ function Wait-Drawn {
     $before = $now
     if ($stable -ge 2) { break }
   }
+  return [math]::Round([math]::Max(0, $clock.Elapsed.TotalSeconds - 1.0), 1)
+}
+# The words of a broken visual the window shows. A word is often part of a longer name ("Replies to read (Blank)"), so
+# each name is searched.
+function Broken-Words($words) {
+  return @($BROKEN | Where-Object { $word = $_; @($words | Where-Object { $_.Contains($word) }).Count -gt 0 })
 }
 # The names at the foot of the window (the tab strip), for the log when a tab is not found.
 function Tab-Names($root) {
@@ -230,21 +236,10 @@ foreach ($page in $list) {
   $clock = [System.Diagnostics.Stopwatch]::StartNew()
   Open-Tab $tab
   Start-Sleep -Milliseconds 300
-  $before = Fingerprint
-  $stable = 0
-  while ($clock.Elapsed.TotalSeconds -lt 60) {
-    Start-Sleep -Milliseconds 500
-    $now = Fingerprint
-    if ($now -eq $before) { $stable++ } else { $stable = 0 }
-    $before = $now
-    if ($stable -ge 2) { break }
-  }
-  # The page drew when the screen stopped changing: the last change was a second (two equal steps) before.
-  $seconds = [math]::Round([math]::Max(0, $clock.Elapsed.TotalSeconds - 1.0), 1)
+  $seconds = Wait-Drawn $clock
   $file = Save-Picture $slug
   $words = Words (Window)
-  # A word of a broken visual is often part of a longer name ("Replies to read (Blank)"), so each name is searched.
-  $broken = @($BROKEN | Where-Object { $word = $_; @($words | Where-Object { $_.Contains($word) }).Count -gt 0 })
+  $broken = Broken-Words $words
   # The status bar says which page is open ("Page 14 of 17"): the judge compares it with the place of the page.
   $status = @($words | Where-Object { $_ -match '^Page \d+ of \d+$' }) | Select-Object -First 1
   Say "$($page.displayName): drawn in $seconds s, $file, $status$(if ($broken.Count) { ', shows: ' + ($broken -join '; ') })"
@@ -256,19 +251,18 @@ foreach ($page in $list) {
     $tabSlug = "$slug-tab$t"
     $t++
     $button = Find-Button (Window) $label
-    if (-not $button) { Say "$($page.displayName): no tab '$label' on the canvas"; $tabs += [ordered]@{ tab = $label; found = $false; file = $null }; continue }
+    if (-not $button) { Say "$($page.displayName): no tab '$label' on the canvas"; $tabs += [ordered]@{ tab = $label; found = $false; seconds = $null; file = $null; broken = @() }; continue }
     $at = Center $button
+    $tabClock = [System.Diagnostics.Stopwatch]::StartNew()
     [PictureWin]::keybd_event(0x11, 0, 0, 0)
     Click $at[0] $at[1]
     [PictureWin]::keybd_event(0x11, 0, 2, 0)
     Start-Sleep -Milliseconds 300
-    Wait-Drawn
+    $tabSeconds = Wait-Drawn $tabClock
     $tabFile = Save-Picture $tabSlug
-    $tabWords = Words (Window)
-    $tabBroken = @($BROKEN | Where-Object { $word = $_; @($tabWords | Where-Object { $_.Contains($word) }).Count -gt 0 })
-    foreach ($word in $tabBroken) { $broken += "$word (tab $label)" }
-    Say "$($page.displayName), tab ${label}: $tabFile$(if ($tabBroken.Count) { ', shows: ' + ($tabBroken -join '; ') })"
-    $tabs += [ordered]@{ tab = $label; found = $true; file = (Split-Path $tabFile -Leaf) }
+    $tabBroken = Broken-Words (Words (Window))
+    Say "$($page.displayName), tab ${label}: drawn in $tabSeconds s, $tabFile$(if ($tabBroken.Count) { ', shows: ' + ($tabBroken -join '; ') })"
+    $tabs += [ordered]@{ tab = $label; found = $true; seconds = $tabSeconds; file = (Split-Path $tabFile -Leaf); broken = $tabBroken }
   }
   $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken; status = $status; tabs = $tabs }
 }

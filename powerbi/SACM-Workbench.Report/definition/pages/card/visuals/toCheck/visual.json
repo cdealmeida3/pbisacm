@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "problems",
+  "name": "toCheck",
   "position": {
     "x": 224,
     "y": 136,
-    "z": 4700,
+    "z": 4500,
     "height": 568,
     "width": 720,
-    "tabOrder": 4700
+    "tabOrder": 4500
   },
   "visual": {
     "visualType": "tableEx",
@@ -23,27 +23,12 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "Problem"
-                }
-              },
-              "queryRef": "Findings.Problem",
-              "nativeQueryRef": "Problem",
-              "displayName": "Kind"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
                   "Property": "CiName"
                 }
               },
               "queryRef": "Findings.CiName",
               "nativeQueryRef": "CiName",
-              "displayName": "Contract or CI"
+              "displayName": "CI"
             },
             {
               "field": {
@@ -53,12 +38,12 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "OwnedBy"
+                  "Property": "ClassLabel"
                 }
               },
-              "queryRef": "Findings.OwnedBy",
-              "nativeQueryRef": "OwnedBy",
-              "displayName": "Owner"
+              "queryRef": "Findings.ClassLabel",
+              "nativeQueryRef": "ClassLabel",
+              "displayName": "Class"
             },
             {
               "field": {
@@ -83,12 +68,27 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "StateLabel"
+                  "Property": "AskWho"
                 }
               },
-              "queryRef": "Findings.StateLabel",
-              "nativeQueryRef": "StateLabel",
-              "displayName": "State"
+              "queryRef": "Findings.AskWho",
+              "nativeQueryRef": "AskWho",
+              "displayName": "Who to ask"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "StateWhy"
+                }
+              },
+              "queryRef": "Findings.StateWhy",
+              "nativeQueryRef": "StateWhy",
+              "displayName": "Why"
             }
           ]
         }
@@ -103,20 +103,7 @@
                     "Entity": "Findings"
                   }
                 },
-                "Property": "Problem"
-              }
-            },
-            "direction": "Ascending"
-          },
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "Findings"
-                  }
-                },
-                "Property": "CiName"
+                "Property": "AskWho"
               }
             },
             "direction": "Ascending"
@@ -129,13 +116,32 @@
       "values": [
         {
           "properties": {
-            "wordWrap": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Findings"
+                        }
+                      },
+                      "Property": "Finding colour"
+                    }
+                  }
                 }
               }
             }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Findings.StateLabel"
           }
         }
       ],
@@ -145,21 +151,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "120D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.Problem"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "160D"
+                  "Value": "128D"
                 }
               }
             }
@@ -173,13 +165,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "120D"
+                  "Value": "96D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Findings.OwnedBy"
+            "metadata": "Findings.ClassLabel"
           }
         },
         {
@@ -187,7 +179,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "200D"
+                  "Value": "264D"
                 }
               }
             }
@@ -201,31 +193,32 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "80D"
+                  "Value": "96D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Findings.StateLabel"
+            "metadata": "Findings.AskWho"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "96D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.StateWhy"
           }
         }
       ]
     },
     "visualContainerObjects": {
-      "general": [
-        {
-          "properties": {
-            "altText": {
-              "expr": {
-                "Literal": {
-                  "Value": "'The lines by kind of problem: for Procurement one table per problem in one email; on a SACM list grouped by problem or field'"
-                }
-              }
-            }
-          }
-        }
-      ],
       "title": [
         {
           "properties": {
@@ -239,7 +232,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By kind of problem'"
+                  "Value": "'To check first'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'To solve: who is asked about which CI'"
                 }
               }
             }
@@ -264,7 +270,7 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "Problems note"
+                  "Property": "Lines note"
                 }
               }
             }
@@ -274,10 +280,11 @@
     },
     "drillFilterOtherVisuals": true
   },
+  "isHidden": true,
   "filterConfig": {
     "filters": [
       {
-        "name": "problemFilter",
+        "name": "onlyToCheck",
         "field": {
           "Column": {
             "Expression": {
@@ -285,7 +292,7 @@
                 "Entity": "Findings"
               }
             },
-            "Property": "Problem"
+            "Property": "State"
           }
         },
         "type": "Categorical",
@@ -301,32 +308,28 @@
           "Where": [
             {
               "Condition": {
-                "Not": {
-                  "Expression": {
-                    "In": {
-                      "Expressions": [
-                        {
-                          "Column": {
-                            "Expression": {
-                              "SourceRef": {
-                                "Source": "f"
-                              }
-                            },
-                            "Property": "Problem"
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "f"
                           }
-                        }
-                      ],
-                      "Values": [
-                        [
-                          {
-                            "Literal": {
-                              "Value": "''"
-                            }
-                          }
-                        ]
-                      ]
+                        },
+                        "Property": "State"
+                      }
                     }
-                  }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'review'"
+                        }
+                      }
+                    ]
+                  ]
                 }
               }
             }
@@ -334,6 +337,5 @@
         }
       }
     ]
-  },
-  "isHidden": true
+  }
 }
