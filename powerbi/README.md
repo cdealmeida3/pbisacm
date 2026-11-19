@@ -27,11 +27,11 @@ The report opens on the **My day** page. Look at:
 
 | Page | What you should see |
 |---|---|
-| **My day** | The Reports line and **Open Reports** at the top. For the samples: 1 reply to read, 1 reminder due, 3 cases to escalate, and the findings new since the report before (the samples have two CI reports: 4 and 11 November). The line at the top: "Since the report of 4 Nov: 23 new, 2 solved." |
-| **My work** | *Me* is Alex Example (in Sample mode the first active member of the team; in the workspace the person signed in). The 2 cases assigned to Alex. |
+| **My day** | The chip of the reports at the top right ("✓ 5 reports · 11 Nov · up to date"; a press opens Reports). Four numbers: for the samples 1 reply to read (Dee Owner), 1 person to escalate (Ada Example), 1 reminder due (Cy Keeper) and the findings new since the report before (the samples have two CI reports: 4 and 11 November). Below, **Your next steps**: one line per person, in the order of the team's rules (the reply first, then the escalation, the reminder, the people never asked). Select a step and press **Open person** (or right-click, **Drill through**, **Person**). At the right, **Since the last report** per section and **Waiting on others**. |
+| **Work queue** | One line per person asked, with the next step, the open lines, the cards, the last message and who has them. The buttons at the top choose a status. The app *SACM actions* sits at the right (section 6.4). |
 | **Activity** | The 22 events of the sample journal, newest first, in the words of the app. **Day**, **Who** and **Type** filter them. |
 | **History** | To solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. **Card** filters one card. |
-| **Audit** | The verification record of the report date chosen (**Report date** at the top right). The buttons on the navy band at the left open the other parts of the audit: **Export**, **Not followed** and **Lifecycle review** (pages that are not in the tabs). |
+| **Audit** | The verification record of the report date chosen (**Report date** at the top right). On the navy rail at the left, its parts **Record**, **Export**, **Not followed** and **Lifecycle review** show under *Audit* and open the other parts (pages that are not in the tabs). |
 | **Audit export** | The export of a period (**Period of the export**): what was verified (2 findings solved on 11 November, with the days to verify), the actions of the team, the CI reports loaded, the findings per check and those new in the period, and what was open at the end. **More options (...)**, **Export data** on each table gives the Excel file. |
 | **Not followed** | The exceptions (the 3 decisions to stop following: 2 still run, 1 ended on 10 November) and the cases not followed up. The app *SACM actions* sits at the right for **Follow again** (section 6.4). |
 | **Lifecycle review** | The lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The marks, then the evidence (who checked, the case, when it was asked); the app *SACM audit* sits at the right (section 6.8). |
@@ -44,8 +44,9 @@ The report opens on the **My day** page. Look at:
 | **Contract changes** | The newest Solusi contract file against the one before it: new contracts, contracts no longer in the file, status changes and changed fields. Then the Concluded contracts that end in the next 30 and in the next 90 days (counted from today), and the running contracts without a daily responsible. For information only: nobody is asked. The samples have two Solusi files, an earlier one and the newest, so the page compares them; 2 Concluded contracts end in the next 90 days (none in 30) and 1 has no daily responsible. |
 | **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples: **39 of 39**. Below: the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up), each with the app's number and *OK*. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
 
-Every page has the navy band at the left; at its foot the version, "invented samples" or "SharePoint", and when the
-data was refreshed. Under the title of every table and chart, a grey line says how many lines it shows, or why it shows
+Every page has the navy rail at the left: one item per page (a press opens it), the page in view lighter with a coral
+line, the number of next steps beside *My day* and of open lines beside *Work queue*; at its foot the version, "invented
+samples" or "SharePoint", and when the data was refreshed. Under the title of every table and chart, a grey line says how many lines it shows, or why it shows
 none ("No reply to read: a reply to a message of the team shows here."): a box is never empty without a word. Every page is
 1280 × 720 and fits the window; *Case* is longer (1440) and scrolls.
 
@@ -151,7 +152,7 @@ first: the report reads the reports and the lists of the team's site.
    look at it, then deploy it to the team's workspace.
 
 Who is *Me*: the report finds the person signed in by their email in the list *SACM Team*. A manager whose email is not
-there sees no *My work*.
+there sees nothing assigned to them on *Work queue*.
 
 ## 5. Make the team's lists in SharePoint
 
@@ -178,7 +179,7 @@ the refresh.
 ## 6. Stage 2: the actions (Power App and flows)
 
 From build B6 a manager acts on the cases inside the report. The Power App **SACM actions** sits on the pages Card,
-Case, Person and My work (the *Power Apps visual*). It gets the lines of the page, or the lines you selected, and offers
+Case, Person and Work queue (the *Power Apps visual*). It gets the lines of the page, or the lines you selected, and offers
 only what every selected line allows. **Save** adds **one row** to the list *SACM Journal*, then asks the flow
 *SACMRefresh* to refresh the report. The report shows the change after that refresh, in about a minute. In the meantime
 the app shows, under **Done lately**, what the team did on these lines (it reads the list at once).
@@ -355,9 +356,9 @@ not while you edit it. Publish the report first (section 4).
     number. Then **File → Save as** `SACM actions`, and **Publish**. **Share** it with the group `SACM managers`. Each manager agrees
     to the SharePoint connection the first time they open it.
 11. Back in the report: the visual shows the app. **Save** the report.
-12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **My work** (Ctrl+V). It keeps the same app. Set
-    its size and position as in the table below. On *My work* change the filter of the visual to **CaseLines → My CIs**
-    *is not blank*, so it gets your open lines.
+12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **Work queue** (Ctrl+V). It keeps the same app. Set
+    its size and position as in the table below. On *Work queue* change the filter of the visual to **CaseLines → Queue
+    lines** *is not blank*, so it gets every open line of the page (the free ones too, for **Share out**).
 13. In Desktop, to keep the visual in the repository: download the report (**File → Download this file → A copy of
     your report**), open it, **File → Save as** the `.pbip` over your copy of `powerbi/`, and send the changed files of
     `SACM-Workbench.Report/` (the commit must not hold a `.pbix`).
@@ -375,7 +376,7 @@ What to know:
 - **Selecting rows** in a table of the page (Ctrl+click) filters the visual too: the app then acts only on those lines.
 - **Until the refresh**, the menu offers what the lines allowed at the last refresh. To avoid a second row by mistake,
   Save is off for 3 minutes for the same action on the same lines (not for a note).
-- **Hand over my work** hands over your open lines among the lines the app gets. Use it on the page **My work**: there
+- **Hand over my work** hands over your open lines among the lines the app gets. Use it on the page **Work queue**: there
   the app gets all your open work.
 - **Assign** to *Nobody (free)* makes the lines free again.
 - A case the newest report no longer shows (solved, or not followed up) is not on these pages. **Follow again** for it
@@ -391,12 +392,13 @@ them in **Format → General → Properties → Size and position**:
 | Case | SACM actions | 956 | 516 | 300 | 420 |
 | Card | SACM actions | 956 | 84 | 300 | 300 |
 | Person | SACM actions | 956 | 84 | 300 | 368 |
-| My work | SACM actions | 956 | 84 | 300 | 620 |
+| Work queue | SACM actions | 956 | 84 | 300 | 620 |
 | Not followed | SACM actions (Follow again) | 956 | 84 | 300 | 620 |
 | Messages | SACM messages | 956 | 84 | 300 | 620 |
 | Lifecycle review | SACM audit | 956 | 84 | 300 | 620 |
 
-An app placed before build D1 (0.46.0) keeps its old place: move it to the place above.
+An app placed before build D1 (0.46.0) keeps its old place: move it to the place above. Build D2 (0.47.0) renamed the
+page *My work* to *Work queue*: an app already on it stays where it is.
 
 ### 6.5 How many refreshes (spike S5)
 

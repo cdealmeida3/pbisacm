@@ -48,6 +48,25 @@ table ReportTypes
 	measure 'Report types note' = [Reports line]
 		displayFolder: Page notes
 
+	/// The chip at the top right of My day: the Reports line with a tick when every report is there and fresh, a ! otherwise.
+	measure 'Reports chip' =
+			VAR words = SUBSTITUTE ( [Reports line], "Reports: ", "" )
+			VAR fine = RIGHT ( words, 8 ) = " · fresh"
+			VAR cut = SEARCH ( ". ", words, 1, 0 )
+			VAR short = IF ( cut > 0, LEFT ( words, cut - 1 ) & " · one is too old", words )
+			RETURN IF ( fine, "✓ " & SUBSTITUTE ( words, " · fresh", " · up to date" ), "! " & short )
+		displayFolder: My day
+
+	/// The colour of the words of the Reports chip: green when every report is fresh, amber otherwise.
+	measure 'Reports colour' =
+			IF ( LEFT ( [Reports chip], 1 ) = "!", "#7d5700", "#067647" )
+		displayFolder: My day
+
+	/// The fill of the Reports chip: soft green when every report is fresh, soft amber otherwise.
+	measure 'Reports fill' =
+			IF ( LEFT ( [Reports chip], 1 ) = "!", "#fffaeb", "#ecfdf3" )
+		displayFolder: My day
+
 	column Kind
 		dataType: string
 		sourceColumn: Kind

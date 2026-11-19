@@ -122,7 +122,7 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     }
     if (index === 0 && page.visibility === 'HiddenInViewMode') problems.push(`${where}: the first page is hidden`);
     // 2. How many.
-    // The navy rail and what is on it (its foot line, the parts of a split page) count as one: build D2 makes it one page navigator.
+    // The navy rail and what is on it (its picture, buttons, counts and foot line, tools/powerbi/rail.ts) count as one.
     const counted = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name)).length + (visuals.some((visual) => RAIL_VISUAL.test(visual.name)) ? 1 : 0);
     if (counted > GRID.maxVisuals) problems.push(`${where}: ${counted} visuals, more than ${GRID.maxVisuals} (design pass §8.1)`);
     const apps = visuals.filter((visual) => /powerapps/i.test(visual.visual?.visualType ?? ''));
@@ -199,8 +199,8 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
         if (sum > width - TABLE_CHROME) problems.push(`${at}: the columns take ${sum} px, the table has ${width - TABLE_CHROME}: it scrolls to the side`);
       }
     }
-    // 4. No two visuals over each other (the rail carries its own).
-    const placed = visuals.filter((visual) => visual.name !== 'rail');
+    // 4. No two visuals over each other (the parts of the rail sit on its picture, rail.ts places them).
+    const placed = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name));
     for (let a = 0; a < placed.length; a++) {
       for (let b = a + 1; b < placed.length; b++) {
         if (overlap(placed[a]!.position, placed[b]!.position)) problems.push(`${where}: ${placed[a]!.name} and ${placed[b]!.name} are over each other`);

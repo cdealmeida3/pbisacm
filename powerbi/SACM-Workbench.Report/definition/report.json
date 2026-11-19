@@ -20,6 +20,91 @@
           "name": "sacm-theme.json",
           "path": "sacm-theme.json",
           "type": "CustomTheme"
+        },
+        {
+          "name": "rail-myday.svg",
+          "path": "rail-myday.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-mywork.svg",
+          "path": "rail-mywork.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-messages.svg",
+          "path": "rail-messages.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-cards.svg",
+          "path": "rail-cards.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-backlog.svg",
+          "path": "rail-backlog.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-contracts.svg",
+          "path": "rail-contracts.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-activity.svg",
+          "path": "rail-activity.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-history.svg",
+          "path": "rail-history.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-audit.svg",
+          "path": "rail-audit.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-auditexport.svg",
+          "path": "rail-auditexport.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-auditfollow.svg",
+          "path": "rail-auditfollow.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-auditreview.svg",
+          "path": "rail-auditreview.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-reports.svg",
+          "path": "rail-reports.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-card.svg",
+          "path": "rail-card.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-case.svg",
+          "path": "rail-case.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-person.svg",
+          "path": "rail-person.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-selfcheck.svg",
+          "path": "rail-selfcheck.svg",
+          "type": "Image"
         }
       ]
     }

@@ -6,7 +6,7 @@
     "y": 16,
     "z": 2000,
     "height": 56,
-    "width": 1032,
+    "width": 720,
     "tabOrder": 2000
   },
   "visual": {
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "My work",
+                    "value": "Work queue",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "18pt",
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Replies to read first (yours first), then the people to contact on the cases assigned to you.",
+                    "value": "Every open line, one row per person asked. Select lines, then Take, Assign or Share out with the app at the right.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

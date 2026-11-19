@@ -115,6 +115,76 @@ table CaseLines
 	measure 'Not followed note' = IF ( COUNTROWS ( CaseLines ) + 0 = 0, "No case is set aside: the team follows every case.", "Select lines, then Follow again in the app." )
 		displayFolder: Page notes
 
+	/// The next step with the person of a line of the Work queue (the same steps as Person state, from the lines in view, every card, not only the daily ones): 1 a reply to read, 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked, 6 marked fixed. The status chosen above the table keeps its lines only.
+	measure 'Queue state' =
+			VAR asOf = [Today]
+			VAR mails = CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), TREATAS ( VALUES ( CaseLines[Key] ), Findings[Key] ), Findings[ContactEmail] <> "" )
+			VAR answered = CALCULATE ( COUNTROWS ( RepliesToRead ), TREATAS ( mails, RepliesToRead[From] ) )
+			VAR escalation = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "escalation" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ) )
+			VAR reminder = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "reminder" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ) )
+			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "New" ), KEEPFILTERS ( CaseLines[State] = "open" ) )
+			VAR asked = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "Contacted" ) )
+			VAR marked = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] IN { "Fix in progress", "Fixed" } ) )
+			RETURN
+			    SWITCH ( TRUE (), answered > 0, 1, escalation > 0, 2, reminder > 0, 3, fresh > 0, 4, asked > 0, 5, marked > 0, 6 )
+		formatString: 0
+		displayFolder: Work queue
+
+	/// On a line of the Work queue: the open lines with the person (not Verified, not Not followed up) in the status chosen; blank hides the line.
+	measure 'Queue lines' =
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+		displayFolder: Work queue
+
+	/// On a line of the Work queue: why the team asks the person and where the email goes ("Owned by · dee@example.com").
+	measure 'Queue why' =
+			VAR keys = VALUES ( CaseLines[Key] )
+			VAR via = CALCULATE ( MAX ( Findings[ContactVia] ), TREATAS ( keys, Findings[Key] ) )
+			VAR mail = CALCULATE ( MAX ( Findings[ContactEmail] ), TREATAS ( keys, Findings[Key] ) )
+			VAR said = UPPER ( LEFT ( via, 1 ) ) & MID ( via, 2, 200 )
+			RETURN IF ( via <> "" || mail <> "", said & IF ( via <> "" && mail <> "", " · " ) & mail )
+		displayFolder: Work queue
+
+	/// On a line of the Work queue: the cards of the open lines with the person, three at most.
+	measure 'Queue cards' =
+			VAR lines = CALCULATETABLE ( CaseLines, KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) )
+			VAR cards = DISTINCT ( SELECTCOLUMNS ( lines, "@card", RELATED ( Checks[CardLabel] ) ) )
+			VAR cardCount = COUNTROWS ( cards )
+			RETURN IF ( cardCount > 0, CONCATENATEX ( TOPN ( 3, cards, [@card], ASC ), [@card], ", ", [@card], ASC ) & IF ( cardCount > 3, " and " & ( cardCount - 3 ) & " more" ) )
+		displayFolder: Work queue
+
+	/// On a line of the Work queue: the day of the last message to the person, or never.
+	measure 'Queue asked' =
+			VAR lastSent = MAX ( CaseLines[SentOn] )
+			RETURN IF ( ISBLANK ( lastSent ), "never", FORMAT ( lastSent, "d mmm" ) )
+		displayFolder: Work queue
+
+	/// On a line of the Work queue: who in the team has the open lines with the person, or free.
+	measure 'Queue has it' =
+			VAR lines = CALCULATETABLE ( CaseLines, KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( CaseLines[AssignedTo] <> "" ) )
+			VAR names = DISTINCT ( SELECTCOLUMNS ( lines, "@name", CaseLines[AssignedTo] ) )
+			RETURN IF ( COUNTROWS ( names ) > 0, CONCATENATEX ( names, [@name], ", ", [@name], ASC ), "free" )
+		displayFolder: Work queue
+
+	/// The people with open lines in the status chosen (Work queue).
+	measure 'Queue people' =
+			COUNTROWS ( FILTER ( VALUES ( CaseLines[ContactName] ), CaseLines[ContactName] <> "" && NOT ISBLANK ( [Queue lines] ) ) ) + 0
+		formatString: #,0
+		displayFolder: Work queue
+
+	/// Under the title of the people to ask (Work queue): how many lines with how many people, or why the box is empty.
+	measure 'Queue note' =
+			VAR people = [Queue people]
+			VAR lines = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( CaseLines[ContactName] <> "" ) ) + 0
+			RETURN
+			    IF (
+			        people = 0,
+			        "Nobody to ask in the status chosen: choose another status, or none.",
+			        lines & IF ( lines = 1, " open line", " open lines" ) & " with " & people & IF ( people = 1, " person", " people" ) & ", in the order of the team's rules. Select lines for the app at the right."
+			    )
+		displayFolder: Page notes
+
 	column Key
 		dataType: string
 		isDataTypeInferred

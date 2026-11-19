@@ -34,21 +34,21 @@
                       "Entity": "ReportTypes"
                     }
                   },
-                  "Property": "Reports line"
+                  "Property": "Reports chip"
                 }
               }
             },
             "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segoe UI'"
+                  "Value": "'Segoe UI Semibold'"
                 }
               }
             },
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "9D"
                 }
               }
             },
@@ -56,8 +56,13 @@
               "solid": {
                 "color": {
                   "expr": {
-                    "Literal": {
-                      "Value": "'#2b2623'"
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "ReportTypes"
+                        }
+                      },
+                      "Property": "Reports colour"
                     }
                   }
                 }
@@ -66,7 +71,7 @@
             "horizontalAlignment": {
               "expr": {
                 "Literal": {
-                  "Value": "'left'"
+                  "Value": "'right'"
                 }
               }
             },
@@ -119,13 +124,22 @@
                   "Value": "true"
                 }
               }
-            },
+            }
+          }
+        },
+        {
+          "properties": {
             "fillColor": {
               "solid": {
                 "color": {
                   "expr": {
-                    "Literal": {
-                      "Value": "'#ffffff'"
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "ReportTypes"
+                        }
+                      },
+                      "Property": "Reports fill"
                     }
                   }
                 }
@@ -165,7 +179,33 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'The reports: press to open the page Reports'"
+                  "Value": "'The reports: open Reports'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
