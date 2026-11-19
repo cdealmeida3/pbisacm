@@ -34,6 +34,9 @@ test('the flows only refresh, wait, file or send what a manager pressed, one at 
   assert.ok(problems.some((line) => line.includes('one at a time')));
   assert.ok(problems.some((line) => line.includes('sends what a manager pressed Send on')));
   assert.ok(problems.some((line) => line.includes('does not refresh')));
+  // A flow that answers the app cannot have concurrency control (Power Automate refuses to save it, D337).
+  const f5 = appFlows().find((flow) => flow.id === 'F5')!;
+  assert.ok(flowProblems([{ ...f5, concurrency: 1 }]).some((line) => line.includes('must be off')));
 });
 
 test('a flow sends only from the app, one message, exactly the inputs the manager sends; it files replies only in SACM Replies', () => {

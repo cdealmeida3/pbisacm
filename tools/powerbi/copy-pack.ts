@@ -47,6 +47,7 @@ export function copyPack(): string {
   const rule = refreshRule();
   const gate = gateExpressions(rule);
   const once: Step = { title: 'One run at a time', html: 'On the trigger: <b>…</b> → <b>Settings</b> → <b>Concurrency control</b> on, <b>Degree of parallelism 1</b>.' };
+  const answering: Step = { title: 'Concurrency control off', html: 'Leave the trigger\'s <b>Concurrency control</b> <b>off</b>. This flow answers the app, and Power Automate refuses to save it with concurrency control on (<i>InvalidConcurrencyConfiguration</i>, D337).' };
   const refreshStep = 'Workspace: <b>My workspace</b> (pick it). Dataset: <b>SACM-Workbench</b>.';
   const gateSteps = (by: string, source: string, byNote: string): Step[] => [
     { title: 'Now: the time of the team', html: '<b>+ New step → Data Operation → Compose</b>. Rename the step <b>Now</b> (… → Rename). Inputs: the expression below, with your time zone (the box at the top).', rows: [{ label: 'Step name', value: 'Now' }, { label: 'Inputs (expression)', value: gate.Now }] },
@@ -69,7 +70,7 @@ export function copyPack(): string {
       why: 'The button <b>Refresh now</b> of the three apps, and nothing else (D332). It refreshes at most once in each window (D333) and tells the app what happened.',
       steps: [
         { title: 'Make the flow', html: '<b>Create → Instant cloud flow</b>. Name above. Trigger <b>When Power Apps calls a flow (V2)</b>. No inputs. <b>Create</b>.' },
-        once,
+        answering,
         ...gateSteps(appBy, 'app', 'the manager who pressed (expression)'),
         {
           title: 'The five answers', html: 'Add <b>Respond to a PowerApp or flow</b> in five places, with the same four outputs each time.',
@@ -124,7 +125,7 @@ export function copyPack(): string {
       why: 'The Outlook draft button. Puts the email into the manager\'s own Drafts, From = shared mailbox. Sends nothing.',
       steps: [
         { title: 'Make the flow', html: '<b>Create → Instant cloud flow</b>, trigger <b>When Power Apps calls a flow (V2)</b>. Two <b>Text</b> inputs:', rows: [{ label: 'Input 1 (text)', value: 'Message' }, { label: 'Input 2 (text_1)', value: 'Csv' }], after: 'Make Csv optional.' },
-        once,
+        answering,
         { title: 'Make the draft', html: '<b>+ New step → Office 365 Outlook → Send an HTTP request</b>. Keep the step\'s name as it is (<i>Send an HTTP request</i>): step 4 uses it.', rows: [{ label: 'URI', value: 'https://graph.microsoft.com/v1.0/me/messages' }, { label: 'Method', value: 'POST' }, { label: 'Content-Type', value: 'application/json' }, { label: 'Body (expression)', value: `json(replace(replace(triggerBody()?['text'], '%%CSV%%', base64(coalesce(triggerBody()?['text_1'], ''))), '%%FROM%%', '${MAILBOX}'))`, note: 'the mailbox address comes from the box at the top' }] },
         { title: 'Give the link back', html: '<b>+ New step → Power Apps → Respond to a PowerApp or flow</b>. <b>+ Add an output → Text</b>.', rows: [{ label: 'Output name', value: 'Link' }, { label: 'Value (expression)', value: "body('Send_an_HTTP_request')?['webLink']" }] },
         { title: 'Save and share', html: '<b>Save</b>. <b>Run only users → Edit</b>: <b>SACM managers</b>; for <b>Office 365 Outlook</b> pick <b>Provided by run-only user</b> (not your connection). Each manager signs in once, so the draft lands in their Drafts.' },
@@ -233,7 +234,7 @@ ${css}</style>
    <li>The report is published to <b>My workspace</b> and refreshes with real data. My workspace allows <b>${rule.dailyLimit} refreshes a day</b>, the flows included. The rule: ${esc(refreshRuleText(rule))} Never press Refresh now many times to test it.</li>
    <li>The five SharePoint lists exist: SACM Journal, SACM Replies, SACM Settings, SACM Team (you are in it) and <b>SACM Refreshes</b> (Title, By, Source), with <b>List settings → Title → Enforce unique values: Yes</b>.</li>
    <li>The scheduled refresh is on: one time, ${esc(rule.scheduled.join(', '))}, in the time zone you type above.</li>
-   <li>All flows go in the <b>same environment</b> as the apps (normally the default one). Names must be exact.</li>
+   <li>All flows go in the <b>same environment</b> as the apps (normally the default one). Names must be exact. Concurrency control: on (1) for every flow except <b>SACMRefresh</b> and <b>SACMDraft</b>, which answer the app: off.</li>
   </ol>
  </div>
  <nav aria-label="Jump to">

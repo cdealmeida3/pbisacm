@@ -11,6 +11,7 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 - **The rail says how old the data is** ("refreshed 2 h ago", D335), because the service shows times in UTC. *My day* and *Reports* show the rule above their Refresh now button.
 - **The first refresh must finish in 2 hours** (D336): README §4A says how many CI reports to keep in the folder; older ones go into a sub-folder *Archive*, which the report does not read.
 - What to do in the tenant: README §5 (the list *SACM Refreshes*, unique Title), §6.3 (the new steps of F5, F6 and F3; F1 without its refresh), §6.4, §6.6 and §6.8 (the field *Report at* of each app, then paste the new formulas and screens).
+- **Concurrency control off for the flows that answer the app** (D337): Power Automate refuses to save *SACMRefresh* and *SACMDraft* with it on. The other flows keep one run at a time.
 - No check, number or email text changed.
 
 ## 0.51.0 — The Power BI report, the design pass part 6: polish and the team guide (D6)

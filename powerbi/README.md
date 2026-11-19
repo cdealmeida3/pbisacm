@@ -335,7 +335,9 @@ scheduled refresh (it stays in the flow, never in the repository).
 **F5 SACMRefresh** (the button **Refresh now** of the three apps, and only that button):
 
 1. **Create → Instant cloud flow.** Name `SACMRefresh`, trigger **When Power Apps calls a flow (V2)**. No inputs.
-2. On the trigger: **... → Settings → Concurrency control**: on, **Degree of Parallelism** `1`.
+2. **Concurrency control stays off** on the trigger (D337). Power Automate refuses to save a flow that answers the app
+   with concurrency control on (*InvalidConcurrencyConfiguration*). The gate is the lock: two presses in one window
+   still give one refresh.
 3. The steps of the gate: **Now**, **Minutes**, **Open**; in the True branch **Window**, **Create item** (By:
    `triggerOutputs()['headers']['x-ms-user-email']`, Source: `app`) and **Refresh a dataset**.
 4. The answers: **Power Apps → Respond to a PowerApp or flow**, with four **Text** outputs `Result`, `At`, `By` and
@@ -377,7 +379,7 @@ scheduled refresh (it stays in the flow, never in the repository).
 1. **Create → Instant cloud flow.** Name `SACMSend`, trigger **When Power Apps calls a flow (V2)**. Add six **Text**
    inputs, in this order: `To`, `Cc`, `Subject`, `Body`, `Csv`, `FileName`. Make `Csv` and `FileName` optional (**...
    → Make the field optional**): a short email has no file.
-2. Concurrency `1`, as in F5 step 2.
+2. On the trigger: **... → Settings → Concurrency control**: on, **Degree of Parallelism** `1`.
 3. **New step → Office 365 Outlook → Send an email from a shared mailbox (V2).** Original Mailbox Address: the shared
    SACM mailbox. To: the input *To*. CC: the input *Cc*. Subject: the input *Subject*. Body: the input *Body* (the
    email is HTML: in the editor press **</>** first, then put the input).
@@ -401,7 +403,8 @@ Drafts folder of the manager who pressed, with From set to the shared SACM mailb
 checks it in Outlook and presses Send there.
 
 1. **Create → Instant cloud flow.** Name `SACMDraft`, trigger **When Power Apps calls a flow (V2)**. Two **Text**
-   inputs: `Message` and `Csv` (make `Csv` optional). Concurrency `1`.
+   inputs: `Message` and `Csv` (make `Csv` optional). **Concurrency control off**: the flow answers the app (step 3),
+   and Power Automate refuses concurrency control then (D337).
 2. **New step → Office 365 Outlook → Send an HTTP request.** URI `https://graph.microsoft.com/v1.0/me/messages`,
    Method `POST`, Content-Type `application/json`. Body: the expression
    `json(replace(replace(triggerBody()?['text'], '%%CSV%%', base64(coalesce(triggerBody()?['text_1'], ''))), '%%FROM%%', '<the address of the shared SACM mailbox>'))`.

@@ -146,7 +146,11 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
     if (names.has(flow.name)) problems.push(`Flows: the name ${flow.name} is there twice`);
     names.add(flow.name);
     if (!TRIGGERS.has(flow.trigger)) problems.push(`Flows: ${flow.id} starts on "${flow.trigger}": a flow starts on a button, the app or a new email, never on a timer (D2, D269)`);
-    if (flow.concurrency !== 1) problems.push(`Flows: ${flow.id} must run one at a time (concurrency 1), so two refreshes never overlap`);
+    // Power Automate refuses concurrency control on a flow that answers the app (Respond is synchronous: the error
+    // InvalidConcurrencyConfiguration, D337). Those flows run with it off: F5 is locked by the gate, F7 only makes a draft.
+    const answers = flow.steps.some((step) => step.action === RESPOND);
+    if (answers && flow.concurrency !== 0) problems.push(`Flows: ${flow.id} answers the app, so its concurrency control must be off (0): Power Automate refuses it with a Respond step (D337)`);
+    if (!answers && flow.concurrency !== 1) problems.push(`Flows: ${flow.id} must run one at a time (concurrency 1), so two runs never overlap`);
     if (flow.inputs?.length && flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} has inputs, but only a flow the app calls (Power Apps (V2)) gets them`);
     const sends = flow.steps.filter((step) => step.action === SEND);
     const drafts = flow.steps.filter((step) => step.action === DRAFT);

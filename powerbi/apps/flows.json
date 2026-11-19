@@ -1,12 +1,12 @@
 {
-  "note": "The Power Automate flows of builds B6, B7, D5 and 0.52.0 (D295, D301, D315, D333), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power Apps call a flow by it), the trigger, the inputs a Power App gives it, the outputs it answers the app with, the concurrency of the trigger (1: one run at a time; the others wait) and the steps in order. A step with 'if' runs only on that branch, or after that step (Configure run after). A flow refreshes through the gate, files a report or a reply, sends exactly the message a manager pressed Send or Test on (its To, Cc, Subject, Body and file are the inputs of the trigger, never made by the flow, D2, D301), or makes the Outlook draft a manager pressed Outlook draft on in the manager's own Drafts, which sends nothing (F7, D315). The gate (D333): a refresh on demand runs at most once in each window of powerbi/apps/refresh.json, because each window is one row of the list SACM Refreshes, whose Title is unique; the expressions of its steps are those of tools/powerbi/refresh.ts (gateExpressions). None runs on a timer (D269): the one scheduled refresh is set on the semantic model in the service. npm run powerbi:lint checks these rules and that the apps call only flows of this file. The workspace is My workspace (README section 4A, D331); the semantic model has the name of the .pbip. <the time zone of the team> is the Windows name of the team's time zone, the same as the scheduled refresh: Carlos writes it in the flows, never here.",
+  "note": "The Power Automate flows of builds B6, B7, D5 and 0.52.0 (D295, D301, D315, D333), as Carlos makes them by hand in the company tenant with the steps of powerbi/README.md §6. One entry per flow: its name (the Power Apps call a flow by it), the trigger, the inputs a Power App gives it, the outputs it answers the app with, the concurrency of the trigger (1: one run at a time, the others wait; 0: off, for a flow that answers the app, because Power Automate refuses concurrency control with a Respond step, D337) and the steps in order. A step with 'if' runs only on that branch, or after that step (Configure run after). A flow refreshes through the gate, files a report or a reply, sends exactly the message a manager pressed Send or Test on (its To, Cc, Subject, Body and file are the inputs of the trigger, never made by the flow, D2, D301), or makes the Outlook draft a manager pressed Outlook draft on in the manager's own Drafts, which sends nothing (F7, D315). The gate (D333): a refresh on demand runs at most once in each window of powerbi/apps/refresh.json, because each window is one row of the list SACM Refreshes, whose Title is unique; the expressions of its steps are those of tools/powerbi/refresh.ts (gateExpressions). None runs on a timer (D269): the one scheduled refresh is set on the semantic model in the service. npm run powerbi:lint checks these rules and that the apps call only flows of this file. The workspace is My workspace (README section 4A, D331); the semantic model has the name of the .pbip. <the time zone of the team> is the Windows name of the team's time zone, the same as the scheduled refresh: Carlos writes it in the flows, never here.",
   "flows": [
     {
       "id": "F5",
       "name": "SACMRefresh",
       "purpose": "Refresh the report when a manager presses Refresh now in a Power App, at most once in each window of the refresh rule (powerbi/apps/refresh.json, D333), and answer the app: started, taken (when and by whom the window was used), closed (outside the hours), refused (Power BI did not start it, with its message) or error. No Save calls it (D332).",
       "trigger": "Power Apps (V2)",
-      "concurrency": 1,
+      "concurrency": 0,
       "steps": [
         {
           "action": "Compose",
@@ -209,7 +209,7 @@
         "Message",
         "Csv"
       ],
-      "concurrency": 1,
+      "concurrency": 0,
       "steps": [
         {
           "action": "Send an HTTP request",
