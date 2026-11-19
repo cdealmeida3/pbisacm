@@ -203,6 +203,11 @@ report reads them; the Power Apps add rows to *SACM Journal* and *SACM Settings*
 
 In the site: **New → List → Blank list**, the name, then **Add column** for each column below. *Title* is there already.
 
+**"This column already exists"?** A list has some columns of its own that it does not show, and one may have the name you
+type (for example *Type*). Look first: **Add column → Show/hide columns**. If the column is there, tick it, and it is the
+right one when **List settings →** the column shows `Field=` and the exact name at the end of the address of the page (for
+example `Field=Type`). If the address shows another name (for example `Type0`), tell the developer before you go on.
+
 | List | Columns (type) | One row is |
 |---|---|---|
 | **SACM Journal** | Title (the event id), At (Date and time), By (Single line: the email), ByName, Type, Keys (Multiple lines: one finding key per line), Text (Multiple lines), Ref, To, Cc, Subject, Kind, Channel, Person, Reason, ReviewOn (Date), RetireOn (Date), CheckId, CiKey, CiName, Items (Multiple lines, plain text: the sample of a lifecycle review, build B8): all Single line of text unless said | One action of a manager: a message, a reminder, an escalation, a note, fixed, not followed up, assigned, the start of a lifecycle review and its marks, a change of the settings, … (the events of [DATA-MODEL.md](../docs/DATA-MODEL.md) §3). **Items**: if you made the list before B8, add this column |
