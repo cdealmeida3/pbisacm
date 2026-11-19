@@ -42,6 +42,7 @@ import { loadReferences } from '../../src/hosts/cli.ts';
 import { STATUSES } from '../../src/core/cases/cases.ts';
 import { EXCEPTION_REASONS } from '../../src/core/audit/audit.ts';
 import { statusWord } from '../../src/app/view/cases.ts';
+import { EMAIL_STYLE, ROWS_IN_EMAIL_RANGE } from './email.ts';
 import { COLUMNS, CONTRACT_COLUMNS, EPO_ROLE, MAX_CIS_PER_MESSAGE, REQUESTS, ROLE_LABEL, ROLE_REQUEST, ROLE_WORD } from '../../src/core/messages/messages.ts';
 import type { FastForm, Node } from './regex.ts';
 import { staleRail, writeRail } from './rail.ts';
@@ -287,8 +288,10 @@ function packed(): Query[] {
     { name: 'StateFiles', group: 'Packed', description: 'GENERATED from powerbi/samples/state/. The invented lists of the team\'s state (journal, replies, settings, team), as their bytes in base64, read when StateMode is Sample (D291).',
       m: `#table(type table [FileName = text, Base64 = text], {\n${stateFiles().map((file) => `\t{${mText(file.name)}, ${mText(file.base64)}}`).join(',\n')}\n})` },
     { name: 'StateLists', group: 'Packed', description: 'GENERATED from tools/powerbi/history.ts (D291). The four lists of the team\'s state: the name of the SharePoint list, the sample file and the columns.', m: json(STATE_LISTS) },
-    { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158). The range and the default of each number setting.',
-      m: json(Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }]))) },
+    { name: 'SettingRanges', group: 'Packed', description: 'GENERATED from src/app/state/store.ts (D158) and tools/powerbi/email.ts (rowsInEmail, D314). The range and the default of each number setting.',
+      m: json({ ...Object.fromEntries(Object.entries(NUMBER_RANGES).map(([key, range]) => [key, { ...range, default: (DEFAULT_SETTINGS as unknown as Record<string, number>)[key] }])), rowsInEmail: ROWS_IN_EMAIL_RANGE }) },
+    { name: 'EmailStyle', group: 'Packed', description: 'GENERATED from tools/powerbi/email.ts and tokens.ts (D313). The look of the email template (fnEmailTemplate): its colours, its fonts and the phone rule.',
+      m: json(EMAIL_STYLE) },
     { name: 'MessageWords', group: 'Packed', description: 'GENERATED from src/core/messages/messages.ts (build B7, D300). The words of the messages: the requests of the Service Portal (id, name, the action inside its form, the name before 0.14.1), the words of the roles, EPO\'s names for them, the request that changes each role, the columns of the tables and the most CIs in one message.',
       m: json({ requests: REQUESTS, roleLabel: ROLE_LABEL, roleWord: ROLE_WORD, epoRole: EPO_ROLE, roleRequest: ROLE_REQUEST, columns: COLUMNS, contractColumns: CONTRACT_COLUMNS, maxCis: MAX_CIS_PER_MESSAGE }) },
     { name: 'AppActions', group: 'Packed', description: 'GENERATED from powerbi/apps/actions.json (D294). The actions of the Power App SACM actions: id, label, the journal event, its scope and what the manager types; fnCaseActions gives each case the actions of scope line that apply.',

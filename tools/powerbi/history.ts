@@ -28,6 +28,7 @@ import { cardWords, describeEvent } from '../../src/app/view/activity.ts';
 import type { Episode, VerificationRecord } from '../../src/core/audit/audit.ts';
 import { loadPacks, loadReferences } from '../../src/hosts/cli.ts';
 import { DEFAULT_SETTINGS, NUMBER_RANGES, settingNumber } from '../../src/app/state/store.ts';
+import { rowsInEmailOf } from './email.ts';
 import type { NumberSetting } from '../../src/app/state/store.ts';
 import { EARLIER, RECORD_DATE, SAMPLE_FILES } from '../../tests/sample-record.ts';
 import { caseActions, personOf } from './actions.ts';
@@ -111,7 +112,7 @@ export function teamNumbers(rows: Array<Record<string, string>>): Record<NumberS
 
 /** The rows of the table Settings: one per key, the value of its last row, and the value that counts for a number. */
 export function settingsRows(rows: Array<Record<string, string>>): Array<Record<string, string>> {
-  const numbers = teamNumbers(rows) as Record<string, number>;
+  const numbers: Record<string, number> = { ...(teamNumbers(rows) as Record<string, number>), rowsInEmail: rowsInEmailOf(rows) };
   const keys = Array.from(new Set(rows.map((row) => (row.Title ?? '').trim()).filter(Boolean)));
   return keys.map((key) => {
     const value = rows.filter((row) => (row.Title ?? '').trim() === key).pop()!.Value ?? '';

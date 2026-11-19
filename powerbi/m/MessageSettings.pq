@@ -4,7 +4,9 @@
 // reference/record-teams. One row per setting: Title is the key, Value the value. The keys: portalLink, signature,
 // epoOwnerName, epoOwnerEmail, procurementName, procurementEmail, procurementLeadName, procurementLeadEmail,
 // request.<id>.name and request.<id>.link (the ids of MessageWords[requests]), team.<id>.name and team.<id>.people
-// ("Name <address>; Name <address>", one person per part). A key that is not there, or empty, keeps its default. The
+// ("Name <address>; Name <address>", one person per part), and rowsInEmail: the lines a table of an email shows before
+// "and N more in the attached file" (D314; a whole number in its range of SettingRanges, else the default 10). A key
+// that is not there, or empty, keeps its default. The
 // manager who sends is not a setting: the Power App puts their name in the draft (%%SENDER%%, fnDrafts).
 let
     // A Title typed twice: the last row counts (as the HTML app reads its settings); an empty Title is left out.
@@ -34,6 +36,13 @@ let
         teamIds)
 in
     [
+        RowsInEmail =
+            let
+                range = SettingRanges[rowsInEmail],
+                raw = value("rowsInEmail", ""),
+                whole = if raw <> "" and Text.Remove(raw, {"0".."9"}) = "" then Number.FromText(raw, "en-US") else null
+            in
+                if whole <> null and whole >= range[min] and whole <= range[max] then whole else range[default],
         PortalLink = value("portalLink", ""), Signature = value("signature", "SACM team"),
         EpoOwnerName = value("epoOwnerName", ""), EpoOwnerEmail = value("epoOwnerEmail", ""),
         ProcurementName = value("procurementName", "Procurement"), ProcurementEmail = value("procurementEmail", ""),

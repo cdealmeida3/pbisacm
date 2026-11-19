@@ -383,6 +383,31 @@ table Run
 		summarizeBy: none
 		sourceColumn: Drafts.FreeKeys
 
+	column 'Drafts.Html'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Drafts.Html
+
+	column 'Drafts.Csv'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Drafts.Csv
+
+	column 'Drafts.Summary'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Drafts.Summary
+
+	column 'Drafts.EmailSubject'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Drafts.EmailSubject
+
+	column 'Drafts.EmailId'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Drafts.EmailId
+
 	column 'Exceptions.Target'
 		dataType: string
 		summarizeBy: none

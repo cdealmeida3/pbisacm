@@ -13,7 +13,10 @@
 // escalation: who did not answer), NobodyAbove, Mailbox, Team, Person (who the draft is about) and Items (its cases).
 // Subject, Body and Plain hold %%REF%% where the reference goes and %%SENDER%% where the name of the manager goes: the
 // Power App fills both when the manager sends (D301). The order of the drafts and of their lines is the one of the
-// HTML app.
+// HTML app. Layout: the same message as data, part by part, for the email template (fnEmailTemplate, D313), as
+// src/core gives it (Draft.layout): Opening (HTML paragraphs, without Why), Why (the line why they get it, or ""),
+// Sections (each Key, Group, Heading, Title, Lead, Role, Contract, Found, Rows, Ask, Why), FirstName, Cis, Noun, Sender,
+// Signature. `settings` may hold MaxCis: the CIs a message holds before it is split (a test of the template, EmailsSplit).
 (cases as list, settings as record) as list =>
     let
         words = MessageWords,
@@ -144,8 +147,14 @@
                             & Text.Combine(List.Transform(head, (cell) => "<th align=""left"" style=""white-space:nowrap"">" & cell & "</th>")) & "</tr>" & rows & "</table>",
                         Text = Text.Combine(List.Transform(items, line), "#(lf)")
                     ],
-        // One part per check and route (and kind of problem): its intro, table, ask and why.
-        sectionsBody = (items as list, kind as text, sameWhy as logical) as list =>
+        // The cells of a line as text (src/core rowCells): those of the table, with "what we found" always last.
+        rowCells = (item as record) as list =>
+            let fact = item[Fact] in
+            if isContract(item) then let contract = fact[Contract] in {textOf(contract[Number]), textOf(contract[Name]), textOf(contract[Vendor]), textOf(fact[Detail])}
+            else {textOf(fact[CiName]), textOf(fact[EpoId]), textOf(fact[ClassLabel]), textOf(fact[OwnedBy]), textOf(fact[ManagedBy]), textOf(fact[Status]), textOf(fact[SupportGroup]), textOf(fact[Detail])},
+        roleColumn = (via as text) as text => if via = "owned by" then "Owned by" else if via = "managed by" then "Managed by" else "",
+        // One part per check and route (and kind of problem): its intro, table, ask and why; and the same as data (Layout, D313).
+        sectionsBody = (items as list, kind as text, sameWhy as logical, group as text) as record =>
             let
                 bySection = fnGroupBy(items, (item) => sectionKey(item[Fact])),
                 sections = List.Buffer(List.Transform(Record.FieldValues(bySection), (members) =>
@@ -154,9 +163,9 @@
                         pack = packOf(fact),
                         problem = if byProblem(pack) <> null then problemOf(fact) else null
                     in
-                        [PackId = pack[id], Problem = problem, Items = members, Texts = fnMessageSection(textsOf(pack, problem), fact[Route], members, settings)])),
+                        [Key = sectionKey(fact), PackId = pack[id], Problem = problem, Items = members, Texts = fnMessageSection(textsOf(pack, problem), fact[Route], members, settings)])),
                 several = List.Count(sections) > 1,
-                part = (at as number) as list =>
+                part = (at as number) as record =>
                     let
                         chosen = sections{at},
                         texts = chosen[Texts],
@@ -166,14 +175,24 @@
                         count = if chosen[Problem] <> null then " (" & Text.From(List.Count(members)) & ")" else "",
                         next = if at + 1 < List.Count(sections) then sections{at + 1} else null,
                         // The parts of one check with a table per kind of problem share the line "why it matters": it comes once, after the last.
-                        shareWhy = chosen[Problem] <> null and next <> null and next[PackId] = chosen[PackId] and next[Problem] <> null
+                        shareWhy = chosen[Problem] <> null and next <> null and next[PackId] = chosen[PackId] and next[Problem] <> null,
+                        lead = join({if kind <> "escalation" and not sameWhy then plain(texts[WhyYou]) else plain(""), texts[Intro]}, " "),
+                        contract = List.AllTrue(List.Transform(members, isContract))
                     in
-                        (if several then {[Html = "<h3 style=""margin:18px 0 6px"">" & texts[Heading][Html] & count & "</h3>", Text = "#(lf)" & Text.Upper(texts[Heading][Text], "en-US") & count]} else {})
-                        & {p(join({if kind <> "escalation" and not sameWhy then plain(texts[WhyYou]) else plain(""), texts[Intro]}, " ")), table(members, found)}
-                        & (if kind <> "escalation" then {p(texts[Ask])} else {})
-                        & (if shareWhy then {} else {p(texts[Why])})
+                        [
+                            Body = (if several then {[Html = "<h3 style=""margin:18px 0 6px"">" & texts[Heading][Html] & count & "</h3>", Text = "#(lf)" & Text.Upper(texts[Heading][Text], "en-US") & count]} else {})
+                                & {p(lead), table(members, found)}
+                                & (if kind <> "escalation" then {p(texts[Ask])} else {})
+                                & (if shareWhy then {} else {p(texts[Why])}),
+                            Layout = [
+                                Key = chosen[Key], Group = group, Heading = texts[Heading][Html], Title = texts[Heading][Text], Lead = lead[Html],
+                                Role = roleColumn(textOf(members{0}[Fact][ContactVia])), Contract = contract, Found = found or contract,
+                                Rows = List.Buffer(List.Transform(members, rowCells)), Ask = if kind <> "escalation" then texts[Ask][Html] else "", Why = if shareWhy then "" else texts[Why][Html]
+                            ]
+                        ],
+                done = List.Buffer(List.Transform(List.Positions(sections), part))
             in
-                List.Combine(List.Transform(List.Positions(sections), part)),
+                [Body = List.Combine(List.Transform(done, (one) => one[Body])), Layout = List.Transform(done, (one) => one[Layout])],
         // The first contact of these cases, by any channel (F02): its day and whether it was a Teams chat.
         firstContact = (items as list) as nullable record =>
             let
@@ -246,12 +265,14 @@
                     & (if kind = "reminder" then {plain(reminderLine)} else {})
                     & (if kind = "escalation" then {plain(escalationOpening(items, person, group[NobodyAbove]))} else {})
                     & (if kind <> "escalation" and sameWhy then {plain(if kinds > 1 then why & " We found " & plural(kinds, "kind") & " of problem." else why)} else {}),
+                // The opening without the line why they get it (Layout): the email template adds that line itself.
+                layoutOpening = List.Transform(List.FirstN(opening, List.Count(opening) - (if kind <> "escalation" and sameWhy then 1 else 0)), (piece) => piece[Html]),
                 heading = (value as text) as record => [Html = "<h2 style=""margin:22px 0 4px;font-size:16px"">" & fnHtml(value) & "</h2>", Text = "#(lf)== " & Text.Upper(value, "en-US") & " =="],
+                stillTitle = if firstOfStill <> null then "Still open (our message of " & longDate(firstOfStill[On]) & ")" else "Still open",
+                halves = List.Buffer(if two then {sectionsBody(still, kind, sameWhy, stillTitle), sectionsBody(newOnes, kind, sameWhy, "New since then")} else {sectionsBody(items, kind, sameWhy, "")}),
                 parts =
-                    if two then
-                        {heading(if firstOfStill <> null then "Still open (our message of " & longDate(firstOfStill[On]) & ")" else "Still open")}
-                        & sectionsBody(still, kind, sameWhy) & {heading("New since then")} & sectionsBody(newOnes, kind, sameWhy)
-                    else sectionsBody(items, kind, sameWhy),
+                    if two then {heading(stillTitle)} & halves{0}[Body] & {heading("New since then")} & halves{1}[Body]
+                    else halves{0}[Body],
                 signature = Text.Trim(if settings[Signature] <> "" then settings[Signature] else "SACM team"),
                 body = List.Transform(opening, p) & parts
                     & {p(plain("When you reply, please keep the reference [" & ref & "] in the subject.")),
@@ -282,7 +303,12 @@
                     NobodyAbove = kind = "escalation" and group[NobodyAbove],
                     Mailbox = List.AllTrue(List.Transform(items, (item) => toMailbox(item[Fact]))), Team = allTeam,
                     Person = if fact[ContactId] <> "" then fact[ContactId] else lower(textOf(fact[ContactEmail])),
-                    Items = items
+                    Items = items,
+                    Layout = [
+                        Opening = layoutOpening, Why = if kind <> "escalation" and sameWhy then fnHtml(why) else "",
+                        Sections = List.Combine(List.Transform(halves, (half) => half[Layout])), FirstName = textOf(fact[CiName]),
+                        Cis = List.Buffer(List.Distinct(List.Transform(items, (item) => item[Fact][CiKey]))), Noun = noun, Sender = "%%SENDER%%", Signature = signature
+                    ]
                 ],
 
         /* ---------------------------------------------------------- every group, sorted and split */
@@ -307,7 +333,7 @@
                 items = List.Buffer(List.Transform(List.Sort(numbered, order), (entry) => entry[Item])),
                 // Split by CI, never in the middle of a CI; the limit counts for the whole email. A mailbox or a team gets one message.
                 whole = List.AllTrue(List.Transform(items, (item) => toMailbox(item[Fact]) or isTeam(item[Fact]))),
-                limit = words[maxCis],
+                limit = Record.FieldOrDefault(settings, "MaxCis", words[maxCis]),
                 count = List.Count(items),
                 chunkIds = if whole then List.Repeat({0}, count)
                     else List.Buffer(List.Skip(List.Generate(

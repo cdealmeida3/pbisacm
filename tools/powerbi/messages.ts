@@ -22,6 +22,8 @@ import { DEFAULT_SETTINGS } from '../../src/app/state/store.ts';
 import { loadPacks, loadReferences } from '../../src/hosts/cli.ts';
 import { stateRows } from './history.ts';
 import type { HistoryKey } from './history.ts';
+import { emailsOf, rowsInEmailOf } from './email.ts';
+import type { Email } from './email.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 
@@ -78,15 +80,18 @@ export function draftCases(cases: Case[], packs = loadPacks()): Case[] {
 }
 
 /** One row of the table Drafts as the answer key gives it: the draft with the tokens of the Power App in place of the reference and the name. */
-export interface DraftRow { Ref: string; Kind: string; To: string; Cc: string; Subject: string; Body: string; Plain: string; Chat: string; Keys: string; NewKeys: string; CheckIds: string; CiCount: number; PartIndex: number; PartCount: number; About: string; NobodyAbove: boolean; Mailbox: boolean; Team: boolean; Person: string; AssignedTo: string; FreeKeys: string }
+export interface DraftRow { Html: string; Csv: string; Summary: string; EmailSubject: string; EmailId: string; Ref: string; Kind: string; To: string; Cc: string; Subject: string; Body: string; Plain: string; Chat: string; Keys: string; NewKeys: string; CheckIds: string; CiCount: number; PartIndex: number; PartCount: number; About: string; NobodyAbove: boolean; Mailbox: boolean; Team: boolean; Person: string; AssignedTo: string; FreeKeys: string }
 
 /** A draft with %%REF%% where its reference is, as Power Query writes it, and the reference a reminder answers in Ref. */
-export function draftRow(draft: Draft, items: Case[], settings: MessageSettings): DraftRow {
+export function draftRow(draft: Draft, items: Case[], settings: MessageSettings, email: Email, emailRef: string, emailId: string): DraftRow {
   const tokens = (text: string): string => text.split(draft.ref).join(REF_TOKEN).split(settings.senderName ?? SAMPLE_SENDER).join(SENDER_TOKEN);
   const byKey = new Map(items.map((item) => [item.key, item]));
   const own = draft.keys.map((key) => byKey.get(key)!);
   const assigned = Array.from(new Set(own.map((item) => item.assignedTo)));
+  // The email holds the reference of its first part (D314).
+  const emailTokens = (text: string): string => text.split(emailRef).join(REF_TOKEN).split(settings.senderName ?? SAMPLE_SENDER).join(SENDER_TOKEN);
   return {
+    Html: emailTokens(email.html), Csv: email.csv, Summary: email.summary, EmailSubject: emailTokens(email.subject), EmailId: emailId,
     Ref: draft.kind !== 'first' && draft.part.index === 1 ? draft.ref : '', Kind: draft.kind, To: draft.to, Cc: draft.cc,
     Subject: tokens(draft.subject), Body: tokens(draft.body), Plain: tokens(draft.plain), Chat: chatMessage(own, loadPacks(), settings, REF_TOKEN, draft.to),
     Keys: draft.keys.join('\n'), NewKeys: draft.newKeys.join('\n'), CheckIds: draft.checkIds.join(', '), CiCount: draft.ciCount,
@@ -109,7 +114,9 @@ export function draftRows(key: HistoryKey): DraftRow[] {
   const position = new Map(latest.facts.map((fact, at) => [fact.key, at]));
   const chosen = draftCases(key.cases).sort((a, b) => (position.get(a.key) ?? Infinity) - (position.get(b.key) ?? Infinity));
   let ref = 0;
-  return buildDrafts(chosen, loadPacks(), settings, () => `SACM-KEY${String(++ref).padStart(3, '0')}`).drafts.map((draft) => draftRow(draft, chosen, settings));
+  const drafts = buildDrafts(chosen, loadPacks(), settings, () => `SACM-KEY${String(++ref).padStart(3, '0')}`).drafts;
+  const emails = emailsOf(drafts, (at) => drafts[at]!.ref, rowsInEmailOf(stateRows('settings')));
+  return drafts.map((draft, at) => draftRow(draft, chosen, settings, emails[at]!, drafts[emails[at]!.first]!.ref, `D${String(emails[at]!.first + 1).padStart(4, '0')}`));
 }
 
 /** One message of tests/recorded/messages.txt. */

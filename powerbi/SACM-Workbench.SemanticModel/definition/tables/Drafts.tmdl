@@ -219,6 +219,41 @@ table Drafts
 		isNameInferred
 		sourceColumn: [FreeKeys]
 
+	/// The email (D313): the message laid out for Outlook by fnEmailTemplate, with %%REF%% and %%SENDER%%. The parts of a long message are one email (D314): it is on the first part, and the other parts hold "".
+	column Html
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Html]
+
+	/// The file the email carries when a table is longer than rowsInEmail lines (D314): every line of the email as CSV, UTF-8 with a BOM, named after the reference. "" for a short email.
+	column Csv
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Csv]
+
+	/// "In this email" as text: one line per part of the email, with its number of lines.
+	column Summary
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Summary]
+
+	/// The subject of the email: the Subject, or for the parts of a long message joined into one email, the subject of all its CIs.
+	column EmailSubject
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EmailSubject]
+
+	/// The draft that holds the email of this one: its own DraftId on the first part of a message, the first part's on the others.
+	column EmailId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EmailId]
+
 	partition Drafts = calculated
 		mode: import
 		source =
@@ -247,5 +282,10 @@ table Drafts
 					"Team", Run[Drafts.Team],
 					"Person", Run[Drafts.Person],
 					"AssignedTo", Run[Drafts.AssignedTo],
-					"FreeKeys", Run[Drafts.FreeKeys]
+					"FreeKeys", Run[Drafts.FreeKeys],
+					"Html", Run[Drafts.Html],
+					"Csv", Run[Drafts.Csv],
+					"Summary", Run[Drafts.Summary],
+					"EmailSubject", Run[Drafts.EmailSubject],
+					"EmailId", Run[Drafts.EmailId]
 				)

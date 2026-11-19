@@ -2,6 +2,14 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.49.0 — The Power BI report, the design pass part 4: the email template (D4)
+
+- **Every message is now also a finished email** (D313), in the new columns *Html*, *Csv*, *Summary*, *EmailSubject* and *EmailId* of *Drafts*: a navy band with the reference, **In this email** (the numbered parts and how many lines each has), a number before each part, clear tables with the class under the name, the values that are the same on every line said once above the table, a box **What we ask**, **Why it matters** in grey, and a footer that says why the person gets the email. The words are the same as before, word for word. On a phone each line of a table becomes a small card.
+- **A long message is one email** (D314): the parts of more than 25 CIs are joined. Each table shows its first 10 lines and "and N more in the attached file"; the email carries the full list as a CSV file named after the reference, ready for Excel. The setting `rowsInEmail` of *SACM Settings* changes the 10 (1 to 100).
+- The app *SACM messages* and the flows still send *Body*; they use the new email and the file from build D5. Carlos chose that the email goes out from the shared mailbox and that **Outlook draft** goes into the manager's own Drafts (D315, for D5).
+- The emails of the samples are recorded in `tests/recorded/emails/` and the workflow *Power BI* compares the Power Query with them byte for byte, also with long messages split and joined.
+- No check, number or message text changed. The HTML app is as before: its drafts only carry their parts as data too.
+
 ## 0.48.0 — The Power BI report, the design pass part 3: the work pages (D3)
 
 - **People** (D321): one line per person with open lines, in the order of the team's rules: the next step, a bar of the open lines in the colours of their states, the kinds of problem, the cards and the last time asked. **Find a person** searches the names; **Open person** opens the one selected.
