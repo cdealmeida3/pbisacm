@@ -2,6 +2,15 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.47.0 — The Power BI report, the design pass part 2: the rail, My day and the Work queue (D2)
+
+- **A navy rail on every page** (D319): one item per page with its icon (My day, Work queue, Messages, Cards, Mapping, Contracts, History, Activity, Audit, Reports). A press opens the page. The page in view is lighter, with a coral line; *Card* lights *Cards*, *Person* and *Case* light *Work queue*. Beside *My day* the number of next steps, beside *Work queue* the open lines. On the four Audit pages their parts (*Record*, *Export*, *Not followed*, *Lifecycle review*) show under *Audit*.
+- **My day is the next steps** (D320): four numbers (replies to read, people to escalate, reminders due, new since the last report), then **Your next steps**, one line per person in the order of the team's rules, each with a chip, what to do and why, and its button. Select a step and press **Open the step** to see the person. The lines SACM fixes itself are a button to All cards. At the right **Since the last report** (per section, a small line over the reports and a bar of what was open before and what is new) and **Waiting on others**.
+- **My work is now the Work queue**: every open line, one line per person asked, with the next step, the lines, the cards, the last message and who has them. The buttons at the top choose a status. The app *SACM actions* stays at the right; an app already placed on the page stays where it is.
+- **The chip of the reports** at the top right of My day is green when every report is there and fresh, amber when one is missing or too old; it opens Reports.
+- The small chips, buttons, bars and lines are pictures drawn by measures of the model (no custom visual, D311).
+- No check, number or message changed; the HTML app is as before.
+
 ## 0.46.0 — The Power BI report, the design pass part 1: the theme and the pages (D1)
 
 - **Every page fits the screen** (D312): 1280 × 720, with no scroll bar, at any window size (*Case*, the sheet of one CI, is longer and scrolls). A navy band at the left of every page, the name of the page and one line on what it is for at the top, the visuals in white boxes on the warm page of the app (design A, D310).
