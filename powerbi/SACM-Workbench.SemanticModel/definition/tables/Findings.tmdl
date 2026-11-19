@@ -77,6 +77,18 @@ table Findings
 		displayFolder: My day
 
 	/// 1 on a person with a next step today (Person state 1 to 4): the visual filter of Your next steps (My day).
+	/// PREVIEW: 1 when one card is opened (Card shows nothing before, rule 7).
+	measure 'Card chosen' = IF ( COUNTROWS ( ALLSELECTED ( Checks[CardLabel] ) ) = 1, 1 )
+		formatString: 0
+
+	/// PREVIEW: 1 when one CI is opened.
+	measure 'CI chosen' = IF ( COUNTROWS ( ALLSELECTED ( Findings[CiName] ) ) = 1, 1 )
+		formatString: 0
+
+	/// PREVIEW: 1 when one person is opened.
+	measure 'Person chosen' = IF ( COUNTROWS ( ALLSELECTED ( Findings[ContactName] ) ) = 1, 1 )
+		formatString: 0
+
 	measure 'Step mark' =
 			VAR kind = [Person state]
 			VAR everyone = SELECTEDVALUE ( ViewChoice[View], "Mine and free" ) = "Everyone"
