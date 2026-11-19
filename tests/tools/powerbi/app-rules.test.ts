@@ -148,5 +148,10 @@ test('the three screens use only modern controls with their own properties, or t
     const controls = screenControls(readFileSync(file, 'utf8'));
     assert.ok(controls.length > 10, `${app}: the controls were read`);
     assert.deepEqual(controlProblems(file, { Screens: { S: { Children: controls } } }), [], app);
+    // A formula on one line is a plain YAML value: ": " or " #" in it breaks the YAML (Studio refuses the paste). Such a
+    // formula goes in a block (|-). The CI parses the whole file; this finds the usual slip without .NET.
+    const plain = readFileSync(file, 'utf8').split('\n').map((line, at) => ({ line, at: at + 1 }))
+      .filter(({ line }) => /^\s+[A-Za-z]+: =/.test(line) && /: |\s#/.test(line.slice(line.indexOf(': =') + 3)));
+    assert.deepEqual(plain.map(({ at }) => `${app}:${at}`), [], 'a one-line formula with ": " or " #" must be a block (|-)');
   }
 });

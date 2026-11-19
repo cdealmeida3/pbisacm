@@ -146,11 +146,11 @@ export function appLook(): string {
     ['ColourPage', c.page!, 'behind the panels'],
     ['ColourSurface', c.surface!, 'a panel'],
     ['ColourMailPage', email.page!, 'behind the email'],
-    ['ColourBlue', c.blue!, 'a first message'], ['ColourBlueSoft', c['blue-soft']!, ''],
-    ['ColourAmber', c.amber!, 'a reminder'], ['ColourAmberSoft', c['amber-soft']!, ''],
-    ['ColourRed', c.red!, 'an escalation, a warning'], ['ColourRedSoft', c['red-soft']!, ''],
+    ['ColourBlue', c.blue!, 'asked: a first message, an email sent; information (LOOK §2)'], ['ColourBlueSoft', c['blue-soft']!, ''],
+    ['ColourAmber', c.amber!, 'a reminder, a warning'], ['ColourAmberSoft', c['amber-soft']!, ''],
+    ['ColourRed', c.red!, 'an escalation, a problem, a value that cannot be saved'], ['ColourRedSoft', c['red-soft']!, ''],
     ['ColourViolet', c.violet!, 'a reply'], ['ColourVioletSoft', c['violet-soft']!, ''],
-    ['ColourGreen', c.green!, 'done, sent'], ['ColourGreenSoft', c['green-soft']!, ''],
+    ['ColourGreen', c.green!, 'OK, saved'], ['ColourGreenSoft', c['green-soft']!, ''],
     ['ColourGrey', c.grey!, 'nothing to do, not yet'], ['ColourGreySoft', c['grey-soft']!, '']
   ];
   return [

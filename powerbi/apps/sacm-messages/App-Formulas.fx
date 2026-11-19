@@ -11,15 +11,15 @@ ColourLine = ColorValue("#e8dfd3"); // borders and lines
 ColourPage = ColorValue("#faf6f1"); // behind the panels
 ColourSurface = ColorValue("#ffffff"); // a panel
 ColourMailPage = ColorValue("#f4f1ec"); // behind the email
-ColourBlue = ColorValue("#175cd3"); // a first message
+ColourBlue = ColorValue("#175cd3"); // asked: a first message, an email sent; information (LOOK §2)
 ColourBlueSoft = ColorValue("#eff8ff");
-ColourAmber = ColorValue("#7d5700"); // a reminder
+ColourAmber = ColorValue("#7d5700"); // a reminder, a warning
 ColourAmberSoft = ColorValue("#fffaeb");
-ColourRed = ColorValue("#b42318"); // an escalation, a warning
+ColourRed = ColorValue("#b42318"); // an escalation, a problem, a value that cannot be saved
 ColourRedSoft = ColorValue("#fef3f2");
 ColourViolet = ColorValue("#5925dc"); // a reply
 ColourVioletSoft = ColorValue("#f4f3ff");
-ColourGreen = ColorValue("#067647"); // done, sent
+ColourGreen = ColorValue("#067647"); // OK, saved
 ColourGreenSoft = ColorValue("#ecfdf3");
 ColourGrey = ColorValue("#475467"); // nothing to do, not yet
 ColourGreySoft = ColorValue("#f2f4f7");
@@ -83,6 +83,9 @@ Emails = ForAll(
                 IsBlank(email.HtmlLength) || IsBlank(email.CsvLength), "unknown",
                 Len(email.Html) = email.HtmlLength && Len(email.Csv) = email.CsvLength, "yes",
                 "cut"),
+            // What the app remembers of an email it recorded, until the refresh takes it off the list: its first key
+            // between two line breaks (a refresh may number the drafts again, the keys stay).
+            SentKey: Char(10) & First(Split(Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)), Char(10))).Value & Char(10),
             PartCount: CountRows(parts),
             CiCount: Sum(parts, CiCount),
             Keys: Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)),

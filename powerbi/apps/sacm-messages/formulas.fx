@@ -56,6 +56,9 @@ Emails = ForAll(
                 IsBlank(email.HtmlLength) || IsBlank(email.CsvLength), "unknown",
                 Len(email.Html) = email.HtmlLength && Len(email.Csv) = email.CsvLength, "yes",
                 "cut"),
+            // What the app remembers of an email it recorded, until the refresh takes it off the list: its first key
+            // between two line breaks (a refresh may number the drafts again, the keys stay).
+            SentKey: Char(10) & First(Split(Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)), Char(10))).Value & Char(10),
             PartCount: CountRows(parts),
             CiCount: Sum(parts, CiCount),
             Keys: Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)),

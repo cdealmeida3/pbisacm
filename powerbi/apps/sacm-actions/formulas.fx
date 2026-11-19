@@ -78,7 +78,12 @@ RecentEvents = Filter(
 // they are delegated), newest first; the report shows the same replies after the refresh. A reply is read once a
 // manager acts on one of its lines: Mark answered (status Answered), Waiting until (status Fix in progress and a note
 // with the date) or a status of the tab Actions (RepliesToRead of the report).
-ReplyRefs = Distinct(Filter(Lines, !IsBlank(LastRef)), LastRef);
+// One SharePoint query per reference, so at most ReplyRefLimit of them: the references of the lines with a reply to
+// read when there are any, else those of every line (the Work queue may give the app hundreds).
+ReplyRefLimit = 25;
+ReplyRefs = FirstN(
+    Distinct(Filter(Lines, !IsBlank(LastRef) && (ToReadCount = 0 || Step = "Reply to read")), LastRef),
+    ReplyRefLimit);
 LineReplies = Sort(
     Filter(
         ForAll(ReplyRefs As reference, First(Sort(Filter('SACM Replies', Title = reference.Value), Received, SortOrder.Descending))),

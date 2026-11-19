@@ -56,7 +56,11 @@ Screens:
             Text: |-
               =If(
                   IsEmpty(CurrentLines), "No lifecycle review yet. New review draws " & CountRows(NextLines) & " CIs from the newest CI report.",
-                  "Review " & CurrentId & ": " & MarkedCount & " of " & CountRows(CurrentLines) & " CIs checked.")
+                  "Review " & CurrentId & ": " & MarkedCount & " of " & CountRows(CurrentLines) & " CIs checked." &
+                  // Why the buttons are grey (LOOK rule 7).
+                  If(StartedToday, " A review was started today: one a day.", "") &
+                  If(IsEmpty(Filter(LineGallery.AllItems, MarkCheck.Checked)), " Tick CIs to mark them.", "") &
+                  If(IsEmpty(AgreeingLines), " No CI left that EPO shows the same.", ""))
             Font: =AppFont
             Size: =10
             Color: =ColourInk

@@ -120,7 +120,8 @@ Screens:
           Control: ModernDropdown@1.0.0
           Properties:
             Items: =TeamNames
-            Default: ={ Value: MeName }
+            Default: |-
+              ={ Value: MeName }
             ItemDisplayText: =ThisItem.Value
             AccessibleLabel: ="Team member"
             BasePaletteColor: =ColourNavy
@@ -491,7 +492,9 @@ Screens:
                       !IsBlank(varReplyDone) && varReplyDone.Ref = ReplyPick.Selected.Title && Now() < DateAdd(varReplyDone.At, 3, TimeUnit.Minutes),
                       "Done just now. The report shows it after the refresh.",
                       ticked = 0, "Tick the lines the reply answers.",
-                      ticked & If(ticked = 1, " line ticked: the buttons act on it.", " lines ticked: the buttons act on them.")))
+                      ticked & If(ticked = 1, " line ticked.", " lines ticked.") &
+                      If(IsBlank(WaitDate.SelectedDate) || WaitDate.SelectedDate <= Today(), " Waiting until needs a date after today.", "") &
+                      If(IsBlank(Trim(ReplyNote.Text)), " Add note needs a note.", "")))
             Font: =AppFont
             Size: =9
             Color: =ColourMuted
@@ -596,7 +599,8 @@ Screens:
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
-            Tooltip: ="Fix in progress, with a note of the date they gave: no reminder goes while it stands"
+            Tooltip: |-
+              ="Fix in progress, with a note of the date they gave: no reminder goes while it stands"
             Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
             DisplayMode: |-
               =If(
