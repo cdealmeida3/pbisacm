@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { readExpressions, readTable, tmdlName } from '../../../tools/powerbi/tmdl.ts';
+import { daxParts, queryColumns, readExpressions, readTable, tmdlName } from '../../../tools/powerbi/tmdl.ts';
 
 /* The small TMDL reader of tools/powerbi/tmdl.ts: expressions with their description and group, tables with columns, measures and the M of the partition. */
 
@@ -37,6 +37,21 @@ test('a table gives its columns, its measures (one line and several) and the M o
     assert.deepEqual(table.columns, [{ name: 'ReportDate', dataType: 'dateTime', sourceColumn: 'ReportDate' }, { name: 'File name', dataType: 'string', sourceColumn: 'FileName' }]);
     assert.deepEqual(table.measures, [{ name: 'Run count', dax: 'COUNTROWS ( Runs )' }, { name: 'Long', dax: 'VAR a = 1\nRETURN a' }]);
     assert.equal(table.partitionM, 'RunsRows');
+  });
+});
+
+test('a calculated column gives its DAX (one line and several); it is not a column of the query', () => {
+  const text = [
+    'table Runs', '', '\tcolumn ReportDate', '\t\tdataType: dateTime', '\t\tsourceColumn: ReportDate', '',
+    '\tcolumn Week = Runs[ReportDate] - WEEKDAY ( Runs[ReportDate], 2 ) + 1', '\t\tdataType: dateTime', '\t\tformatString: d mmm', '',
+    '\tcolumn Step =', '\t\t\tVAR a = 1', '\t\t\tRETURN a', '\t\tdataType: string', '\t\tsortByColumn: ReportDate', '',
+    '\tpartition Runs = m', '\t\tmode: import', '\t\tsource = RunsRows', ''
+  ].join('\n');
+  withFile(text, (file) => {
+    const table = readTable(file);
+    assert.deepEqual(table.columns.map((column) => [column.name, column.dataType, column.dax ?? '']), [['ReportDate', 'dateTime', ''], ['Week', 'dateTime', 'Runs[ReportDate] - WEEKDAY ( Runs[ReportDate], 2 ) + 1'], ['Step', 'string', 'VAR a = 1\nRETURN a']]);
+    assert.deepEqual(queryColumns(table).map((column) => column.name), ['ReportDate']);
+    assert.deepEqual(daxParts(table).map((part) => part.name), ['Week', 'Step']);
   });
 });
 

@@ -33,6 +33,29 @@ table Runs
 	measure 'Runs note' = IF ( COUNTROWS ( Runs ) + 0 = 0, "No CI report is loaded yet.", "The files of each CI report date." )
 		displayFolder: Page notes
 
+	/// A number of Audit: the CI report dates of the period chosen.
+	measure 'Reports received' =
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			RETURN CALCULATE ( COUNTROWS ( Runs ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= fromDate, Runs[ReportDate] <= toDate ) + 0
+		formatString: #,0
+		displayFolder: Audit
+
+	/// Under the CI reports of the period (Audit): the first and the last.
+	measure 'Reports received line' =
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			VAR openingDate = CALCULATE ( MIN ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= fromDate, Runs[ReportDate] <= toDate )
+			VAR closingDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= fromDate, Runs[ReportDate] <= toDate )
+			RETURN IF ( ISBLANK ( openingDate ), "no CI report in the period", "from " & FORMAT ( openingDate, "d mmm" ) & " to " & FORMAT ( closingDate, "d mmm yyyy" ) )
+		displayFolder: Audit
+
+	/// Under a number of Audit: the findings found in the period that were new in it.
+	measure 'Found line' =
+			VAR fresh = [New in the period] + 0
+			RETURN fresh & " new in the period"
+		displayFolder: Audit
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred
@@ -77,6 +100,12 @@ table Runs
 		isDataTypeInferred
 		isNameInferred
 		sourceColumn: [ContractFile]
+
+	/// The Monday of the week of the CI report date (Found and closed per week, Audit; build D3).
+	column Week = Runs[ReportDate] - WEEKDAY ( Runs[ReportDate], 2 ) + 1
+		dataType: dateTime
+		formatString: d mmm
+		summarizeBy: none
 
 	partition Runs = calculated
 		mode: import

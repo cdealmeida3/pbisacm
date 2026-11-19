@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "topic",
   "position": {
-    "x": 836,
-    "y": 16,
-    "z": 3000,
-    "height": 56,
-    "width": 420,
-    "tabOrder": 3000
+    "x": 668,
+    "y": 84,
+    "z": 4700,
+    "height": 40,
+    "width": 200,
+    "tabOrder": 4700
   },
   "visual": {
     "visualType": "slicer",
@@ -41,7 +41,7 @@
             "mode": {
               "expr": {
                 "Literal": {
-                  "Value": "'Basic'"
+                  "Value": "'Dropdown'"
                 }
               }
             }
@@ -51,23 +51,10 @@
       "header": [
         {
           "properties": {
-            "text": {
+            "show": {
               "expr": {
                 "Literal": {
-                  "Value": "'What the card is about'"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "general": [
-        {
-          "properties": {
-            "orientation": {
-              "expr": {
-                "Literal": {
-                  "Value": "1D"
+                  "Value": "false"
                 }
               }
             }
@@ -82,7 +69,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'What the card is about'"
+                  "Value": "'topic'"
                 }
               }
             }
@@ -111,7 +98,7 @@
           "Version": 2,
           "From": [
             {
-              "Name": "c",
+              "Name": "f",
               "Entity": "Checks",
               "Type": 0
             }
@@ -127,7 +114,7 @@
                           "Column": {
                             "Expression": {
                               "SourceRef": {
-                                "Source": "c"
+                                "Source": "f"
                               }
                             },
                             "Property": "Topic"

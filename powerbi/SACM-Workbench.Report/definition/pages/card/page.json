@@ -16,7 +16,7 @@
                 "Entity": "Checks"
               }
             },
-            "Property": "CheckId"
+            "Property": "CardLabel"
           }
         },
         "type": "Categorical",
@@ -39,7 +39,7 @@
                 "Entity": "Checks"
               }
             },
-            "Property": "CheckId"
+            "Property": "CardLabel"
           }
         }
       }

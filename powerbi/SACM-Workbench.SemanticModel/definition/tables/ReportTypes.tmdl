@@ -67,6 +67,42 @@ table ReportTypes
 			IF ( LEFT ( [Reports chip], 1 ) = "!", "#fffaeb", "#ecfdf3" )
 		displayFolder: My day
 
+	/// The reports of Overview as chips: each type with a tick when its newest file is up to date, an alert when it is old or missing, in its colour (green, amber, red). The chips flow over two lines of 300 × 56.
+	measure 'Reports tile' =
+			VAR asOf = [Today]
+			VAR chips =
+			    ADDCOLUMNS (
+			        ALL ( ReportTypes[Kind], ReportTypes[Label], ReportTypes[Order], ReportTypes[NewestDate], ReportTypes[StaleAfter] ),
+			        "@word", IF ( ReportTypes[Kind] = "contract", "Contracts", LEFT ( ReportTypes[Label], SEARCH ( " ", ReportTypes[Label] & " ", 1, 0 ) - 1 ) ),
+			        "@kind", IF ( ISBLANK ( ReportTypes[NewestDate] ), 3, IF ( DATEDIFF ( ReportTypes[NewestDate], asOf, DAY ) > ReportTypes[StaleAfter], 2, 1 ) )
+			    )
+			VAR sized = ADDCOLUMNS ( chips, "@w", LEN ( [@word] ) * 7 + 30 )
+			VAR placed = ADDCOLUMNS ( sized, "@start", VAR orderAt = ReportTypes[Order] RETURN SUMX ( FILTER ( sized, ReportTypes[Order] < orderAt ), [@w] + 6 ) + 0 )
+			VAR lined = ADDCOLUMNS ( placed, "@line", IF ( [@start] + [@w] > 300, 1, 0 ) )
+			VAR shift = MINX ( FILTER ( lined, [@line] = 1 ), [@start] ) + 0
+			VAR drawn =
+			    CONCATENATEX (
+			        lined,
+			        VAR x = [@start] - IF ( [@line] = 1, shift, 0 )
+			        VAR y = 2 + [@line] * 28
+			        VAR ink = SWITCH ( [@kind], 1, "#067647", 2, "#7d5700", "#b42318" )
+			        VAR paper = SWITCH ( [@kind], 1, "#ecfdf3", 2, "#fffaeb", "#fef3f2" )
+			        VAR mark = IF ( [@kind] = 1, "<path d='M" & x + 9 & " " & y + 12 & "l3 3 6-6' fill='none' stroke='" & ink & "' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/>", "<path d='M" & x + 12 & " " & y + 6 & "v6M" & x + 12 & " " & y + 16 & "v.5' stroke='" & ink & "' stroke-width='2' stroke-linecap='round'/>" )
+			        RETURN
+			            "<rect x='" & x & "' y='" & y & "' width='" & [@w] & "' height='22' rx='11' fill='" & paper & "'/>" & mark
+			                & "<text x='" & x + 22 & "' y='" & y + 15.5 & "' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='" & ink & "'>" & [@word] & "</text>",
+			        "",
+			        ReportTypes[Order], ASC
+			    )
+			VAR picture = "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='56' viewBox='0 0 300 56'>" & drawn & "</svg>"
+			RETURN "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// The words of the reports chip at the top right of every page, without its mark: under the chips of Overview.
+	measure 'Reports tile line' = MID ( [Reports chip], 3, 500 )
+		displayFolder: Overview
+
 	column Kind
 		dataType: string
 		sourceColumn: Kind

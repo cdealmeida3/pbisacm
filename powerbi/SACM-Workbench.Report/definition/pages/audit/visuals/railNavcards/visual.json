@@ -3,11 +3,11 @@
   "name": "railNavcards",
   "position": {
     "x": 8,
-    "y": 160,
-    "z": 1003,
+    "y": 196,
+    "z": 1004,
     "height": 32,
     "width": 172,
-    "tabOrder": 4
+    "tabOrder": 5
   },
   "visual": {
     "visualType": "actionButton",

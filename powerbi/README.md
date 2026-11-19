@@ -29,26 +29,30 @@ The report opens on the **My day** page. Look at:
 |---|---|
 | **My day** | The chip of the reports at the top right ("✓ 5 reports · 11 Nov · up to date"; a press opens Reports). Four numbers: for the samples 1 reply to read (Dee Owner), 1 person to escalate (Ada Example), 1 reminder due (Cy Keeper) and the findings new since the report before (the samples have two CI reports: 4 and 11 November). Below, **Your next steps**: one line per person, in the order of the team's rules (the reply first, then the escalation, the reminder, the people never asked). Select a step and press **Open person** (or right-click, **Drill through**, **Person**). At the right, **Since the last report** per section and **Waiting on others**. |
 | **Work queue** | One line per person asked, with the next step, the open lines, the cards, the last message and who has them. The buttons at the top choose a status. The app *SACM actions* sits at the right (section 6.4). |
-| **Activity** | The 22 events of the sample journal, newest first, in the words of the app. **Day**, **Who** and **Type** filter them. |
-| **History** | To solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. **Card** filters one card. |
-| **Audit** | The verification record of the report date chosen (**Report date** at the top right). On the navy rail at the left, its parts **Record**, **Export**, **Not followed** and **Lifecycle review** show under *Audit* and open the other parts (pages that are not in the tabs). |
+| **People** | One line per person with open lines, in the order of the team's rules: the next step, a bar of the open lines, the kinds of problem, the cards, the last time asked. **Find a person** searches the names. Select a person and press **Open person**. |
+| **History** | Two tabs. **What happened**: the 22 events of the sample journal and the replies of the sample list, newest first, in the words of the app, with an icon per kind. The search box (a CI, a person, a card or a reference), the row of kinds and **Who** filter them. **Trend**: to solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. |
+| **Overview** | Four tiles: the open lines, the lines waiting on a person and the lines solved since the last report (each against 4 November, with a small line), and the reports with a chip each. **Where the work sits** (open lines by section and next step, darker is more, the total of each section at the right), **Open lines per report** (with a person, and the ones SACM fixes) and **Who holds the most** (select a person, **Open person**). |
+| **Audit** | The summary of a period (**Period**, all days when none is chosen): the CI reports received, the problems found, closed and verified, the median days to an answer (*–* when the samples have no reply to an email of the period); found and closed per week; every escalation email of the period (the samples have none, so the box says so). **Open the record** and **Export for the auditor** open two of its parts. On the navy rail its parts **Summary**, **Record**, **Export**, **Not followed** and **Lifecycle review** show under *Audit*. |
+| **Audit record** | The verification record of the report date chosen (**Report date**). |
 | **Audit export** | The export of a period (**Period of the export**): what was verified (2 findings solved on 11 November, with the days to verify), the actions of the team, the CI reports loaded, the findings per check and those new in the period, and what was open at the end. **More options (...)**, **Export data** on each table gives the Excel file. |
 | **Not followed** | The exceptions (the 3 decisions to stop following: 2 still run, 1 ended on 10 November) and the cases not followed up. The app *SACM actions* sits at the right for **Follow again** (section 6.4). |
 | **Lifecycle review** | The lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The marks, then the evidence (who checked, the case, when it was asked); the app *SACM audit* sits at the right (section 6.8). |
 | **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. Below: the runs, the classes and the files that could not be read (none for the samples). |
-| **Cards** | The three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. **Topic** at the top right filters the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
-| **Card** (drill through) | Right-click a row of the Cards page, choose **Drill through**, then **Card**. The counts at the top right (to solve, to check, waiting, known), then one table of every line of the card with its state and why, the SACM fix list (with **Open in ServiceNow**), the lines by kind of problem (for *For Procurement*: one email to the Procurement mailbox, one table per kind), and a table with the columns of the SACM template: its **More options (...)**, **Export data** gives the Excel file. A contract shows as `CT…: name`. |
-| **Case** (drill through) | Right-click a CI on the Card page, **Drill through**, **Case**: each problem of the CI, its state, who is asked, who is copied and who gets an escalation, the chip *changed in EPO*, and *What EPO already has* when EPO already holds the person asked for (then nobody needs to be asked). Below: **Relationships**, every CI above and below it, its class, status and type, and whether the line counts for the checks. |
-| **Person** (drill through) | Right-click the person asked, **Drill through**, **Person**: everything open with them. |
+| **Cards** | Two tabs. **Sections**: the three sections side by side, each card with a badge (the number to solve, a tick when OK) and a small line of its report dates. **List**: one row per check, as before. Select a card, then **Open card**. On the list: the three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. The row of states (*To solve*, *To check*, *OK*, *Not tested*) and **Topic** filter the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
+| **Card** (drill through) | On All cards select a card and press **Open card**. **Back**, the card and what it finds, then the tabs **To solve with a person** (the lines by the person to ask, then the kind of problem, with why a line waits), **SACM fix list** (with **Open in ServiceNow**), **To check** (the lines to check first) and **Export** (the columns of the SACM template: **More options (...)**, **Export data** gives the Excel file). At the right the app, *About this card* with the numbers, and **Open CI** for the line selected. A contract shows as `CT…: name`. |
+| **Case** (drill through) | On a card or a person select a line and press **Open CI**. **Back**, the CI and its fields, then the tabs **Problems** (each problem, its state, why it waits, who is asked, the follow-up, **Open in ServiceNow**), **People** (who is asked, copied, who gets an escalation), **Relationships** (every CI above and below it, and whether the line counts), **Timeline** and **Replies**. The app *SACM actions* at the right (section 6.4). |
+| **Person** (drill through) | On My day, People or Overview select a person and press **Open person**: the next step, the open lines, the kinds of problem, the last contact, everything open with them, their replies, **Prepare the email** (opens Messages) and **Open CI**. |
 | **Mapping backlog** | One line per CI to map with its owner: why it is on the list, the stage of its class, the steps, its criticality and the next step ("Invite the owner to a mapping session", or why it waits). **Lines** filters To solve, To check, Waiting and Planned. Below: the **capability sheet** for Enterprise Architecture (its line says how many, or why it is empty: it needs the Relationship report), every Business Capability with what is above and below it (**Export data** gives the Excel file). For the samples: 4 CIs to map. The backlog has no drill through to the Case page: right-click the CI on the *Mapping backlog* card instead. The stage is the last one the journal sets for the CI (the Power App's *Mapping stage*), else the first stage of the class: in the samples one CI is at *Session held*. |
 | **Contract changes** | The newest Solusi contract file against the one before it: new contracts, contracts no longer in the file, status changes and changed fields. Then the Concluded contracts that end in the next 30 and in the next 90 days (counted from today), and the running contracts without a daily responsible. For information only: nobody is asked. The samples have two Solusi files, an earlier one and the newest, so the page compares them; 2 Concluded contracts end in the next 90 days (none in 30) and 1 has no daily responsible. |
 | **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples: **39 of 39**. Below: the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up), each with the app's number and *OK*. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
 
 Every page has the navy rail at the left: one item per page (a press opens it), the page in view lighter with a coral
 line, the number of next steps beside *My day* and of open lines beside *Work queue*; at its foot the version, "invented
-samples" or "SharePoint", and when the data was refreshed. Under the title of every table and chart, a grey line says how many lines it shows, or why it shows
+samples" or "SharePoint", and when the data was refreshed. At the top right of every page the chip of the reports (green when
+every report is up to date, amber when one is old or missing; a press opens Reports). Under the title of every table and chart, a grey line says how many lines it shows, or why it shows
 none ("No reply to read: a reply to a message of the team shows here."): a box is never empty without a word. Every page is
-1280 × 720 and fits the window; *Case* is longer (1440) and scrolls.
+1280 × 720 and fits the window, *Case* too (build D3 put its parts on tabs). The tabs of All cards, Card, Case and
+History are bookmarks: a press shows one table and keeps the card, CI or person of the page.
 
 In Sample mode "today" is **11 November 2026**, the date of the samples, so the ages on the Reports page and the
 reminders due never change.
@@ -333,8 +337,8 @@ Make it in the **Power BI service** (app.powerbi.com): Desktop gives Power Apps 
 not while you edit it. Publish the report first (section 4).
 
 1. Open the report, **Edit**. Go to the page **Case**. **Visualizations → Power Apps**. Place it on the right, beside
-   *People* and *Relationships*: **Format → General → Properties → Size and position**: X `956`, Y `516`, width `300`,
-   height `420`. (Each page keeps a free place for its app; the table at the end of this section lists them all.)
+   the tabs: **Format → General → Properties → Size and position**: X `956`, Y `84`, width `300`,
+   height `620`. (Each page keeps a free place for its app; the table at the end of this section lists them all.)
 2. With the visual selected, add these fields of **CaseLines** to **Power Apps data**, in this order: *Key*, *CheckId*,
    *CiName*, *Status*, *AssignedTo*, *Person*, *Actions*, *Stages*, *StageId*, *ExceptionReason*, *RetireOn*,
    *ContactName*, *ShareTo* (from build B7: an app made in B6 gets it when you add the field and edit the app from the
@@ -364,7 +368,7 @@ not while you edit it. Publish the report first (section 4).
     `SACM-Workbench.Report/` (the commit must not hold a `.pbix`).
 
 How to try it: on the Case page of a test CI, pick **Note**, type a word, **Save**. The app says *Saved*; the line
-appears under **Done lately** at once; after about a minute (the refresh) the page *Activity* shows the note.
+appears under **Done lately** at once; after about a minute (the refresh) the tab *What happened* of **History** shows the note.
 
 What to know:
 
@@ -389,7 +393,7 @@ them in **Format → General → Properties → Size and position**:
 
 | Page | App | X | Y | Width | Height |
 |---|---|---|---|---|---|
-| Case | SACM actions | 956 | 516 | 300 | 420 |
+| Case | SACM actions | 956 | 84 | 300 | 620 |
 | Card | SACM actions | 956 | 84 | 300 | 300 |
 | Person | SACM actions | 956 | 84 | 300 | 368 |
 | Work queue | SACM actions | 956 | 84 | 300 | 620 |
@@ -398,7 +402,8 @@ them in **Format → General → Properties → Size and position**:
 | Lifecycle review | SACM audit | 956 | 84 | 300 | 620 |
 
 An app placed before build D1 (0.46.0) keeps its old place: move it to the place above. Build D2 (0.47.0) renamed the
-page *My work* to *Work queue*: an app already on it stays where it is.
+page *My work* to *Work queue*: an app already on it stays where it is. **Build D3 (0.48.0) moved the app of Case**:
+the page is now 720 high with tabs, so move its app to X `956`, Y `84`, width `300`, height `620`.
 
 ### 6.5 How many refreshes (spike S5)
 
@@ -451,8 +456,8 @@ Make it once, as the app of section 6.4:
    managers`. Save the report.
 
 How to try it: in *SACM Team* put yourself as a member. On a test message, change **To** to your own address, press
-**Test**: the email comes to you. Then **Send**: it comes again, and after the refresh the page *Activity* shows the
-message.
+**Test**: the email comes to you. Then **Send**: it comes again, and after the refresh the tab *What happened* of
+**History** shows the message.
 
 What to know:
 

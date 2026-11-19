@@ -3,11 +3,11 @@
   "name": "railNavhistory",
   "position": {
     "x": 8,
-    "y": 268,
-    "z": 1006,
+    "y": 304,
+    "z": 1007,
     "height": 32,
     "width": 172,
-    "tabOrder": 7
+    "tabOrder": 8
   },
   "visual": {
     "visualType": "actionButton",

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "List",
+  "name": "cardsList",
+  "options": {
+    "targetVisualNames": [
+      "completeness",
+      "correctness",
+      "compliance",
+      "checks"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true,
+    "suppressActiveSection": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "cards",
+    "sections": {
+      "cards": {
+        "visualContainers": {
+          "completeness": {
+            "singleVisual": {
+              "visualType": "tableEx",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "correctness": {
+            "singleVisual": {
+              "visualType": "tableEx",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "compliance": {
+            "singleVisual": {
+              "visualType": "tableEx",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "checks": {
+            "singleVisual": {
+              "visualType": "tableEx"
+            }
+          }
+        }
+      }
+    }
+  }
+}

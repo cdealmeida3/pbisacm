@@ -6,7 +6,7 @@
     "y": 16,
     "z": 2000,
     "height": 56,
-    "width": 1032,
+    "width": 600,
     "tabOrder": 2000
   },
   "visual": {
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The newest report of each type, how old it is, and the files not read. A report is known by its columns.",
+                    "value": "The newest report of each type, how old it is, and the files not read.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

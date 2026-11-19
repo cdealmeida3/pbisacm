@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "To solve with a person",
+  "name": "cardLines",
+  "options": {
+    "targetVisualNames": [
+      "lines",
+      "fixList",
+      "toCheck",
+      "export"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true,
+    "suppressActiveSection": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "card",
+    "sections": {
+      "card": {
+        "visualContainers": {
+          "lines": {
+            "singleVisual": {
+              "visualType": "tableEx"
+            }
+          },
+          "fixList": {
+            "singleVisual": {
+              "visualType": "tableEx",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "toCheck": {
+            "singleVisual": {
+              "visualType": "tableEx",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "export": {
+            "singleVisual": {
+              "visualType": "tableEx",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

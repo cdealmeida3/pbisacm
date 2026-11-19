@@ -29,7 +29,8 @@ test('the page in view is lit once; a drill-through page lights the page it belo
   assert.equal(lit(railSvg('selfcheck', 720)), 0, 'the Self-check is on no item');
   const person = railSvg('person', 720);
   assert.equal(lit(person), 1);
-  assert.ok(/fill-opacity="0.12"\/>\n<rect x="8" y="92"/.test(person), 'Person lights Work queue, the second item');
+  assert.ok(/fill-opacity="0.12"\/>\n<rect x="8" y="128"/.test(person), 'Person lights People, the third item');
+  assert.ok(/fill-opacity="0.12"\/>\n<rect x="8" y="92"/.test(railSvg('case', 720)), 'Case lights Work queue, the second item');
   assert.ok(!person.includes('Lifecycle review'), 'the parts of the Audit show on its pages only');
   const follow = railSvg('auditfollow', 720);
   for (const part of AUDIT_PARTS) assert.ok(follow.includes(`>${part.label}<`), `${part.label} shows on the Audit pages`);
@@ -49,7 +50,9 @@ test('each item has a button that opens its page, the counts sit beside My day a
   const names = visuals.map((visual) => visual.name);
   for (const { page } of RAIL_ITEMS) assert.ok(names.includes(`railNav${page}`), `no button for ${page}`);
   assert.deepEqual(names.filter((name) => name.startsWith('railBadge')), ['railBadgemyday', 'railBadgemywork']);
-  assert.ok(names.every((name) => name.startsWith('rail')), 'the lint counts the rail as one visual by its names');
+  assert.ok(names.filter((name) => name !== 'reportsChip').every((name) => name.startsWith('rail')), 'the lint counts the rail as one visual by its names');
+  const chip = JSON.stringify(visuals.find((visual) => visual.name === 'reportsChip'));
+  assert.ok(chip.includes("'reports'") && chip.includes('"Reports chip"'), 'the reports chip shows the reports and opens Reports');
   const nav = JSON.stringify(visuals.find((visual) => visual.name === 'railNavreports'));
   assert.ok(nav.includes("'PageNavigation'") && nav.includes("'reports'"));
   const about = visuals.find((visual) => visual.name === 'railAbout') as unknown as { position: { y: number; height: number } };

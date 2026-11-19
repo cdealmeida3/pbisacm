@@ -3,11 +3,11 @@
   "name": "problems",
   "position": {
     "x": 224,
-    "y": 216,
-    "z": 4000,
-    "height": 288,
-    "width": 1032,
-    "tabOrder": 4000
+    "y": 228,
+    "z": 4500,
+    "height": 476,
+    "width": 720,
+    "tabOrder": 4500
   },
   "visual": {
     "visualType": "tableEx",
@@ -92,111 +92,6 @@
             },
             {
               "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "ContactVia"
-                }
-              },
-              "queryRef": "Findings.ContactVia",
-              "nativeQueryRef": "ContactVia",
-              "displayName": "Why them"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "Route"
-                }
-              },
-              "queryRef": "Findings.Route",
-              "nativeQueryRef": "Route",
-              "displayName": "Fixed in"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "Source"
-                }
-              },
-              "queryRef": "Findings.Source",
-              "nativeQueryRef": "Source",
-              "displayName": "EPO says"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "EpoCorrection"
-                }
-              },
-              "queryRef": "Findings.EpoCorrection",
-              "nativeQueryRef": "EpoCorrection",
-              "displayName": "EPO has"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "Chips"
-                }
-              },
-              "queryRef": "Findings.Chips",
-              "nativeQueryRef": "Chips",
-              "displayName": "Chips"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "ServiceNowLink"
-                }
-              },
-              "queryRef": "Findings.ServiceNowLink",
-              "nativeQueryRef": "ServiceNowLink",
-              "displayName": "Link"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "CaseLines"
-                    }
-                  },
-                  "Property": "Line status"
-                }
-              },
-              "queryRef": "CaseLines.Line status",
-              "nativeQueryRef": "Line status",
-              "displayName": "Status"
-            },
-            {
-              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
@@ -212,18 +107,18 @@
             },
             {
               "field": {
-                "Measure": {
+                "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "CaseLines"
+                      "Entity": "Findings"
                     }
                   },
-                  "Property": "Line who"
+                  "Property": "ServiceNowLink"
                 }
               },
-              "queryRef": "CaseLines.Line who",
-              "nativeQueryRef": "Line who",
-              "displayName": "Has it"
+              "queryRef": "Findings.ServiceNowLink",
+              "nativeQueryRef": "ServiceNowLink",
+              "displayName": "Link"
             }
           ]
         }
@@ -286,7 +181,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "88D"
+                  "Value": "112D"
                 }
               }
             }
@@ -300,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "105D"
+                  "Value": "160D"
                 }
               }
             }
@@ -328,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "98D"
+                  "Value": "100D"
                 }
               }
             }
@@ -342,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "50D"
+                  "Value": "88D"
                 }
               }
             }
@@ -356,105 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "71D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.ContactVia"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "71D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.Route"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "71D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.Source"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "64D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.EpoCorrection"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "50D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.Chips"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "44D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.ServiceNowLink"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
                   "Value": "80D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "CaseLines.Line status"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "78D"
                 }
               }
             }
@@ -468,13 +265,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "57D"
+                  "Value": "76D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "CaseLines.Line who"
+            "metadata": "Findings.ServiceNowLink"
           }
         }
       ]

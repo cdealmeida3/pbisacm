@@ -1,10 +1,38 @@
-/// Every event of the journal in words, newest first (D293): what it did, who, the cards and the CIs it touched.
+/// Every event of the journal in words, and every reply with a time (build D3), newest first (D293): what it did, who, the cards and the CIs it touched.
 table Activity
 
 	/// The line under the title of the Activity page.
 	measure 'Activity line' =
 			VAR n = COUNTROWS ( Activity ) + 0
 			RETURN n & IF ( n = 1, " event", " events" ) & IF ( n = 0, ". The journal is empty: the team records its work in the list SACM Journal.", "" )
+
+	/// The kind of an event as a small round picture with its icon (History, What happened): an email, a reminder, a status, an assignment, a report, a review, a note. 24 × 24.
+	measure 'Event icon' =
+			VAR icon = SELECTEDVALUE ( Activity[Icon] )
+			VAR glyph =
+			    SWITCH (
+			        icon,
+			        "mail", "<rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3.5 6.5L12 13l8.5-6.5'/>",
+			        "reply", "<path d='M9 7L4 12l5 5'/><path d='M4 12h10a6 6 0 0 1 6 6v1'/>",
+			        "teams", "<rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3.5 6.5L12 13l8.5-6.5'/>",
+			        "remind", "<path d='M6 16V11a6 6 0 1 1 12 0v5l2 2H4z'/><path d='M10 20a2 2 0 0 0 4 0'/>",
+			        "ok", "<path d='M5 12.5l4.5 4.5L19 7'/>",
+			        "assign", "<circle cx='12' cy='8' r='4'/><path d='M4 21a8 8 0 0 1 16 0'/>",
+			        "handover", "<path d='M4 12h14'/><path d='M13 6l6 6-6 6'/>",
+			        "load", "<path d='M4 4h16v16H4z'/><path d='M4 9h16M9 9v11'/>",
+			        "stop", "<circle cx='12' cy='12' r='8'/><path d='M7 17L17 7'/>",
+			        "review", "<path d='M9 3h6l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z'/><path d='M9 13l2 2 4-4'/>",
+			        "eye", "<path d='M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z'/><circle cx='12' cy='12' r='3'/>",
+			        "calendar", "<rect x='3' y='5' width='18' height='16' rx='2'/><path d='M3 10h18M8 3v4M16 3v4'/>",
+			        "settings", "<circle cx='12' cy='12' r='3'/><path d='M12 2v3M12 19v3M2 12h3M19 12h3'/>",
+			        "<path d='M5 4h14v16H5z'/><path d='M8 9h8M8 13h8M8 17h5'/>"
+			    )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><circle cx='12' cy='12' r='12' fill='#e6e9f4'/>"
+			        & "<g transform='translate(6 6) scale(0.5)' fill='none' stroke='#0c1c49' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'>" & glyph & "</g></svg>"
+			RETURN IF ( NOT ISBLANK ( icon ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
 
 	column Id
 		dataType: string
@@ -55,6 +83,16 @@ table Activity
 		dataType: int64
 		summarizeBy: none
 		sourceColumn: Keys
+
+	/// The kind of the event in a few groups (Emails, Replies, Reminders, Status, Assigned, Notes, Reports, Reviews, Not followed, Other): the buttons of History.
+	column Kind
+		dataType: string
+		sourceColumn: Kind
+
+	/// The words the search box of History looks in: what happened, the cards, the text and who (build D3).
+	column Find
+		dataType: string
+		sourceColumn: Find
 
 	partition Activity = m
 		mode: import

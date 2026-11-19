@@ -12,6 +12,7 @@
 // nothing. Only invented data: the job runs in Sample mode.
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { readTabGroups } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -205,14 +206,22 @@ export function drillColumns(): string[] {
 }
 
 /** One page for the picture step (pictures.ps1, D318): its folder name, its tab, whether the team sees its tab. */
-export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number }
+export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number; tabs: string[] }
+
+/** The tabs of each page (D323) after its first one, by their words: the picture step presses each and takes a picture. */
+function tabsByPage(): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const group of readTabGroups()) out.set(group.page, [...(out.get(group.page) ?? []), ...group.tabs.slice(1).map((tab) => tab.label)]);
+  return out;
+}
 
 /** Every page in the order of pages.json: the picture step opens each from its tab (a drill-through page shows its empty state). */
 export function pageList(): PageEntry[] {
   const order = readJson<{ pageOrder: string[] }>(join(PAGES, 'pages.json')).pageOrder;
+  const tabs = tabsByPage();
   return order.map((name) => {
     const page = readJson<{ displayName: string; visibility?: string; width: number; height: number; pageBinding?: { type?: string } }>(join(PAGES, name, 'page.json'));
-    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height };
+    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height, tabs: tabs.get(name) ?? [] };
   });
 }
 
@@ -223,7 +232,7 @@ export interface QueryResult { query: VisualQuery; error?: string; rows?: Array<
 /** What the runner gives back: the model's own errors (TOM), the open and refresh, and each query. */
 export interface Results { opened: boolean; openError?: string; refreshError?: string; modelErrors: string[]; results: QueryResult[] }
 /** What the picture step gives back (pictures.ps1): per page the seconds it took to draw and the words of a broken visual it shows. */
-export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[]; status?: string | null }> }
+export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] | null; status?: string | null; tabs?: Array<{ tab: string; found: boolean; seconds?: number | null; file: string | null; broken?: string[] }> }> }
 /** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
 export const DRAW_SECONDS = 3;
 
@@ -285,7 +294,14 @@ export function judgePictures(pictures: Pictures, notes: string[] = []): string[
     if (!page.found) { problems.push(`${page.displayName}: the picture step found no tab for the page`); continue; }
     const expected = `Page ${index + 1} of ${pictures.pages.length}`;
     if (page.status && page.status !== expected) { problems.push(`${page.displayName}: the picture shows "${page.status}", not "${expected}": the tab did not open the page (picture ${page.file})`); continue; }
-    for (const words of page.broken) problems.push(`${page.displayName}: the page shows "${words}" (picture ${page.file})`);
+    for (const words of page.broken ?? []) problems.push(`${page.displayName}: the page shows "${words}" (picture ${page.file})`);
+    for (const tab of page.tabs ?? []) {
+      const where = `${page.displayName}, tab ${tab.tab}`;
+      if (!tab.found) { problems.push(`${page.displayName}: the picture step found no tab "${tab.tab}" on the page (D323)`); continue; }
+      for (const words of tab.broken ?? []) problems.push(`${where}: the tab shows "${words}" (picture ${tab.file})`);
+      if (typeof tab.seconds === 'number' && tab.seconds > DRAW_SECONDS) problems.push(`${where}: the tab took ${tab.seconds} s to draw, more than ${DRAW_SECONDS} s (picture ${tab.file})`);
+      else notes.push(`${where}: drawn in ${tab.seconds ?? '?'} s (picture ${tab.file})`);
+    }
     if (page.seconds !== null && page.seconds > DRAW_SECONDS) problems.push(`${page.displayName}: the page took ${page.seconds} s to draw, more than ${DRAW_SECONDS} s (picture ${page.file})`);
     else notes.push(`${page.displayName}: drawn in ${page.seconds} s (picture ${page.file})`);
   }

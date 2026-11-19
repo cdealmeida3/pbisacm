@@ -3,11 +3,11 @@
   "name": "relationships",
   "position": {
     "x": 224,
-    "y": 728,
-    "z": 6000,
-    "height": 208,
+    "y": 228,
+    "z": 4700,
+    "height": 476,
     "width": 720,
-    "tabOrder": 6000
+    "tabOrder": 4700
   },
   "visual": {
     "visualType": "tableEx",
@@ -190,7 +190,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "52D"
+                  "Value": "40D"
                 }
               }
             }
@@ -204,7 +204,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "52D"
+                  "Value": "48D"
                 }
               }
             }
@@ -218,7 +218,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "142D"
+                  "Value": "136D"
                 }
               }
             }
@@ -232,7 +232,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "118D"
+                  "Value": "96D"
                 }
               }
             }
@@ -246,7 +246,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "95D"
+                  "Value": "72D"
                 }
               }
             }
@@ -260,7 +260,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "59D"
+                  "Value": "120D"
                 }
               }
             }
@@ -288,7 +288,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "86D"
+                  "Value": "96D"
                 }
               }
             }
@@ -412,5 +412,6 @@
         }
       }
     ]
-  }
+  },
+  "isHidden": true
 }

@@ -6,7 +6,7 @@
     "y": 16,
     "z": 2000,
     "height": 56,
-    "width": 1032,
+    "width": 600,
     "tabOrder": 2000
   },
   "visual": {
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "What changed in Solusi since the file before, and the contracts to watch. For information: nobody is asked.",
+                    "value": "What changed in Solusi since the file before, and the contracts to watch.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

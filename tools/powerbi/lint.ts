@@ -27,7 +27,7 @@ import { join, relative } from 'node:path';
 import * as PQP from '@microsoft/powerquery-parser';
 import Ajv from 'ajv';
 import type { AnySchema } from 'ajv';
-import { MODEL, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
+import { daxParts, MODEL, queryColumns, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
 import { EXPECTED_HISTORY, staleQueries, THEME_FILE } from './generate.ts';
 import { lightColours } from './tokens.ts';
 import { connectorSource } from './connector.ts';
@@ -142,7 +142,7 @@ const visit = (value: unknown, where: string): void => {
 };
 for (const file of filesUnder(join(REPORT, 'definition'), /visual\.json$/)) visit(JSON.parse(readFileSync(file, 'utf8')), relative(root, file));
 for (const table of tables) {
-  for (const measure of table.measures) {
+  for (const measure of daxParts(table)) {
     // A column a measure makes itself (ADDCOLUMNS ( …, "@days", … )) is named with @ and read as [@days].
     const made = new Set(Array.from(measure.dax.matchAll(/"(@[^"]+)"/g), (match) => match[1]!));
     const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
@@ -167,16 +167,16 @@ done.push('References: every field of the visuals and the measures is in the mod
 /* 4b. DAX variable names */
 // Desktop drops a measure whose variable is a word DAX keeps for itself, and every visual that shows it is empty
 // ("Select or drag fields"): in 0.44.0 the variables before, day and all emptied My day, History and Self-check, and the
-// Desktop check (D309) found from, to and status; build D2 found name, address and open. No variable may be a DAX function (the list of the copied skill
+// Desktop check (D309) found from, to and status; build D2 found name, address and open; build D3 found hint. No variable may be a DAX function (the list of the copied skill
 // dax-reference), a keyword or a table of the model. And IF takes at most three arguments (SWITCH ( TRUE (), … ) takes more).
 const DAX_KEYWORDS = ['define', 'evaluate', 'order', 'by', 'start', 'at', 'return', 'var', 'measure', 'column', 'table', 'function', 'in', 'not',
   'true', 'false', 'asc', 'desc', 'day', 'month', 'year', 'quarter', 'week', 'hour', 'minute', 'second', 'before', 'after', 'boolean', 'integer',
   'string', 'double', 'currency', 'datetime', 'variant', 'scalar', 'expr', 'anyval', 'anyref', 'val', 'from', 'to', 'status', 'with', 'skip',
-  'dense', 'abs', 'rel', 'partitionby', 'orderby', 'matchby', 'keep', 'blanks', 'default', 'first', 'last', 'name', 'address', 'open'];
+  'dense', 'abs', 'rel', 'partitionby', 'orderby', 'matchby', 'keep', 'blanks', 'default', 'first', 'last', 'name', 'address', 'open', 'received', 'hint'];
 const daxCatalog = JSON.parse(readFileSync(join(root, '.claude', 'skills', 'dax-reference', 'generated', 'catalog.json'), 'utf8')) as { functions: Array<{ name: string }> };
 const kept = new Set([...DAX_KEYWORDS, ...daxCatalog.functions.map((entry) => entry.name.toLowerCase()), ...tables.map((table) => table.name.toLowerCase())]);
 for (const table of tables) {
-  for (const measure of table.measures) {
+  for (const measure of daxParts(table)) {
     const dax = measure.dax.replace(/"(?:[^"]|"")*"/g, '""');
     const names = new Set<string>();
     for (const match of dax.matchAll(/\bVAR\s+([A-Za-z_][A-Za-z0-9_]*)/gi)) {
@@ -269,7 +269,7 @@ const madeBy: Record<string, string> = { Run: 'RunRows', HistoryRun: 'fnHistoryR
 for (const table of calculatedTables) {
   const { source, part, columns: taken } = table.calculated!;
   if (!partsOf(madeBy[source]!).has(part)) problems.push(`Run: table ${table.name} takes the part "${part}", which ${madeBy[source]} does not make`);
-  const want = table.columns.map((column) => column.name).join(', ');
+  const want = queryColumns(table).map((column) => column.name).join(', ');
   if (taken.map(([name]) => name).join(', ') !== want) problems.push(`Run: table ${table.name} takes the columns [${taken.map(([name]) => name).join(', ')}], its TMDL file declares [${want}]`);
   for (const [name, column] of taken) if (column !== `${part}.${name}`) problems.push(`Run: table ${table.name} takes ${name} from ${source}[${column}], not ${source}[${part}.${name}]`);
 }

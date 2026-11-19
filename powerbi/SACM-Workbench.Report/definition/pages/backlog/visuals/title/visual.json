@@ -6,7 +6,7 @@
     "y": 16,
     "z": 2000,
     "height": 56,
-    "width": 680,
+    "width": 600,
     "tabOrder": 2000
   },
   "visual": {
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "One line per CI that must be mapped with its owner. Waiting: the CI is in Ready. Planned: a tag says when.",
+                    "value": "One line per CI to map with its owner. Waiting: in Ready. Planned: a tag says when.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

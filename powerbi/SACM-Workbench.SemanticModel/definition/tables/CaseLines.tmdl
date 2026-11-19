@@ -185,6 +185,39 @@ table CaseLines
 			    )
 		displayFolder: Page notes
 
+	/// A cell of Where the work sits (Overview): the open lines of the newest report of the section (row) at the step (column, Step); blank leaves the cell empty. The column Open is the total of the row.
+	measure 'Heat lines' =
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+		displayFolder: Overview
+
+	/// The background of a cell of Where the work sits (Overview): darker navy for more lines, on the scale of the biggest cell; the column Open (the total) on the page colour.
+	measure 'Heat fill' =
+			VAR n = [Heat lines] + 0
+			VAR most = MAXX ( ALLSELECTED ( Checks[Section] ), MAXX ( ALLSELECTED ( CaseLines[Step] ), [Heat lines] ) )
+			VAR share = DIVIDE ( n, most, 0 )
+			RETURN
+			    IF (
+			        NOT ISINSCOPE ( CaseLines[Step] ),
+			        "#faf6f1",
+			        SWITCH ( TRUE (), n = 0, "#ffffff", share < 0.25, "#eff8ff", share < 0.5, "#b2ddff", share < 0.75, "#175cd3", "#0c1c49" )
+			    )
+		displayFolder: Overview
+
+	/// The text of a cell of Where the work sits (Overview): white on the two darkest fills.
+	measure 'Heat ink' =
+			VAR n = [Heat lines] + 0
+			VAR most = MAXX ( ALLSELECTED ( Checks[Section] ), MAXX ( ALLSELECTED ( CaseLines[Step] ), [Heat lines] ) )
+			RETURN IF ( ISINSCOPE ( CaseLines[Step] ) && DIVIDE ( n, most, 0 ) >= 0.5, "#ffffff", "#2b2623" )
+		displayFolder: Overview
+
+	/// Under the title of Where the work sits (Overview).
+	measure 'Heat note' =
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			RETURN IF ( n = 0, "Nothing open: the newest report finds nothing to solve.", FORMAT ( n, "#,0" ) & " open lines by section and next step · darker is more" )
+		displayFolder: Page notes
+
 	column Key
 		dataType: string
 		isDataTypeInferred
@@ -448,6 +481,32 @@ table CaseLines
 		isDataTypeInferred
 		isNameInferred
 		sourceColumn: [ShareTo]
+
+	/// The step of an open line for Where the work sits (Overview, build D3), as a number: 6 SACM fixes when nobody is asked, else the first of 5 Reply to read (the person wrote back), 4 Escalate, 3 Reminder due (by the date of the newest refresh), 1 New, 2 Asked. The same order as the next step of the Work queue (Queue state). The column Step says it in words and sorts by it (so the words come from the number: a sort column may not use the column it sorts).
+	column StepOrder =
+			VAR asOf = IF ( MAX ( About[SourceMode] ) = "Sample", MAX ( About[SampleDate] ), TODAY () )
+			VAR mail = LOOKUPVALUE ( Findings[ContactEmail], Findings[Key], CaseLines[Key], "" )
+			VAR wrote = mail <> "" && NOT ISEMPTY ( FILTER ( RepliesToRead, RepliesToRead[From] = mail ) )
+			VAR due = CaseLines[ReminderFrom] <= asOf
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        CaseLines[ContactName] = "", 6,
+			        wrote, 5,
+			        CaseLines[Remind] = "escalation" && due, 4,
+			        CaseLines[Remind] = "reminder" && due, 3,
+			        CaseLines[Status] = "New", 1,
+			        2
+			    )
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+
+	/// The step of an open line in words, the columns of Where the work sits: New, Asked, Reminder due, Escalate, Reply to read, SACM fixes (in the order of StepOrder).
+	column Step = SWITCH ( CaseLines[StepOrder], 1, "New", 2, "Asked", 3, "Reminder due", 4, "Escalate", 5, "Reply to read", "SACM fixes" )
+		dataType: string
+		summarizeBy: none
+		sortByColumn: StepOrder
 
 	partition CaseLines = calculated
 		mode: import

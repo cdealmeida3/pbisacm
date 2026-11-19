@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "replies",
   "position": {
-    "x": 744,
+    "x": 956,
     "y": 464,
-    "z": 6000,
-    "height": 240,
-    "width": 512,
-    "tabOrder": 6000
+    "z": 4700,
+    "height": 188,
+    "width": 300,
+    "tabOrder": 4700
   },
   "visual": {
     "visualType": "tableEx",
@@ -38,57 +38,12 @@
                       "Entity": "Replies"
                     }
                   },
-                  "Property": "From"
-                }
-              },
-              "queryRef": "Replies.From",
-              "nativeQueryRef": "From",
-              "displayName": "From"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Replies"
-                    }
-                  },
-                  "Property": "Subject"
-                }
-              },
-              "queryRef": "Replies.Subject",
-              "nativeQueryRef": "Subject",
-              "displayName": "Subject"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Replies"
-                    }
-                  },
                   "Property": "Body"
                 }
               },
               "queryRef": "Replies.Body",
               "nativeQueryRef": "Body",
               "displayName": "Reply"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Replies"
-                    }
-                  },
-                  "Property": "Reply mark"
-                }
-              },
-              "queryRef": "Replies.Reply mark",
-              "nativeQueryRef": "Reply mark",
-              "displayName": "Ref"
             }
           ]
         }
@@ -180,7 +135,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "80D"
+                  "Value": "76D"
                 }
               }
             }
@@ -194,55 +149,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "112D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Replies.From"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "81D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Replies.Subject"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "107D"
+                  "Value": "184D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "Replies.Body"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "88D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Replies.Reply mark"
           }
         }
       ]

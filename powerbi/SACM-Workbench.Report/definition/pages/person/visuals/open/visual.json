@@ -3,11 +3,11 @@
   "name": "open",
   "position": {
     "x": 224,
-    "y": 192,
-    "z": 4000,
-    "height": 260,
+    "y": 196,
+    "z": 4600,
+    "height": 508,
     "width": 720,
-    "tabOrder": 4000
+    "tabOrder": 4600
   },
   "visual": {
     "visualType": "tableEx",
@@ -89,21 +89,6 @@
               "queryRef": "Findings.ContactVia",
               "nativeQueryRef": "ContactVia",
               "displayName": "Why them"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "Cc"
-                }
-              },
-              "queryRef": "Findings.Cc",
-              "nativeQueryRef": "Cc",
-              "displayName": "Copied"
             },
             {
               "field": {
@@ -196,7 +181,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "89D"
+                  "Value": "120D"
                 }
               }
             }
@@ -210,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "74D"
+                  "Value": "112D"
                 }
               }
             }
@@ -224,7 +209,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "168D"
                 }
               }
             }
@@ -238,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "65D"
+                  "Value": "64D"
                 }
               }
             }
@@ -252,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "81D"
+                  "Value": "72D"
                 }
               }
             }
@@ -266,21 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "113D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Findings.Cc"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "82D"
+                  "Value": "80D"
                 }
               }
             }
@@ -294,7 +265,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "58D"
+                  "Value": "64D"
                 }
               }
             }

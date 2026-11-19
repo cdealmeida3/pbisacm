@@ -4,10 +4,10 @@
   "position": {
     "x": 224,
     "y": 16,
-    "z": 6000,
+    "z": 2000,
     "height": 56,
-    "width": 1032,
-    "tabOrder": 6000
+    "width": 600,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "textbox",
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The sample of CIs checked against EPO, with its evidence. The app SACM audit at the right records the marks.",
+                    "value": "The sample of CIs checked against EPO, with its evidence. The app records the marks.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",
