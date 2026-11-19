@@ -90,7 +90,10 @@ export function readTabGroups(definition = REPORT_DEFINITION): TabGroup[] {
   });
 }
 
-/** The report as the rules read it: the pages in their order, each with its visuals (a folder without visual.json is rule 12's). */
+/**
+ * The report as the rules read it: the pages in their order, each with its visuals. A page without page.json or a visual
+ * folder without visual.json is left out here: rule 12 (folderProblems, run by the lint before this) reports it.
+ */
 export function readPages(definition = REPORT_DEFINITION): ReportPages {
   const folder = join(definition, 'pages');
   const order = (JSON.parse(readFileSync(join(folder, 'pages.json'), 'utf8')) as { pageOrder: string[] }).pageOrder;
@@ -270,13 +273,13 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
       const at = `${where} › ${visual.name}`;
       const type = visual.visual?.visualType ?? '';
       // 3. Native only, apart from the visual added by hand, exactly on its place (D339).
-      const app = isAppVisual(visual) || !type;
-      if (app && !(type && ownSlot && samePlace(visual.position, ownSlot))) {
+      const notNative = isAppVisual(visual) || !type;
+      if (notNative && !(type && ownSlot && samePlace(visual.position, ownSlot))) {
         problems.push(ownSlot && type
           ? `${at}: the visual type ${type} is not native; a visual added by hand sits exactly on the place of ${ownSlot.label} (${ownSlot.x}, ${ownSlot.y}, ${ownSlot.width} × ${ownSlot.height})`
           : `${at}: the visual type ${type || '(none)'} is not a native visual of the list (D311: no custom, R or Python visual)`);
       }
-      if (app) continue;
+      if (notNative) continue;
       if (type === 'image' && JSON.stringify(visual.visual?.objects ?? {}).includes('"url"')) problems.push(`${at}: a picture from the web; pictures are resources of the report (D311)`);
       // 4. The grid.
       const { x, y, width, height } = visual.position;

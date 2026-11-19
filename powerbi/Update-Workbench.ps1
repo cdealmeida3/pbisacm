@@ -55,8 +55,9 @@ Write-Host "SACM Workbench $($plan.version): carry your settings from the previo
 
 # --- Find the previous folder --------------------------------------------------------------------------------------
 $hereFull = [System.IO.Path]::GetFullPath($here).TrimEnd('\', '/')
-if ($From -eq '') {
-  $parent = Split-Path -Parent $hereFull
+# The newest older SACM-Workbench-<version> in a folder, else its folder powerbi (versions before 0.53.0 unzipped there).
+function Find-Previous([string]$parent) {
+  if ($null -eq $parent -or $parent -eq '' -or -not (Test-Path -LiteralPath $parent)) { return $null }
   $best = $null
   $bestVersion = $null
   foreach ($folder in Get-ChildItem -LiteralPath $parent -Directory) {
@@ -66,11 +67,17 @@ if ($From -eq '') {
     if (-not (Test-Project $folder.FullName)) { continue }
     if ($null -eq $bestVersion -or $version -gt $bestVersion) { $best = $folder.FullName; $bestVersion = $version }
   }
-  # Versions before 0.53.0 unzipped into a folder named powerbi.
   if ($null -eq $best) {
     $old = Join-Path $parent 'powerbi'
     if ((Test-Path -LiteralPath $old) -and (Test-Project $old)) { $best = $old }
   }
+  return $best
+}
+if ($From -eq '') {
+  $parent = Split-Path -Parent $hereFull
+  $best = Find-Previous $parent
+  # Windows' Extract All puts the zip's folder into a new folder named after the zip: look one folder higher too.
+  if ($null -eq $best) { $best = Find-Previous (Split-Path -Parent $parent) }
   if ($null -eq $best) {
     if ($Yes) { Stop-Update "No previous folder found next to this one ($parent). Give it with -From." }
     Write-Host 'No previous version was found next to this folder.'
@@ -82,7 +89,10 @@ if ($From -eq '') {
 if (-not (Test-Path -LiteralPath $From)) { Stop-Update "The folder $From does not exist." }
 $From = [System.IO.Path]::GetFullPath($From).TrimEnd('\', '/')
 if ($From -eq $hereFull) { Stop-Update 'The previous folder is this folder.' }
-if (-not (Test-Project $From)) { Stop-Update "The folder $From is not a SACM Workbench project (it has no SACM-Workbench.SemanticModel or SACM-Workbench.Report)." }
+if (-not (Test-Project $From)) {
+  if (Test-Path -LiteralPath (Join-Path $From 'SACM-Workbench.Report/report.json')) { Stop-Update "The report in $From is saved in the older format (report.json, not definition/pages). In Power BI Desktop turn on the option of README section 1 (Store reports using enhanced metadata format, PBIR), open it, save it, and run this again." }
+  Stop-Update "The folder $From is not a SACM Workbench project (it has no SACM-Workbench.SemanticModel or SACM-Workbench.Report)."
+}
 
 Write-Host ''
 Write-Host "Previous folder: $From"
@@ -180,8 +190,8 @@ foreach ($oldPage in Get-ChildItem -LiteralPath $oldPages -Directory | Sort-Obje
     if ($null -eq $slot) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this version keeps no place for an app on this page. Add it again by hand if you still need it (README section 6)."; continue }
     $destination = Join-Path (Join-Path $target 'visuals') $app.Name
     if (Test-Path -LiteralPath $destination) {
-      $already = Get-Visual (Join-Path $destination 'visual.json')
-      if ($already.Type -eq $app.Type) { $visualLines += "  $label : $($slot.name) is already here."; continue }
+      $alreadyFile = Join-Path $destination 'visual.json'
+      if ((Test-Path -LiteralPath $alreadyFile) -and (Get-Visual $alreadyFile).Type -eq $app.Type) { $visualLines += "  $label : $($slot.name) is already here."; continue }
       $visualLines += "  $label : the visual $($app.Name) is not copied: this version has a visual of that name."; continue
     }
     $present = @(Get-AppVisuals $target) + @($copies | Where-Object { $_.Target -eq $target })
@@ -209,12 +219,13 @@ if ($reportChanged) {
     $newReportText = $newReportText.Substring(0, $existing.Index) + $list + $newReportText.Substring($existing.Index + $existing.Length)
   } else {
     $at = $newReportText.IndexOf('{')
-    $newReportText = $newReportText.Substring(0, $at + 1) + "`n  " + $list + ',' + $newReportText.Substring($at + 1)
+    $rest = $newReportText.Substring($at + 1)
+    $comma = if ($rest.Trim().StartsWith('}')) { '' } else { ',' }
+    $newReportText = $newReportText.Substring(0, $at + 1) + "`n  " + $list + $comma + $rest
   }
 }
 
 # --- Write ---------------------------------------------------------------------------------------------------------
-if ($newModel -cne $newModelBefore) { Write-Text $newModelFile $newModel }
 foreach ($copy in $copies) {
   $visuals = Join-Path $copy.Target 'visuals'
   if (-not (Test-Path -LiteralPath $visuals)) { New-Item -ItemType Directory -Path $visuals | Out-Null }
@@ -224,6 +235,7 @@ foreach ($copy in $copies) {
   $visualLines += "  $($copy.Label) : $($copy.Slot.name) copied, at X $($copy.Slot.x), Y $($copy.Slot.y), $($copy.Slot.width) x $($copy.Slot.height)."
 }
 if ($reportChanged) { Write-Text $newReportFile $newReportText }
+if ($newModel -cne $newModelBefore) { Write-Text $newModelFile $newModel }
 
 Write-Host ''
 Write-Host 'Parameters:'

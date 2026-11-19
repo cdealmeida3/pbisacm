@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
@@ -108,9 +108,22 @@ const pages = (project: string): string => join(project, 'SACM-Workbench.Report'
 const modelFile = (project: string): string => join(project, 'SACM-Workbench.SemanticModel', 'definition', 'expressions.tmdl');
 const invented = { sourceMode: '"SharePoint"', folder: '"Shared Documents/Invented team/Reports"' };
 
-/** An invented visual Carlos added in the service: a type that is not native, at a place near the slot. */
+/**
+ * An invented visual Carlos added in the service: a type that is not native, at a place near the slot, with the kind of
+ * fields a Power Apps visual keeps (an app id, an environment, its fields and filter; all invented, zero GUIDs).
+ */
 function appVisual(name: string, type: string, position: { x: number; y: number; width: number; height: number }): string {
-  return `${JSON.stringify({ name, position: { ...position, z: 9000, tabOrder: 9000 }, visual: { visualType: type, objects: { invented: [{ properties: { app: 'invented' } }] } } }, null, 2)}\n`;
+  const zero = '00000000-0000-0000-0000-000000000000';
+  return `${JSON.stringify({
+    name,
+    position: { ...position, z: 9000, tabOrder: 9000 },
+    visual: {
+      visualType: type,
+      query: { queryState: { Values: { projections: [{ field: { Column: { Expression: { SourceRef: { Entity: 'CaseLines' } }, Property: 'Key' } }, queryRef: 'CaseLines.Key' }] } } },
+      objects: { general: [{ properties: { appId: { expr: { Literal: { Value: `'${zero}'` } } }, environmentId: { expr: { Literal: { Value: `'${zero}'` } } } } }] }
+    },
+    filterConfig: { filters: [{ name: 'forTheApp', field: { Measure: { Expression: { SourceRef: { Entity: 'CaseLines' } }, Property: 'For the app' } }, type: 'Advanced' }] }
+  }, null, 2)}\n`;
 }
 
 /**
@@ -173,6 +186,9 @@ test('the update script carries the parameters and the apps of the previous fold
     assert.deepEqual([app.position.x, app.position.y, app.position.width, app.position.height], [APP_SLOTS.case!.x, APP_SLOTS.case!.y, APP_SLOTS.case!.width, APP_SLOTS.case!.height]);
     assert.equal(app.position.z, 9000);
     assert.equal(app.visual.visualType, 'PowerApps_PBI_CV_INVENTED');
+    // Only the place changes: the app id, the environment, the fields and the filter come over as they were.
+    const original = JSON.parse(readFileSync(join(old, 'SACM-Workbench.Report', 'definition', 'pages', 'case', 'visuals', 'a1b2c3d4e5f6a7b8c9d0', 'visual.json'), 'utf8')) as Record<string, unknown>;
+    assert.deepEqual({ ...app, position: undefined }, { ...original, position: undefined });
     const flow = placed('myday', 'f0e1d2c3b4a596877869');
     assert.deepEqual([flow.position.x, flow.position.y, flow.position.width, flow.position.height], [FLOW_SLOTS.myday!.x, FLOW_SLOTS.myday!.y, FLOW_SLOTS.myday!.width, FLOW_SLOTS.myday!.height]);
     assert.ok(!existsSync(join(pages(project), 'overview', 'visuals', 'aaaabbbbccccddddeeee')), 'an app on a page with no place is not copied');
@@ -242,31 +258,15 @@ test('the update script refuses, and changes nothing, when this version lacks a 
   }
 });
 
-test('the lint finds an old panel, a half copy and an app off its place', () => {
-  const at = mkdtempSync(join(tmpdir(), 'sacm-folders-'));
+test('the update script looks one folder higher when Windows unzipped into a folder named after the zip', { skip }, () => {
+  const at = mkdtempSync(join(tmpdir(), 'sacm-update-'));
   try {
-    const definition = join(at, 'definition');
-    cpSync(join(root, 'powerbi', 'SACM-Workbench.Report', 'definition'), definition, { recursive: true });
-    mkdirSync(join(definition, 'pages', 'oldpage'));
-    mkdirSync(join(definition, 'pages', 'case', 'visuals', 'halfcopy'));
-    mkdirSync(join(definition, 'pages', 'case', 'visuals', 'renamed'));
-    writeFileSync(join(definition, 'pages', 'case', 'visuals', 'renamed', 'visual.json'), JSON.stringify({ name: 'other', position: { x: 224, y: 84, width: 8, height: 8 }, visual: { visualType: 'shape' } }));
-    const problems = folderProblems(definition);
-    assert.ok(problems.some((line) => line.includes('pages/oldpage is not a page of pages.json')), problems.join('\n'));
-    assert.ok(problems.some((line) => line.includes('visuals/halfcopy has no visual.json')), problems.join('\n'));
-    assert.ok(problems.some((line) => line.includes('visuals/renamed: its visual.json is named other')), problems.join('\n'));
-
-    rmSync(join(definition, 'pages', 'oldpage'), { recursive: true });
-    rmSync(join(definition, 'pages', 'case', 'visuals', 'halfcopy'), { recursive: true });
-    rmSync(join(definition, 'pages', 'case', 'visuals', 'renamed'), { recursive: true });
-    mkdirSync(join(definition, 'pages', 'case', 'visuals', 'app'));
-    writeFileSync(join(definition, 'pages', 'case', 'visuals', 'app', 'visual.json'), appVisual('app', 'PowerApps_PBI_CV_INVENTED', { x: 952, y: 84, width: 300, height: 620 }));
-    assert.deepEqual(folderProblems(definition), []);
-    const pageLines = pageProblems(readPages(definition), readCatalogue());
-    assert.ok(pageLines.some((line) => line.includes('› app: the visual type PowerApps_PBI_CV_INVENTED is not native; a visual added by hand sits exactly on the place')), pageLines.join('\n'));
-    writeFileSync(join(definition, 'pages', 'case', 'visuals', 'app', 'visual.json'), appVisual('app', 'PowerApps_PBI_CV_INVENTED', { ...APP_SLOTS.case! }));
-    assert.deepEqual(pageProblems(readPages(definition), readCatalogue()), []);
-    assert.ok(statSync(join(definition, 'pages', 'case', 'visuals', 'app', 'visual.json')).isFile());
+    previousFolder(at);
+    const project = newFolder(join(at, `SACM-Workbench-PowerBI-R1-${version}`));
+    const run = update(project);
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    assert.match(run.stdout, /Previous folder: .*powerbi/);
+    assert.match(readFileSync(modelFile(project), 'utf8'), new RegExp(`^expression SourceMode = ${invented.sourceMode} meta`, 'm'));
   } finally {
     rmSync(at, { recursive: true, force: true });
   }

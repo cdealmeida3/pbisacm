@@ -76,7 +76,11 @@ of the new pages.
 1. **Close Power BI Desktop.**
 2. If Windows marks the zip as downloaded: right-click the zip, **Properties**, tick **Unblock**, **OK**.
 3. **Unzip the new zip next to your current folder**, so both sit in the same folder. For example `Documents\SACM\powerbi`
-   (your folder of 0.52.0 or older) and `Documents\SACM\SACM-Workbench-0.53.0`.
+   (your folder of 0.52.0 or older) and `Documents\SACM\SACM-Workbench-0.53.0`. In *Extract All*, choose the folder
+   that holds your current folder (`Documents\SACM`): Windows proposes a new folder named after the zip, and the script
+   then looks one folder higher too.
+   **Apps you already added in the service** (section 6): before your first update, do step 13 of section 6.4 once, so
+   your folder holds them. Otherwise the update has no app to carry and you add them again by hand (below).
 4. In the new folder, **double-click `Update-Workbench.cmd`.** A window opens. It finds your previous folder (the newest
    older `SACM-Workbench-…` next to it, else `powerbi`), or asks you to paste its path. Answer `Y`.
 5. It copies only what is yours, and says each step:

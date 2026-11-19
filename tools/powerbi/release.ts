@@ -126,7 +126,7 @@ if (import.meta.main) {
   const args = process.argv.slice(2);
   const labelAt = args.indexOf('--label');
   const label = labelAt >= 0 ? args[labelAt + 1] : undefined;
-  const target = args.find((arg, index) => !arg.startsWith('--') && index !== labelAt + 1);
+  const target = args.find((arg, index) => !arg.startsWith('--') && (labelAt < 0 || index !== labelAt + 1));
   if (!target) {
     console.error('Usage: node tools/powerbi/release.ts <folder or file.zip> [--label R1]');
     process.exit(2);

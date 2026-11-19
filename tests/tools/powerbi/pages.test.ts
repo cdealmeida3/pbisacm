@@ -1,8 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { LONG_BUTTONS, pageProblems, readCatalogue, readPages, themeProblems, wordProblems } from '../../../tools/powerbi/pages.ts';
+import { folderProblems, LONG_BUTTONS, pageProblems, readCatalogue, readPages, themeProblems, wordProblems } from '../../../tools/powerbi/pages.ts';
+import { APP_SLOTS } from '../../../tools/powerbi/tokens.ts';
 import type { ReportPages, Visual } from '../../../tools/powerbi/pages.ts';
 import { theme } from '../../../tools/powerbi/generate.ts';
 
@@ -135,4 +137,38 @@ test('the longer button words of the lint are those of LOOK rule 4', () => {
   const look = readFileSync(join(import.meta.dirname, '..', '..', '..', 'docs', 'LOOK.md'), 'utf8');
   const agreed = /agreed longer ones \((.*)\)\./.exec(look)?.[1]?.split(', ');
   assert.deepEqual(agreed, LONG_BUTTONS);
+});
+
+const root = join(import.meta.dirname, '..', '..', '..');
+/** An invented Power Apps visual, as Carlos adds it in the service (any type that is not native). */
+const handAdded = (position: { x: number; y: number; width: number; height: number }): string =>
+  JSON.stringify({ name: 'app', position: { ...position, z: 9000 }, visual: { visualType: 'PowerApps_PBI_CV_INVENTED' } });
+
+test('rule 12 finds a page folder no file names, a half copy and a renamed visual; rule 3 keeps a visual added by hand on its place (D340)', () => {
+  const at = mkdtempSync(join(tmpdir(), 'sacm-folders-'));
+  try {
+    const definition = join(at, 'definition');
+    cpSync(join(root, 'powerbi', 'SACM-Workbench.Report', 'definition'), definition, { recursive: true });
+    mkdirSync(join(definition, 'pages', 'oldpage'));
+    mkdirSync(join(definition, 'pages', 'case', 'visuals', 'halfcopy'));
+    mkdirSync(join(definition, 'pages', 'case', 'visuals', 'renamed'));
+    writeFileSync(join(definition, 'pages', 'case', 'visuals', 'renamed', 'visual.json'), JSON.stringify({ name: 'other', position: { x: 224, y: 84, width: 8, height: 8 }, visual: { visualType: 'shape' } }));
+    const problems = folderProblems(definition);
+    assert.ok(problems.some((line) => line.includes('pages/oldpage is not a page of pages.json')), problems.join('\n'));
+    assert.ok(problems.some((line) => line.includes('visuals/halfcopy has no visual.json')), problems.join('\n'));
+    assert.ok(problems.some((line) => line.includes('visuals/renamed: its visual.json is named other')), problems.join('\n'));
+
+    rmSync(join(definition, 'pages', 'oldpage'), { recursive: true });
+    rmSync(join(definition, 'pages', 'case', 'visuals', 'halfcopy'), { recursive: true });
+    rmSync(join(definition, 'pages', 'case', 'visuals', 'renamed'), { recursive: true });
+    mkdirSync(join(definition, 'pages', 'case', 'visuals', 'app'));
+    writeFileSync(join(definition, 'pages', 'case', 'visuals', 'app', 'visual.json'), handAdded({ x: 952, y: 84, width: 300, height: 620 }));
+    assert.deepEqual(folderProblems(definition), []);
+    const pageLines = pageProblems(readPages(definition), readCatalogue());
+    assert.ok(pageLines.some((line) => line.includes('› app: the visual type PowerApps_PBI_CV_INVENTED is not native; a visual added by hand sits exactly on the place')), pageLines.join('\n'));
+    writeFileSync(join(definition, 'pages', 'case', 'visuals', 'app', 'visual.json'), handAdded({ x: APP_SLOTS.case!.x, y: APP_SLOTS.case!.y, width: APP_SLOTS.case!.width, height: APP_SLOTS.case!.height }));
+    assert.deepEqual(pageProblems(readPages(definition), readCatalogue()), []);
+  } finally {
+    rmSync(at, { recursive: true, force: true });
+  }
 });

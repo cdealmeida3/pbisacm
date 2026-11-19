@@ -1,13 +1,14 @@
 # The Power BI report's Power Query, run for real on the invented samples (plan §9.2, the job "powerbi-eval"). Microsoft's
 # Power Query test tool (PQTest, in the NuGet package Microsoft.PowerQuery.SdkTools) runs only on Windows, so this job
 # uses GitHub's own Windows runner, never a self-hosted one (D286).
+#   0. The job "powerbi-eval" first runs the test of Update-Workbench.ps1 in Windows PowerShell 5.1, as Carlos's laptop
+#      has it (D339).
 #   1. tools/powerbi/connector.ts packs every query of the model into a small test connector (SacmEval.mez).
 #   2. PQTest runs each table of the model and the unit cases of the reading functions, in Sample mode: no data source.
 #   3. tools/powerbi/parity.ts compares the result with the answer key (src/core/ and tests/recorded/), line by line.
 #   4. The job "powerbi-time": the refresh time on invented samples at the size of the real reports (tools/powerbi/time.ps1,
 #      D283), and the counts at that size against src/core. On a pull request it is the gate: it fails over 120 s in all,
 #      or over 60 s for one table. Started by hand, it times the sizes and stages asked for, with no gate.
-#   Before them the job runs the test of Update-Workbench.ps1 in Windows PowerShell 5.1, as Carlos's laptop has it (D339).
 #   5. The job "powerbi-desktop" (D309): Power BI Desktop itself, installed on the runner, opens the project, refreshes it on
 #      the samples and runs the query of every visual of every page (tools/powerbi/desktop.ps1); it fails when Desktop
 #      would show a visual broken or empty, a card "(Blank)", a blank line, or a measure or table with an error. Then it
