@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "toCheck",
   "position": {
-    "x": 964,
-    "y": 52,
-    "z": 1800,
-    "height": 72,
-    "width": 96,
-    "tabOrder": 1800
+    "x": 916,
+    "y": 16,
+    "z": 4000,
+    "height": 60,
+    "width": 108,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "card",
@@ -34,37 +34,6 @@
       }
     },
     "objects": {
-      "labels": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "14D"
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#2b2623'"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ],
       "categoryLabels": [
         {
           "properties": {
@@ -72,6 +41,30 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "labels": [
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#7d5700'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
                 }
               }
             }
@@ -100,6 +93,40 @@
               "expr": {
                 "Literal": {
                   "Value": "'Findings to check first'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
                 }
               }
             }

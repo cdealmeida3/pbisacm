@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "noDaily",
   "position": {
-    "x": 856,
-    "y": 380,
-    "z": 3200,
-    "height": 292,
-    "width": 400,
-    "tabOrder": 3200
+    "x": 920,
+    "y": 436,
+    "z": 7000,
+    "height": 268,
+    "width": 336,
+    "tabOrder": 7000
   },
   "visual": {
     "visualType": "tableEx",
@@ -28,7 +28,7 @@
               },
               "queryRef": "ContractChanges.Number",
               "nativeQueryRef": "Number",
-              "displayName": "Contract number"
+              "displayName": "Contract"
             },
             {
               "field": {
@@ -98,33 +98,6 @@
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
@@ -135,6 +108,64 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "72D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ContractChanges.Number"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "75D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ContractChanges.Name"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ContractChanges.Vendor"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "58D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ContractChanges.Status"
           }
         }
       ]
@@ -166,7 +197,32 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Running contracts with no daily responsible'"
+                  "Value": "'No daily responsible'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ContractChanges"
+                    }
+                  },
+                  "Property": "No daily note"
                 }
               }
             }

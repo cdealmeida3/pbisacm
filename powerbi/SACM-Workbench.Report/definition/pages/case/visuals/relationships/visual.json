@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "relationships",
   "position": {
-    "x": 24,
-    "y": 680,
-    "z": 5500,
-    "height": 280,
-    "width": 1232,
-    "tabOrder": 5500
+    "x": 224,
+    "y": 728,
+    "z": 6000,
+    "height": 208,
+    "width": 720,
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "tableEx",
@@ -43,7 +43,7 @@
               },
               "queryRef": "RelationshipLinks.Relation",
               "nativeQueryRef": "Relation",
-              "displayName": "The other CI is its"
+              "displayName": "Its"
             },
             {
               "field": {
@@ -88,7 +88,7 @@
               },
               "queryRef": "RelationshipLinks.OtherStatus",
               "nativeQueryRef": "OtherStatus",
-              "displayName": "Operational status"
+              "displayName": "Status"
             },
             {
               "field": {
@@ -118,7 +118,7 @@
               },
               "queryRef": "RelationshipLinks.Counts",
               "nativeQueryRef": "Counts",
-              "displayName": "Counts for the checks"
+              "displayName": "Counts"
             },
             {
               "field": {
@@ -133,7 +133,7 @@
               },
               "queryRef": "RelationshipLinks.Excluded",
               "nativeQueryRef": "Excluded",
-              "displayName": "Excluded from calculation"
+              "displayName": "Excluded"
             }
           ]
         }
@@ -171,33 +171,6 @@
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
@@ -208,6 +181,120 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "52D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.Order"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "52D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.Relation"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "142D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.Other"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "118D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.OtherClass"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "95D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.OtherStatus"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "59D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.Type"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "72D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.Counts"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "86D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RelationshipLinks.Excluded"
           }
         }
       ]
@@ -240,6 +327,31 @@
               "expr": {
                 "Literal": {
                   "Value": "'Relationships'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "CI note"
                 }
               }
             }

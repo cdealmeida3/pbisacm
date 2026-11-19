@@ -53,6 +53,28 @@ table ContractChanges
 			RETURN
 			    in30 & " Concluded " & IF ( in30 = 1, "contract ends", "contracts end" ) & " in the next 30 days, " & in90 & " in the next 90 days · " & noDaily & " running " & IF ( noDaily = 1, "contract has", "contracts have" ) & " no daily responsible"
 
+	/// Under the title of What changed (Contract changes): the file compared and the counts.
+	measure 'Changes note' = VAR head = [Changes head] RETURN IF ( LEFT ( head, 3 ) = "No ", head, head & " " & [Changes line] )
+		displayFolder: Page notes
+
+	/// Under the title of the contracts that end in 30 days.
+	measure 'Ending 30 note' =
+			VAR n = COUNTROWS ( FILTER ( ContractChanges, NOT ISBLANK ( [Ends in 30 days] ) ) ) + 0
+			RETURN
+			    IF ( n = 0, "No Concluded contract ends in the next 30 days.", FORMAT ( n, "#,0" ) & IF ( n = 1, " Concluded contract ends", " Concluded contracts end" ) & " in the next 30 days, the soonest first." )
+		displayFolder: Page notes
+
+	/// Under the title of the contracts that end in 90 days.
+	measure 'Ending 90 note' =
+			VAR n = COUNTROWS ( FILTER ( ContractChanges, NOT ISBLANK ( [Ends in 90 days] ) ) ) + 0
+			RETURN
+			    IF ( n = 0, "No Concluded contract ends in the next 90 days.", FORMAT ( n, "#,0" ) & IF ( n = 1, " Concluded contract ends", " Concluded contracts end" ) & " in the next 90 days, the soonest first." )
+		displayFolder: Page notes
+
+	/// Under the title of the running contracts with no daily responsible.
+	measure 'No daily note' = IF ( COUNTROWS ( ContractChanges ) + 0 = 0, "Every running contract has one.", "Running contracts that name nobody for the daily work." )
+		displayFolder: Page notes
+
 	/// The order of the line on the page and in its export.
 	column Line
 		dataType: int64

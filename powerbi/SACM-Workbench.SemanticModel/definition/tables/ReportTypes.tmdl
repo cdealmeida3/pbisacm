@@ -44,6 +44,10 @@ table ReportTypes
 	/// The soft background of the state.
 	measure 'Report state fill' = SWITCH ( [Report state], "Missing", "#fef3f2", "Old", "#fffaeb", "Up to date", "#ecfdf3" )
 
+	/// Under the title of the report types (Reports).
+	measure 'Report types note' = [Reports line]
+		displayFolder: Page notes
+
 	column Kind
 		dataType: string
 		sourceColumn: Kind

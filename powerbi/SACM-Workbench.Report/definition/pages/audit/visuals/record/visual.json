@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "record",
   "position": {
-    "x": 24,
-    "y": 124,
-    "z": 2000,
-    "height": 380,
-    "width": 1232,
-    "tabOrder": 2000
+    "x": 224,
+    "y": 84,
+    "z": 8000,
+    "height": 620,
+    "width": 1032,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -103,7 +103,7 @@
               },
               "queryRef": "History.Record other",
               "nativeQueryRef": "Record other",
-              "displayName": "Other findings"
+              "displayName": "Other"
             },
             {
               "field": {
@@ -118,7 +118,7 @@
               },
               "queryRef": "History.New",
               "nativeQueryRef": "New",
-              "displayName": "New since the last report"
+              "displayName": "New"
             },
             {
               "field": {
@@ -133,7 +133,7 @@
               },
               "queryRef": "History.Solved",
               "nativeQueryRef": "Solved",
-              "displayName": "Verified since the last report"
+              "displayName": "Verified"
             },
             {
               "field": {
@@ -172,35 +172,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "general": [
         {
@@ -228,7 +199,32 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'The verification record of the report date chosen (the newest when none is chosen)'"
+                  "Value": "'Record'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Record note"
                 }
               }
             }
@@ -236,7 +232,137 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "80D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Dimension"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "120D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CardLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "107D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HistoryTested.Record tested"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "94D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Record to solve"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "121D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Record CIs to solve"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "73D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Record other"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "60D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.New"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "94D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "History.Solved"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "239D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HistoryNotes.Record not tested"
+          }
+        }
+      ]
+    }
   },
   "filterConfig": {
     "filters": [

@@ -5,6 +5,10 @@ table Exceptions
 	measure 'Not followed up' = CALCULATE ( COUNTROWS ( Exceptions ), Exceptions[State] = "running" ) + 0
 		formatString: #,0
 
+	/// Under the title of the decisions to stop following (Not followed).
+	measure 'Exceptions note' = IF ( COUNTROWS ( Exceptions ) + 0 = 0, "No decision to stop following yet.", "Newest first, with the date to look again." )
+		displayFolder: Page notes
+
 	column Target
 		dataType: string
 		isDataTypeInferred

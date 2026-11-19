@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "problems",
   "position": {
-    "x": 24,
-    "y": 516,
-    "z": 3500,
-    "height": 156,
-    "width": 1232,
-    "tabOrder": 3500
+    "x": 744,
+    "y": 396,
+    "z": 10000,
+    "height": 148,
+    "width": 512,
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "tableEx",
@@ -28,7 +28,7 @@
               },
               "queryRef": "Findings.Problem",
               "nativeQueryRef": "Problem",
-              "displayName": "Kind of problem"
+              "displayName": "Kind"
             },
             {
               "field": {
@@ -58,7 +58,7 @@
               },
               "queryRef": "Findings.OwnedBy",
               "nativeQueryRef": "OwnedBy",
-              "displayName": "Contract owner"
+              "displayName": "Owner"
             },
             {
               "field": {
@@ -89,21 +89,6 @@
               "queryRef": "Findings.StateLabel",
               "nativeQueryRef": "StateLabel",
               "displayName": "State"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "AskWho"
-                }
-              },
-              "queryRef": "Findings.AskWho",
-              "nativeQueryRef": "AskWho",
-              "displayName": "Who is asked"
             }
           ]
         }
@@ -141,33 +126,6 @@
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
@@ -178,6 +136,78 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "75D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Problem"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "112D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "73D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.OwnedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "144D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Detail"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "65D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.StateLabel"
           }
         }
       ]
@@ -208,13 +238,33 @@
             },
             "text": {
               "expr": {
+                "Literal": {
+                  "Value": "'By kind of problem'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Checks"
+                      "Entity": "Findings"
                     }
                   },
-                  "Property": "Problems title"
+                  "Property": "Problems note"
                 }
               }
             }

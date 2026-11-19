@@ -1,6 +1,10 @@
 /// The grey lines of the Cards page for the classes that are not checked yet (reference/parked-classes, D179).
 table Parked
 
+	/// Under the title of the classes not checked yet (All cards).
+	measure 'Parked note' = IF ( COUNTROWS ( Parked ) + 0 = 0, "Every class of the CI report is checked.", "Classes of the CI report that no card checks yet." )
+		displayFolder: Page notes
+
 	column Line
 		dataType: string
 		isDataTypeInferred

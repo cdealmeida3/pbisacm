@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "open",
   "position": {
-    "x": 24,
-    "y": 156,
-    "z": 3000,
-    "height": 516,
-    "width": 1232,
-    "tabOrder": 3000
+    "x": 224,
+    "y": 192,
+    "z": 4000,
+    "height": 260,
+    "width": 720,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "tableEx",
@@ -44,21 +44,6 @@
               "queryRef": "Findings.CiName",
               "nativeQueryRef": "CiName",
               "displayName": "CI"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Findings"
-                    }
-                  },
-                  "Property": "ClassLabel"
-                }
-              },
-              "queryRef": "Findings.ClassLabel",
-              "nativeQueryRef": "ClassLabel",
-              "displayName": "Class"
             },
             {
               "field": {
@@ -128,21 +113,6 @@
                       "Entity": "CaseLines"
                     }
                   },
-                  "Property": "Line status"
-                }
-              },
-              "queryRef": "CaseLines.Line status",
-              "nativeQueryRef": "Line status",
-              "displayName": "Status"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "CaseLines"
-                    }
-                  },
                   "Property": "Line follow-up"
                 }
               },
@@ -163,7 +133,7 @@
               },
               "queryRef": "CaseLines.Line who",
               "nativeQueryRef": "Line who",
-              "displayName": "Who has it"
+              "displayName": "Has it"
             }
           ]
         }
@@ -188,33 +158,6 @@
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
@@ -244,6 +187,120 @@
               }
             ],
             "metadata": "Findings.StateLabel"
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "89D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CardLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "74D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "116D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Detail"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "65D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.StateLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "81D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ContactVia"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "113D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Cc"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "82D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.Line follow-up"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "58D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.Line who"
           }
         }
       ]
@@ -276,6 +333,31 @@
               "expr": {
                 "Literal": {
                   "Value": "'Open with them'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Open with note"
                 }
               }
             }

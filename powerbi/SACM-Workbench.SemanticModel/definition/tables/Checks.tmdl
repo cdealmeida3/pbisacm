@@ -95,15 +95,19 @@ table Checks
 			    )
 		formatString: 0
 
+	/// The place of the card in the order of Card order, 1 for the first: the first column (#) of All cards, so the table keeps the order of the app without showing its key (design D1).
+	measure 'Card place' = IF ( ISBLANK ( [Card order] ), BLANK (), RANKX ( FILTER ( ALLSELECTED ( Checks ), NOT ISBLANK ( [Card order] ) ), [Card order], , ASC, DENSE ) )
+		formatString: 0
+
 	/// Checks that are not off.
 	measure 'Checks in use' = COUNTROWS ( Checks ) + 0
 		formatString: 0
 
 	/// What the card page says to do: the hint of the check file.
-	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "The page shows every card until you choose one." )
+	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "On All cards, right-click a line, then Drill through, Card. Until then the page shows every card." )
 
 	/// The name of the check on its card page.
-	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen: on All cards, right-click a line and choose Drill through, Card." )
+	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen" )
 
 	/// The line of the section Completeness (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
 	measure Completeness =
@@ -152,6 +156,10 @@ table Checks
 			VAR three = both & IF ( both <> "" && laterText <> "", " · " ) & laterText
 			VAR words = three & IF ( three <> "" && greyText <> "", " · " ) & greyText
 			RETURN "Compliance: " & IF ( words = "", "All OK", words )
+
+	/// Under the title of the table of cards (All cards).
+	measure 'Cards note' = IF ( COUNTROWS ( Checks ) + 0 = 0, "No card is about this: choose another subject.", "Red: to solve. Blue: to check. Green: OK. Grey: not tested. Right-click, Drill through, Card." )
+		displayFolder: Page notes
 
 	column CheckId
 		dataType: string

@@ -3,7 +3,7 @@
   "name": "selfcheck",
   "displayName": "Self-check",
   "displayOption": "FitToPage",
-  "height": 1100,
+  "height": 720,
   "width": 1280,
   "visibility": "HiddenInViewMode"
 }

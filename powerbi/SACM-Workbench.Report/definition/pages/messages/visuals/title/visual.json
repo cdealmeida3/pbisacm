@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "title",
   "position": {
-    "x": 24,
-    "y": 12,
-    "z": 1000,
-    "height": 64,
-    "width": 760,
-    "tabOrder": 1000
+    "x": 224,
+    "y": 16,
+    "z": 2000,
+    "height": 56,
+    "width": 448,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "textbox",
@@ -21,9 +21,9 @@
                   {
                     "value": "Messages",
                     "textStyle": {
-                      "fontFamily": "Segoe UI",
+                      "fontFamily": "Segoe UI Semibold",
                       "fontSize": "18pt",
-                      "fontWeight": "bold"
+                      "color": "#2b2623"
                     }
                   }
                 ]
@@ -31,10 +31,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "The messages ready to send. Open one in the app SACM messages, at the right, and press Send.",
+                    "value": "Ready to send. Open one in the app at the right, and press Send.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "10pt",
+                      "fontSize": "9pt",
                       "color": "#655a52"
                     }
                   }
@@ -46,7 +46,7 @@
       ]
     },
     "visualContainerObjects": {
-      "border": [
+      "background": [
         {
           "properties": {
             "show": {
@@ -59,7 +59,7 @@
           }
         }
       ],
-      "background": [
+      "border": [
         {
           "properties": {
             "show": {

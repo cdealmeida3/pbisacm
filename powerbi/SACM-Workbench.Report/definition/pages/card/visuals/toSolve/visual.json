@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "toSolve",
   "position": {
-    "x": 860,
-    "y": 52,
-    "z": 1700,
-    "height": 72,
-    "width": 96,
-    "tabOrder": 1700
+    "x": 800,
+    "y": 16,
+    "z": 3000,
+    "height": 60,
+    "width": 108,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "card",
@@ -34,37 +34,6 @@
       }
     },
     "objects": {
-      "labels": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "14D"
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#2b2623'"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ],
       "categoryLabels": [
         {
           "properties": {
@@ -72,6 +41,30 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "labels": [
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#b42318'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
                 }
               }
             }
@@ -100,6 +93,40 @@
               "expr": {
                 "Literal": {
                   "Value": "'Findings to solve'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
                 }
               }
             }

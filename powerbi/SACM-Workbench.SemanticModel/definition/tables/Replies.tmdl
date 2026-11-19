@@ -9,6 +9,10 @@ table Replies
 			VAR here = SELECTEDVALUE ( Replies[Ref] )
 			RETURN IF ( NOT ISBLANK ( here ) && here IN refs, here )
 
+	/// Under the title of the replies (Case, Person).
+	measure 'Replies list note' = IF ( COUNTROWS ( Replies ) + 0 = 0, "No reply yet.", "Every reply filed from the shared mailbox." )
+		displayFolder: Page notes
+
 	column Ref
 		dataType: string
 		sourceColumn: Ref

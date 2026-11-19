@@ -3,7 +3,7 @@
   "name": "card",
   "displayName": "Card",
   "displayOption": "FitToPage",
-  "height": 880,
+  "height": 720,
   "width": 1280,
   "filterConfig": {
     "filters": [

@@ -1,0 +1,367 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "reviews",
+  "position": {
+    "x": 224,
+    "y": 84,
+    "z": 7000,
+    "height": 300,
+    "width": 720,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Order"
+                }
+              },
+              "queryRef": "ReviewLines.Order",
+              "nativeQueryRef": "Order",
+              "displayName": "#"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "ReviewLabel"
+                }
+              },
+              "queryRef": "ReviewLines.ReviewLabel",
+              "nativeQueryRef": "ReviewLabel",
+              "displayName": "Review"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "GroupLabel"
+                }
+              },
+              "queryRef": "ReviewLines.GroupLabel",
+              "nativeQueryRef": "GroupLabel",
+              "displayName": "Part"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "ReviewLines.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "ClassLabel"
+                }
+              },
+              "queryRef": "ReviewLines.ClassLabel",
+              "nativeQueryRef": "ClassLabel",
+              "displayName": "Class"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "EpoId"
+                }
+              },
+              "queryRef": "ReviewLines.EpoId",
+              "nativeQueryRef": "EpoId",
+              "displayName": "EPO ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "ReviewLines.Status",
+              "nativeQueryRef": "Status",
+              "displayName": "ServiceNow"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "EpoStatusWords"
+                }
+              },
+              "queryRef": "ReviewLines.EpoStatusWords",
+              "nativeQueryRef": "EpoStatusWords",
+              "displayName": "EPO"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "ResultLabel"
+                }
+              },
+              "queryRef": "ReviewLines.ResultLabel",
+              "nativeQueryRef": "ResultLabel",
+              "displayName": "Result"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "ReviewLines"
+                  }
+                },
+                "Property": "Order"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The lifecycle review: each CI of each review with its mark, then the CIs of the next review'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The lifecycle review'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Review line"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "48D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Order"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "69D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.ReviewLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "56D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.GroupLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "120D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.ClassLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "69D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.EpoId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "96D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Status"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "49D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.EpoStatusWords"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "69D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.ResultLabel"
+          }
+        }
+      ]
+    }
+  }
+}

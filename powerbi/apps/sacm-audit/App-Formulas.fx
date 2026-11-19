@@ -19,7 +19,7 @@ ReviewResults = Table(
 // them after the settings and the results of the review (SettingCatalog, ReviewResults) into App-Formulas.fx (to paste
 // into App → Formulas) and Src/App.pa.yaml. Words of the app: plain English, as in the report.
 //
-// Lines: the rows the Power Apps visual of the page Audit gives (the fields of the table ReviewLines, README §6.8): each CI
+// Lines: the rows the Power Apps visual of the page Lifecycle review gives (the fields of the table ReviewLines, README §6.8): each CI
 // of each lifecycle review, then the CIs a new review would draw from the newest CI report (Review "next"). The app only
 // adds rows to the lists SACM Journal and SACM Settings (D272); it changes or removes none, and sends nothing.
 

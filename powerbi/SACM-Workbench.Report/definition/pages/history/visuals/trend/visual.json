@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "trend",
   "position": {
-    "x": 24,
-    "y": 156,
-    "z": 2000,
+    "x": 224,
+    "y": 184,
+    "z": 8000,
     "height": 256,
-    "width": 616,
-    "tabOrder": 2000
+    "width": 508,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "lineChart",
@@ -129,7 +129,32 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'To solve, new and solved per report date'"
+                  "Value": "'To solve, new and solved'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Trend note"
                 }
               }
             }

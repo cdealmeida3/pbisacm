@@ -18,6 +18,10 @@ table RepliesToRead
 			VAR names = SUBSTITUTE ( SELECTEDVALUE ( RepliesToRead[AssignedTo] ), ", ", "|" )
 			RETURN IF ( NOT ISBLANK ( me ) && names <> "" && PATHCONTAINS ( names, me ), "Mine", "Reply" )
 
+	/// Under the title of Replies to read (My day, My work): what to do, or why the box is empty (D318: never a blank box).
+	measure 'Replies note' = IF ( [All replies to read] = 0, "No reply to read: a reply to a message of the team shows here.", "Newest first. Read the reply, then record what it answers." )
+		displayFolder: Page notes
+
 	column File
 		dataType: string
 		isDataTypeInferred

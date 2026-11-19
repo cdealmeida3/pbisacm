@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "fix",
   "position": {
-    "x": 640,
-    "y": 156,
-    "z": 2100,
+    "x": 744,
+    "y": 184,
+    "z": 9000,
     "height": 256,
-    "width": 616,
-    "tabOrder": 2100
+    "width": 512,
+    "tabOrder": 9000
   },
   "visual": {
     "visualType": "lineChart",
@@ -99,7 +99,32 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Days to fix of the findings solved at each report date'"
+                  "Value": "'Days to fix'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "History"
+                    }
+                  },
+                  "Property": "Days to fix note"
                 }
               }
             }

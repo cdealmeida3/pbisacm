@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "problems",
   "position": {
-    "x": 24,
-    "y": 176,
-    "z": 3000,
-    "height": 300,
-    "width": 1232,
-    "tabOrder": 3000
+    "x": 224,
+    "y": 216,
+    "z": 4000,
+    "height": 288,
+    "width": 1032,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "tableEx",
@@ -73,7 +73,7 @@
               },
               "queryRef": "Findings.StateWhy",
               "nativeQueryRef": "StateWhy",
-              "displayName": "Why not to solve"
+              "displayName": "Why it waits"
             },
             {
               "field": {
@@ -88,7 +88,7 @@
               },
               "queryRef": "Findings.ContactName",
               "nativeQueryRef": "ContactName",
-              "displayName": "Who is asked"
+              "displayName": "Asked"
             },
             {
               "field": {
@@ -133,7 +133,7 @@
               },
               "queryRef": "Findings.Source",
               "nativeQueryRef": "Source",
-              "displayName": "What EPO says"
+              "displayName": "EPO says"
             },
             {
               "field": {
@@ -148,7 +148,7 @@
               },
               "queryRef": "Findings.EpoCorrection",
               "nativeQueryRef": "EpoCorrection",
-              "displayName": "What EPO already has"
+              "displayName": "EPO has"
             },
             {
               "field": {
@@ -178,7 +178,7 @@
               },
               "queryRef": "Findings.ServiceNowLink",
               "nativeQueryRef": "ServiceNowLink",
-              "displayName": "Open in ServiceNow"
+              "displayName": "Link"
             },
             {
               "field": {
@@ -223,7 +223,7 @@
               },
               "queryRef": "CaseLines.Line who",
               "nativeQueryRef": "Line who",
-              "displayName": "Who has it"
+              "displayName": "Has it"
             }
           ]
         }
@@ -248,33 +248,6 @@
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
@@ -304,6 +277,204 @@
               }
             ],
             "metadata": "Findings.StateLabel"
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.CardLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "105D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Detail"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "64D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.StateLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "98D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.StateWhy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "50D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ContactName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "71D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ContactVia"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "71D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Route"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "71D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Source"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "64D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.EpoCorrection"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "50D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Chips"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "44D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.ServiceNowLink"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "80D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.Line status"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "78D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.Line follow-up"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "57D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "CaseLines.Line who"
           }
         }
       ]
@@ -336,6 +507,31 @@
               "expr": {
                 "Literal": {
                   "Value": "'Problems'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Case problems note"
                 }
               }
             }

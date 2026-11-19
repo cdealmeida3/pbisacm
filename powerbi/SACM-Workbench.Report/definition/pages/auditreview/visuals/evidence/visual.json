@@ -1,0 +1,396 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "evidence",
+  "position": {
+    "x": 224,
+    "y": 396,
+    "z": 8000,
+    "height": 308,
+    "width": 720,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Order"
+                }
+              },
+              "queryRef": "ReviewLines.Order",
+              "nativeQueryRef": "Order",
+              "displayName": "#"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "ReviewLabel"
+                }
+              },
+              "queryRef": "ReviewLines.ReviewLabel",
+              "nativeQueryRef": "ReviewLabel",
+              "displayName": "Review"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "ReviewLines.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Note"
+                }
+              },
+              "queryRef": "ReviewLines.Note",
+              "nativeQueryRef": "Note",
+              "displayName": "Note"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CheckedBy"
+                }
+              },
+              "queryRef": "ReviewLines.CheckedBy",
+              "nativeQueryRef": "CheckedBy",
+              "displayName": "Checked by"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CheckedOn"
+                }
+              },
+              "queryRef": "ReviewLines.CheckedOn",
+              "nativeQueryRef": "CheckedOn",
+              "displayName": "Checked on"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "CaseStatus"
+                }
+              },
+              "queryRef": "ReviewLines.CaseStatus",
+              "nativeQueryRef": "CaseStatus",
+              "displayName": "Case"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "FirstMessage"
+                }
+              },
+              "queryRef": "ReviewLines.FirstMessage",
+              "nativeQueryRef": "FirstMessage",
+              "displayName": "Asked on"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Reminders"
+                }
+              },
+              "queryRef": "ReviewLines.Reminders",
+              "nativeQueryRef": "Reminders",
+              "displayName": "Reminders"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "EscalatedOn"
+                }
+              },
+              "queryRef": "ReviewLines.EscalatedOn",
+              "nativeQueryRef": "EscalatedOn",
+              "displayName": "Escalated"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "ReviewLines"
+                  }
+                },
+                "Property": "Order"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The evidence of the lifecycle review: who checked each CI, when, and the follow-up of its case'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The evidence'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ReviewLines"
+                    }
+                  },
+                  "Property": "Review line"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Order"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "57D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.ReviewLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "96D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "46D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Note"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "84D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CheckedBy"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "84D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CheckedOn"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "44D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.CaseStatus"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "71D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.FirstMessage"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "78D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.Reminders"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "78D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "ReviewLines.EscalatedOn"
+          }
+        }
+      ]
+    }
+  }
+}

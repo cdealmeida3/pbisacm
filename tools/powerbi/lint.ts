@@ -17,6 +17,9 @@
 //   9. App (build B6): the Power App source of powerbi/apps/sacm-actions/ is valid against Microsoft's schema of pa.yaml
 //      (a copy in tools/powerbi/schemas/pa-yaml/), every Power Fx formula parses with Microsoft's Power Fx library
 //      (tools/powerbi/powerfx-check/, needs `dotnet`), and the app and its flows keep the rules of tools/powerbi/app-rules.ts.
+//  10. Pages (design pass §8.1, tools/powerbi/pages.ts): the size of every page, at most 12 native visuals, the 4 px grid,
+//      no overlap, the places of the Power Apps, the widths of the table columns, titles on one line, a line by a measure
+//      under every table and chart, no text under 9 pt, only properties Power BI has, the hidden pages.
 // --no-dotnet skips step 1 and the parsing of step 9, and says so (for a computer without .NET); the CI never uses it.
 import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -25,12 +28,14 @@ import * as PQP from '@microsoft/powerquery-parser';
 import Ajv from 'ajv';
 import type { AnySchema } from 'ajv';
 import { MODEL, readExpressions, readTables, SOURCE_TABLES } from './tmdl.ts';
-import { EXPECTED_HISTORY, lightColours, staleQueries, THEME_FILE } from './generate.ts';
+import { EXPECTED_HISTORY, staleQueries, THEME_FILE } from './generate.ts';
+import { lightColours } from './tokens.ts';
 import { connectorSource } from './connector.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
 import { APP_FOLDERS } from './actions.ts';
 import { callProblems, catalogueProblems, flowProblems } from './app-rules.ts';
 import type { Formula } from './app-rules.ts';
+import { pageProblems, readCatalogue, readPages, THEME_SCHEMA_FILE, themeProblems } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const REPORT = join(root, 'powerbi', 'SACM-Workbench.Report');
@@ -97,7 +102,7 @@ const ajv = new Ajv({ strict: false, allErrors: true });
 // Each schema is known by the address of its path: Microsoft's $id of the two "embedded" schemas differs from the name
 // the others refer to (schema.embedded.json, schema-embedded.json).
 const SCHEMA_BASE = 'https://developer.microsoft.com/json-schemas/fabric/';
-for (const file of filesUnder(SCHEMAS, /\.json$/)) {
+for (const file of filesUnder(SCHEMAS, /\.json$/).filter((path) => path !== THEME_SCHEMA_FILE)) {
   const schema = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
   ajv.addSchema({ ...schema, $id: SCHEMA_BASE + relative(SCHEMAS, file).replace(/\\/g, '/') } as AnySchema);
 }
@@ -111,6 +116,11 @@ for (const file of pbirFiles) {
   if (!validate(value)) for (const error of (validate.errors ?? []).slice(0, 5)) problems.push(`PBIR: ${where}: ${error.instancePath || '/'} ${error.message}`);
 }
 done.push(`PBIR: ${pbirFiles.length} files checked against the schemas`);
+// The theme has no $schema Power BI reads; it is checked against Microsoft's schema of report themes (version 2.159).
+// Microsoft's file repeats one word in a list, which a strict reader refuses: it is read as it is, without that check.
+const validateTheme = new Ajv({ strict: false, allErrors: true, validateSchema: false }).compile(JSON.parse(readFileSync(THEME_SCHEMA_FILE, 'utf8')) as AnySchema);
+if (!validateTheme(JSON.parse(readFileSync(THEME_FILE, 'utf8')))) for (const error of (validateTheme.errors ?? []).slice(0, 5)) problems.push(`Theme: ${relative(root, THEME_FILE)}: ${error.instancePath || '/'} ${error.message}`);
+done.push('Theme: sacm-theme.json is valid against the schema of report themes');
 
 /* 4. References */
 const columns = new Map(tables.map((table) => [table.name, new Set(table.columns.map((column) => column.name))]));
@@ -308,6 +318,12 @@ if (process.argv.includes('--no-dotnet')) {
   }
 }
 done.push('App: the actions agree with fnCaseActions; the flows only refresh, wait, file, or send what a manager pressed');
+
+/* 10. Pages */
+const report = readPages();
+const catalogue = readCatalogue();
+problems.push(...pageProblems(report, catalogue), ...themeProblems(JSON.parse(readFileSync(THEME_FILE, 'utf8')) as never, catalogue));
+done.push(`Pages: ${report.pages.length} pages of 1280 × 720, at most 12 native visuals each, on the grid, tables fit, every empty box says why`);
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);

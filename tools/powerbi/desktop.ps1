@@ -1,6 +1,7 @@
 # The Desktop check (build B8, D309), on GitHub's Windows runner: install Power BI Desktop, open the project, wait for its
 # engine, then run every visual (tools/powerbi/desktop-check/) and judge what Desktop would show (tools/powerbi/desktop.ts).
-# The job "powerbi-desktop" runs it. Invented samples only (Sample mode); nothing is written to the repository.
+# Then the picture step (D318, tools/powerbi/pictures.ps1): a picture of every page as Desktop draws it, and the time it
+# took. The job "powerbi-desktop" runs it. Invented samples only (Sample mode); nothing is written to the repository.
 #   ./tools/powerbi/desktop.ps1 [-Out .build/desktop]
 param([string]$Out = ".build/desktop")
 $ErrorActionPreference = "Stop"
@@ -43,8 +44,43 @@ if (-not (Test-Path $desktop)) {
 if (-not (Test-Path $desktop)) { throw "Power BI Desktop is not installed" }
 Write-Output "Power BI Desktop $((Get-Item $desktop).VersionInfo.ProductVersion)"
 
-# 2. Open the project, as a double click on the .pbip does; wait for the port of its engine.
-$project = (Resolve-Path "powerbi/SACM-Workbench.pbip").Path
+# The screen of the runner is 1024 x 768: a page of 1280 x 720 would be drawn at half size. A screen of a laptop
+# (1920 x 1080) shows the pages as the team sees them.
+try {
+  Add-Type @"
+using System; using System.Runtime.InteropServices;
+public static class DesktopScreen {
+  [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)] public struct DEVMODE {
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmDeviceName; public short dmSpecVersion; public short dmDriverVersion;
+    public short dmSize; public short dmDriverExtra; public int dmFields; public int dmPositionX; public int dmPositionY; public int dmDisplayOrientation;
+    public int dmDisplayFixedOutput; public short dmColor; public short dmDuplex; public short dmYResolution; public short dmTTOption; public short dmCollate;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmFormName; public short dmLogPixels; public int dmBitsPerPel; public int dmPelsWidth;
+    public int dmPelsHeight; public int dmDisplayFlags; public int dmDisplayFrequency; public int dmICMMethod; public int dmICMIntent; public int dmMediaType;
+    public int dmDitherType; public int dmReserved1; public int dmReserved2; public int dmPanningWidth; public int dmPanningHeight; }
+  [DllImport("user32.dll")] public static extern int EnumDisplaySettings(string d, int m, ref DEVMODE dm);
+  [DllImport("user32.dll")] public static extern int ChangeDisplaySettings(ref DEVMODE dm, int f);
+  public static int Set(int w, int h) { DEVMODE dm = new DEVMODE(); dm.dmSize = (short)Marshal.SizeOf(dm);
+    EnumDisplaySettings(null, -1, ref dm); dm.dmPelsWidth = w; dm.dmPelsHeight = h; dm.dmFields = 0x80000 | 0x100000;
+    return ChangeDisplaySettings(ref dm, 0); }
+}
+"@
+  $changed = [DesktopScreen]::Set(1920, 1080)
+  Add-Type -AssemblyName System.Windows.Forms
+  Write-Output "Screen: $([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width) x $([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height) (change: $changed)"
+} catch { Write-Output "Screen size not changed: $($_.Exception.Message)" }
+
+# 2. Open the project, as a double click on the .pbip does; wait for the port of its engine. Desktop opens a copy in which
+# every page is shown, so the picture step finds a tab for the hidden pages too (Card, Case, Person, Self-check, the
+# parts of Audit); the files of the repository are not changed.
+$copy = Join-Path $Out "project"
+if (Test-Path $copy) { Remove-Item -Recurse -Force $copy }
+Copy-Item -Recurse "powerbi" $copy
+foreach ($file in Get-ChildItem -Recurse -Filter "page.json" (Join-Path $copy "SACM-Workbench.Report")) {
+  $text = Get-Content -Raw $file.FullName
+  $visible = $text -replace ',\s*"visibility":\s*"HiddenInViewMode"', '' -replace '"visibility":\s*"HiddenInViewMode",\s*', ''
+  if ($visible -ne $text) { Set-Content -NoNewline -Encoding utf8NoBOM $file.FullName $visible }
+}
+$project = (Resolve-Path (Join-Path $copy "SACM-Workbench.pbip")).Path
 Write-Output "$(Get-Date -Format HH:mm:ss) Opening $project"
 Start-Process -FilePath $desktop -ArgumentList "`"$project`""
 $workspaces = Join-Path $env:LOCALAPPDATA "Microsoft\Power BI Desktop\AnalysisServicesWorkspaces"
@@ -67,7 +103,9 @@ Write-Output "Engine of Desktop on port $port"
 # 3. Refresh, every visual, the results (the judge runs in the next step).
 dotnet run --project tools/powerbi/desktop-check -c Release -- $port . $Out
 $code = $LASTEXITCODE
-Show-Screen "after the check"
+# 4. The picture step (D318): every page as Desktop draws it. Its findings go to the judge with the results.
+node tools/powerbi/desktop.ts pages (Join-Path $Out "pages.json")
+& "$PSScriptRoot/pictures.ps1" -Pages (Join-Path $Out "pages.json") -Out (Join-Path $Out "pictures")
 # The errors Desktop wrote to its own traces (Power Query gives its reasons there).
 $traces = Join-Path $env:LOCALAPPDATA "Microsoft\Power BI Desktop\Traces"
 Get-ChildItem $traces -Recurse -Filter *.log -ErrorAction SilentlyContinue |

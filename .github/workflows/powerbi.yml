@@ -9,7 +9,11 @@
 #      or over 60 s for one table. Started by hand, it times the sizes and stages asked for, with no gate.
 #   5. The job "powerbi-desktop" (D309): Power BI Desktop itself, installed on the runner, opens the project, refreshes it on
 #      the samples and runs the query of every visual of every page (tools/powerbi/desktop.ps1); it fails when Desktop
-#      would show a visual broken or empty, a card "(Blank)", a blank line, or a measure or table with an error.
+#      would show a visual broken or empty, a card "(Blank)", a blank line, or a measure or table with an error. Then it
+#      takes a picture of every page (tools/powerbi/pictures.ps1, D318) and fails on a page that shows a broken visual or
+#      "(Blank)", or takes more than 3 s to draw. The pictures are an artifact of the run. Started by hand with "pictures",
+#      the job also commits them to the branch (never to main), because a cloud thread cannot download an artifact:
+#      the repository rules fail while the folder pictures/ is in the branch, so it is removed before the merge.
 # Only on pull requests that change the report, the check files, the samples, the readers or the answer key.
 name: Power BI
 
@@ -47,6 +51,10 @@ on:
       jobs:
         description: Which jobs to run (eval, time, desktop; empty for all)
         default: ""
+      pictures:
+        description: Commit the pictures of the pages to this branch (never main), to review them
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -170,7 +178,7 @@ jobs:
   powerbi-desktop:
     if: github.event.pull_request.draft != true && (inputs.jobs == '' || inputs.jobs == null || contains(inputs.jobs, 'desktop'))
     runs-on: windows-latest
-    timeout-minutes: 40
+    timeout-minutes: 50
     defaults:
       run:
         shell: pwsh
@@ -189,10 +197,35 @@ jobs:
       - name: Open the report in Power BI Desktop and run every visual
         run: ./tools/powerbi/desktop.ps1 -Out .build/desktop
       - name: What Desktop would show wrong
-        run: node tools/powerbi/desktop.ts judge .build/desktop/results.json
+        run: node tools/powerbi/desktop.ts judge .build/desktop/results.json .build/desktop/pictures/pictures.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: powerbi-desktop
           path: .build/desktop/
           retention-days: 7
+
+  # D318: the pictures of the Desktop check, committed to the branch in pictures/ for the review, only when the run was
+  # started by hand with "pictures" (the repository rules refuse the folder at the merge). A job of its own, so only it
+  # can write to the repository.
+  powerbi-pictures:
+    needs: powerbi-desktop
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.pictures && github.ref_name != 'main' && needs.powerbi-desktop.result != 'skipped'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: powerbi-desktop
+          path: .build/desktop
+      - name: Commit the pictures to the branch
+        run: |
+          git config user.name "Desktop check"
+          git config user.email "desktop-check@example.com"
+          rm -rf pictures && mkdir -p pictures
+          cp .build/desktop/pictures/* pictures/ 2>/dev/null || true
+          git add -f pictures
+          git commit -m "Pictures of the pages from the Desktop check (for review; remove before the merge)" || exit 0
+          git push origin "HEAD:${GITHUB_REF_NAME}"

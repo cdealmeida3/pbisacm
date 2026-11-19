@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "classes",
   "position": {
-    "x": 836,
-    "y": 296,
-    "z": 4000,
-    "height": 370,
-    "width": 420,
-    "tabOrder": 4000
+    "x": 956,
+    "y": 316,
+    "z": 5000,
+    "height": 388,
+    "width": 300,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "tableEx",
@@ -67,35 +67,6 @@
         "isDefaultSort": true
       }
     },
-    "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "visualContainerObjects": {
       "title": [
         {
@@ -110,7 +81,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'CIs by class (newest CI report; the nine classes of the checks)'"
+                  "Value": "'CIs by class'"
                 }
               }
             }
@@ -129,9 +100,66 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Classes note"
+                }
+              }
+            }
+          }
+        }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "189D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Classes.Label"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "70D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Inventory.CIs"
+          }
+        }
+      ]
+    }
   },
   "filterConfig": {
     "filters": [

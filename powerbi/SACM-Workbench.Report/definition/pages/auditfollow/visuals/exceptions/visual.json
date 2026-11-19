@@ -1,0 +1,338 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "exceptions",
+  "position": {
+    "x": 224,
+    "y": 84,
+    "z": 7000,
+    "height": 300,
+    "width": 720,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "Exceptions.CiName",
+              "nativeQueryRef": "CiName",
+              "displayName": "CI"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "CheckId"
+                }
+              },
+              "queryRef": "Exceptions.CheckId",
+              "nativeQueryRef": "CheckId",
+              "displayName": "Check"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "Reason"
+                }
+              },
+              "queryRef": "Exceptions.Reason",
+              "nativeQueryRef": "Reason",
+              "displayName": "Reason"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "Note"
+                }
+              },
+              "queryRef": "Exceptions.Note",
+              "nativeQueryRef": "Note",
+              "displayName": "Note"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "ByName"
+                }
+              },
+              "queryRef": "Exceptions.ByName",
+              "nativeQueryRef": "ByName",
+              "displayName": "Decided by"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "At"
+                }
+              },
+              "queryRef": "Exceptions.At",
+              "nativeQueryRef": "At",
+              "displayName": "Decided on"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "ReviewOn"
+                }
+              },
+              "queryRef": "Exceptions.ReviewOn",
+              "nativeQueryRef": "ReviewOn",
+              "displayName": "Review on"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "StateLabel"
+                }
+              },
+              "queryRef": "Exceptions.StateLabel",
+              "nativeQueryRef": "StateLabel",
+              "displayName": "State"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Exceptions"
+                  }
+                },
+                "Property": "Order"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Decisions to stop following, newest first'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Decisions to stop following'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Exceptions"
+                    }
+                  },
+                  "Property": "Exceptions note"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "116D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.CiName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "60D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.CheckId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "77D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.Reason"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "74D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.Note"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "94D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.ByName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "94D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.At"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.ReviewOn"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "74D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Exceptions.StateLabel"
+          }
+        }
+      ]
+    }
+  }
+}

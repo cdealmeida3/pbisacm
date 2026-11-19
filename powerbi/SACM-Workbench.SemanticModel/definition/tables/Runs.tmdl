@@ -25,6 +25,14 @@ table Runs
 			RETURN IF ( NOT ISBLANK ( d ) && d >= [Period from] && d <= [Period to], CALCULATE ( COUNTROWS ( History ), History[State] = "open" ) + 0 )
 		formatString: #,0
 
+	/// Under the title of the loads (Audit export).
+	measure 'Loads note' = IF ( COUNTROWS ( Runs ) + 0 = 0, "No CI report in the period chosen.", "The CI reports of the period chosen." )
+		displayFolder: Page notes
+
+	/// Under the title of the reports the cards were checked with (Reports).
+	measure 'Runs note' = IF ( COUNTROWS ( Runs ) + 0 = 0, "No CI report is loaded yet.", "The files of each CI report date." )
+		displayFolder: Page notes
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred
