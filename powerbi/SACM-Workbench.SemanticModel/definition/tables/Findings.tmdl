@@ -346,6 +346,20 @@ table Findings
 			RETURN "on " & n & IF ( n = 1, " CI", " CIs" )
 		displayFolder: People
 
+	/// The next step with the person in view (Person, build D3): the word of the chip, Nothing open when nothing is.
+	measure 'Person step' = SWITCH ( [Person state], 1, "Reply to read", 2, "Escalate", 3, "Reminder due", 4, "New", 5, "Asked", 6, "Marked fixed", "Nothing open" )
+		displayFolder: People
+
+	/// The colour of the next step with the person in view: the colour of its chip (LOOK rule 5).
+	measure 'Person step ink' = SWITCH ( [Person state], 1, "#5925dc", 2, "#b42318", 3, "#7d5700", 4, "#175cd3", 6, "#107569", "#475467" )
+		displayFolder: People
+
+	/// Under the next step with the person in view: the kinds of problem, one part each in the email.
+	measure 'Person step line' =
+			VAR n = [Person kinds]
+			RETURN n & IF ( n = 1, " kind of problem", " kinds of problem" ) & " · one part each in the email"
+		displayFolder: People
+
 	/// The kinds of problem (cards) of the open lines with the person in view (Person): one part each in the email.
 	measure 'Person kinds' =
 			CALCULATE ( DISTINCTCOUNT ( CaseLines[CheckId] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0

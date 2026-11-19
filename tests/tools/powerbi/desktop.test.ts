@@ -85,22 +85,25 @@ test('the list of the pages: the drill-through pages, Self-check and the parts o
   for (const page of pages) assert.equal(page.width, 1280, page.name);
 });
 
-test('the pictures: a page with no tab, a tab that opened another page, a broken word or a slow page is a problem; a page in time is a note', () => {
+test('the pictures: a page with no tab, a tab that opened another page, a broken word or a slow page or tab is a problem; a page in time is a note; no list of broken words (PowerShell writes null) is none', () => {
   const pictures: Pictures = {
     taken: true,
     pages: [
-      { page: 'myday', displayName: 'My day', found: true, seconds: 1.2, file: '01-myday.png', broken: [], status: 'Page 1 of 5' },
-      { page: 'case', displayName: 'Case', found: true, seconds: 1.0, file: '02-case.png', broken: [], status: 'Page 6 of 6' },
+      { page: 'myday', displayName: 'My day', found: true, seconds: 1.2, file: '01-myday.png', broken: [], status: 'Page 1 of 6' },
+      { page: 'case', displayName: 'Case', found: true, seconds: 1.0, file: '02-case.png', broken: null, status: 'Page 6 of 6' },
       { page: 'cards', displayName: 'Cards', found: false, seconds: null, file: null, broken: [] },
       { page: 'backlog', displayName: 'Backlog', found: true, seconds: 1.0, file: '03-backlog.png', broken: ['(Blank)'] },
-      { page: 'history', displayName: 'History', found: true, seconds: 4.5, file: '04-history.png', broken: [], tabs: [{ tab: 'Trend', found: false, file: null }] }
+      { page: 'history', displayName: 'History', found: true, seconds: 4.5, file: '04-history.png', broken: [], tabs: [{ tab: 'Trend', found: false, file: null }] },
+      { page: 'card', displayName: 'Card', found: true, seconds: 1.0, file: '05-card.png', broken: [], tabs: [{ tab: 'Export', found: true, seconds: 3.5, file: '05-card-tab1.png', broken: ['(Blank)'] }] }
     ]
   };
   const notes: string[] = [];
   const problems = judgePictures(pictures, notes);
-  assert.equal(problems.length, 5);
+  assert.equal(problems.length, 7);
+  assert.match(problems.join('\n'), /Card, tab Export: the tab shows "\(Blank\)"/);
+  assert.match(problems.join('\n'), /Card, tab Export: the tab took 3\.5 s/);
   assert.match(problems.join('\n'), /History: the picture step found no tab "Trend"/);
-  assert.match(problems.join('\n'), /Case: the picture shows "Page 6 of 6", not "Page 2 of 5"/);
+  assert.match(problems.join('\n'), /Case: the picture shows "Page 6 of 6", not "Page 2 of 6"/);
   assert.match(problems.join('\n'), /Cards/);
   assert.match(problems.join('\n'), /\(Blank\)/);
   assert.match(problems.join('\n'), /History.*4\.5/);

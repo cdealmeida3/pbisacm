@@ -232,7 +232,7 @@ export interface QueryResult { query: VisualQuery; error?: string; rows?: Array<
 /** What the runner gives back: the model's own errors (TOM), the open and refresh, and each query. */
 export interface Results { opened: boolean; openError?: string; refreshError?: string; modelErrors: string[]; results: QueryResult[] }
 /** What the picture step gives back (pictures.ps1): per page the seconds it took to draw and the words of a broken visual it shows. */
-export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[]; status?: string | null; tabs?: Array<{ tab: string; found: boolean; seconds?: number | null; file: string | null; broken?: string[] }> }> }
+export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[] | null; status?: string | null; tabs?: Array<{ tab: string; found: boolean; seconds?: number | null; file: string | null; broken?: string[] }> }> }
 /** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
 export const DRAW_SECONDS = 3;
 
@@ -294,7 +294,7 @@ export function judgePictures(pictures: Pictures, notes: string[] = []): string[
     if (!page.found) { problems.push(`${page.displayName}: the picture step found no tab for the page`); continue; }
     const expected = `Page ${index + 1} of ${pictures.pages.length}`;
     if (page.status && page.status !== expected) { problems.push(`${page.displayName}: the picture shows "${page.status}", not "${expected}": the tab did not open the page (picture ${page.file})`); continue; }
-    for (const words of page.broken) problems.push(`${page.displayName}: the page shows "${words}" (picture ${page.file})`);
+    for (const words of page.broken ?? []) problems.push(`${page.displayName}: the page shows "${words}" (picture ${page.file})`);
     for (const tab of page.tabs ?? []) {
       const where = `${page.displayName}, tab ${tab.tab}`;
       if (!tab.found) { problems.push(`${page.displayName}: the picture step found no tab "${tab.tab}" on the page (D323)`); continue; }

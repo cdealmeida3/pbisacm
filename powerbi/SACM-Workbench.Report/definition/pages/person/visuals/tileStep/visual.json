@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "tileKinds",
+  "name": "tileStep",
   "position": {
     "x": 468,
     "y": 84,
@@ -23,12 +23,12 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "Person kinds"
+                  "Property": "Person step"
                 }
               },
-              "queryRef": "Findings.Person kinds",
-              "nativeQueryRef": "Person kinds",
-              "displayName": "Kinds of problem"
+              "queryRef": "Findings.Person step",
+              "nativeQueryRef": "Person step",
+              "displayName": "Next step"
             }
           ]
         }
@@ -42,8 +42,13 @@
               "solid": {
                 "color": {
                   "expr": {
-                    "Literal": {
-                      "Value": "'#0c1c49'"
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Findings"
+                        }
+                      },
+                      "Property": "Person step ink"
                     }
                   }
                 }
@@ -164,8 +169,13 @@
             },
             "text": {
               "expr": {
-                "Literal": {
-                  "Value": "'one part each in the email'"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Person step line"
                 }
               }
             },
@@ -222,7 +232,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Kinds of problem'"
+                  "Value": "'Next step'"
                 }
               }
             }
@@ -242,7 +252,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Kinds of problem'"
+                  "Value": "'Next step'"
                 }
               }
             }

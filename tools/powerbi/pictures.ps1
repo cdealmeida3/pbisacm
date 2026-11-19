@@ -239,7 +239,7 @@ foreach ($page in $list) {
   $seconds = Wait-Drawn $clock
   $file = Save-Picture $slug
   $words = Words (Window)
-  $broken = Broken-Words $words
+  $broken = @(Broken-Words $words)
   # The status bar says which page is open ("Page 14 of 17"): the judge compares it with the place of the page.
   $status = @($words | Where-Object { $_ -match '^Page \d+ of \d+$' }) | Select-Object -First 1
   Say "$($page.displayName): drawn in $seconds s, $file, $status$(if ($broken.Count) { ', shows: ' + ($broken -join '; ') })"
@@ -260,7 +260,7 @@ foreach ($page in $list) {
     Start-Sleep -Milliseconds 300
     $tabSeconds = Wait-Drawn $tabClock
     $tabFile = Save-Picture $tabSlug
-    $tabBroken = Broken-Words (Words (Window))
+    $tabBroken = @(Broken-Words (Words (Window)))
     Say "$($page.displayName), tab ${label}: drawn in $tabSeconds s, $tabFile$(if ($tabBroken.Count) { ', shows: ' + ($tabBroken -join '; ') })"
     $tabs += [ordered]@{ tab = $label; found = $true; seconds = $tabSeconds; file = (Split-Path $tabFile -Leaf); broken = $tabBroken }
   }
