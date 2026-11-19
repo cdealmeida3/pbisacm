@@ -151,12 +151,13 @@ now** on the semantic model in the service does not count. Section 6.5 gives the
    source credentials**. For the SharePoint site: **Edit credentials**, **OAuth2**, privacy level **Organizational**, and
    sign in with your company account. Without it the refresh fails with "credentials missing".
 5. **The first refresh.** On the semantic model, press **Refresh now**. This button does not count against the 8. The
-   first refresh computes the history of every CI report in the folder of the last 24 months: about @@SECONDS@@ seconds
-   for each report date. It must finish in 2 hours, so **keep at most @@DATES@@ CI reports in the folder** (D336). Move
-   older reports into a sub-folder named `Archive` of the reports folder: the report never reads a sub-folder. Later
-   refreshes compute only a changed or a new day of the last 7 (incremental refresh with *detect data changes*, D290).
-   **Publishing again** (a new version of the report) starts the whole history again: press **Refresh now** in the
-   service after each publish too.
+   first refresh computes the history of every CI report in the folder of the last 24 months: about 25 seconds for each
+   report date. It must finish in 2 hours, so **keep at most 200 CI reports in the folder** (D336). About 290 fit on the
+   test machine; 200 leave a third of the 2 hours spare, because the service can be slower. Move older reports into a
+   sub-folder named `Archive` of the reports folder: the report never reads a sub-folder. Later refreshes compute only a
+   changed or a new day of the last 7 (incremental refresh with *detect data changes*, D290). **Publishing again** (a
+   new version of the report) starts the whole history again: press **Refresh now** in the service after each publish
+   too.
 6. **Scheduled refresh.** Settings → **Refresh** → **Configure a refresh schedule**: on; the **time zone of the team**
    (the same zone as in the flows, section 6.3); **one** time, after the morning reports arrive: `07:00`. Turn on **Send
    refresh failure notifications** to yourself. Add no other time: each one takes one of the 8 (section 6.5). Power BI
