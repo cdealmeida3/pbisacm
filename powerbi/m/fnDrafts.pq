@@ -165,7 +165,7 @@
                     in
                         [Key = sectionKey(fact), PackId = pack[id], Problem = problem, Items = members, Texts = fnMessageSection(textsOf(pack, problem), fact[Route], members, settings)])),
                 several = List.Count(sections) > 1,
-                part = (at as number) as list =>
+                part = (at as number) as record =>
                     let
                         chosen = sections{at},
                         texts = chosen[Texts],

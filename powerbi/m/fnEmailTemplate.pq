@@ -136,13 +136,13 @@
                 commonLine(common) & "<table width=""100%"" cellpadding=""0"" cellspacing=""0"" border=""0"" class=""t"" style=""border-collapse:collapse;" & F
                     & ";font-size:13px;border:1px solid " & C[line] & """><tr class=""h"">" & Text.Combine(List.Transform(columns, (col) => th(col[Label]))) & "</tr>" & body & rest & "</table>",
         // One part: its number and heading, the text, the table, what we ask and why it matters.
-        sectionHtml = (piece as record, number as number, numbered as logical) as text =>
+        sectionHtml = (piece as record, index as number, numbered as logical) as text =>
             let
                 heading =
                     if numbered then
                         "<table cellpadding=""0"" cellspacing=""0"" border=""0""><tr><td valign=""top"" width=""26""><table cellpadding=""0"" cellspacing=""0"" border=""0""><tr>"
                             & "<td bgcolor=""" & C[navy] & """ width=""26"" height=""26"" align=""center"" style=""" & F & ";color:" & C[onNavy]
-                            & ";font-size:13px;font-weight:600;border-radius:13px"">" & Text.From(number) & "</td></tr></table></td>"
+                            & ";font-size:13px;font-weight:600;border-radius:13px"">" & Text.From(index) & "</td></tr></table></td>"
                             & "<td style=""padding:2px 0 0 10px;" & F & ";font-size:16px;line-height:22px;font-weight:600;color:" & C[ink] & """>" & piece[Heading] & "</td></tr></table>"
                     else "<div style=""" & F & ";font-size:16px;font-weight:600;color:" & C[ink] & """>" & piece[Heading] & "</div>"
             in
