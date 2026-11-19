@@ -1,6 +1,8 @@
 # The Power BI report's Power Query, run for real on the invented samples (plan §9.2, the job "powerbi-eval"). Microsoft's
 # Power Query test tool (PQTest, in the NuGet package Microsoft.PowerQuery.SdkTools) runs only on Windows, so this job
 # uses GitHub's own Windows runner, never a self-hosted one (D286).
+#   0. The job "powerbi-eval" first runs the test of Update-Workbench.ps1 in Windows PowerShell 5.1, as Carlos's laptop
+#      has it (D339).
 #   1. tools/powerbi/connector.ts packs every query of the model into a small test connector (SacmEval.mez).
 #   2. PQTest runs each table of the model and the unit cases of the reading functions, in Sample mode: no data source.
 #   3. tools/powerbi/parity.ts compares the result with the answer key (src/core/ and tests/recorded/), line by line.
@@ -81,6 +83,11 @@ jobs:
           node-version: 22.x
           cache: npm
       - run: npm ci
+      # D339: the update script as Carlos runs it, in Windows PowerShell 5.1 (the Linux job "checks" runs it in pwsh 7).
+      - name: The update script in Windows PowerShell 5.1
+        env:
+          UPDATE_SHELL: powershell
+        run: node --no-warnings --test tests/tools/powerbi/release.test.ts
       - name: Power Query SDK tools (cached)
         id: sdk
         uses: actions/cache@v4

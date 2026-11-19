@@ -21,7 +21,8 @@ setting the report up.
 
 You need Power BI Desktop (free, from the Microsoft Store or from Microsoft's download page).
 
-1. Get the folder `powerbi/`: either unzip the zip from the project thread, or clone the repository.
+1. Get the folder: unzip the zip from the project thread (it holds one folder, `SACM-Workbench-<version>`), or clone
+   the repository (the folder `powerbi/`). **Updating from an earlier version:** see *Update to a new version* below.
 2. Double-click `SACM-Workbench.pbip`.
 3. Power BI Desktop opens the report. **The pages are empty the first time**: a project keeps no data in its files.
 4. Press **Refresh** (Home ribbon). Desktop reads the invented sample reports that are inside the file. There is no
@@ -65,6 +66,36 @@ reminders due never change.
 **RangeEnd** (parameters; 1 November 2026 to 1 January 2030). Keep RangeStart recent in Desktop (a month or two back):
 each report date costs about as much as one refresh. In the workspace the incremental refresh sets the dates itself
 (section 4).
+
+### Update to a new version
+
+Since version 0.53.0 every zip unpacks into its own folder, `SACM-Workbench-<version>` (D339). Never unzip a new version
+over an old folder: unzipping adds and replaces files but never deletes, so panels of the old version stay and sit on top
+of the new pages.
+
+1. **Close Power BI Desktop.**
+2. If Windows marks the zip as downloaded: right-click the zip, **Properties**, tick **Unblock**, **OK**.
+3. **Unzip the new zip next to your current folder**, so both sit in the same folder. For example `Documents\SACM\powerbi`
+   (your folder of 0.52.0 or older) and `Documents\SACM\SACM-Workbench-0.53.0`. In *Extract All*, choose the folder
+   that holds your current folder (`Documents\SACM`): Windows proposes a new folder named after the zip, and the script
+   then looks one folder higher too.
+   **Apps you already added in the service** (section 6): before your first update, do step 13 of section 6.4 once, so
+   your folder holds them. Otherwise the update has no app to carry and you add them again by hand (below).
+4. In the new folder, **double-click `Update-Workbench.cmd`.** A window opens. It finds your previous folder (the newest
+   older `SACM-Workbench-…` next to it, else `powerbi`), or asks you to paste its path. Answer `Y`.
+5. It copies only what is yours, and says each step:
+   - the values of the five parameters **SourceMode**, **StateMode**, **SharePointSite**, **ReportsFolder** and
+     **ServiceNowAddress**, so you do not type them again;
+   - the **Power Apps** and the **Refresh now** buttons you added (section 6), each to the same page, at the place this
+     version keeps for it. They are in your folder only after step 13 of section 6.4.
+   It copies nothing else, deletes nothing and never changes the previous folder.
+6. Press a key to close the window. **Open `SACM-Workbench.pbip` in the new folder** and press **Refresh**.
+7. When the new version works, publish it (section 4) and delete the previous folder.
+
+**If the script cannot run** (the window says scripts are disabled, or IT blocks it), do the same by hand: open the new
+`.pbip`, **Transform data → Edit parameters**, type the five values again, **Apply changes**. Publish, then add the apps
+again in the service: on each page of the table of section 6.4, **Visualizations → Power Apps → Choose app** (your app,
+not *Create new*), the same fields and filter as before, and the place of the table.
 
 ### If Desktop cannot open the .pbip (an older Power BI Desktop)
 
@@ -491,9 +522,11 @@ not while you edit it. Publish the report first (section 4).
 12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **Work queue** (Ctrl+V). It keeps the same app. Set
     its size and position as in the table below. On *Work queue* change the filter of the visual to **CaseLines → Queue
     lines** *is not blank*, so it gets every open line of the page (the free ones too, for **Share out**).
-13. In Desktop, to keep the visual in the repository: download the report (**File → Download this file → A copy of
-    your report**), open it, **File → Save as** the `.pbip` over your copy of `powerbi/`, and send the changed files of
-    `SACM-Workbench.Report/` (the commit must not hold a `.pbix`).
+13. **Once, after you add or change an app**, keep the visuals in your own folder, so that the next update carries them
+    (section 1, *Update to a new version*, D339): in the service, **File → Download this file → A copy of your report**;
+    open the `.pbix` in Desktop; **File → Save as**, type **Power BI project (\*.pbip)**, name `SACM-Workbench`, into
+    **your current folder** (the one of section 1), over its files. Then delete the downloaded `.pbix`. Do not send these
+    files to the repository: the visuals hold the ids of the company's apps.
 
 How to try it: on the Case page of a test CI, tab **Actions**, pick **Note**, type a word, **Save**. The app says
 *Saved*; the line appears under **Done lately** at once, with *not in the report yet*, and the top line counts one
@@ -747,6 +780,11 @@ The parts and the commands are in [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md
 - `npm run powerbi:lint` checks the model with Microsoft's library (needs .NET 8), the queries, the report files, the
   references and the colours. The workflow "Power BI" runs the queries on Windows with Microsoft's Power Query test tool
   and compares the result with the TypeScript logic of `src/core/`.
+- **The zip for Carlos** (D339): `node tools/powerbi/release.ts <folder> --label R1` writes
+  `SACM-Workbench-PowerBI-R1-<version>.zip` from the files of `powerbi/` that git keeps, all inside the folder
+  `SACM-Workbench-<version>/`, with `update.json` for `Update-Workbench.ps1` (the parameters it carries and the places of
+  `APP_SLOTS` and `FLOW_SLOTS`). Make it from `main` after the merge. The test `tests/tools/powerbi/release.test.ts` runs
+  the script in PowerShell on an invented previous folder (GitHub's Linux runner has `pwsh`).
 - If you change a query in Power BI Desktop, copy the change into `powerbi/m/` and run `npm run powerbi:generate`:
   `expressions.tmdl` is generated.
 - The refresh must stay under 2 minutes at the size of the real reports (D283). The job *powerbi-time* of the workflow

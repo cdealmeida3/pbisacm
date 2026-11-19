@@ -351,6 +351,7 @@ A check with the status `off` is switched off: its file stays, it does not run a
 - **A message makes the group mine** when nobody has it (D164).
 - **Before a message**, the app warns when a colleague wrote to the same person, or about the same CIs, in the last 24 hours (D23).
 - **Nothing is sent without a manager pressing Send** (D2). Flows send exactly what a manager queued.
+- **Only live cards ask people** (D346, from build R3 of the Power BI report): a card that is *proposed* (D114) shows its lines, but goes into no message, no next step and no line of the queue until Carlos sets it live.
 
 ## 19. Not followed up
 
@@ -375,6 +376,7 @@ Contracts live in Solusi; **Procurement owns the data** (D89). An import copies 
 - **The EPO ID column of Solusi is free text:** every number of three digits or more is an EPO ID. It must name a known, live Service Instance; a system is Retired when every Service Instance with that EPO ID is Retired (D100).
 - **Upload check:** after the upload, a field that still differs, or a contract of Solusi not in ServiceNow yet. A SACM fix list (D146): first check that the file was uploaded; then SACM sets the value of Solusi in ServiceNow and marks the line as fixed. No incident. A person's name is on *Contracts to fix in ServiceNow*, not here.
 - **Contract changes** is a page, not a check: what changed since the Solusi file loaded before, and how many Concluded contracts end in the next 30 and 90 days, counted from today (D102). Nobody is asked.
+- **The contracts table of ServiceNow comes as its own scheduled report** on `ast_contract` (D342). The file of links between contracts and CIs (`ast_contract`, `ci_item`) is a different report, known but not used yet.
 - The contract checks run when a CI report is loaded, with both contract files loaded with or before it (D97). Without both, the cards are grey.
 - Contract cards list findings by kind of problem, never by owner: the people of a contract are not who is asked.
 
