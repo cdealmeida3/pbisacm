@@ -3,7 +3,8 @@
 # page has stopped drawing, takes a picture, and reads the words the page shows (Desktop's canvas is a web page, and
 # Windows UI Automation reads its text). It writes pictures.json for the judge (tools/powerbi/desktop.ts):
 #   page, picture file, seconds to draw, and the words that mean a visual is broken ("Can't display the visual",
-#   "Select or drag fields", "(Blank)", ...). Invented samples only (Sample mode).
+#   "Select or drag fields", "(Blank)", ...). A page with tabs (D323) gets one more picture per tab after its first: the
+#   tab is pressed with Ctrl (Desktop edits the report, and Ctrl+click is how a button acts there). Invented samples only.
 #   ./tools/powerbi/pictures.ps1 -Pages .build/desktop/pages.json -Out .build/desktop/pictures
 param([Parameter(Mandatory)][string]$Pages, [string]$Out = ".build/desktop/pictures")
 $ErrorActionPreference = "Continue"
@@ -16,6 +17,7 @@ public static class PictureWin {
   [DllImport("user32.dll")] public static extern void mouse_event(int f, int x, int y, int d, int e);
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int c);
+  [DllImport("user32.dll")] public static extern void keybd_event(byte k, byte s, int f, int e);
 }
 "@
 $UIA = [System.Windows.Automation.AutomationElement]
@@ -105,6 +107,30 @@ function Open-Tab($tab) {
   }
   try { $tab.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select(); return } catch { }
   try { $tab.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke(); return } catch { }
+}
+# A button of the canvas by its words (a tab of a bookmark navigator): above the tab strip, the size of a button.
+function Find-Button($root, [string]$name) {
+  $window = $root.Current.BoundingRectangle
+  $condition = New-Object System.Windows.Automation.PropertyCondition($NameProperty, $name)
+  foreach ($element in $root.FindAll($Scope::Descendants, $condition)) {
+    $r = $element.Current.BoundingRectangle
+    if ($r.IsEmpty -or $r.Height -gt 60 -or $r.Width -lt 10 -or $r.Y -gt ($window.Y + $window.Height - 140)) { continue }
+    return $element
+  }
+  return $null
+}
+# Waits until two fingerprints of the screen in a row are equal (at most 60 s).
+function Wait-Drawn {
+  $clock = [System.Diagnostics.Stopwatch]::StartNew()
+  $before = Fingerprint
+  $stable = 0
+  while ($clock.Elapsed.TotalSeconds -lt 60) {
+    Start-Sleep -Milliseconds 500
+    $now = Fingerprint
+    if ($now -eq $before) { $stable++ } else { $stable = 0 }
+    $before = $now
+    if ($stable -ge 2) { break }
+  }
 }
 # The names at the foot of the window (the tab strip), for the log when a tab is not found.
 function Tab-Names($root) {
@@ -222,7 +248,29 @@ foreach ($page in $list) {
   # The status bar says which page is open ("Page 14 of 17"): the judge compares it with the place of the page.
   $status = @($words | Where-Object { $_ -match '^Page \d+ of \d+$' }) | Select-Object -First 1
   Say "$($page.displayName): drawn in $seconds s, $file, $status$(if ($broken.Count) { ', shows: ' + ($broken -join '; ') })"
-  $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken; status = $status }
+  # The other tabs of the page: Ctrl+click each, wait until it has drawn, a picture, and the broken words it shows.
+  $tabs = @()
+  $t = 1
+  foreach ($label in @($page.tabs)) {
+    if (-not $label) { continue }
+    $tabSlug = "$slug-tab$t"
+    $t++
+    $button = Find-Button (Window) $label
+    if (-not $button) { Say "$($page.displayName): no tab '$label' on the canvas"; $tabs += [ordered]@{ tab = $label; found = $false; file = $null }; continue }
+    $at = Center $button
+    [PictureWin]::keybd_event(0x11, 0, 0, 0)
+    Click $at[0] $at[1]
+    [PictureWin]::keybd_event(0x11, 0, 2, 0)
+    Start-Sleep -Milliseconds 300
+    Wait-Drawn
+    $tabFile = Save-Picture $tabSlug
+    $tabWords = Words (Window)
+    $tabBroken = @($BROKEN | Where-Object { $word = $_; @($tabWords | Where-Object { $_.Contains($word) }).Count -gt 0 })
+    foreach ($word in $tabBroken) { $broken += "$word (tab $label)" }
+    Say "$($page.displayName), tab ${label}: $tabFile$(if ($tabBroken.Count) { ', shows: ' + ($tabBroken -join '; ') })"
+    $tabs += [ordered]@{ tab = $label; found = $true; file = (Split-Path $tabFile -Leaf) }
+  }
+  $results += [ordered]@{ page = $page.name; displayName = $page.displayName; found = $true; seconds = $seconds; file = (Split-Path $file -Leaf); broken = $broken; status = $status; tabs = $tabs }
 }
 [ordered]@{ taken = $true; minutes = [math]::Round(((Get-Date) - $started).TotalMinutes, 1); pages = $results } | ConvertTo-Json -Depth 5 |
   Out-File -Encoding utf8NoBOM (Join-Path $Out "pictures.json")

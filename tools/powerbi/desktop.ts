@@ -205,14 +205,27 @@ export function drillColumns(): string[] {
 }
 
 /** One page for the picture step (pictures.ps1, D318): its folder name, its tab, whether the team sees its tab. */
-export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number }
+export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number; tabs: string[] }
+
+/** The tabs of each page (D323) after its first one, by their words: the picture step presses each and takes a picture. */
+function tabsByPage(): Map<string, string[]> {
+  const folder = join(PAGES, '..', 'bookmarks');
+  const out = new Map<string, string[]>();
+  if (!existsSync(join(folder, 'bookmarks.json'))) return out;
+  for (const group of readJson<{ items: Array<{ children?: string[] }> }>(join(folder, 'bookmarks.json')).items) {
+    const tabs = (group.children ?? []).map((child) => readJson<{ displayName: string; explorationState: { activeSection: string } }>(join(folder, `${child}.bookmark.json`)));
+    for (const tab of tabs.slice(1)) out.set(tab.explorationState.activeSection, [...(out.get(tab.explorationState.activeSection) ?? []), tab.displayName]);
+  }
+  return out;
+}
 
 /** Every page in the order of pages.json: the picture step opens each from its tab (a drill-through page shows its empty state). */
 export function pageList(): PageEntry[] {
   const order = readJson<{ pageOrder: string[] }>(join(PAGES, 'pages.json')).pageOrder;
+  const tabs = tabsByPage();
   return order.map((name) => {
     const page = readJson<{ displayName: string; visibility?: string; width: number; height: number; pageBinding?: { type?: string } }>(join(PAGES, name, 'page.json'));
-    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height };
+    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height, tabs: tabs.get(name) ?? [] };
   });
 }
 
@@ -223,7 +236,7 @@ export interface QueryResult { query: VisualQuery; error?: string; rows?: Array<
 /** What the runner gives back: the model's own errors (TOM), the open and refresh, and each query. */
 export interface Results { opened: boolean; openError?: string; refreshError?: string; modelErrors: string[]; results: QueryResult[] }
 /** What the picture step gives back (pictures.ps1): per page the seconds it took to draw and the words of a broken visual it shows. */
-export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[]; status?: string | null }> }
+export interface Pictures { taken: boolean; why?: string; pages: Array<{ page: string; displayName: string; found: boolean; seconds: number | null; file: string | null; broken: string[]; status?: string | null; tabs?: Array<{ tab: string; found: boolean; file: string | null }> }> }
 /** The longest a page may take to draw in Desktop (D318): longer, and the team waits on app.powerbi.com too. */
 export const DRAW_SECONDS = 3;
 
@@ -286,6 +299,10 @@ export function judgePictures(pictures: Pictures, notes: string[] = []): string[
     const expected = `Page ${index + 1} of ${pictures.pages.length}`;
     if (page.status && page.status !== expected) { problems.push(`${page.displayName}: the picture shows "${page.status}", not "${expected}": the tab did not open the page (picture ${page.file})`); continue; }
     for (const words of page.broken) problems.push(`${page.displayName}: the page shows "${words}" (picture ${page.file})`);
+    for (const tab of page.tabs ?? []) {
+      if (!tab.found) problems.push(`${page.displayName}: the picture step found no tab "${tab.tab}" on the page (D323)`);
+      else notes.push(`${page.displayName}, tab ${tab.tab}: picture ${tab.file}`);
+    }
     if (page.seconds !== null && page.seconds > DRAW_SECONDS) problems.push(`${page.displayName}: the page took ${page.seconds} s to draw, more than ${DRAW_SECONDS} s (picture ${page.file})`);
     else notes.push(`${page.displayName}: drawn in ${page.seconds} s (picture ${page.file})`);
   }

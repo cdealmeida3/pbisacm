@@ -81,6 +81,7 @@ test('the list of the pages: the drill-through pages, Self-check and the parts o
   const pages = pageList();
   assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['auditexport', 'auditfollow', 'auditrecord', 'auditreview', 'card', 'case', 'person', 'selfcheck']);
   assert.deepEqual(pages.filter((page) => page.drillThrough).map((page) => page.name).sort(), ['card', 'case', 'person']);
+  assert.deepEqual(pages.find((page) => page.name === 'card')?.tabs, ['SACM fix list', 'By kind of problem', 'Export'], 'the picture step presses each tab after the first');
   for (const page of pages) assert.equal(page.width, 1280, page.name);
 });
 
@@ -92,12 +93,13 @@ test('the pictures: a page with no tab, a tab that opened another page, a broken
       { page: 'case', displayName: 'Case', found: true, seconds: 1.0, file: '02-case.png', broken: [], status: 'Page 6 of 6' },
       { page: 'cards', displayName: 'Cards', found: false, seconds: null, file: null, broken: [] },
       { page: 'backlog', displayName: 'Backlog', found: true, seconds: 1.0, file: '03-backlog.png', broken: ['(Blank)'] },
-      { page: 'history', displayName: 'History', found: true, seconds: 4.5, file: '04-history.png', broken: [] }
+      { page: 'history', displayName: 'History', found: true, seconds: 4.5, file: '04-history.png', broken: [], tabs: [{ tab: 'Trend', found: false, file: null }] }
     ]
   };
   const notes: string[] = [];
   const problems = judgePictures(pictures, notes);
-  assert.equal(problems.length, 4);
+  assert.equal(problems.length, 5);
+  assert.match(problems.join('\n'), /History: the picture step found no tab "Trend"/);
   assert.match(problems.join('\n'), /Case: the picture shows "Page 6 of 6", not "Page 2 of 5"/);
   assert.match(problems.join('\n'), /Cards/);
   assert.match(problems.join('\n'), /\(Blank\)/);
