@@ -88,7 +88,7 @@
         parkedSet = if parked = null then [] else parked[KeySet],
         checkable = List.Buffer(List.Select(cis, (ci) => not Record.HasFields(parkedSet, ci[Key]))),
         checkableKeys = fnKeySet(List.Transform(checkable, (ci) => ci[Key])),
-        packs = List.Buffer(List.Select(List.Transform(Json.Document(CheckFiles), (entry) => entry[pack]), (pack) => pack[status] <> "off")),
+        packs = List.Buffer(List.Select(List.Transform(Json.Document(CheckFiles), (entry) => entry[pack]), (pack) => pack[status] = "live")),
         moduleOf = (pack as record) as text => if pack[detector][type] = "rule" then "rule" else Record.FieldOrDefault(pack[detector], "module", pack[detector][type]),
         built = List.Buffer(List.Select(packs, (pack) => List.Contains(BuiltDetectors, moduleOf(pack)))),
         // The scope of a check (fnInScope), with its words in compared form once: the class, and the status of the CI.

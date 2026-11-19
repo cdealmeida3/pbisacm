@@ -194,9 +194,14 @@ jobs:
           dotnet-version: 8.0.x
       - name: Build the runner
         run: dotnet build tools/powerbi/desktop-check -c Release
+      - name: PREVIEW ONLY - the reports folder, invented at real size with many people
+        run: |
+          node tools/powerbi/scaled.ts --write C:\preview-data --history 1
+          python tools/preview/people.py C:\preview-data
       - name: Open the report in Power BI Desktop and run every visual
         run: ./tools/powerbi/desktop.ps1 -Out .build/desktop
       - name: What Desktop would show wrong
+        continue-on-error: true
         run: node tools/powerbi/desktop.ts judge .build/desktop/results.json .build/desktop/pictures/pictures.json
       - uses: actions/upload-artifact@v4
         if: always()

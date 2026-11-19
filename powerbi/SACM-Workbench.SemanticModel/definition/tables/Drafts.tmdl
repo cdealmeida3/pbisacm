@@ -45,6 +45,42 @@ table Drafts
 			VAR ref = SELECTEDVALUE ( Drafts[Ref] )
 			RETURN IF ( HASONEVALUE ( Drafts[DraftId] ), SUBSTITUTE ( subjectText, "%%REF%%", IF ( ref <> "", ref, "reference given at Send" ) ) )
 
+	/// PREVIEW: the draft the right side of Messages shows: the one chosen in the list, else the first of the list.
+	measure 'Preview id' =
+			VAR firstName = CALCULATE ( MIN ( Drafts[ToName] ) )
+			RETURN CALCULATE ( MIN ( Drafts[DraftId] ), Drafts[ToName] = firstName )
+
+	/// PREVIEW: a value of the head of the email.
+	measure 'Preview value' =
+			VAR pick = [Preview id]
+			VAR asked = SELECTEDVALUE ( PreviewFields[Field] )
+			RETURN
+			    CALCULATE (
+			        SWITCH (
+			            asked,
+			            "To", SELECTEDVALUE ( Drafts[ToName] ) & "  <" & SELECTEDVALUE ( Drafts[To] ) & ">",
+			            "Cc", IF ( SELECTEDVALUE ( Drafts[Cc] ) = "", "Nobody", SUBSTITUTE ( SELECTEDVALUE ( Drafts[Cc] ), ";", "," ) ),
+			            "Subject", SUBSTITUTE ( SELECTEDVALUE ( Drafts[Subject] ), "%%REF%%", "reference given at Send" ),
+			            "Kind", SELECTEDVALUE ( Drafts[KindLabel] ) & " · " & SELECTEDVALUE ( Drafts[CiCount] ) & " CIs · from the shared SACM mailbox"
+			        ),
+			        Drafts[DraftId] = pick
+			    )
+
+	/// PREVIEW: 1 on the head lines that have a value.
+	measure 'Preview field mark' = IF ( NOT ISBLANK ( [Preview value] ), 1 )
+		formatString: 0
+
+	/// PREVIEW: the line under the title of the email.
+	measure 'Preview note' =
+			VAR chosen = HASONEVALUE ( Drafts[ToName] )
+			RETURN IF ( chosen, "As it will arrive.", "The first of the list. Choose another in the list on the left." )
+
+	/// PREVIEW: a line of the email shown, blank after its last line.
+	measure 'Preview line' =
+			VAR pick = [Preview id]
+			VAR n = SELECTEDVALUE ( LineNumbers[No] )
+			RETURN CALCULATE ( MAX ( DraftLines[Line] ), REMOVEFILTERS ( DraftLines ), DraftLines[DraftId] = pick, DraftLines[LineNo] = n )
+
 	/// The draft, D0001 first: by person in the order the newest report first names them (one refresh only: the next refresh numbers them again).
 	column DraftId
 		dataType: string

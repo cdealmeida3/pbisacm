@@ -1,0 +1,13 @@
+/// PREVIEW: the line numbers of the email on Messages.
+table LineNumbers
+
+	column No
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Value]
+
+	partition LineNumbers = calculated
+		mode: import
+		source = GENERATESERIES ( 1, 600, 1 )

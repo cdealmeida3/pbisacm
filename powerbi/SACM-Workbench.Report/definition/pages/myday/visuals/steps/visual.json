@@ -53,6 +53,36 @@
                       "Entity": "Findings"
                     }
                   },
+                  "Property": "Step with"
+                }
+              },
+              "queryRef": "Findings.Step with",
+              "nativeQueryRef": "Step with",
+              "displayName": "With"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Step with order"
+                }
+              },
+              "queryRef": "Findings.Step with order",
+              "nativeQueryRef": "Step with order",
+              "displayName": " "
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
                   "Property": "Step"
                 }
               },
@@ -65,6 +95,19 @@
       },
       "sortDefinition": {
         "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Findings"
+                  }
+                },
+                "Property": "Step with order"
+              }
+            },
+            "direction": "Ascending"
+          },
           {
             "field": {
               "Measure": {
@@ -103,7 +146,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "136D"
+                  "Value": "128D"
                 }
               }
             }
@@ -117,13 +160,41 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "328D"
+                  "Value": "248D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "Findings.Step"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "76D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Step with"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Step with order"
           }
         }
       ],
@@ -144,6 +215,26 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#ffffff'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Findings.Step with order"
           }
         }
       ]

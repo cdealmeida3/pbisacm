@@ -1,0 +1,21 @@
+/// PREVIEW: the switch of My day: Mine and free (the default) or Everyone.
+table ViewChoice
+
+	column View
+		dataType: string
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [View]
+		sortByColumn: Order
+
+	column Order
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Order]
+
+	partition ViewChoice = calculated
+		mode: import
+		source = DATATABLE ( "View", STRING, "Order", INTEGER, { { "Mine and free", 1 }, { "Everyone", 2 } } )

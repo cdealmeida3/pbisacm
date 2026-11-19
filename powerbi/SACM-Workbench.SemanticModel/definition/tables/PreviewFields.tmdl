@@ -1,0 +1,21 @@
+/// PREVIEW: the lines of the head of the email on Messages.
+table PreviewFields
+
+	column Field
+		dataType: string
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Field]
+		sortByColumn: Order
+
+	column Order
+		dataType: int64
+		isHidden
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Order]
+
+	partition PreviewFields = calculated
+		mode: import
+		source = DATATABLE ( "Field", STRING, "Order", INTEGER, { { "To", 1 }, { "Cc", 2 }, { "Subject", 3 }, { "Kind", 4 } } )

@@ -4,7 +4,7 @@ let
     sample = Table.TransformColumns(
         Table.RenameColumns(Table.AddColumn(SampleFiles, "Modified", each null, type nullable datetime), {{"Base64", "Content"}}),
         {{"Content", (text) => Binary.FromText(text, BinaryEncoding.Base64), type binary}}),
-    files = if SourceMode = "SharePoint" then fnSharePointFiles() else Table.SelectColumns(sample, {"FileName", "Modified", "Content"}),
+    files = if SourceMode = "SharePoint" then fnSharePointFiles() else if SourceMode = "Folder" then fnFolderFiles() else Table.SelectColumns(sample, {"FileName", "Modified", "Content"}),
     reports = Table.SelectRows(files, each fnIsReportFile([FileName])),
     dated = Table.AddColumn(reports, "ReportDate", each fnReportDate([FileName], [Modified]), type nullable date)
 in

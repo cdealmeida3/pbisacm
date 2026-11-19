@@ -1,0 +1,32 @@
+/// PREVIEW: the plain text of each draft, one row per line, for the email on Messages.
+table DraftLines
+
+	column DraftId
+		dataType: string
+		isNameInferred
+		sourceColumn: [DraftId]
+
+	column LineNo
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [LineNo]
+
+	column Line
+		dataType: string
+		isNameInferred
+		sourceColumn: [Line]
+
+	partition DraftLines = calculated
+		mode: import
+		source =
+				VAR prepared =
+				    SELECTCOLUMNS (
+				        Drafts,
+				        "@id", Drafts[DraftId],
+				        "@p", SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( Drafts[Plain], "|", "/" ), UNICHAR ( 13 ), "" ), UNICHAR ( 10 ), "|" ), "%%SENDER%%", "Your name" ), "%%REF%%", "SACM-REF" )
+				    )
+				VAR expanded = GENERATE ( prepared, GENERATESERIES ( 1, PATHLENGTH ( [@p] ), 1 ) )
+				RETURN
+				    SELECTCOLUMNS ( expanded, "DraftId", [@id], "LineNo", [Value], "Line", PATHITEM ( [@p], [Value], TEXT ) )

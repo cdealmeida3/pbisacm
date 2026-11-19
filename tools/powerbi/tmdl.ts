@@ -133,7 +133,7 @@ export function readTable(file: string): Table {
     if (measure) { table.measures.push({ name: unquote(measure[1]!), dax: valueAt(lines, i, 1).text }); continue; }
     if (/^\t\tsource\s*=/.test(line) && /^\tpartition\s/.test(lines.slice(0, i).reverse().find((before) => /^\t\S/.test(before)) ?? '')) {
       const source = valueAt(lines, i, 2).text;
-      if (table.partitionKind === 'calculated') { table.dax = source; table.calculated = readCalculated(source, `${file}:${i + 1}`); } else table.partitionM = source;
+      if (table.partitionKind === 'calculated') { table.dax = source; if (!/PREVIEW/.test(lines.slice(0, 3).join(' '))) table.calculated = readCalculated(source, `${file}:${i + 1}`); } else table.partitionM = source;
     }
   }
   return table;

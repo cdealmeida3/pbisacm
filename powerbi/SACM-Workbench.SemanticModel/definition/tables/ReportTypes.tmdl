@@ -10,7 +10,7 @@ table ReportTypes
 	/// The Reports line under the title of My day (src/app/view/tiles.ts, reportsLine): "5 reports · 11 Nov · fresh", or how many are loaded and which are missing, and a warning for each report that is too old.
 	measure 'Reports line' =
 			VAR asOf = [Today]
-			VAR types = ALL ( ReportTypes )
+			VAR types = ALLNOBLANKROW ( ReportTypes )
 			VAR total = COUNTROWS ( types )
 			VAR loaded = COUNTROWS ( FILTER ( types, NOT ISBLANK ( ReportTypes[NewestDate] ) ) )
 			VAR newest = MAXX ( types, ReportTypes[NewestDate] )
@@ -72,7 +72,7 @@ table ReportTypes
 			VAR asOf = [Today]
 			VAR chips =
 			    ADDCOLUMNS (
-			        ALL ( ReportTypes[Kind], ReportTypes[Label], ReportTypes[Order], ReportTypes[NewestDate], ReportTypes[StaleAfter] ),
+			        ALLNOBLANKROW ( ReportTypes[Kind], ReportTypes[Label], ReportTypes[Order], ReportTypes[NewestDate], ReportTypes[StaleAfter] ),
 			        "@word", IF ( ReportTypes[Kind] = "contract", "Contracts", LEFT ( ReportTypes[Label], SEARCH ( " ", ReportTypes[Label] & " ", 1, 0 ) - 1 ) ),
 			        "@kind", IF ( ISBLANK ( ReportTypes[NewestDate] ), 3, IF ( DATEDIFF ( ReportTypes[NewestDate], asOf, DAY ) > ReportTypes[StaleAfter], 2, 1 ) )
 			    )

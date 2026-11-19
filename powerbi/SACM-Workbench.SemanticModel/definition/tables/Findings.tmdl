@@ -79,7 +79,11 @@ table Findings
 	/// 1 on a person with a next step today (Person state 1 to 4): the visual filter of Your next steps (My day).
 	measure 'Step mark' =
 			VAR kind = [Person state]
-			RETURN IF ( NOT ISBLANK ( kind ) && kind <= 4, 1 )
+			VAR everyone = SELECTEDVALUE ( ViewChoice[View], "Mine and free" ) = "Everyone"
+			VAR who = [Me]
+			VAR keys = VALUES ( Findings[Key] )
+			VAR mineOrFree = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[AssignedTo] IN { "", who } )
+			RETURN IF ( NOT ISBLANK ( kind ) && kind <= 4 && ( everyone || mineOrFree > 0 ), 1 )
 		formatString: 0
 		displayFolder: My day
 
@@ -116,6 +120,18 @@ table Findings
 		displayFolder: My day
 
 	/// On a line of Your next steps: what to do with the person and why, in a few words ("Read the reply of 6 Nov · 2 CIs").
+	/// PREVIEW: who has the person's lines: You, Free, or the manager they are assigned to.
+	measure 'Step with' =
+			VAR who = [Me]
+			VAR keys = VALUES ( Findings[Key] )
+			VAR mine = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[AssignedTo] = who )
+			VAR other = CALCULATE ( MAX ( CaseLines[AssignedTo] ), TREATAS ( keys, CaseLines[Key] ), CaseLines[AssignedTo] <> "", CaseLines[AssignedTo] <> who )
+			RETURN IF ( mine > 0, "You", IF ( ISBLANK ( other ), "Free", other ) )
+
+	/// PREVIEW: 1 on your own steps, 2 on the free ones, 3 on the others: the order of Your next steps.
+	measure 'Step with order' = SWITCH ( [Step with], "You", 1, "Free", 2, 3 )
+		formatString: 0
+
 	measure Step =
 			VAR kind = [Person state]
 			VAR asOf = [Today]
@@ -196,7 +212,7 @@ table Findings
 			    IF (
 			        n = 0,
 			        "Nobody to write to today: no reply to read, no reminder due and nobody new to ask." & fixes,
-			        n & IF ( n = 1, " step", " steps" ) & " for " & FORMAT ( [Today], "dddd d mmmm" ) & IF ( NOT ISBLANK ( me ), " · " & me ) & ", in the order of the team's rules. Select one, then Open person." & fixes
+			        n & IF ( n = 1, " step", " steps" ) & " for " & FORMAT ( [Today], "dddd d mmmm" ) & IF ( NOT ISBLANK ( me ), " · " & me ) & IF ( SELECTEDVALUE ( ViewChoice[View], "Mine and free" ) = "Everyone", ", the whole team", ", yours first, then the free ones" ) & ", in the order of the team's rules. Select one, then Open person." & fixes
 			    )
 		displayFolder: Page notes
 

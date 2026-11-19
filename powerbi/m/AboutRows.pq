@@ -5,6 +5,6 @@
 // browser's time (the measure Report at). RefreshRule: the refresh rule in words (powerbi/apps/refresh.json, D333).
 #table(
     type table [Version = text, SourceMode = text, Data = text, SampleDate = date, RefreshedAt = datetime, RefreshedUtc = datetime, RefreshRule = text],
-    {{WorkbenchVersion, SourceMode,
-        if SourceMode = "SharePoint" then "Reports from the SharePoint folder" else "Invented sample data, packed in this file",
+    {{WorkbenchVersion, if SourceMode = "Folder" then "Sample" else SourceMode,
+        if SourceMode = "Folder" then "Invented data at real size" else if SourceMode = "SharePoint" then "Reports from the SharePoint folder" else "Invented sample data, packed in this file",
         SampleDate, DateTime.LocalNow(), DateTimeZone.RemoveZone(DateTimeZone.UtcNow()), RefreshRule[Text]}})

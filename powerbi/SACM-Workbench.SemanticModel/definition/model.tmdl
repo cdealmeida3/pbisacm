@@ -1,5 +1,5 @@
 model Model
-	culture: en-US
+	culture: en-GB
 	defaultPowerBIDataSourceVersion: powerBI_V3
 	sourceQueryCulture: en-US
 	dataAccessOptions
@@ -58,6 +58,10 @@ ref table HistoryRun
 ref table CaseLines
 ref table RepliesToRead
 ref table Drafts
+ref table DraftLines
+ref table PreviewFields
+ref table LineNumbers
+ref table ViewChoice
 ref table Exceptions
 ref table Journal
 ref table JournalKeys
