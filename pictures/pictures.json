@@ -1,6 +1,6 @@
 {
   "taken": true,
-  "minutes": 6.0,
+  "minutes": 13.5,
   "pages": [
     {
       "page": "myday",
@@ -15,7 +15,7 @@
       "page": "mywork",
       "displayName": "Work queue",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "02-mywork.png",
       "broken": [],
       "status": "Page 2 of 17"
@@ -51,7 +51,7 @@
       "page": "contracts",
       "displayName": "Contract changes",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "06-contracts.png",
       "broken": [],
       "status": "Page 6 of 17"
@@ -87,7 +87,7 @@
       "page": "auditexport",
       "displayName": "Audit export",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 3.0,
       "file": "10-auditexport.png",
       "broken": [],
       "status": "Page 10 of 17"
@@ -96,7 +96,7 @@
       "page": "auditfollow",
       "displayName": "Not followed",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "11-auditfollow.png",
       "broken": [],
       "status": "Page 11 of 17"
