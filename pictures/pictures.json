@@ -1,14 +1,15 @@
 {
   "taken": true,
-  "minutes": 12.2,
+  "minutes": 11.8,
   "pages": [
     {
       "page": "myday",
       "displayName": "My day",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "01-myday.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 1 of 17"
     },
     {
       "page": "mywork",
@@ -16,7 +17,8 @@
       "found": true,
       "seconds": 2.0,
       "file": "02-mywork.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 2 of 17"
     },
     {
       "page": "messages",
@@ -24,7 +26,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "03-messages.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 3 of 17"
     },
     {
       "page": "cards",
@@ -32,7 +35,8 @@
       "found": true,
       "seconds": 2.0,
       "file": "04-cards.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 4 of 17"
     },
     {
       "page": "backlog",
@@ -40,7 +44,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "05-backlog.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 5 of 17"
     },
     {
       "page": "contracts",
@@ -48,7 +53,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "06-contracts.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 6 of 17"
     },
     {
       "page": "activity",
@@ -56,7 +62,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "07-activity.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 7 of 17"
     },
     {
       "page": "history",
@@ -64,7 +71,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "08-history.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 8 of 17"
     },
     {
       "page": "audit",
@@ -72,7 +80,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "09-audit.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 9 of 17"
     },
     {
       "page": "auditexport",
@@ -80,7 +89,8 @@
       "found": true,
       "seconds": 2.0,
       "file": "10-auditexport.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 10 of 17"
     },
     {
       "page": "auditfollow",
@@ -88,7 +98,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "11-auditfollow.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 11 of 17"
     },
     {
       "page": "auditreview",
@@ -96,7 +107,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "12-auditreview.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 12 of 17"
     },
     {
       "page": "reports",
@@ -104,7 +116,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "13-reports.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 13 of 17"
     },
     {
       "page": "card",
@@ -112,23 +125,26 @@
       "found": true,
       "seconds": 2.0,
       "file": "14-card.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 14 of 17"
     },
     {
       "page": "case",
       "displayName": "Case",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 3.0,
       "file": "15-case.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 15 of 17"
     },
     {
       "page": "person",
       "displayName": "Person",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "16-person.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 16 of 17"
     },
     {
       "page": "selfcheck",
@@ -136,7 +152,8 @@
       "found": true,
       "seconds": 1.0,
       "file": "17-selfcheck.png",
-      "broken": []
+      "broken": [],
+      "status": "Page 17 of 17"
     }
   ]
 }
