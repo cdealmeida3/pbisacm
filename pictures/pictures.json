@@ -1,6 +1,6 @@
 {
   "taken": true,
-  "minutes": 5.9,
+  "minutes": 7.0,
   "pages": [
     {
       "page": "myday",
@@ -10,7 +10,10 @@
       "file": "01-myday.png",
       "broken": [],
       "status": "Page 1 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "mywork",
@@ -20,17 +23,23 @@
       "file": "02-mywork.png",
       "broken": [],
       "status": "Page 2 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "people",
       "displayName": "People",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "03-people.png",
       "broken": [],
       "status": "Page 3 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "messages",
@@ -40,13 +49,16 @@
       "file": "04-messages.png",
       "broken": [],
       "status": "Page 4 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "cards",
       "displayName": "All cards",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 3.0,
       "file": "05-cards.png",
       "broken": [],
       "status": "Page 5 of 19",
@@ -54,11 +66,17 @@
         {
           "tab": "List",
           "found": true,
-          "seconds": 1.0,
+          "seconds": 2.0,
           "file": "05-cards-tab1.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         }
-      ]
+      ],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "backlog",
@@ -68,17 +86,23 @@
       "file": "06-backlog.png",
       "broken": [],
       "status": "Page 6 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "contracts",
       "displayName": "Contract changes",
       "found": true,
-      "seconds": 3.0,
+      "seconds": 2.0,
       "file": "07-contracts.png",
       "broken": [],
       "status": "Page 7 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "history",
@@ -94,19 +118,28 @@
           "found": true,
           "seconds": 1.0,
           "file": "08-history-tab1.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         }
-      ]
+      ],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "overview",
       "displayName": "Overview",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 4.0,
       "file": "09-overview.png",
       "broken": [],
       "status": "Page 9 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "audit",
@@ -116,7 +149,10 @@
       "file": "10-audit.png",
       "broken": [],
       "status": "Page 10 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "auditrecord",
@@ -126,37 +162,49 @@
       "file": "11-auditrecord.png",
       "broken": [],
       "status": "Page 11 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "auditexport",
       "displayName": "Audit export",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 3.0,
       "file": "12-auditexport.png",
       "broken": [],
       "status": "Page 12 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "auditfollow",
       "displayName": "Not followed",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "13-auditfollow.png",
       "broken": [],
       "status": "Page 13 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "auditreview",
       "displayName": "Lifecycle review",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "14-auditreview.png",
       "broken": [],
       "status": "Page 14 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "reports",
@@ -166,7 +214,10 @@
       "file": "15-reports.png",
       "broken": [],
       "status": "Page 15 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "card",
@@ -182,23 +233,35 @@
           "found": true,
           "seconds": 1.0,
           "file": "16-card-tab1.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         },
         {
           "tab": "To check",
           "found": true,
           "seconds": 1.0,
           "file": "16-card-tab2.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         },
         {
           "tab": "Export",
           "found": true,
           "seconds": 2.0,
           "file": "16-card-tab3.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         }
-      ]
+      ],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "case",
@@ -214,40 +277,58 @@
           "found": true,
           "seconds": 1.0,
           "file": "17-case-tab1.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         },
         {
           "tab": "Relationships",
           "found": true,
           "seconds": 1.0,
           "file": "17-case-tab2.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         },
         {
           "tab": "Timeline",
           "found": true,
           "seconds": 1.0,
           "file": "17-case-tab3.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         },
         {
           "tab": "Replies",
           "found": true,
           "seconds": 1.0,
           "file": "17-case-tab4.png",
-          "broken": []
+          "broken": [],
+          "look": {
+            "IsPresent": false
+          }
         }
-      ]
+      ],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "person",
       "displayName": "Person",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 3.0,
       "file": "18-person.png",
       "broken": [],
       "status": "Page 18 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     },
     {
       "page": "selfcheck",
@@ -257,7 +338,10 @@
       "file": "19-selfcheck.png",
       "broken": [],
       "status": "Page 19 of 19",
-      "tabs": []
+      "tabs": [],
+      "look": {
+        "IsPresent": false
+      }
     }
   ]
 }
