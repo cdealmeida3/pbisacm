@@ -38,7 +38,7 @@
                 ids = List.Distinct(List.Transform(flat, idOf))
             in
                 List.Buffer(List.Transform(ids, (id) =>
-                    let same = List.Select(flat, (piece) => idOf(piece) = id) in
+                    let same = List.Buffer(List.Select(flat, (piece) => idOf(piece) = id)) in
                     same{0} & [Rows = List.Combine(List.Transform(same, (piece) => piece[Rows])), Found = List.AnyTrue(List.Transform(same, (piece) => piece[Found]))])),
         cisOf = (members as list) as number => List.Count(List.Distinct(List.Combine(List.Transform(members, (draft) => draft[Layout][Cis])))),
         // The subject of an email of several parts, as fnDrafts writes a subject, for all its CIs.
@@ -96,12 +96,12 @@
                 same = (at as number) as logical => List.Count(List.Distinct(column(at))) = 1,
                 empty = (at as number) as logical => List.AllTrue(List.Transform(column(at), (value) => value = "")),
                 // The role of the person asked is always them; an empty column says nothing; one value on every line goes above the table.
-                roles = List.Transform({3, 4, 5, 6}, (at) =>
+                roles = List.Buffer(List.Transform({3, 4, 5, 6}, (at) =>
                     let label = columnWords{at} in
                     if (label = piece[Role] and same(at)) or empty(at) then null
                     else if same(at) then [Common = {label, rows{0}{at}}]
-                    else [Column = [At = at, Label = label, Wide = false, Name = false]]),
-                columns =
+                    else [Column = [At = at, Label = label, Wide = false, Name = false]])),
+                columns = List.Buffer(
                     if piece[Contract] then
                         List.Transform({0, 1, 2}, (at) => [At = at, Label = {"Contract number", "Name", "Vendor"}{at}, Wide = false, Name = false])
                         & {[At = 3, Label = "What we found", Wide = true, Name = false]}
@@ -109,9 +109,9 @@
                         {[At = 0, Label = columnWords{0}, Wide = false, Name = true]}
                         & (if empty(1) then {} else {[At = 1, Label = columnWords{1}, Wide = false, Name = false]})
                         & List.Transform(List.Select(roles, (entry) => entry <> null and Record.HasFields(entry, "Column")), (entry) => entry[Column])
-                        & (if piece[Found] then {[At = 7, Label = "What we found", Wide = true, Name = false]} else {}),
+                        & (if piece[Found] then {[At = 7, Label = "What we found", Wide = true, Name = false]} else {})),
                 common = if piece[Contract] then {} else List.Transform(List.Select(roles, (entry) => entry <> null and Record.HasFields(entry, "Common")), (entry) => entry[Common]),
-                shown = List.FirstN(rows, rowsInEmail),
+                shown = List.Buffer(List.FirstN(rows, rowsInEmail)),
                 more = List.Count(rows) - List.Count(shown),
                 th = (label as text) as text =>
                     "<th align=""left"" bgcolor=""" & C[head] & """ style=""padding:7px 10px;color:" & C[navy] & ";font-weight:600;border-bottom:1px solid " & C[line] & """>" & label & "</th>",
@@ -184,7 +184,7 @@
                 sections = joinedSections(members),
                 kinds = List.Count(List.Distinct(List.Transform(sections, (piece) => piece[Key]))),
                 numbered = List.Count(sections) > 1,
-                opening = layout[Opening] & (if layout[Why] <> "" then {if kinds > 1 then layout[Why] & " We found " & plural(kinds, "kind") & " of problem." else layout[Why]} else {}),
+                opening = List.Buffer(layout[Opening] & (if layout[Why] <> "" then {if kinds > 1 then layout[Why] & " We found " & plural(kinds, "kind") & " of problem." else layout[Why]} else {})),
                 long = List.AnyTrue(List.Transform(sections, (piece) => List.Count(piece[Rows]) > rowsInEmail)),
                 csv = if long then csvOf(sections) else "",
                 subject = if List.Count(members) = 1 and first[PartCount] = 1 then first[Subject] else joinedSubject(members, sections),
@@ -219,7 +219,7 @@
                     & "</table></td></tr></table></body></html>"
             in
                 [Html = html, Csv = csv, Summary = summary, Subject = subject],
-        emails = List.Buffer(List.Transform(groups, (positions) => emailOf(List.Transform(positions, (at) => all{at})))),
+        emails = List.Buffer(List.Transform(groups, (positions) => emailOf(List.Buffer(List.Transform(positions, (at) => all{at}))))),
         // For each draft: its email (the first part) or nothing (the other parts), and where its email is.
         groupOf = List.Buffer(List.Combine(List.Transform(List.Positions(groups), (n) => List.Repeat({n}, List.Count(groups{n})))))
     in

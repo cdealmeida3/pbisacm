@@ -187,7 +187,7 @@
                             Layout = [
                                 Key = chosen[Key], Group = group, Heading = texts[Heading][Html], Title = texts[Heading][Text], Lead = lead[Html],
                                 Role = roleColumn(textOf(members{0}[Fact][ContactVia])), Contract = contract, Found = found or contract,
-                                Rows = List.Transform(members, rowCells), Ask = if kind <> "escalation" then texts[Ask][Html] else "", Why = if shareWhy then "" else texts[Why][Html]
+                                Rows = List.Buffer(List.Transform(members, rowCells)), Ask = if kind <> "escalation" then texts[Ask][Html] else "", Why = if shareWhy then "" else texts[Why][Html]
                             ]
                         ],
                 done = List.Buffer(List.Transform(List.Positions(sections), part))
@@ -269,7 +269,7 @@
                 layoutOpening = List.Transform(List.FirstN(opening, List.Count(opening) - (if kind <> "escalation" and sameWhy then 1 else 0)), (piece) => piece[Html]),
                 heading = (value as text) as record => [Html = "<h2 style=""margin:22px 0 4px;font-size:16px"">" & fnHtml(value) & "</h2>", Text = "#(lf)== " & Text.Upper(value, "en-US") & " =="],
                 stillTitle = if firstOfStill <> null then "Still open (our message of " & longDate(firstOfStill[On]) & ")" else "Still open",
-                halves = if two then {sectionsBody(still, kind, sameWhy, stillTitle), sectionsBody(newOnes, kind, sameWhy, "New since then")} else {sectionsBody(items, kind, sameWhy, "")},
+                halves = List.Buffer(if two then {sectionsBody(still, kind, sameWhy, stillTitle), sectionsBody(newOnes, kind, sameWhy, "New since then")} else {sectionsBody(items, kind, sameWhy, "")}),
                 parts =
                     if two then {heading(stillTitle)} & halves{0}[Body] & {heading("New since then")} & halves{1}[Body]
                     else halves{0}[Body],
@@ -307,7 +307,7 @@
                     Layout = [
                         Opening = layoutOpening, Why = if kind <> "escalation" and sameWhy then fnHtml(why) else "",
                         Sections = List.Combine(List.Transform(halves, (half) => half[Layout])), FirstName = textOf(fact[CiName]),
-                        Cis = List.Distinct(List.Transform(items, (item) => item[Fact][CiKey])), Noun = noun, Sender = "%%SENDER%%", Signature = signature
+                        Cis = List.Buffer(List.Distinct(List.Transform(items, (item) => item[Fact][CiKey]))), Noun = noun, Sender = "%%SENDER%%", Signature = signature
                     ]
                 ],
 

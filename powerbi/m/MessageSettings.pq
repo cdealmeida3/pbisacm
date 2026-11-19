@@ -40,9 +40,9 @@ in
             let
                 range = SettingRanges[rowsInEmail],
                 raw = value("rowsInEmail", ""),
-                number = if raw <> "" and Text.Remove(raw, {"0".."9"}) = "" then Number.FromText(raw, "en-US") else null
+                whole = if raw <> "" and Text.Remove(raw, {"0".."9"}) = "" then Number.FromText(raw, "en-US") else null
             in
-                if number <> null and number >= range[min] and number <= range[max] then number else range[default],
+                if whole <> null and whole >= range[min] and whole <= range[max] then whole else range[default],
         PortalLink = value("portalLink", ""), Signature = value("signature", "SACM team"),
         EpoOwnerName = value("epoOwnerName", ""), EpoOwnerEmail = value("epoOwnerEmail", ""),
         ProcurementName = value("procurementName", "Procurement"), ProcurementEmail = value("procurementEmail", ""),

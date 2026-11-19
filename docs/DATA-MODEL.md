@@ -214,6 +214,7 @@ Written by flow F3. Fields `from`, `received`, `subject`, `body` (HTML; `preview
 | `exceptionMonths` | Months until the review date of *Not followed up* | 6 |
 | `underRetirementDays`, `readyDays` | Days before *Under retirement too long* and *Ready too long* | 90, 90 (a file saved before 0.20, without the Procurement lead, that holds 180 is read as 90) |
 | `serviceNowAddress` | The ServiceNow of the team, as "https://" and the host: each record of a SACM list opens a search there (D244) | empty (no link) |
+| `rowsInEmail` | Power BI report only, a row of the list *SACM Settings* (D314): the most lines a table of an email shows; the full list goes in a CSV file. The app does not read it | 10 (1 to 100) |
 
 Real links and addresses live only here, in the team folder, never in the repository.
 
