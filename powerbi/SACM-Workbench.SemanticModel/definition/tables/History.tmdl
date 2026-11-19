@@ -279,6 +279,176 @@ table History
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
+	/// A number of Overview: what the newest CI report has to solve, on every card.
+	measure 'Open now' =
+			VAR d = [Newest report date]
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open" ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
+	/// Under the number of open lines (Overview): how it moved since the report before.
+	measure 'Open now line' =
+			VAR d = [Newest report date]
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			VAR openBefore = CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = priorDate, History[State] = "open" ) + 0
+			VAR delta = [Open now] - openBefore
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( d ), "No CI report yet",
+			        ISBLANK ( priorDate ), "One CI report so far",
+			        delta = 0, "the same as on " & FORMAT ( priorDate, "d mmm" ),
+			        delta < 0, FORMAT ( -delta, "#,0" ) & " fewer than on " & FORMAT ( priorDate, "d mmm" ),
+			        FORMAT ( delta, "#,0" ) & " more than on " & FORMAT ( priorDate, "d mmm" )
+			    )
+		displayFolder: Overview
+
+	/// A number of Overview: the lines of the newest CI report that wait for a person (a person or a team is named).
+	measure 'Waiting now' =
+			VAR d = [Newest report date]
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open", History[ContactName] <> "" ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
+	/// Under the lines that wait for a person (Overview): what is due today.
+	measure 'Waiting now line' =
+			VAR up = [To escalate]
+			VAR due = [Reminders due]
+			RETURN up & " to escalate · " & due & IF ( due = 1, " reminder due", " reminders due" )
+		displayFolder: Overview
+
+	/// A number of Overview: the findings the newest CI report verified as solved (gone from a tested part of a CI it still has).
+	measure 'Solved now' = CALCULATE ( [Solved], REMOVEFILTERS ( Runs ) ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
+	/// Under the solved findings (Overview): which reports it compares.
+	measure 'Solved now line' =
+			VAR d = [Newest report date]
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			RETURN IF ( ISBLANK ( priorDate ), "from the second CI report on", "since " & FORMAT ( priorDate, "d mmm" ) & ", verified by the report of " & FORMAT ( d, "d mmm" ) )
+		displayFolder: Overview
+
+	/// The open lines of each of the last 12 CI report dates as a small line, the newest a dot (Overview, Open lines). 120 × 36.
+	measure 'Open trend' =
+			VAR points =
+			    ADDCOLUMNS (
+			        TOPN ( 12, CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ), Runs[ReportDate], DESC ),
+			        "@v", CALCULATE ( COUNTROWS ( History ), History[State] = "open" ) + 0
+			    )
+			VAR n = COUNTROWS ( points )
+			VAR highest = MAXX ( points, [@v] )
+			VAR lowest = MINX ( points, [@v] )
+			VAR span = MAX ( highest - lowest, 1 )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 112 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
+			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
+			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='36' viewBox='0 0 120 36'>"
+			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#0c1c49' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>" )
+			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='3' fill='#0c1c49'/>" )
+			        & "</svg>"
+			RETURN "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// The lines that waited for a person on each of the last 12 CI report dates as a small line (Overview). 120 × 36.
+	measure 'Waiting trend' =
+			VAR points =
+			    ADDCOLUMNS (
+			        TOPN ( 12, CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ), Runs[ReportDate], DESC ),
+			        "@v", CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] <> "" ) + 0
+			    )
+			VAR n = COUNTROWS ( points )
+			VAR highest = MAXX ( points, [@v] )
+			VAR lowest = MINX ( points, [@v] )
+			VAR span = MAX ( highest - lowest, 1 )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 112 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
+			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
+			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='36' viewBox='0 0 120 36'>"
+			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#0c1c49' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>" )
+			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='3' fill='#0c1c49'/>" )
+			        & "</svg>"
+			RETURN "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// The findings verified as solved on each of the last 12 CI report dates as a small line in teal (Overview). 120 × 36.
+	measure 'Solved trend' =
+			VAR points =
+			    ADDCOLUMNS (
+			        TOPN ( 12, CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ), Runs[ReportDate], DESC ),
+			        "@v", CALCULATE ( [Solved] ) + 0
+			    )
+			VAR n = COUNTROWS ( points )
+			VAR highest = MAXX ( points, [@v] )
+			VAR lowest = MINX ( points, [@v] )
+			VAR span = MAX ( highest - lowest, 1 )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 112 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
+			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
+			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='36' viewBox='0 0 120 36'>"
+			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#107569' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>" )
+			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='3' fill='#107569'/>" )
+			        & "</svg>"
+			RETURN "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// A line of Open lines per report (Overview): the lines of a CI report date that wait for a person.
+	measure 'With a person' = CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] <> "" ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
+	/// A line of Open lines per report (Overview): the lines of a CI report date that SACM fixes itself (no person is named).
+	measure 'SACM fixes' = CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] = "" ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
+	/// Under the title of Open lines per report (Overview).
+	measure 'Overview trend note' = IF ( [Report dates] + 0 < 2, "One CI report so far: the lines show from the second.", "Each CI report date: the lines that wait for a person, and the ones SACM fixes itself." )
+		displayFolder: Page notes
+
+	/// A column of Found and closed (Audit): the new findings of a CI report date in the period chosen.
+	measure 'Found in the period' =
+			VAR d = MAX ( Runs[ReportDate] )
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			RETURN IF ( d >= fromDate && d <= toDate, [New] )
+		formatString: #,0
+		displayFolder: Audit
+
+	/// A column of Found and closed (Audit): the findings a CI report date of the period verified as solved.
+	measure 'Closed in the period' =
+			VAR d = MAX ( Runs[ReportDate] )
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			RETURN IF ( d >= fromDate && d <= toDate, [Solved] )
+		formatString: #,0
+		displayFolder: Audit
+
+	/// A number of Audit: the findings the CI reports of the period verified as solved.
+	measure 'Closed and verified' =
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			VAR dates = CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] >= fromDate, Runs[ReportDate] <= toDate )
+			RETURN SUMX ( dates, CALCULATE ( [Solved] ) ) + 0
+		formatString: #,0
+		displayFolder: Audit
+
+	/// Under the number closed and verified (Audit): its share of the findings of the period.
+	measure 'Closed line' =
+			VAR found = [Period findings] + 0
+			RETURN IF ( found = 0, "nothing was found in the period", FORMAT ( DIVIDE ( [Closed and verified], found ), "0 %" ) & " of the findings of the period" )
+		displayFolder: Audit
+
+	/// Under the title of Found and closed (Audit).
+	measure 'Found closed note' = IF ( [Report dates] + 0 < 2, "One CI report so far: found and closed show from the second.", "Each CI report date of the period: the new findings, and the ones it verified as solved." )
+		displayFolder: Page notes
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred

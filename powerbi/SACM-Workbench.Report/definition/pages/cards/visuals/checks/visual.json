@@ -3,11 +3,11 @@
   "name": "checks",
   "position": {
     "x": 224,
-    "y": 140,
-    "z": 7000,
-    "height": 448,
+    "y": 136,
+    "z": 4400,
+    "height": 456,
     "width": 1032,
-    "tabOrder": 7000
+    "tabOrder": 4400
   },
   "visual": {
     "visualType": "tableEx",
@@ -440,5 +440,6 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  }
+  },
+  "isHidden": true
 }

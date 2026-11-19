@@ -104,7 +104,7 @@ table Checks
 		formatString: 0
 
 	/// What the card page says to do: the hint of the check file.
-	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "On All cards, right-click a line, then Drill through, Card. Until then the page shows every card." )
+	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "On All cards, select a card, then Open card. Until then the page shows every card." )
 
 	/// The name of the check on its card page.
 	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen" )
@@ -158,8 +158,76 @@ table Checks
 			RETURN "Compliance: " & IF ( words = "", "All OK", words )
 
 	/// Under the title of the table of cards (All cards).
-	measure 'Cards note' = IF ( COUNTROWS ( Checks ) + 0 = 0, "No card is about this: choose another subject.", "Red: to solve. Blue: to check. Green: OK. Grey: not tested. Right-click, Drill through, Card." )
+	measure 'Cards note' = IF ( COUNTROWS ( Checks ) + 0 = 0, "No card is about this: choose another subject.", "Red: to solve. Blue: to check. Green: OK. Grey: not tested. Select a card, then Open card." )
 		displayFolder: Page notes
+
+	/// The number of a card in a pill of the colour of its state (All cards): the CIs, lines or contracts to solve or to check, a tick when it is OK, a dash when it was not tested. The place of the card in the order of the app comes first in the picture, so a table sorted on it keeps that order. 56 × 32: a table gives all its pictures one size.
+	measure 'Card badge' =
+			VAR state = [Card state]
+			VAR place = [Card place]
+			VAR words = [Card number]
+			VAR cut = SEARCH ( " ", words, 1, 0 )
+			VAR figure = IF ( state <> "OK" && cut > 0, LEFT ( words, cut - 1 ) )
+			VAR ink = [Card colour]
+			VAR paper = [Card fill]
+			VAR wide = IF ( figure = "", 32, MAX ( 32, LEN ( figure ) * 8 + 16 ) )
+			VAR mark =
+			    SWITCH (
+			        TRUE (),
+			        figure <> "", "<text x='" & wide / 2 & "' y='20.5' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='12' font-weight='700' fill='" & ink & "'>" & figure & "</text>",
+			        state = "OK", "<path d='M10 16.5l4 4 8-9' fill='none' stroke='" & ink & "' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>",
+			        "<path d='M11 16h10' stroke='" & ink & "' stroke-width='2' stroke-linecap='round'/>"
+			    )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' class='p" & FORMAT ( place, "000" ) & "' width='56' height='32' viewBox='0 0 56 32'>"
+			        & "<rect x='0' y='6' width='" & wide & "' height='20' rx='10' fill='" & paper & "'/>" & mark & "</svg>"
+			RETURN IF ( NOT ISBLANK ( state ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// A small line of what the card had to solve on each of its last 12 CI report dates, the newest a coral dot (All cards). 56 × 32, the size of the badge.
+	measure 'Card trend' =
+			VAR points =
+			    ADDCOLUMNS (
+			        TOPN ( 12, CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ), Runs[ReportDate], DESC ),
+			        "@open", CALCULATE ( COUNTROWS ( History ), History[State] = "open" ) + 0
+			    )
+			VAR n = COUNTROWS ( points )
+			VAR highest = MAX ( MAXX ( points, [@open] ), 1 )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 48 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 26 - [@open] * 18 / highest, 0 ) )
+			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
+			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='56' height='32' viewBox='0 0 56 32'>"
+			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#0c1c49' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round'/>" )
+			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='2.5' fill='#fd472c'/>" )
+			        & "</svg>"
+			RETURN IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// Under the title of What this card asks (Card): its numbers, or how to choose a card.
+	measure 'Card numbers' =
+			IF (
+			    NOT HASONEVALUE ( Checks[CheckId] ),
+			    "No card chosen.",
+			    FORMAT ( [To solve], "#,0" ) & " to solve · " & FORMAT ( [To check], "#,0" ) & " to check · " & FORMAT ( [Waiting], "#,0" ) & " waiting · " & FORMAT ( [Known], "#,0" ) & " known"
+			)
+		displayFolder: Page notes
+
+	/// What this card asks (Card): the text of its check file, else its hint, or how to choose a card.
+	measure 'Card about' =
+			VAR cardText = SELECTEDVALUE ( Checks[CardText] )
+			VAR hint = SELECTEDVALUE ( Checks[CardHint] )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        NOT HASONEVALUE ( Checks[CheckId] ), "On All cards, select a card, then Open card.",
+			        cardText <> "", cardText,
+			        hint <> "", hint,
+			        "This check has no text yet."
+			    )
+		displayFolder: Card
 
 	column CheckId
 		dataType: string

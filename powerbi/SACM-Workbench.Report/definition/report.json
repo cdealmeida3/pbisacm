@@ -32,6 +32,11 @@
           "type": "Image"
         },
         {
+          "name": "rail-people.svg",
+          "path": "rail-people.svg",
+          "type": "Image"
+        },
+        {
           "name": "rail-messages.svg",
           "path": "rail-messages.svg",
           "type": "Image"
@@ -52,18 +57,23 @@
           "type": "Image"
         },
         {
-          "name": "rail-activity.svg",
-          "path": "rail-activity.svg",
-          "type": "Image"
-        },
-        {
           "name": "rail-history.svg",
           "path": "rail-history.svg",
           "type": "Image"
         },
         {
+          "name": "rail-overview.svg",
+          "path": "rail-overview.svg",
+          "type": "Image"
+        },
+        {
           "name": "rail-audit.svg",
           "path": "rail-audit.svg",
+          "type": "Image"
+        },
+        {
+          "name": "rail-auditrecord.svg",
+          "path": "rail-auditrecord.svg",
           "type": "Image"
         },
         {

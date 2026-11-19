@@ -2,7 +2,7 @@
 // `npm run powerbi:lint` (step 10) and by the tests on small examples. They read the report files of
 // powerbi/SACM-Workbench.Report/definition/ and Microsoft's schema of report themes, which lists every formatting
 // property of every visual type:
-//   1. Every page is 1280 × 720 and fits the page (Case, the tallest, at most 1440 and fits the width).
+//   1. Every page is 1280 × 720 and fits the page (a page of GRID.tallest may be taller and fits the width).
 //   2. At most 12 visuals on a page (the rail counts as one); at most one Power Apps visual, and none on the first page.
 //   3. Native visuals only (D311): no custom visual, no R or Python visual, no picture from the web.
 //   4. The grid: every place and size on the 4 px grid, inside the page, inside the content frame (the rail apart),
@@ -15,6 +15,10 @@
 //   8. Every formatting property a visual sets is one Power BI has for its visual type (the theme schema), so nothing
 //      is guessed (the pbip skill: never guess a visual's schema).
 //   9. The drill-through pages and Self-check are hidden from the team's tabs.
+//  10. Tabs (build D3, D323): a group of bookmarks with a bookmark navigator on its page. Each bookmark changes only
+//      what its visuals show (never the filters, so a drill-through keeps its CI, card or person), the visuals of the
+//      first tab show when the page opens and the others are hidden. Two visuals of one group may sit at the same place
+//      when no tab shows both.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { APP_SLOTS, CELL_PADDING, GRID, MIN_TEXT_POINTS, TABLE_CHROME, TEXT, textWidth } from './tokens.ts';
@@ -37,7 +41,39 @@ export interface Visual {
   };
 }
 export interface Page { name: string; displayName: string; width: number; height: number; displayOption?: string; visibility?: string; pageBinding?: { type?: string } }
-export interface ReportPages { order: string[]; pages: Array<{ page: Page; visuals: Visual[] }> }
+/** A group of bookmarks that are the tabs of a page: each tab shows some of the targets and hides the others. */
+export interface TabGroup { name: string; page: string; tabs: Array<{ name: string; targets: string[]; shown: string[]; onlyDisplay: boolean }> }
+export interface ReportPages { order: string[]; pages: Array<{ page: Page; visuals: Visual[] }>; tabGroups?: TabGroup[] }
+
+interface BookmarkFile {
+  name: string;
+  options?: { targetVisualNames?: string[]; applyOnlyToTargetVisuals?: boolean; suppressData?: boolean };
+  explorationState: { activeSection: string; sections: Record<string, { visualContainers: Record<string, { singleVisual?: { display?: { mode?: string } } }> }> };
+}
+/** The groups of bookmarks of the report (definition/bookmarks/), each with the page its bookmarks show. */
+export function readTabGroups(definition = REPORT_DEFINITION): TabGroup[] {
+  const folder = join(definition, 'bookmarks');
+  if (!existsSync(join(folder, 'bookmarks.json'))) return [];
+  const meta = JSON.parse(readFileSync(join(folder, 'bookmarks.json'), 'utf8')) as { items: Array<{ name: string; children?: string[] }> };
+  return meta.items.filter((item) => item.children).map((item) => {
+    const files = item.children!.map((child) => JSON.parse(readFileSync(join(folder, `${child}.bookmark.json`), 'utf8')) as BookmarkFile);
+    const page = files[0]?.explorationState.activeSection ?? '';
+    return {
+      name: item.name,
+      page,
+      tabs: files.map((file) => {
+        const targets = file.options?.targetVisualNames ?? [];
+        const states = file.explorationState.sections[page]?.visualContainers ?? {};
+        return {
+          name: file.name,
+          targets,
+          shown: targets.filter((target) => states[target]?.singleVisual?.display?.mode !== 'hidden'),
+          onlyDisplay: file.options?.applyOnlyToTargetVisuals === true && file.options?.suppressData === true && file.explorationState.activeSection === page
+        };
+      })
+    };
+  });
+}
 
 /** The report as the rules read it: the pages in their order, each with its visuals. */
 export function readPages(definition = REPORT_DEFINITION): ReportPages {
@@ -52,7 +88,8 @@ export function readPages(definition = REPORT_DEFINITION): ReportPages {
         ? readdirSync(visualsFolder).sort().map((visual) => JSON.parse(readFileSync(join(visualsFolder, visual, 'visual.json'), 'utf8')) as Visual)
         : [];
       return { page, visuals };
-    })
+    }),
+    tabGroups: readTabGroups(definition)
   };
 }
 
@@ -199,14 +236,36 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
         if (sum > width - TABLE_CHROME) problems.push(`${at}: the columns take ${sum} px, the table has ${width - TABLE_CHROME}: it scrolls to the side`);
       }
     }
-    // 4. No two visuals over each other (the parts of the rail sit on its picture, rail.ts places them).
+    // 10. Tabs.
+    const groups = (report.tabGroups ?? []).filter((group) => group.page === page.name);
+    for (const group of groups) {
+      const at = `${where} › tabs ${group.name}`;
+      const names = new Set(visuals.map((visual) => visual.name));
+      const targets = new Set(group.tabs.flatMap((tab) => tab.targets));
+      for (const tab of group.tabs) {
+        if (!tab.onlyDisplay) problems.push(`${at}: the tab ${tab.name} must change only what its visuals show (applyOnlyToTargetVisuals, suppressData, its own page): a tab that sets filters loses the drill-through`);
+        if (tab.targets.length !== targets.size || tab.targets.some((target) => !targets.has(target))) problems.push(`${at}: the tab ${tab.name} has other visuals than the other tabs of its group`);
+      }
+      for (const target of targets) if (!names.has(target)) problems.push(`${at}: the visual ${target} is not on the page`);
+      const first = new Set(group.tabs[0]?.shown ?? []);
+      for (const visual of visuals.filter((entry) => targets.has(entry.name))) {
+        const hiddenNow = (visual as Visual & { isHidden?: boolean }).isHidden === true;
+        if (first.has(visual.name) === hiddenNow) problems.push(`${at}: ${visual.name} ${hiddenNow ? 'is hidden, but the first tab shows it' : 'shows, but the first tab hides it'}`);
+      }
+      const navigator = visuals.some((visual) => visual.visual?.visualType === 'bookmarkNavigator' && literal(visual.visual.objects?.bookmarks?.[0]?.properties?.bookmarkGroup) === `'${group.name}'`);
+      if (!navigator) problems.push(`${at}: no bookmark navigator shows the tabs of this group`);
+    }
+    /** Whether two visuals are never shown together: both on the tabs of one group, and no tab shows both. */
+    const apart = (a: string, b: string): boolean => groups.some((group) => group.tabs.every((tab) => tab.targets.includes(a) && tab.targets.includes(b) && !(tab.shown.includes(a) && tab.shown.includes(b))));
+    // 4. No two visuals over each other (the parts of the rail sit on its picture, rail.ts places them; tabs, rule 10).
     const placed = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name));
     for (let a = 0; a < placed.length; a++) {
       for (let b = a + 1; b < placed.length; b++) {
-        if (overlap(placed[a]!.position, placed[b]!.position)) problems.push(`${where}: ${placed[a]!.name} and ${placed[b]!.name} are over each other`);
+        if (overlap(placed[a]!.position, placed[b]!.position) && !apart(placed[a]!.name, placed[b]!.name)) problems.push(`${where}: ${placed[a]!.name} and ${placed[b]!.name} are over each other`);
       }
     }
   });
+  for (const group of report.tabGroups ?? []) if (!report.order.includes(group.page)) problems.push(`Tabs ${group.name}: its page ${group.page} is not in the report`);
   return problems;
 }
 

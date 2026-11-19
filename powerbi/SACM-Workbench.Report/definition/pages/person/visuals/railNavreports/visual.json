@@ -3,11 +3,11 @@
   "name": "railNavreports",
   "position": {
     "x": 8,
-    "y": 376,
-    "z": 1009,
+    "y": 412,
+    "z": 1010,
     "height": 32,
     "width": 172,
-    "tabOrder": 10
+    "tabOrder": 11
   },
   "visual": {
     "visualType": "actionButton",

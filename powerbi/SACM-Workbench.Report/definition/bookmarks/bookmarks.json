@@ -1,0 +1,42 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "cardsTabs",
+      "displayName": "All cards",
+      "children": [
+        "cardsSections",
+        "cardsList"
+      ]
+    },
+    {
+      "name": "cardTabs",
+      "displayName": "Card",
+      "children": [
+        "cardLines",
+        "cardFixList",
+        "cardProblems",
+        "cardExport"
+      ]
+    },
+    {
+      "name": "caseTabs",
+      "displayName": "Case",
+      "children": [
+        "caseProblems",
+        "casePeople",
+        "caseRelationships",
+        "caseTimeline",
+        "caseReplies"
+      ]
+    },
+    {
+      "name": "historyTabs",
+      "displayName": "History",
+      "children": [
+        "historyEvents",
+        "historyTrend"
+      ]
+    }
+  ]
+}

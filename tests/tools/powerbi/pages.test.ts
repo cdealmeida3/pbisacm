@@ -94,3 +94,19 @@ test('the theme sets only formatting Power BI has; a matrix has no total row of 
   assert.match(problems.join('\n'), /total\.totals/);
   assert.match(problems.join('\n'), /sparkles/);
 });
+
+test('tabs: two tables at one place on two tabs are fine; a tab that sets filters, a wrong first tab or no navigator is a problem', () => {
+  const navigator: Visual = { name: 'tabs', position: { x: 224, y: 84, width: 300, height: 40 }, visual: { visualType: 'bookmarkNavigator', objects: { bookmarks: [{ properties: { bookmarkGroup: lit("'backlogTabs'") } }] } } };
+  const lines = table('lines', { x: 224, y: 136, width: 508, height: 300 }, [200, 200]);
+  const other = { ...table('other', { x: 224, y: 136, width: 508, height: 300 }, [200, 200]), isHidden: true } as Visual;
+  const tabGroups = (onlyDisplay: boolean): ReportPages['tabGroups'] => [{
+    name: 'backlogTabs', page: 'backlog',
+    tabs: [{ name: 'a', targets: ['lines', 'other'], shown: ['lines'], onlyDisplay }, { name: 'b', targets: ['lines', 'other'], shown: ['other'], onlyDisplay }]
+  }];
+  assert.deepEqual(pageProblems({ ...page([navigator, lines, other]), tabGroups: tabGroups(true) }, catalogue), []);
+  const problems = pageProblems({ ...page([lines, { ...other, isHidden: false } as Visual]), tabGroups: tabGroups(false) }, catalogue).join('\n');
+  assert.match(problems, /must change only what its visuals show/);
+  assert.match(problems, /other shows, but the first tab hides it/);
+  assert.match(problems, /no bookmark navigator/);
+  assert.match(pageProblems(page([lines, other]), catalogue).join('\n'), /lines and other are over each other/);
+});

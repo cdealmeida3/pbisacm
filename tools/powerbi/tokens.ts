@@ -49,8 +49,8 @@ export const MIN_TEXT_POINTS = 9;
 export const GRID = {
   width: 1280,
   height: 720,
-  /** The tallest page: Case, the side sheet of one CI (D312). */
-  tallest: { case: 1440 } as Record<string, number>,
+  /** A page taller than 720 (D312 allows Case up to 1440): none since build D3 put the parts of Case on tabs. */
+  tallest: {} as Record<string, number>,
   step: 4,
   /** Where the visuals go: right of the navy rail (0 to 188), with the name of the page at the top. */
   content: { left: 224, right: 1256, top: 16, bottom: 704 },
@@ -73,7 +73,7 @@ export const APP_SLOTS: Record<string, { app: string; x: number; y: number; widt
   auditreview: { app: 'SACM audit', x: 956, y: 84, width: 300, height: 620 },
   card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 300 },
   person: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 368 },
-  case: { app: 'SACM actions', x: 956, y: 516, width: 300, height: 420 }
+  case: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 }
 };
 
 /** The space a table's column needs beside its header text (the padding of the cell and the sort arrow), in px. */

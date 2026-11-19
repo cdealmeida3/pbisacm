@@ -3,11 +3,11 @@
   "name": "timeline",
   "position": {
     "x": 224,
-    "y": 948,
-    "z": 7000,
-    "height": 240,
-    "width": 1032,
-    "tabOrder": 7000
+    "y": 228,
+    "z": 4800,
+    "height": 476,
+    "width": 720,
+    "tabOrder": 4800
   },
   "visual": {
     "visualType": "tableEx",
@@ -195,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "115D"
+                  "Value": "104D"
                 }
               }
             }
@@ -209,7 +209,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "107D"
+                  "Value": "88D"
                 }
               }
             }
@@ -223,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "119D"
+                  "Value": "72D"
                 }
               }
             }
@@ -237,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "225D"
+                  "Value": "160D"
                 }
               }
             }
@@ -251,7 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "311D"
+                  "Value": "176D"
                 }
               }
             }
@@ -265,7 +265,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "114D"
+                  "Value": "80D"
                 }
               }
             }
@@ -276,5 +276,6 @@
         }
       ]
     }
-  }
+  },
+  "isHidden": true
 }

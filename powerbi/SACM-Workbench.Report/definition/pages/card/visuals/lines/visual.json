@@ -3,11 +3,11 @@
   "name": "lines",
   "position": {
     "x": 224,
-    "y": 84,
-    "z": 8000,
-    "height": 300,
+    "y": 136,
+    "z": 4500,
+    "height": 568,
     "width": 720,
-    "tabOrder": 8000
+    "tabOrder": 4500
   },
   "visual": {
     "visualType": "tableEx",
@@ -181,7 +181,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "99D"
+                  "Value": "104D"
                 }
               }
             }
@@ -195,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "91D"
+                  "Value": "80D"
                 }
               }
             }
@@ -209,7 +209,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "155D"
+                  "Value": "164D"
                 }
               }
             }
@@ -223,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "67D"
+                  "Value": "64D"
                 }
               }
             }
@@ -237,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "75D"
+                  "Value": "88D"
                 }
               }
             }
@@ -251,7 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "105D"
+                  "Value": "100D"
                 }
               }
             }
@@ -265,7 +265,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "83D"
+                  "Value": "80D"
                 }
               }
             }

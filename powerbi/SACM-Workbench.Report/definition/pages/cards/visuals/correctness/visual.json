@@ -3,154 +3,144 @@
   "name": "correctness",
   "position": {
     "x": 572,
-    "y": 84,
-    "z": 5000,
-    "height": 44,
+    "y": 136,
+    "z": 4200,
+    "height": 456,
     "width": 336,
-    "tabOrder": 5000
+    "tabOrder": 4200
   },
   "visual": {
-    "visualType": "actionButton",
-    "objects": {
-      "text": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            }
-          }
-        },
-        {
-          "properties": {
-            "text": {
-              "expr": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Checks"
                     }
                   },
-                  "Property": "Correctness"
+                  "Property": "Card badge"
                 }
-              }
+              },
+              "queryRef": "Checks.Card badge",
+              "nativeQueryRef": "Card badge",
+              "displayName": " "
             },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#2b2623'"
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
                     }
+                  },
+                  "Property": "CardLabel"
+                }
+              },
+              "queryRef": "Checks.CardLabel",
+              "nativeQueryRef": "CardLabel",
+              "displayName": "Card"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
+                    }
+                  },
+                  "Property": "Card trend"
+                }
+              },
+              "queryRef": "Checks.Card trend",
+              "nativeQueryRef": "Card trend",
+              "displayName": "Trend"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Checks"
                   }
-                }
+                },
+                "Property": "Card badge"
               }
             },
-            "horizontalAlignment": {
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
               "expr": {
                 "Literal": {
-                  "Value": "'left'"
-                }
-              }
-            },
-            "verticalAlignment": {
-              "expr": {
-                "Literal": {
-                  "Value": "'middle'"
-                }
-              }
-            },
-            "leftMargin": {
-              "expr": {
-                "Literal": {
-                  "Value": "12D"
-                }
-              }
-            },
-            "rightMargin": {
-              "expr": {
-                "Literal": {
-                  "Value": "12D"
+                  "Value": "64D"
                 }
               }
             }
           },
           "selector": {
-            "id": "default"
+            "metadata": "Checks.Card badge"
           }
-        }
-      ],
-      "icon": [
+        },
         {
           "properties": {
-            "show": {
+            "value": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "fill": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "fillColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#ffffff'"
-                    }
-                  }
-                }
-              }
-            },
-            "transparency": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
+                  "Value": "168D"
                 }
               }
             }
           },
           "selector": {
-            "id": "default"
+            "metadata": "Checks.CardLabel"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "64D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Checks.Card trend"
           }
         }
       ],
-      "outline": [
+      "grid": [
         {
           "properties": {
-            "show": {
+            "imageHeight": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "32D"
+                }
+              }
+            },
+            "imageWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "56D"
                 }
               }
             }
@@ -172,34 +162,45 @@
           }
         }
       ],
-      "padding": [
+      "title": [
         {
           "properties": {
-            "top": {
+            "show": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "true"
                 }
               }
             },
-            "bottom": {
+            "text": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "'Correctness'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             },
-            "left": {
+            "text": {
               "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
-            },
-            "right": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Checks"
+                    }
+                  },
+                  "Property": "Correctness"
                 }
               }
             }
@@ -208,5 +209,126 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "onlyCorrectness",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Checks"
+              }
+            },
+            "Property": "Dimension"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f",
+              "Entity": "Checks",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "f"
+                          }
+                        },
+                        "Property": "Dimension"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'correctness'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "withLabel",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Checks"
+              }
+            },
+            "Property": "CardLabel"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f",
+              "Entity": "Checks",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "f"
+                              }
+                            },
+                            "Property": "CardLabel"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "null"
+                            }
+                          }
+                        ],
+                        [
+                          {
+                            "Literal": {
+                              "Value": "''"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

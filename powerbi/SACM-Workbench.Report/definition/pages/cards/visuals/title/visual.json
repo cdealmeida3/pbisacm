@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "One line per check. Right-click a line, Drill through, Card, to open its lines.",
+                    "value": "One card per check, by section. Select a card, then Open card.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "problems",
   "position": {
-    "x": 744,
-    "y": 396,
-    "z": 10000,
-    "height": 148,
-    "width": 512,
-    "tabOrder": 10000
+    "x": 224,
+    "y": 136,
+    "z": 4700,
+    "height": 568,
+    "width": 720,
+    "tabOrder": 4700
   },
   "visual": {
     "visualType": "tableEx",
@@ -145,7 +145,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "75D"
+                  "Value": "120D"
                 }
               }
             }
@@ -159,7 +159,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "112D"
+                  "Value": "160D"
                 }
               }
             }
@@ -173,7 +173,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "73D"
+                  "Value": "120D"
                 }
               }
             }
@@ -187,7 +187,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "144D"
+                  "Value": "200D"
                 }
               }
             }
@@ -201,7 +201,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "65D"
+                  "Value": "80D"
                 }
               }
             }
@@ -334,5 +334,6 @@
         }
       }
     ]
-  }
+  },
+  "isHidden": true
 }

@@ -13,6 +13,23 @@ table Replies
 	measure 'Replies list note' = IF ( COUNTROWS ( Replies ) + 0 = 0, "No reply yet.", "Every reply filed from the shared mailbox." )
 		displayFolder: Page notes
 
+	/// A number of Audit: the median days from the first email of a case to its reply, for the replies of the period chosen; blank with no reply.
+	measure 'Days to an answer' =
+			VAR fromDate = [Period from]
+			VAR toDate = [Period to]
+			VAR answers = FILTER ( ALL ( Replies[Ref], Replies[Received] ), Replies[Ref] <> "" && Replies[Received] >= fromDate && Replies[Received] < toDate + 1 )
+			VAR waits =
+			    ADDCOLUMNS (
+			        answers,
+			        "@asked",
+			            VAR ref = Replies[Ref]
+			            RETURN CALCULATE ( MIN ( Journal[At] ), REMOVEFILTERS ( Journal ), REMOVEFILTERS ( 'Date' ), Journal[Ref] = ref, Journal[Type] = "message" )
+			    )
+			VAR known = FILTER ( waits, NOT ISBLANK ( [@asked] ) && [@asked] <= Replies[Received] )
+			RETURN IF ( COUNTROWS ( known ) > 0, MEDIANX ( known, DATEDIFF ( [@asked], Replies[Received], DAY ) ) )
+		formatString: 0.0
+		displayFolder: Audit
+
 	column Ref
 		dataType: string
 		sourceColumn: Ref

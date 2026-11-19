@@ -6,7 +6,7 @@
     "y": 16,
     "z": 2000,
     "height": 56,
-    "width": 1032,
+    "width": 600,
     "tabOrder": 2000
   },
   "visual": {
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "For the developer: per check, the answer key of the HTML app against this report. Only in Sample mode.",
+                    "value": "For the developer: per check, the answer key of the HTML app against this report.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

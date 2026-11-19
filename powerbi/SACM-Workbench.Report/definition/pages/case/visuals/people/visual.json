@@ -3,11 +3,11 @@
   "name": "people",
   "position": {
     "x": 224,
-    "y": 516,
-    "z": 5000,
-    "height": 200,
+    "y": 228,
+    "z": 4600,
+    "height": 476,
     "width": 720,
-    "tabOrder": 5000
+    "tabOrder": 4600
   },
   "visual": {
     "visualType": "tableEx",
@@ -195,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "106D"
+                  "Value": "120D"
                 }
               }
             }
@@ -209,7 +209,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "100D"
+                  "Value": "112D"
                 }
               }
             }
@@ -223,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "144D"
+                  "Value": "160D"
                 }
               }
             }
@@ -237,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "136D"
+                  "Value": "96D"
                 }
               }
             }
@@ -251,7 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "107D"
+                  "Value": "108D"
                 }
               }
             }
@@ -344,5 +344,6 @@
         }
       }
     ]
-  }
+  },
+  "isHidden": true
 }

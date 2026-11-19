@@ -3,11 +3,11 @@
   "name": "railNavmessages",
   "position": {
     "x": 8,
-    "y": 124,
-    "z": 1002,
+    "y": 160,
+    "z": 1003,
     "height": 32,
     "width": 172,
-    "tabOrder": 3
+    "tabOrder": 4
   },
   "visual": {
     "visualType": "actionButton",

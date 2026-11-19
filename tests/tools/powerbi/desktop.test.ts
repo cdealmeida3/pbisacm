@@ -29,9 +29,9 @@ test('a card asks its measure in one row; a table groups its columns and keeps i
 });
 
 test('every visual of the report has a query; a drill-through page gets one more per value', () => {
-  const queries = queriesOf(new Map([["'Checks'[CheckId]", ['DESC-QUALITY']]]));
+  const queries = queriesOf(new Map([["'Checks'[CardLabel]", ['Description']]]));
   assert.ok(queries.length > 90);
-  assert.ok(queries.some((query) => query.pageName === 'card' && query.drill?.value === 'DESC-QUALITY'));
+  assert.ok(queries.some((query) => query.pageName === 'card' && query.drill?.value === 'Description'));
   assert.ok(queries.some((query) => query.pageName === 'card' && query.drill?.value === ''));
   for (const query of queries) assert.match(query.dax, /^EVALUATE /);
 });
@@ -79,7 +79,7 @@ test('the line under a title and a text a measure writes are asked too, so an em
 
 test('the list of the pages: the drill-through pages, Self-check and the parts of Audit are hidden, every page is 1280 wide (D312)', () => {
   const pages = pageList();
-  assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['auditexport', 'auditfollow', 'auditreview', 'card', 'case', 'person', 'selfcheck']);
+  assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['auditexport', 'auditfollow', 'auditrecord', 'auditreview', 'card', 'case', 'person', 'selfcheck']);
   assert.deepEqual(pages.filter((page) => page.drillThrough).map((page) => page.name).sort(), ['card', 'case', 'person']);
   for (const page of pages) assert.equal(page.width, 1280, page.name);
 });

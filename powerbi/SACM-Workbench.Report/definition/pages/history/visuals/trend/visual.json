@@ -3,11 +3,11 @@
   "name": "trend",
   "position": {
     "x": 224,
-    "y": 184,
-    "z": 8000,
-    "height": 256,
+    "y": 136,
+    "z": 4200,
+    "height": 272,
     "width": 508,
-    "tabOrder": 8000
+    "tabOrder": 4200
   },
   "visual": {
     "visualType": "lineChart",
@@ -163,5 +163,6 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  }
+  },
+  "isHidden": true
 }

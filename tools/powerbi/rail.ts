@@ -1,5 +1,7 @@
 // The navy rail of every page (design pass §5.1, build D2, D319): the picture of the rail, the buttons that open the pages
-// and the counts beside My day and Work queue, written by generate.ts on every page of pages.json.
+// and the counts beside My day and Work queue, written by generate.ts on every page of pages.json. Build D3 adds the
+// reports chip at the top right of every page (reportsChip, D322): green when every report is up to date, amber when one
+// is old or missing; it opens Reports.
 //   - rail: an image visual (0, 0, 188 × the page height) that shows rail-<page>.svg, a registered resource of the report.
 //     The picture draws the name, the icon and the label of each page, the page in view in a lighter band with a coral
 //     line, and on the pages of the Audit its four parts.
@@ -10,7 +12,7 @@
 // every visual whose name starts with rail as one (pages.ts rule 2). Same repository, same bytes.
 import { existsSync, readdirSync, readFileSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { FONT, lightColours } from './tokens.ts';
+import { FONT, FONT_SEMIBOLD, lightColours } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const REPORT = join(root, 'powerbi', 'SACM-Workbench.Report');
@@ -35,7 +37,8 @@ const ICONS: Record<string, string> = {
   map: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7.8 7.8l3 7.5M16.2 7.8l-3 7.5M8.5 6h7"/>',
   contract: '<path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
   history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>',
-  activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/>',
+  overview: '<path d="M4 20V11M10 20V5M16 20v-6M2 20h20"/>',
   audit: '<path d="M9 3h6l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M9 13l2 2 4-4"/>',
   reports: '<path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/>',
   logo: `<rect x="3" y="3" width="13" height="13" rx="2"/><path d="M3 8h13M3 12h13M8 3v13M12 3v13" opacity=".6"/><circle cx="16" cy="16" r="4.2" stroke="${CORAL}"/><path d="M19 19l2.5 2.5" stroke="${CORAL}"/>`
@@ -47,24 +50,26 @@ type Badge = { table: string; measure: string; about: string };
 export const RAIL_ITEMS: Array<{ page: string; label: string; icon: string; badge?: Badge }> = [
   { page: 'myday', label: 'My day', icon: 'home', badge: { table: 'Findings', measure: 'Rail badge my day', about: 'the next steps of today' } },
   { page: 'mywork', label: 'Work queue', icon: 'inbox', badge: { table: 'Findings', measure: 'Rail badge work queue', about: 'the open lines' } },
+  { page: 'people', label: 'People', icon: 'people' },
   { page: 'messages', label: 'Messages', icon: 'mail' },
   { page: 'cards', label: 'Cards', icon: 'cards' },
   { page: 'backlog', label: 'Mapping', icon: 'map' },
   { page: 'contracts', label: 'Contracts', icon: 'contract' },
   { page: 'history', label: 'History', icon: 'history' },
-  { page: 'activity', label: 'Activity', icon: 'activity' },
+  { page: 'overview', label: 'Overview', icon: 'overview' },
   { page: 'audit', label: 'Audit', icon: 'audit' },
   { page: 'reports', label: 'Reports', icon: 'reports' }
 ];
-/** The parts of the Audit (D1 put them on its rail): shown under Audit on its four pages. */
+/** The parts of the Audit (D1 put them on its rail, D3 adds the summary of design D): shown under Audit on its pages. */
 export const AUDIT_PARTS: Array<{ page: string; label: string }> = [
-  { page: 'audit', label: 'Record' },
+  { page: 'audit', label: 'Summary' },
+  { page: 'auditrecord', label: 'Record' },
   { page: 'auditexport', label: 'Export' },
   { page: 'auditfollow', label: 'Not followed' },
   { page: 'auditreview', label: 'Lifecycle review' }
 ];
-/** The item a page that is not on the rail lights: a card belongs to Cards, a person and a CI to the Work queue. */
-const BELONGS: Record<string, string> = { card: 'cards', person: 'mywork', case: 'mywork', auditexport: 'audit', auditfollow: 'audit', auditreview: 'audit' };
+/** The item a page that is not on the rail lights: a card belongs to Cards, a person to People, a CI to the Work queue. */
+const BELONGS: Record<string, string> = { card: 'cards', person: 'people', case: 'mywork', auditrecord: 'audit', auditexport: 'audit', auditfollow: 'audit', auditreview: 'audit' };
 
 /** Where things are on the rail, in px. */
 const RAIL = { width: 188, first: 52, pitch: 36, height: 32, partPitch: 32, partHeight: 28, x: 8, itemWidth: 172, badgeX: 136, badgeWidth: 32, badgeHeight: 24 };
@@ -222,7 +227,60 @@ export function railVisuals(page: string, height: number): Visual[] {
       drillFilterOtherVisuals: true
     }
   });
+  out.push(reportsChip());
   return out;
+}
+
+/** Where the reports chip is on every page: the top right of the content, beside the name of the page. */
+export const REPORTS_CHIP = { x: 836, y: 24, width: 420, height: 40 };
+
+/**
+ * The reports chip (build D3, D322): the words of the measure Reports chip at the top right of every page, green when
+ * every report is up to date, amber when one is old or missing (ReportTypes[Reports colour] and [Reports fill]); it opens
+ * Reports. Its name does not start with rail, so the lint counts it and keeps it in the content frame.
+ */
+function reportsChip(): Visual {
+  const reportTypes = (measure: string) => measureRef('ReportTypes', measure);
+  return {
+    $schema: VISUAL_SCHEMA,
+    name: 'reportsChip',
+    position: { ...REPORTS_CHIP, z: 3000, tabOrder: 3000 },
+    visual: {
+      visualType: 'actionButton',
+      objects: {
+        text: [
+          { properties: { show: literal('true') } },
+          {
+            properties: {
+              text: reportTypes('Reports chip'),
+              fontFamily: literal(`'${FONT_SEMIBOLD}'`),
+              fontSize: literal('9D'),
+              fontColor: { solid: { color: reportTypes('Reports colour') } },
+              horizontalAlignment: literal("'right'"),
+              verticalAlignment: literal("'middle'"),
+              leftMargin: literal('12D'),
+              rightMargin: literal('12D')
+            },
+            selector: { id: 'default' }
+          }
+        ],
+        icon: hidden,
+        fill: [
+          { properties: { show: literal('true') } },
+          { properties: { fillColor: { solid: { color: reportTypes('Reports fill') } }, transparency: literal('0D') }, selector: { id: 'default' } }
+        ],
+        outline: hidden
+      },
+      visualContainerObjects: {
+        general: altText('The reports: open Reports'),
+        background: hidden,
+        border: hidden,
+        padding: noPadding,
+        visualLink: [{ properties: { show: literal('true'), type: literal("'PageNavigation'"), navigationSection: literal("'reports'"), tooltip: literal("'Open Reports'") } }]
+      },
+      drillFilterOtherVisuals: true
+    }
+  };
 }
 
 /** The resource name of the rail picture of a page. */

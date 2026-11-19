@@ -25,7 +25,7 @@ table Findings
 	measure 'Finding colour' = SWITCH ( SELECTEDVALUE ( Findings[State] ), "open", "#b42318", "review", "#175cd3", "#475467" )
 
 	/// Under the title of the lines of a card (Card): the order, or why the box is empty. Opened from its tab, the page says how to choose a card.
-	measure 'Lines note' = SWITCH ( TRUE (), NOT ISFILTERED ( Checks[CheckId] ), "No card chosen: on All cards, right-click a line, Drill through, Card.", COUNTROWS ( Findings ) + 0 = 0, "No line: the newest report finds nothing on this card.", "Who is asked about which CI. Owned by, Managed by and Tags are in the export." )
+	measure 'Lines note' = SWITCH ( TRUE (), NOT HASONEVALUE ( Checks[CheckId] ), "No card chosen: on All cards, select a card, then Open card.", COUNTROWS ( Findings ) + 0 = 0, "No line: the newest report finds nothing on this card.", "Who is asked about which CI. Owned by, Managed by and Tags are in the export." )
 		displayFolder: Page notes
 
 	/// Under the title of the SACM fix list (Card): only a card SACM fixes itself has lines.
@@ -41,7 +41,7 @@ table Findings
 		displayFolder: Page notes
 
 	/// Under the title of the CI (Case).
-	measure 'CI note' = IF ( NOT ISFILTERED ( Findings[CiName] ), "No CI chosen: right-click a line of a card, Drill through, Case.", "As the newest CI report shows it." )
+	measure 'CI note' = IF ( NOT ISFILTERED ( Findings[CiName] ), "No CI chosen: on a card or a person, select a line, then Open CI.", "As the newest CI report shows it." )
 		displayFolder: Page notes
 
 	/// Under the title of the problems of a CI (Case).
@@ -53,7 +53,7 @@ table Findings
 		displayFolder: Page notes
 
 	/// Under the title of the person (Person). Opened from its tab, the page says how to choose a person.
-	measure 'Person note' = IF ( NOT ISFILTERED ( Findings[ContactName] ), "No person chosen: right-click a name on a page, Drill through, Person.", "Who they are and why the team asks them." )
+	measure 'Person note' = IF ( NOT ISFILTERED ( Findings[ContactName] ), "No person chosen: on My day, People or Overview, select a name, then Open person.", "Who they are and why the team asks them." )
 		displayFolder: Page notes
 
 	/// Under the title of what is open with a person (Person).
@@ -332,6 +332,165 @@ table Findings
 			RETURN "data:image/svg+xml;utf8," & IF ( n = 0, "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='24'/>", SUBSTITUTE ( picture, "#", "%23" ) )
 		displayFolder: Pictures
 		dataCategory: ImageUrl
+
+	/// The open lines with the person in view (People, Person, Overview): their lines of the newest report, not verified and not set aside; blank hides the person.
+	measure 'Person lines' =
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			RETURN IF ( n > 0, n )
+		formatString: #,0
+		displayFolder: People
+
+	/// Under the number of open lines (Person): on how many CIs.
+	measure 'Person lines line' =
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			RETURN "on " & n & IF ( n = 1, " CI", " CIs" )
+		displayFolder: People
+
+	/// The kinds of problem (cards) of the open lines with the person in view (Person): one part each in the email.
+	measure 'Person kinds' =
+			CALCULATE ( DISTINCTCOUNT ( CaseLines[CheckId] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+		formatString: #,0
+		displayFolder: People
+
+	/// The cards of the open lines with the person in view (People): the first two by name, and how many more.
+	measure 'Person cards' =
+			VAR lines = CALCULATETABLE ( CaseLines, TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			VAR cards = DISTINCT ( SELECTCOLUMNS ( lines, "@card", RELATED ( Checks[CardLabel] ) ) )
+			VAR cardCount = COUNTROWS ( cards )
+			RETURN IF ( cardCount > 0, CONCATENATEX ( TOPN ( 2, cards, [@card], ASC ), [@card], ", ", [@card], ASC ) & IF ( cardCount > 2, " and " & ( cardCount - 2 ) & " more" ) )
+		displayFolder: People
+
+	/// The day the team last wrote to the person in view, or never (People, Person).
+	measure 'Person last asked' =
+			VAR lastSent = CALCULATE ( MAX ( CaseLines[SentOn] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ) )
+			RETURN IF ( ISBLANK ( lastSent ), "never", FORMAT ( lastSent, "d mmm" ) )
+		displayFolder: People
+
+	/// Under the last contact (Person): how many emails the team sent, or never asked.
+	measure 'Person asked line' =
+			VAR times = CALCULATE ( MAX ( CaseLines[Messages] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ) ) + 0
+			RETURN IF ( times = 0, "never asked", "asked " & times & IF ( times = 1, " time", " times" ) )
+		displayFolder: People
+
+	/// The name at the top of the Person page, or what to do when the page was opened from its tab.
+	measure 'Person title' = IF ( HASONEVALUE ( Findings[ContactName] ), SELECTEDVALUE ( Findings[ContactName] ), "No person chosen" )
+		displayFolder: People
+
+	/// Under the name (Person): why the team asks them and where the email goes, or how to choose a person.
+	measure 'Person line' =
+			VAR via = CONCATENATEX ( TOPN ( 2, CALCULATETABLE ( VALUES ( Findings[ContactVia] ), Findings[ContactVia] <> "" ), Findings[ContactVia], ASC ), Findings[ContactVia], ", ", Findings[ContactVia], ASC )
+			VAR mails = CONCATENATEX ( TOPN ( 2, CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), Findings[ContactEmail] <> "" ), Findings[ContactEmail], ASC ), Findings[ContactEmail], "; ", Findings[ContactEmail], ASC )
+			VAR both = via & IF ( via <> "" && mails <> "", " · " ) & mails
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        NOT HASONEVALUE ( Findings[ContactName] ), "On My day, People or Overview, select a name, then Open person.",
+			        both = "", "No address known: the team writes to them by hand.",
+			        both
+			    )
+		displayFolder: People
+
+	/// The open lines with the person in view as a bar of their next steps (People, Overview): the number, then one part per step in the colour of its chip (reply to read, escalate, reminder due, new, asked, marked fixed), as long as the lines on the scale of the person with the most. 128 × 24, the size of the state chip: a table gives all its pictures one size. The number comes first in the picture, so a table sorted on it has the most lines first.
+	measure 'State bar' =
+			VAR asOf = [Today]
+			VAR mine = CALCULATETABLE ( CaseLines, TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			VAR shown = COUNTROWS ( mine ) + 0
+			VAR ranked =
+			    ADDCOLUMNS (
+			        mine,
+			        "@step",
+			            SWITCH (
+			                TRUE (),
+			                CaseLines[Status] = "Answered", 1,
+			                CaseLines[Remind] = "escalation" && CaseLines[ReminderFrom] <= asOf, 2,
+			                CaseLines[Remind] = "reminder" && CaseLines[ReminderFrom] <= asOf, 3,
+			                CaseLines[Status] = "New", 4,
+			                CaseLines[Status] IN { "Fix in progress", "Fixed" }, 6,
+			                5
+			            )
+			    )
+			VAR most =
+			    MAXX (
+			        CALCULATETABLE (
+			            ADDCOLUMNS ( VALUES ( CaseLines[ContactName] ), "@n", CALCULATE ( COUNTROWS ( CaseLines ) ) ),
+			            REMOVEFILTERS ( CaseLines ),
+			            CaseLines[ContactName] <> "",
+			            NOT CaseLines[Status] IN { "Verified", "Not followed up" }
+			        ),
+			        [@n]
+			    )
+			VAR unit = 92 / MAX ( most, 1 )
+			VAR one = ROUND ( COUNTROWS ( FILTER ( ranked, [@step] = 1 ) ) * unit, 0 )
+			VAR two = ROUND ( COUNTROWS ( FILTER ( ranked, [@step] = 2 ) ) * unit, 0 )
+			VAR three = ROUND ( COUNTROWS ( FILTER ( ranked, [@step] = 3 ) ) * unit, 0 )
+			VAR four = ROUND ( COUNTROWS ( FILTER ( ranked, [@step] = 4 ) ) * unit, 0 )
+			VAR five = ROUND ( COUNTROWS ( FILTER ( ranked, [@step] = 5 ) ) * unit, 0 )
+			VAR six = ROUND ( COUNTROWS ( FILTER ( ranked, [@step] = 6 ) ) * unit, 0 )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' class='n" & FORMAT ( 99999 - MIN ( shown, 99999 ), "00000" ) & "' width='128' height='24' viewBox='0 0 128 24'>"
+			        & "<text x='26' y='16.5' text-anchor='end' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='#2b2623'>" & shown & "</text>"
+			        & "<rect x='32' y='7' width='92' height='10' rx='3' fill='#f2f4f7'/>"
+			        & "<rect x='32' y='7' width='" & one & "' height='10' fill='#5925dc'/>"
+			        & "<rect x='" & 32 + one & "' y='7' width='" & two & "' height='10' fill='#b42318'/>"
+			        & "<rect x='" & 32 + one + two & "' y='7' width='" & three & "' height='10' fill='#7d5700'/>"
+			        & "<rect x='" & 32 + one + two + three & "' y='7' width='" & four & "' height='10' fill='#175cd3'/>"
+			        & "<rect x='" & 32 + one + two + three + four & "' y='7' width='" & five & "' height='10' fill='#d0d5dd'/>"
+			        & "<rect x='" & 32 + one + two + three + four + five & "' y='7' width='" & six & "' height='10' fill='#107569'/></svg>"
+			RETURN IF ( shown > 0, "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// Under the title of People: how many people, or why the box is empty.
+	measure 'People line' =
+			VAR n = COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && NOT ISBLANK ( [Person lines] ) ) ) + 0
+			RETURN IF ( n = 0, "Nobody: no open line waits for a person.", n & IF ( n = 1, " person", " people" ) & ", in the order of the team's rules. Select one, then Open person." )
+		displayFolder: Page notes
+
+	/// Under the title of Who holds the most (Overview): the lines that wait for nobody.
+	measure 'Holders line' =
+			VAR sacm = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[ContactName] = "", CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			RETURN IF ( sacm = 0, "The most open lines first. Every open line waits for a person.", "The most open lines first. " & sacm & IF ( sacm = 1, " line has", " lines have" ) & " no person: SACM fixes them, on the fix list of each card." )
+		displayFolder: Page notes
+
+	/// The CI at the top of the Case page, or what to do when the page was opened from its tab.
+	measure 'Case title' = IF ( HASONEVALUE ( Findings[CiName] ), SELECTEDVALUE ( Findings[CiName] ), "No CI chosen" )
+		displayFolder: Case
+
+	/// Under the CI (Case): its class, EPO ID, status and support group, or how to choose a CI.
+	measure 'Case line' =
+			VAR kind = SELECTEDVALUE ( Findings[ClassLabel] )
+			VAR epo = SELECTEDVALUE ( Findings[EpoId] )
+			VAR partA = kind & IF ( kind <> "" && epo <> "", " · " ) & epo
+			VAR life = SELECTEDVALUE ( Findings[Status] )
+			VAR partB = partA & IF ( partA <> "" && life <> "", " · " ) & life
+			VAR supportGroup = SELECTEDVALUE ( Findings[SupportGroup] )
+			VAR said = partB & IF ( partB <> "" && supportGroup <> "", " · " ) & supportGroup
+			RETURN IF ( NOT HASONEVALUE ( Findings[CiName] ), "On a card or a person, select a line, then Open CI.", IF ( said = "", "As the newest CI report shows it.", said ) )
+		displayFolder: Case
+
+	/// A field of the CI (Case): Owned by, or a dash.
+	measure 'Case owned by' =
+			VAR v = IF ( HASONEVALUE ( Findings[CiName] ), SELECTEDVALUE ( Findings[OwnedBy] ) )
+			RETURN IF ( v = "", "–", v )
+		displayFolder: Case
+
+	/// A field of the CI (Case): Managed by, or a dash.
+	measure 'Case managed by' =
+			VAR v = IF ( HASONEVALUE ( Findings[CiName] ), SELECTEDVALUE ( Findings[ManagedBy] ) )
+			RETURN IF ( v = "", "–", v )
+		displayFolder: Case
+
+	/// A field of the CI (Case): Supported by, or a dash.
+	measure 'Case supported by' =
+			VAR v = IF ( HASONEVALUE ( Findings[CiName] ), SELECTEDVALUE ( Findings[SupportedBy] ) )
+			RETURN IF ( v = "", "–", v )
+		displayFolder: Case
+
+	/// A field of the CI (Case): its tags, or a dash.
+	measure 'Case tags' =
+			VAR v = IF ( HASONEVALUE ( Findings[CiName] ), SELECTEDVALUE ( Findings[Tags] ) )
+			RETURN IF ( v = "", "–", v )
+		displayFolder: Case
 
 	column ReportDate
 		dataType: dateTime

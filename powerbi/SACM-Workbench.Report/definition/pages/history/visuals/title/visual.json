@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The findings of every CI report date, for 24 months: the trend, new and solved, days to fix.",
+                    "value": "What the team did, and the trend of every CI report date for 24 months.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

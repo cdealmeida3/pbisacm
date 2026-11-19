@@ -3,11 +3,11 @@
   "name": "export",
   "position": {
     "x": 224,
-    "y": 556,
-    "z": 11000,
-    "height": 148,
-    "width": 1032,
-    "tabOrder": 11000
+    "y": 136,
+    "z": 4800,
+    "height": 568,
+    "width": 720,
+    "tabOrder": 4800
   },
   "visual": {
     "visualType": "tableEx",
@@ -103,7 +103,7 @@
               },
               "queryRef": "Findings.Status",
               "nativeQueryRef": "Status",
-              "displayName": "Operational status"
+              "displayName": "Status"
             },
             {
               "field": {
@@ -240,7 +240,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "119D"
+                  "Value": "80D"
                 }
               }
             }
@@ -254,7 +254,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "68D"
+                  "Value": "60D"
                 }
               }
             }
@@ -268,7 +268,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "99D"
+                  "Value": "56D"
                 }
               }
             }
@@ -282,7 +282,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "83D"
+                  "Value": "76D"
                 }
               }
             }
@@ -296,7 +296,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "95D"
+                  "Value": "84D"
                 }
               }
             }
@@ -310,7 +310,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "150D"
+                  "Value": "60D"
                 }
               }
             }
@@ -324,7 +324,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "108D"
                 }
               }
             }
@@ -338,7 +338,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "67D"
+                  "Value": "48D"
                 }
               }
             }
@@ -352,7 +352,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "187D"
+                  "Value": "108D"
                 }
               }
             }
@@ -363,5 +363,6 @@
         }
       ]
     }
-  }
+  },
+  "isHidden": true
 }

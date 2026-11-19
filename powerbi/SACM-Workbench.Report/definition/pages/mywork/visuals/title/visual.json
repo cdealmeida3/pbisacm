@@ -6,7 +6,7 @@
     "y": 16,
     "z": 2000,
     "height": 56,
-    "width": 720,
+    "width": 600,
     "tabOrder": 2000
   },
   "visual": {
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Every open line, one row per person asked. Select lines, then Take, Assign or Share out with the app at the right.",
+                    "value": "Every open line, one row per person asked. Select lines, then use the app at the right.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

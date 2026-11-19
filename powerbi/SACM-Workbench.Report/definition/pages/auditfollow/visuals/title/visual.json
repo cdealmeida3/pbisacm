@@ -4,10 +4,10 @@
   "position": {
     "x": 224,
     "y": 16,
-    "z": 6000,
+    "z": 2000,
     "height": 56,
-    "width": 1032,
-    "tabOrder": 6000
+    "width": 600,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "textbox",
@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The decisions to stop following a case, and the cases set aside. The app at the right follows them again.",
+                    "value": "Decisions to stop following a case, and the cases set aside. The app follows them again.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

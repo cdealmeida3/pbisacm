@@ -3,11 +3,11 @@
   "name": "fixList",
   "position": {
     "x": 224,
-    "y": 396,
-    "z": 9000,
-    "height": 148,
-    "width": 508,
-    "tabOrder": 9000
+    "y": 136,
+    "z": 4600,
+    "height": 568,
+    "width": 720,
+    "tabOrder": 4600
   },
   "visual": {
     "visualType": "tableEx",
@@ -210,7 +210,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "114D"
+                  "Value": "120D"
                 }
               }
             }
@@ -224,7 +224,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "66D"
+                  "Value": "96D"
                 }
               }
             }
@@ -238,7 +238,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "46D"
+                  "Value": "88D"
                 }
               }
             }
@@ -252,7 +252,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "66D"
+                  "Value": "72D"
                 }
               }
             }
@@ -266,7 +266,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "68D"
+                  "Value": "104D"
                 }
               }
             }
@@ -280,7 +280,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "53D"
+                  "Value": "136D"
                 }
               }
             }
@@ -294,7 +294,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "53D"
+                  "Value": "64D"
                 }
               }
             }
@@ -373,5 +373,6 @@
         }
       }
     ]
-  }
+  },
+  "isHidden": true
 }

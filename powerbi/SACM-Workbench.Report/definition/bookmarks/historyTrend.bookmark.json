@@ -1,0 +1,82 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "Trend",
+  "name": "historyTrend",
+  "options": {
+    "targetVisualNames": [
+      "find",
+      "who",
+      "kind",
+      "events",
+      "trend",
+      "fix",
+      "teams",
+      "classes"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true,
+    "suppressActiveSection": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "history",
+    "sections": {
+      "history": {
+        "visualContainers": {
+          "find": {
+            "singleVisual": {
+              "visualType": "textSlicer",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "who": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "kind": {
+            "singleVisual": {
+              "visualType": "advancedSlicerVisual",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "events": {
+            "singleVisual": {
+              "visualType": "tableEx",
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "trend": {
+            "singleVisual": {
+              "visualType": "lineChart"
+            }
+          },
+          "fix": {
+            "singleVisual": {
+              "visualType": "lineChart"
+            }
+          },
+          "teams": {
+            "singleVisual": {
+              "visualType": "pivotTable"
+            }
+          },
+          "classes": {
+            "singleVisual": {
+              "visualType": "pivotTable"
+            }
+          }
+        }
+      }
+    }
+  }
+}

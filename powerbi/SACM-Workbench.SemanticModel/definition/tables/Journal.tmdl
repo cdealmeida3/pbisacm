@@ -19,6 +19,19 @@ table Journal
 	measure 'Actions note' = IF ( COUNTROWS ( Journal ) + 0 = 0, "No action in the period chosen.", "The journal of the team in the period chosen." )
 		displayFolder: Page notes
 
+	/// On a line of Escalations (Audit): Open while a line of the escalation is still open, else Closed.
+	measure 'Escalation state' =
+			VAR keys = CALCULATETABLE ( VALUES ( JournalKeys[Key] ) )
+			VAR stillOpen = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			RETURN IF ( COUNTROWS ( Journal ) > 0, IF ( stillOpen > 0, "Open", "Closed" ) )
+		displayFolder: Audit
+
+	/// Under the title of Escalations (Audit): how many in the period, or why the box is empty.
+	measure 'Escalations line' =
+			VAR n = CALCULATE ( COUNTROWS ( Journal ), Journal[Type] = "message", Journal[Kind] = "escalation" ) + 0
+			RETURN IF ( n = 0, "No escalation in the period chosen.", n & IF ( n = 1, " escalation", " escalations" ) & " in the period. Each one has its email in History." )
+		displayFolder: Page notes
+
 	column Id
 		dataType: string
 		sourceColumn: Id
