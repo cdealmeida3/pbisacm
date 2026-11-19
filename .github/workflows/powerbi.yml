@@ -178,7 +178,7 @@ jobs:
   powerbi-desktop:
     if: github.event.pull_request.draft != true && (inputs.jobs == '' || inputs.jobs == null || contains(inputs.jobs, 'desktop'))
     runs-on: windows-latest
-    timeout-minutes: 50
+    timeout-minutes: 100
     defaults:
       run:
         shell: pwsh

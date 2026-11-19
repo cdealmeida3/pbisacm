@@ -10,4 +10,4 @@ table LineNumbers
 
 	partition LineNumbers = calculated
 		mode: import
-		source = GENERATESERIES ( 1, 600, 1 )
+		source = GENERATESERIES ( 1, 400, 1 )
