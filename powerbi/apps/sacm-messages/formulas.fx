@@ -38,10 +38,10 @@ RecentMessages = Filter(
 // The report shows an email in the list until the next refresh, which can be two hours away: an email whose cases one of
 // these rows names is Sent for everyone (the buttons are off), not only in the session that sent it.
 SentRows = ForAll(
-    Filter('SACM Journal', Type = "message" && At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))) As row,
+    Filter('SACM Journal', Type = "message" && At >= PendingSince) As row,
     { Keys: row.Keys, At: row.At, ByName: Coalesce(row.ByName, row.By) });
 // The header line (D334): every journal row of the team saved since the report's data.
-PendingCount = CountRows(Filter('SACM Journal', At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))));
+PendingCount = CountRows(Filter('SACM Journal', At >= PendingSince));
 PendingWhere = "";
 ReportUnknownText = "No email from the report now.";
 
@@ -75,7 +75,7 @@ Emails = ForAll(
                         "cut"),
                     // What the app remembers of an email it recorded, until the refresh takes it off the list: its first key
                     // between two line breaks (a refresh may number the drafts again, the keys stay).
-                    SentKey: Char(10) & First(Split(Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)), Char(10))).Value & Char(10),
+                    SentKey: Char(10) & First(Split(keys, Char(10))).Value & Char(10),
                     PartCount: CountRows(parts),
                     CiCount: Sum(parts, CiCount),
                     Keys: keys,

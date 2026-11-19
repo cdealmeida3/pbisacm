@@ -46,7 +46,7 @@ Screens:
             Color: =ColourMuted
             X: =16
             Y: =44
-            Width: =Parent.Width - 32
+            Width: =Parent.Width - 32 - 120
             Height: =32
       - Tabs:
           Control: ModernTabList@1.0.0
@@ -327,27 +327,26 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: =RefreshRuleText
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && IsBlank(SameLabel.Text)
             OnSelect: |-
               =With(
                   { answer: IfError(SACMRefresh.Run(), { result: "error", at: "", by: "", message: "" }) },
                   Switch(
                       answer.result,
                       "started", Notify(RefreshStartedText, NotificationType.Success),
-                      "taken", Notify(Coalesce(answer.by, "A colleague") & " asked for a refresh at " & answer.at & ". One refresh every " & RefreshWindowWords & ": " & RefreshNextText & ". Your work is saved, and this app shows it.", NotificationType.Information),
+                      "taken", Notify(Switch(Lower(Coalesce(answer.by, "")), "", "A colleague", "button", "A colleague", "reply", "A reply that came in", Coalesce(LookUp('SACM Team', Lower(Email) = Lower(answer.by)).Title, answer.by)) & " asked for a refresh at " & answer.at & ". One refresh every " & RefreshWindowWords & ": " & RefreshNextText & ". Your work is saved, and this app shows it.", NotificationType.Information),
                       "closed", Notify(RefreshClosedText, NotificationType.Information),
                       "refused", Notify("Power BI did not start the refresh: " & answer.message & ". Your work is saved.", NotificationType.Warning),
                       Notify(RefreshErrorText, NotificationType.Error)
                   )
               )
-            X: =16
-            Y: =SaveButton.Y
-            Width: =128
-            Height: =36
+            X: =Parent.Width - 128
+            Y: =44
+            Width: =112
+            Height: =32
       - AnywayCheck:
           Control: ModernCheckbox@1.0.0
           Properties:
-            # In the place of Refresh now when SameLabel says a row of the same type is not in the report yet (D334).
+            # Beside Save when SameLabel says a row of the same type is not in the report yet (D334).
             Label: ="Save anyway"
             Checked: =false
             BasePaletteColor: =ColourNavy
@@ -480,7 +479,7 @@ Screens:
                   Color: =ColourInk
                   X: =0
                   Y: =0
-                  Width: =Parent.TemplateWidth - If(!IsBlank(ReportSince) && ThisItem.At >= ReportSince, 128, 0)
+                  Width: =Parent.TemplateWidth - If(ThisItem.At >= PendingSince, 128, 0)
                   Height: =Parent.TemplateHeight - 1
             - RecentChip:
                 Control: Label
@@ -492,7 +491,7 @@ Screens:
                   Color: =ColourGrey
                   Fill: =ColourGreySoft
                   Align: =Align.Center
-                  Visible: =!IsBlank(ReportSince) && ThisItem.At >= ReportSince
+                  Visible: =ThisItem.At >= PendingSince
                   X: =Parent.TemplateWidth - 124
                   Y: =3
                   Width: =124
@@ -606,8 +605,9 @@ Screens:
           Control: Label
           Properties:
             # A reply already answered or put to wait since the report's data (D334): the status Answered or Fix in
-            # progress on a line of this reply, saved by anyone. The report shows the reply as read after the next
-            # refresh; until then Mark answered and Waiting until stay off. Not shown: TickCaption says it.
+            # progress on a line of this reply, saved by anyone after the reply came (the rule of a read reply, D327).
+            # The report shows the reply as read after the next refresh; until then Mark answered and Waiting until
+            # stay off. Not shown: TickCaption says it.
             Text: |-
               =With(
                   { replyKeys: Filter(Lines, LastRef = ReplyPick.Selected.Title) },
@@ -615,6 +615,7 @@ Screens:
                       {
                           done: First(Sort(
                               Filter(PendingEvents As event, event.Type = "status" && (event.Text = "Answered" || event.Text = "Fix in progress") &&
+                                  event.At >= ReplyPick.Selected.Received &&
                                   CountRows(Filter(Split(event.Keys, Char(10)) As key, Trim(key.Value) in replyKeys.Key)) > 0),
                               At, SortOrder.Descending))
                       },

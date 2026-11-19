@@ -40,6 +40,8 @@ RefreshRuleText = "Refresh now: once every 2 hours, 08:00 to 18:00. The report r
 // is not in the report yet: the refresh reads the journal while it runs, so the 5 minutes before count too.
 ReportAt = If(IsBlank(First(PowerBIIntegration.Data).'Report at'), Blank(), DateTimeValue(First(PowerBIIntegration.Data).'Report at'));
 ReportSince = If(IsBlank(ReportAt), Blank(), DateAdd(ReportAt, -5, TimeUnit.Minutes));
+// The same as a time to compare in SharePoint: tomorrow when the time is not known, so no row counts.
+PendingSince = Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days));
 ReportAtText = If(IsBlank(ReportAt), "", IsToday(ReportAt), Text(ReportAt, "hh:mm"), Text(ReportAt, "d mmm hh:mm"));
 // The start of the next window after now, in words: the answer when the window of now is taken.
 RefreshNextText = With(
@@ -49,7 +51,9 @@ RefreshNextText = With(
         If(following >= RefreshToMinutes, "the next is the morning refresh at " & RefreshScheduled, "the next from " & Text(Time(RoundDown(following / 60, 0), Mod(following, 60), 0), "hh:mm"))));
 // The header line of the app (D334): the time of the report's data and the changes saved since then (PendingWhere: where
 // the app counts them, " on these lines" or nothing).
+// No time with lines: the visual lacks the field Report at (README §6.4); then nothing counts as not in the report yet.
 ReportLine = If(
+    IsBlank(ReportAt) && !IsEmpty(PowerBIIntegration.Data), "Add the field Report at to this visual (README §6.4).",
     IsBlank(ReportAt), ReportUnknownText,
     "Report data from " & ReportAtText & ". " &
     If(
@@ -111,11 +115,11 @@ CurrentId = If(ReviewPending, TodayId, First(ReportCurrentLines).Review);
 // The marks saved on the review since the report's data, by anyone (D334): the report shows them after the next
 // refresh. ForAll keeps them in the app (Type, Ref and At are tested in SharePoint, so they are delegated).
 MarksSince = ForAll(
-    Filter('SACM Journal', Type = "review" && Ref = CurrentId && At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))) As row,
+    Filter('SACM Journal', Type = "review" && Ref = CurrentId && At >= PendingSince) As row,
     { CiKey: row.CiKey, Reason: row.Reason, At: row.At, ByName: Coalesce(row.ByName, row.By) });
 MarkedSince = Filter(MarksSince, !IsBlank(CiKey));
 // The header line (D334): every journal row of the team saved since the report's data.
-PendingCount = CountRows(Filter('SACM Journal', At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))));
+PendingCount = CountRows(Filter('SACM Journal', At >= PendingSince));
 PendingWhere = "";
 ReportUnknownText = "The report gave the app no line.";
 // The sample as the journal keeps it (the column Items of SACM Journal, read by LifecycleReviews): the report, its date

@@ -34,11 +34,11 @@ CurrentId = If(ReviewPending, TodayId, First(ReportCurrentLines).Review);
 // The marks saved on the review since the report's data, by anyone (D334): the report shows them after the next
 // refresh. ForAll keeps them in the app (Type, Ref and At are tested in SharePoint, so they are delegated).
 MarksSince = ForAll(
-    Filter('SACM Journal', Type = "review" && Ref = CurrentId && At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))) As row,
+    Filter('SACM Journal', Type = "review" && Ref = CurrentId && At >= PendingSince) As row,
     { CiKey: row.CiKey, Reason: row.Reason, At: row.At, ByName: Coalesce(row.ByName, row.By) });
 MarkedSince = Filter(MarksSince, !IsBlank(CiKey));
 // The header line (D334): every journal row of the team saved since the report's data.
-PendingCount = CountRows(Filter('SACM Journal', At >= Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days))));
+PendingCount = CountRows(Filter('SACM Journal', At >= PendingSince));
 PendingWhere = "";
 ReportUnknownText = "The report gave the app no line.";
 // The sample as the journal keeps it (the column Items of SACM Journal, read by LifecycleReviews): the report, its date

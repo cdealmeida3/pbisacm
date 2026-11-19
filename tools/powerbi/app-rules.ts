@@ -46,7 +46,7 @@ export interface Flow { id: string; name: string; purpose: string; trigger: stri
 export const appFlows = (): Flow[] => (JSON.parse(readFileSync(FLOWS_FILE, 'utf8')) as { flows: Flow[] }).flows;
 
 /** The flow that refreshes the report on demand (F5), and where an app may run it: the OnSelect of its button Refresh now. */
-export const REFRESH_FLOW = 'SACMRefresh';
+const REFRESH_FLOW = 'SACMRefresh';
 const REFRESH_BUTTON = /\/RefreshButton\/Properties\/OnSelect$/;
 
 /** One call of a formula, as tools/powerbi/powerfx-check gives it. */
@@ -123,10 +123,10 @@ export const DRAFT_REQUEST = { URI: 'https://graph.microsoft.com/v1.0/me/message
 const STEPS = new Set(['Refresh a dataset', 'Compose', 'Condition', 'Get items', 'Terminate', 'Create file', 'Html to text', 'Create item', SEND, DRAFT, RESPOND]);
 const REFRESH = 'Refresh a dataset';
 /** The list of the gate: one row per window used, Title unique (D333). The flows add rows with these fields only. */
-export const REFRESHES = 'SACM Refreshes';
+const REFRESHES = 'SACM Refreshes';
 const REFRESH_FIELDS = new Set(['List Name', 'Title', 'By', 'Source']);
 /** The workspace of every refresh: Carlos's own (D331). */
-export const WORKSPACE = 'My workspace';
+const WORKSPACE = 'My workspace';
 /** The fields of a sending step and the input of the trigger each must be. To of a test: the manager who ran the flow. */
 const SEND_FIELDS: Record<string, { input: string; or?: string; optional?: boolean }> = {
   To: { input: 'To', or: '=the user who ran it' }, CC: { input: 'Cc', optional: true }, BCC: { input: 'Bcc', optional: true },
@@ -151,7 +151,7 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
     const sends = flow.steps.filter((step) => step.action === SEND);
     const drafts = flow.steps.filter((step) => step.action === DRAFT);
     for (const step of flow.steps) {
-      if (!STEPS.has(step.action)) problems.push(`Flows: ${flow.id} has the step "${step.action}": a flow refreshes, waits, files a report or a reply, or sends what a manager pressed Send on`);
+      if (!STEPS.has(step.action)) problems.push(`Flows: ${flow.id} has the step "${step.action}": a flow refreshes through the gate of the refresh rule, files a report or a reply, or sends what a manager pressed Send on`);
       else if (step.action !== SEND && step.action !== DRAFT && /send|post|message|reply|forward/i.test(step.action)) problems.push(`Flows: ${flow.id} sends something ("${step.action}")`);
       if (step.action === RESPOND && flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} answers a Power App, but the app does not start it`);
       const list = step.fields['List Name'];
@@ -214,6 +214,9 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
   return problems;
 }
 
+/** What F5 answers the app (README §6.5). */
+const REFRESH_RESULTS = ['started', 'taken', 'closed', 'refused', 'error'];
+
 /**
  * The gate of a flow that refreshes (D333): before the refresh, the steps Now, Minutes, Open and Window with the
  * expressions of refresh.ts, then a row in SACM Refreshes whose Title is the window, and the refresh only when that row
@@ -247,7 +250,6 @@ export function gateProblems(flow: Flow, expected = gateExpressions()): string[]
 }
 
 /** What the refresh flow answers the app (F5, D333). */
-export const REFRESH_RESULTS = ['started', 'taken', 'closed', 'refused', 'error'];
 
 /* ------------------------------------------------------------------ the controls of the apps (D317) */
 

@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { gateExpressions, minutesOf, refreshFormulas, refreshRule, refreshRuleM, refreshRuleText, ruleProblems, windowOf, windowStarts } from '../../../tools/powerbi/refresh.ts';
+import { gateExpressions, minutesOf, refreshFormulas, refreshRule, refreshRuleM, refreshRuleText, ruleProblems, windowStarts } from '../../../tools/powerbi/refresh.ts';
 import { appFlows } from '../../../tools/powerbi/app-rules.ts';
 import { APP_FOLDERS } from '../../../tools/powerbi/actions.ts';
 import { readExpressions } from '../../../tools/powerbi/tmdl.ts';
@@ -24,13 +24,9 @@ test('the rule of refresh.json: whole windows, the scheduled refresh before them
   assert.ok(ruleProblems({ ...rule, from: '8:00' }).some((line) => line.includes('not a time')));
 });
 
-test('the window of a time is the one the gate of the flows names, and none outside the hours', () => {
+test('a time HH:mm in minutes after midnight, as the gate counts them', () => {
+  assert.ok(Number.isNaN(minutesOf('8:00')));
   assert.equal(minutesOf('08:00'), 480);
-  assert.equal(windowOf('2026-11-19', '08:00'), '2026-11-19 08:00');
-  assert.equal(windowOf('2026-11-19', '11:59'), '2026-11-19 10:00');
-  assert.equal(windowOf('2026-11-19', '17:59'), '2026-11-19 16:00');
-  assert.equal(windowOf('2026-11-19', '18:00'), null);
-  assert.equal(windowOf('2026-11-19', '07:59'), null);
 });
 
 test('the flows F3, F5 and F6 use the expressions of the gate with the numbers of refresh.json', () => {

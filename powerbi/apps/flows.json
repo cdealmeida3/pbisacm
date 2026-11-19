@@ -107,10 +107,10 @@
         {
           "action": "Condition",
           "connector": "Control",
-          "if": "Get items is successful",
+          "if": "Get items is successful or has failed",
           "fields": {
             "Name": "Found",
-            "Expression": "greater(length(body('Get_items')?['value']), 0)"
+            "Expression": "greater(length(coalesce(body('Get_items')?['value'], json('[]'))), 0)"
           }
         },
         {

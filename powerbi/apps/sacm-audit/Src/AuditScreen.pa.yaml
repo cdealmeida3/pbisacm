@@ -46,7 +46,7 @@ Screens:
                   Switch(
                       answer.result,
                       "started", Notify(RefreshStartedText, NotificationType.Success),
-                      "taken", Notify(Coalesce(answer.by, "A colleague") & " asked for a refresh at " & answer.at & ". One refresh every " & RefreshWindowWords & ": " & RefreshNextText & ". Your work is saved, and this app shows it.", NotificationType.Information),
+                      "taken", Notify(Switch(Lower(Coalesce(answer.by, "")), "", "A colleague", "button", "A colleague", "reply", "A reply that came in", Coalesce(LookUp('SACM Team', Lower(Email) = Lower(answer.by)).Title, answer.by)) & " asked for a refresh at " & answer.at & ". One refresh every " & RefreshWindowWords & ": " & RefreshNextText & ". Your work is saved, and this app shows it.", NotificationType.Information),
                       "closed", Notify(RefreshClosedText, NotificationType.Information),
                       "refused", Notify("Power BI did not start the refresh: " & answer.message & ". Your work is saved.", NotificationType.Warning),
                       Notify(RefreshErrorText, NotificationType.Error)

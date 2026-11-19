@@ -41,6 +41,8 @@ App:
       // is not in the report yet: the refresh reads the journal while it runs, so the 5 minutes before count too.
       ReportAt = If(IsBlank(First(PowerBIIntegration.Data).'Report at'), Blank(), DateTimeValue(First(PowerBIIntegration.Data).'Report at'));
       ReportSince = If(IsBlank(ReportAt), Blank(), DateAdd(ReportAt, -5, TimeUnit.Minutes));
+      // The same as a time to compare in SharePoint: tomorrow when the time is not known, so no row counts.
+      PendingSince = Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days));
       ReportAtText = If(IsBlank(ReportAt), "", IsToday(ReportAt), Text(ReportAt, "hh:mm"), Text(ReportAt, "d mmm hh:mm"));
       // The start of the next window after now, in words: the answer when the window of now is taken.
       RefreshNextText = With(
@@ -50,7 +52,9 @@ App:
               If(following >= RefreshToMinutes, "the next is the morning refresh at " & RefreshScheduled, "the next from " & Text(Time(RoundDown(following / 60, 0), Mod(following, 60), 0), "hh:mm"))));
       // The header line of the app (D334): the time of the report's data and the changes saved since then (PendingWhere: where
       // the app counts them, " on these lines" or nothing).
+      // No time with lines: the visual lacks the field Report at (README §6.4); then nothing counts as not in the report yet.
       ReportLine = If(
+          IsBlank(ReportAt) && !IsEmpty(PowerBIIntegration.Data), "Add the field Report at to this visual (README §6.4).",
           IsBlank(ReportAt), ReportUnknownText,
           "Report data from " & ReportAtText & ". " &
           If(
@@ -170,7 +174,7 @@ App:
       // (ReportSince, from the field Report at). The report, and the menu of actions it gave the lines, do not know them until
       // the next refresh, which can be two hours away: Done lately marks them, the header line counts them, and Save waits when
       // one of them is of the same type as the action (the box says who saved it, and Save anyway lets it through).
-      PendingEvents = Filter(RecentEvents, !IsBlank(ReportSince) && At >= ReportSince);
+      PendingEvents = Filter(RecentEvents, At >= PendingSince);
       PendingCount = CountRows(PendingEvents);
       PendingWhere = " on these lines";
       ReportUnknownText = "Select lines in the report to see the time of its data.";

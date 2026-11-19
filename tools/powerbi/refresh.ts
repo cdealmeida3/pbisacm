@@ -69,13 +69,16 @@ export const scheduledWords = (rule: RefreshRule = refreshRule()): string =>
 export const refreshRuleText = (rule: RefreshRule = refreshRule()): string =>
   `Refresh now: once every ${windowWords(rule.windowMinutes)}, ${rule.from} to ${rule.to}. The report refreshes at ${scheduledWords(rule)}.`;
 
+/** A text in double quotes, a quote doubled: the same in M and in Power Fx. */
+const quoted = (text: string): string => `"${text.replace(/"/g, '""')}"`;
+
 /** The M of the packed query RefreshRule, which the table About reads (AboutRows). */
 export function refreshRuleM(rule: RefreshRule = refreshRule()): string {
-  const text = (value: string): string => `"${value.replace(/"/g, '""')}"`;
+  const text = quoted;
   return `[WindowMinutes = ${rule.windowMinutes}, From = ${text(rule.from)}, To = ${text(rule.to)}, Scheduled = {${rule.scheduled.map(text).join(', ')}}, DailyLimit = ${rule.dailyLimit}, Text = ${text(refreshRuleText(rule))}]`;
 }
 
-const fx = (text: string): string => `"${text.replace(/"/g, '""')}"`;
+const fx = quoted;
 
 /**
  * The named formulas of the refresh rule that open every app (after the look, D334): the numbers of refresh.json, the time
@@ -101,6 +104,8 @@ export function refreshFormulas(rule: RefreshRule = refreshRule()): string {
     `// is not in the report yet: the refresh reads the journal while it runs, so the ${rule.marginMinutes} minutes before count too.`,
     'ReportAt = If(IsBlank(First(PowerBIIntegration.Data).\'Report at\'), Blank(), DateTimeValue(First(PowerBIIntegration.Data).\'Report at\'));',
     `ReportSince = If(IsBlank(ReportAt), Blank(), DateAdd(ReportAt, -${rule.marginMinutes}, TimeUnit.Minutes));`,
+    '// The same as a time to compare in SharePoint: tomorrow when the time is not known, so no row counts.',
+    'PendingSince = Coalesce(ReportSince, DateAdd(Now(), 1, TimeUnit.Days));',
     'ReportAtText = If(IsBlank(ReportAt), "", IsToday(ReportAt), Text(ReportAt, "hh:mm"), Text(ReportAt, "d mmm hh:mm"));',
     '// The start of the next window after now, in words: the answer when the window of now is taken.',
     'RefreshNextText = With(',
@@ -110,7 +115,9 @@ export function refreshFormulas(rule: RefreshRule = refreshRule()): string {
     '        If(following >= RefreshToMinutes, "the next is the morning refresh at " & RefreshScheduled, "the next from " & Text(Time(RoundDown(following / 60, 0), Mod(following, 60), 0), "hh:mm"))));',
     '// The header line of the app (D334): the time of the report\'s data and the changes saved since then (PendingWhere: where',
     '// the app counts them, " on these lines" or nothing).',
+    '// No time with lines: the visual lacks the field Report at (README §6.4); then nothing counts as not in the report yet.',
     'ReportLine = If(',
+    '    IsBlank(ReportAt) && !IsEmpty(PowerBIIntegration.Data), "Add the field Report at to this visual (README §6.4).",',
     '    IsBlank(ReportAt), ReportUnknownText,',
     '    "Report data from " & ReportAtText & ". " &',
     '    If(',
@@ -139,12 +146,4 @@ export function gateExpressions(rule: RefreshRule = refreshRule()): Record<'Now'
     Window: `concat(formatDateTime(outputs('Now'), 'yyyy-MM-dd'), ' ', formatDateTime(addMinutes(startOfDay(outputs('Now')), add(${from}, mul(div(sub(outputs('Minutes'), ${from}), ${step}), ${step}))), 'HH:mm'))`,
     Filter: "Title eq '@{outputs('Window')}'"
   };
-}
-
-/** The window a time of the team's day falls in, as the gate names it ("2026-11-19 10:00"), or null outside the hours. */
-export function windowOf(day: string, time: string, rule: RefreshRule = refreshRule()): string | null {
-  const now = minutesOf(time);
-  const from = minutesOf(rule.from);
-  if (now < from || now >= minutesOf(rule.to)) return null;
-  return `${day} ${timeOf(from + Math.floor((now - from) / rule.windowMinutes) * rule.windowMinutes)}`;
 }

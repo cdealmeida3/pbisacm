@@ -76,7 +76,7 @@ RecentEvents = Filter(
 // (ReportSince, from the field Report at). The report, and the menu of actions it gave the lines, do not know them until
 // the next refresh, which can be two hours away: Done lately marks them, the header line counts them, and Save waits when
 // one of them is of the same type as the action (the box says who saved it, and Save anyway lets it through).
-PendingEvents = Filter(RecentEvents, !IsBlank(ReportSince) && At >= ReportSince);
+PendingEvents = Filter(RecentEvents, At >= PendingSince);
 PendingCount = CountRows(PendingEvents);
 PendingWhere = " on these lines";
 ReportUnknownText = "Select lines in the report to see the time of its data.";

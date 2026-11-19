@@ -346,7 +346,8 @@ scheduled refresh (it stays in the flow, never in the repository).
      Result `refused`, Message `coalesce(outputs('Refresh_a_dataset')?['body']?['error']?['message'], 'no reason given')`.
    - After *Create item*, a parallel branch with **Configure run after: has failed** only: **SharePoint → Get items**,
      List Name **SACM Refreshes**, Filter Query `Title eq '@{outputs('Window')}'`, Top Count `1`. Then a **Condition**
-     `Found`: `greater(length(body('Get_items')?['value']), 0)` is equal to `true`. In its True branch: Result `taken`,
+     `Found`: `greater(length(coalesce(body('Get_items')?['value'], json('[]'))), 0)` is equal to `true`, with
+     **Configure run after: is successful** and **has failed** (when the list is missing, Get items fails too). In its True branch: Result `taken`,
      At `formatDateTime(convertFromUtc(first(body('Get_items')?['value'])?['Created'], '<the time zone of the team>'), 'HH:mm')`,
      By `first(body('Get_items')?['value'])?['By']`. In its False branch: Result `error`.
 5. No **Delay**: the app gets its answer in a few seconds.
