@@ -1,16 +1,17 @@
 /**
  * Command-line host, for development and tests:
  *   node src/hosts/cli.ts <report.csv|.xlsx> [more reports] [previous findings.json]
- * The type of each report comes from its columns (CI report, Relationship report). Prints a summary and writes
- * findings.json next to the CI report.
+ * The type of each report comes from its columns (CI report, Relationship report). When two files of one type are given,
+ * the newest report date is used, and of one date the fuller file (chooseReports, D348); the others are named with the
+ * reason. Prints a summary and writes findings.json next to the CI report.
  */
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
-import { dateInName } from '../core/memory/finder.ts';
+import { chooseReports, columnCount, dateInName } from '../core/memory/finder.ts';
 import { identityKey } from '../core/shared/names.ts';
 import { readTable } from '../core/reading/table.ts';
-import { recogniseReport, unhandledKind } from '../core/sources/report-types.ts';
+import { fileKind, folderFixes, recogniseReport, unhandledKind } from '../core/sources/report-types.ts';
 import { hiddenNames, matchEnds, readRelationshipReport } from '../core/sources/relationships/relationship-report.ts';
 import type { Relationship } from '../core/sources/relationships/relationship-report.ts';
 import { checksInUse, compareRuns, runChecks } from '../core/checks/engine.ts';
@@ -18,7 +19,7 @@ import { compareEpo, descriptionDifference, epoConfig, readEpoReport } from '../
 import type { EpoInput } from '../core/sources/epo/epo-report.ts';
 import { compareContracts, contractConfig, readContractReport, readSolusiFile } from '../core/sources/contracts/contract-reports.ts';
 import type { ContractInput } from '../core/sources/contracts/contract-reports.ts';
-import { hiddenNotes, readCiReport } from '../core/sources/ci/ci-report.ts';
+import { hiddenNotes, missingWanted, readCiReport } from '../core/sources/ci/ci-report.ts';
 import { buildCases, buildRun, groupCases, isDaily, moduleScores, stateOf } from '../core/cases/cases.ts';
 import { FINDING_STATES, MODULES } from '../core/model/model.ts';
 import type { CheckPack, Finding, References } from '../core/model/model.ts';
@@ -63,11 +64,26 @@ if (process.argv[1] === import.meta.filename) {
   let epo: EpoInput | null = null;
   const contracts: ContractInput = { solusi: null, servicenow: null };
   const references = loadReferences();
+  const folder: Array<{ name: string; date: string; kind: string; message: string }> = [];
+  const given: Array<{ path: string; table: Awaited<ReturnType<typeof readTable>>; type: NonNullable<ReturnType<typeof recogniseReport>['type']>; date: string }> = [];
   for (const path of args.filter((arg) => !/\.json$/i.test(arg))) {
     const table = await readTable(new Uint8Array(readFileSync(path)), inflate, (data) => utf8.decode(data));
     const found = recogniseReport(table.rows[0] ?? []);
-    if (!found.type) { console.error(`${path}: ${found.message}`); continue; }
-    const fileDate = dateInName(basename(path)) || new Date().toISOString().slice(0, 10);
+    const date = dateInName(basename(path)) || new Date().toISOString().slice(0, 10);
+    folder.push({ name: basename(path), date, kind: fileKind(table.rows[0] ?? []), message: found.message });
+    if (!found.type) { console.error(`${path}: ${found.known ? `${found.known.label}. ` : ''}${found.message}`); continue; }
+    given.push({ path, table, type: found.type, date });
+  }
+  // One file per type: the newest date, and of that date the fuller file (D348).
+  const choices = chooseReports(given.map((item) => ({ name: basename(item.path), kind: item.type.kind, date: item.date, columns: columnCount(item.table.rows[0] ?? []), rows: Math.max(0, item.table.rows.length - 1), modified: statSync(item.path).mtimeMs })));
+  const newestOf = new Map<string, string>();
+  for (const item of given) if (item.date > (newestOf.get(item.type.kind) ?? '')) newestOf.set(item.type.kind, item.date);
+  for (const [at, { path, table, type, date }] of given.entries()) {
+    const choice = choices[at]!;
+    if (!choice.used) { console.log(`${path}: ${type.label}. ${choice.whyNotUsed}`); continue; }
+    if (date !== newestOf.get(type.kind)) { console.log(`${path}: ${type.label}. Not used: a newer ${type.label} is given.`); continue; }
+    const found = { type };
+    const fileDate = date;
     if (found.type.kind === 'solusi') {
       const read = readSolusiFile(table.sheets ?? [{ name: '', rows: table.rows }], contractConfig(references)!);
       contracts.solusi = { contracts: read.contracts, date: fileDate, report: basename(path) };
@@ -89,6 +105,11 @@ if (process.argv[1] === import.meta.filename) {
   }
   if (!ciTable) { console.error('Usage: node src/hosts/cli.ts <report.csv|.xlsx> [more reports] [previous findings.json]. No CI report given.'); process.exit(1); }
   const report = readCiReport(ciTable.rows, { lossless: ciTable.lossless, knownHidden: !ciTable.lossless && relationships ? hiddenNames(relationships) : undefined });
+  // What the Reports page of the Power BI report says to fix in the folder (D352).
+  const choiceOf = new Map(given.map((item, at) => [basename(item.path), choices[at]!]));
+  const fixes = folderFixes(folder.map((file) => ({ ...file, used: choiceOf.get(file.name)?.used ?? false, whyNotUsed: choiceOf.get(file.name)?.whyNotUsed ?? '' })),
+    { name: basename(reportPath), date: dateInName(basename(reportPath)), missing: missingWanted(report.columns) });
+  if (fixes.length) console.log(`\nWhat to fix in the folder:\n${fixes.map((fix) => `  ${fix.name || '-'} (${fix.readAs}): ${fix.what}`).join('\n')}\n`);
   if (relationships) {
     const match = matchEnds(relationships, report.cis.map((ci) => ci.key));
     const classOf = new Map<string, Set<string>>();

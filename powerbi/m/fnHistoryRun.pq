@@ -5,13 +5,14 @@
 // keep 24 months, look at the last 7 days and compute again only the days whose files changed (HistoryPolling), so an
 // old report date is computed once, not at every refresh. The pages of the
 // newest report never read it: they read Run, which is always computed in full. Only the files of the ReadDays days
-// before `start` up to `end` are opened. Two CI reports of one day: the last file name is the run of that day.
+// before `start` up to `end` are opened. Two CI reports of one day: the one chosen by its content is the run of that
+// day (D348), as on the pages of the newest report.
 (start as datetime, end as datetime) as table =>
     let
         from = DateTime.Date(start),
         to = DateTime.Date(end),
         files = fnReadFiles(Date.AddDays(from, -ReadDays), to),
-        cis = Table.Buffer(Table.Sort(Table.SelectRows(files, each [Kind] = "ci" and [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
+        cis = Table.Buffer(Table.Sort(Table.SelectRows(files, each [Kind] = "ci" and [Used] and [ReportDate] <> null and [ReportDate] >= from and [ReportDate] < to),
             {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})),
         days = List.Buffer(List.Distinct(cis[ReportDate])),
         runOf = (day as date) as record => fnCheckRun(Table.Last(Table.SelectRows(cis, each [ReportDate] = day)), files),

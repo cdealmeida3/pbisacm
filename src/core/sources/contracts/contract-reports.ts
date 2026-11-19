@@ -205,7 +205,10 @@ export interface ServiceNowRead { contracts: ServiceNowContract[]; notes: string
 export function readContractReport(rows: string[][], config: ContractConfig): ServiceNowRead {
   const header = (rows[0] ?? []).map(normaliseHeader);
   const at = columnsOf(rows[0] ?? [], config.servicenow.columns);
-  const critical = config.servicenow.columns.criticality.map((name) => header.indexOf(name)).filter((index) => index >= 0);
+  // The criticality columns by the end of their name, whatever the prefix (u_, or the instance's scoped-app prefix, D351).
+  const isCritical = (name: string): boolean => config.servicenow.columns.criticality.some((end) => name === end || name.endsWith(`_${end}`));
+  const critical = header.map((name, index) => (isCritical(name) ? index : -1)).filter((index) => index >= 0);
+  at.criticality = critical[0] ?? -1;
   const notes: string[] = [];
   const missing = missingOf(at);
   if (missing.length) notes.push(`The ServiceNow contract report has no column for ${missing.join(', ')}. What needs it is not compared.`);

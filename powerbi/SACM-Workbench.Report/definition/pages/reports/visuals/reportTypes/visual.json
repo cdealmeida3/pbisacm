@@ -3,11 +3,11 @@
   "name": "reportTypes",
   "position": {
     "x": 224,
-    "y": 84,
-    "z": 3000,
-    "height": 220,
-    "width": 1032,
-    "tabOrder": 3000
+    "y": 304,
+    "z": 4000,
+    "height": 240,
+    "width": 720,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "tableEx",
@@ -104,21 +104,6 @@
               "queryRef": "ReportTypes.Newest rows",
               "nativeQueryRef": "Newest rows",
               "displayName": "Rows read"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ReportTypes"
-                    }
-                  },
-                  "Property": "Hint"
-                }
-              },
-              "queryRef": "ReportTypes.Hint",
-              "nativeQueryRef": "Hint",
-              "displayName": "What it is for"
             }
           ]
         }
@@ -197,7 +182,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "128D"
                 }
               }
             }
@@ -211,7 +196,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "190D"
+                  "Value": "212D"
                 }
               }
             }
@@ -225,7 +210,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "124D"
+                  "Value": "96D"
                 }
               }
             }
@@ -239,7 +224,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "104D"
+                  "Value": "72D"
                 }
               }
             }
@@ -253,7 +238,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "97D"
+                  "Value": "88D"
                 }
               }
             }
@@ -267,27 +252,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "111D"
+                  "Value": "80D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "ReportTypes.Newest rows"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "276D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "ReportTypes.Hint"
           }
         }
       ]
@@ -353,5 +324,62 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "reportsOnly",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "ReportTypes"
+              }
+            },
+            "Property": "IsReport"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "r",
+              "Entity": "ReportTypes",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "r"
+                          }
+                        },
+                        "Property": "IsReport"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "true"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

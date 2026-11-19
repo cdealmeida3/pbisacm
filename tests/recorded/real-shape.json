@@ -1,0 +1,160 @@
+{
+  "files": [
+    {
+      "name": "2026-11-19_1cmdb_logical_automation.csv",
+      "kind": "ci",
+      "used": false,
+      "whyNotUsed": "Not used: 2026-11-19_cmdb_logical_automation.csv of the same day has the same columns and rows and is used (the last file name). Move this copy into the sub-folder Archive.",
+      "rows": 20,
+      "fact": "missing: managed_by.user_name, managed_by.active, supported_by.user_name, supported_by.active, owned_by.manager.active, owned_by.manager.user_name, owned_by.department.dept_head, owned_by.department.dept_head.email, support_group.active, sys_created_on, sys_created_by, sys_updated_on, ref_cmdb_ci_service.u_service_mapped, ref_cmdb_ci_service.parent"
+    },
+    {
+      "name": "2026-11-19_Contracts to ServiceNow Report 202611160700.xlsx",
+      "kind": "solusi",
+      "used": true,
+      "whyNotUsed": "",
+      "rows": 5,
+      "fact": "no end: 1"
+    },
+    {
+      "name": "2026-11-19_EPORapport_133.csv",
+      "kind": "epo",
+      "used": true,
+      "whyNotUsed": "",
+      "rows": 6,
+      "fact": ""
+    },
+    {
+      "name": "2026-11-19_ast_contract_automation.csv",
+      "kind": "contract",
+      "used": true,
+      "whyNotUsed": "",
+      "rows": 5,
+      "fact": "criticality: 2"
+    },
+    {
+      "name": "2026-11-19_cmdb_logical_automation.csv",
+      "kind": "ci",
+      "used": true,
+      "whyNotUsed": "",
+      "rows": 20,
+      "fact": "missing: managed_by.user_name, managed_by.active, supported_by.user_name, supported_by.active, owned_by.manager.active, owned_by.manager.user_name, owned_by.department.dept_head, owned_by.department.dept_head.email, support_group.active, sys_created_on, sys_created_by, sys_updated_on, ref_cmdb_ci_service.u_service_mapped, ref_cmdb_ci_service.parent"
+    },
+    {
+      "name": "2026-11-19_contract_ci_automation.csv",
+      "kind": "links",
+      "used": false,
+      "whyNotUsed": "",
+      "rows": 0,
+      "fact": ""
+    },
+    {
+      "name": "2026-11-19_health_orphan_automation.csv",
+      "kind": "health",
+      "used": false,
+      "whyNotUsed": "",
+      "rows": 0,
+      "fact": ""
+    },
+    {
+      "name": "2026-11-19_rel_ci_automation.csv",
+      "kind": "relationship",
+      "used": true,
+      "whyNotUsed": "",
+      "rows": 15,
+      "fact": "excluded: 1"
+    }
+  ],
+  "fixes": [
+    {
+      "name": "2026-11-19_cmdb_logical_automation.csv",
+      "date": "2026-11-19",
+      "readAs": "CI report",
+      "what": "Lacks 14 columns the checks read, so some cards are grey or partly tested. Add them to the ServiceNow report: managed_by.user_name, managed_by.active, supported_by.user_name, supported_by.active, owned_by.manager.active, owned_by.manager.user_name, owned_by.department.dept_head, owned_by.department.dept_head.email, support_group.active, sys_created_on, sys_created_by, sys_updated_on, ref_cmdb_ci_service.u_service_mapped, ref_cmdb_ci_service.parent.",
+      "level": "fix"
+    },
+    {
+      "name": "2026-11-19_1cmdb_logical_automation.csv",
+      "date": "2026-11-19",
+      "readAs": "CI report",
+      "what": "Not used: 2026-11-19_cmdb_logical_automation.csv of the same day has the same columns and rows and is used (the last file name). Move this copy into the sub-folder Archive.",
+      "level": "fix"
+    },
+    {
+      "name": "2026-11-19_contract_ci_automation.csv",
+      "date": "2026-11-19",
+      "readAs": "Contract–CI links",
+      "what": "The links between contracts and CIs: known, not used yet. The ServiceNow contract report is the export of the contracts table (ast_contract).",
+      "level": "known"
+    },
+    {
+      "name": "2026-11-19_health_orphan_automation.csv",
+      "date": "2026-11-19",
+      "readAs": "CMDB Health result",
+      "what": "A CMDB Health result: known, not used yet. It is never the CI report.",
+      "level": "known"
+    }
+  ],
+  "cis": 20,
+  "findings": {
+    "APP-INSTANCE-MATCH": 9,
+    "CONTRACT-NOT-IN-SOLUSI": 1,
+    "CONTRACT-STATUS": 1,
+    "CONTRACT-UPLOAD": 8,
+    "CRIT-ABOVE-PARENT": 4,
+    "CRIT-NONE-REACHES": 2,
+    "DESC-QUALITY": 4,
+    "EPO-ID": 1,
+    "MAPPING": 5,
+    "NAME-STANDARD": 2,
+    "REL-MISSING": 1,
+    "REL-WRONG-TYPE": 3,
+    "RESP-INACTIVE": 1,
+    "RESP-MISSING": 5,
+    "RESP-SAME-PERSON": 1,
+    "SUPPORT-GROUP-MISSING": 5,
+    "TAG-MISSING": 2
+  },
+  "notes": [
+    {
+      "checkId": "EPO-DIFF",
+      "note": "Not tested: the CI report has no \"service mapped\" column (ref_cmdb_ci_service.u_service_mapped). It decides whether SACM or the sync brings the EPO value."
+    },
+    {
+      "checkId": "EPO-NOT-ARRIVED",
+      "note": "Not tested: the CI report has no \"service mapped\" column (ref_cmdb_ci_service.u_service_mapped). It decides whether SACM or the sync brings the EPO value."
+    },
+    {
+      "checkId": "NAME-HIDDEN-CHAR",
+      "note": "Not tested: a CSV report cannot show hidden characters (it writes \"?\" instead). Load the CI report as .xlsx, or load the Relationship report with it."
+    },
+    {
+      "checkId": "OFFERING-PARENT",
+      "note": "Not tested: the report has no Parent column (ref_cmdb_ci_service.parent). Add it to the CI report."
+    },
+    {
+      "checkId": "READY-TOO-LONG",
+      "note": "Not tested: the report has no column for Created (sys_created_on)."
+    },
+    {
+      "checkId": "RESP-INACTIVE",
+      "note": "Not tested for Managed by: the report has no column \"Managed by (active)\" (managed_by.active)."
+    },
+    {
+      "checkId": "RESP-INACTIVE",
+      "note": "Not tested for Supported by: the report has no column \"Supported by (active)\" (supported_by.active)."
+    },
+    {
+      "checkId": "SUPPORT-GROUP-INACTIVE",
+      "note": "Not tested: the report has no column that says if the Support group is active. Add \"Support group Active\" (support_group.active) to the CI report."
+    },
+    {
+      "checkId": "SUPPORTED-BY",
+      "note": "Not tested for Supported by: the report has no column \"Supported by (active)\" (supported_by.active)."
+    },
+    {
+      "checkId": "UNDER-RETIREMENT-LONG",
+      "note": "Not tested: the report has no column for Updated (sys_updated_on)."
+    }
+  ]
+}

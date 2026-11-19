@@ -1,11 +1,11 @@
-/// Every report file: its type by its columns, its report date and how many rows its reader read.
+/// Every report file: its type by its columns, its report date, how many rows its reader read, and whether it is the report of its type and day (D348).
 table ReportFiles
 
-	/// Report files of a known type.
+	/// Report files of a report type (a file the Workbench knows but does not use is not read).
 	measure 'Files read' = CALCULATE ( COUNTROWS ( ReportFiles ), ReportFiles[IsRead] = TRUE () ) + 0
 		formatString: 0
 
-	/// Report files of no known type.
+	/// Report files of no report type.
 	measure 'Files not read' = CALCULATE ( COUNTROWS ( ReportFiles ), ReportFiles[IsRead] = FALSE () ) + 0
 		formatString: 0
 
@@ -44,6 +44,14 @@ table ReportFiles
 	column IsRead
 		dataType: boolean
 		sourceColumn: IsRead
+
+	column Used
+		dataType: boolean
+		sourceColumn: Used
+
+	column WhyNotUsed
+		dataType: string
+		sourceColumn: WhyNotUsed
 
 	column Message
 		dataType: string

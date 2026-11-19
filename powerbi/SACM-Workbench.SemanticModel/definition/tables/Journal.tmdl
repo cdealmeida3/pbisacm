@@ -2,7 +2,7 @@
 table Journal
 
 	/// The events of the journal in view.
-	measure Events = COUNTROWS ( Journal ) + 0
+	measure Events = COUNTROWS ( DISTINCT ( Journal[Id] ) ) + 0
 		formatString: #,0
 
 	/// On a line of the timeline of the Case and Person pages: how many findings of the page (the CI or the person of the drill through) the event names ("2 findings"); blank hides the line.
@@ -12,11 +12,11 @@ table Journal
 			RETURN IF ( n > 0, n & IF ( n = 1, " finding", " findings" ) )
 
 	/// Under the title of the timeline (Case, Person): the order, or why the box is empty.
-	measure 'Timeline note' = IF ( COUNTROWS ( Journal ) + 0 = 0, "Nothing recorded yet: the team's actions show here.", "What the team did, oldest first." )
+	measure 'Timeline note' = IF ( COUNTROWS ( DISTINCT ( Journal[Id] ) ) + 0 = 0, "Nothing recorded yet: the team's actions show here.", "What the team did, oldest first." )
 		displayFolder: Page notes
 
 	/// Under the title of the actions of the period (Audit export).
-	measure 'Actions note' = IF ( COUNTROWS ( Journal ) + 0 = 0, "No action in the period chosen.", "The journal of the team in the period chosen." )
+	measure 'Actions note' = IF ( COUNTROWS ( DISTINCT ( Journal[Id] ) ) + 0 = 0, "No action in the period chosen.", "The journal of the team in the period chosen." )
 		displayFolder: Page notes
 
 	/// On a line of Escalations (Audit): Open while a line of the escalation is still open, else Closed.

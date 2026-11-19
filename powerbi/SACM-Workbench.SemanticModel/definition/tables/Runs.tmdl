@@ -2,7 +2,7 @@
 table Runs
 
 	/// The CI report dates the history holds.
-	measure 'Report dates' = COUNTROWS ( Runs ) + 0
+	measure 'Report dates' = COUNTROWS ( DISTINCT ( Runs[ReportDate] ) ) + 0
 		formatString: #,0
 
 	/// The first day of the period chosen on the Audit page (the slicer of the dates); the first day of the dates without one.
@@ -26,11 +26,11 @@ table Runs
 		formatString: #,0
 
 	/// Under the title of the loads (Audit export).
-	measure 'Loads note' = IF ( COUNTROWS ( Runs ) + 0 = 0, "No CI report in the period chosen.", "The CI reports of the period chosen." )
+	measure 'Loads note' = IF ( COUNTROWS ( DISTINCT ( Runs[ReportDate] ) ) + 0 = 0, "No CI report in the period chosen.", "The CI reports of the period chosen." )
 		displayFolder: Page notes
 
 	/// Under the title of the reports the cards were checked with (Reports).
-	measure 'Runs note' = IF ( COUNTROWS ( Runs ) + 0 = 0, "No CI report is loaded yet.", "The files of each CI report date." )
+	measure 'Runs note' = IF ( COUNTROWS ( DISTINCT ( Runs[ReportDate] ) ) + 0 = 0, "No CI report is loaded yet.", "The files of each CI report date." )
 		displayFolder: Page notes
 
 	/// A number of Audit: the CI report dates of the period chosen.

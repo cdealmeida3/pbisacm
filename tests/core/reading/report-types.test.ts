@@ -5,15 +5,15 @@ import { join } from 'node:path';
 import { deflateRawSync, inflateRawSync } from 'node:zlib';
 import { parseCsv } from '../../../src/core/reading/csv.ts';
 import { runChecks } from '../../../src/core/checks/engine.ts';
-import { reportCandidates } from '../../../src/core/memory/finder.ts';
+import { chooseReports, columnCount, reportCandidates } from '../../../src/core/memory/finder.ts';
 import { archiveFolderOf, removedFolderOf, runFolder } from '../../../src/core/memory/memory.ts';
 import { hiddenCharacters, identityKey, nameKey } from '../../../src/core/shared/names.ts';
-import { hiddenNotes, readCiReport } from '../../../src/core/sources/ci/ci-report.ts';
+import { hiddenNotes, missingWanted, readCiReport } from '../../../src/core/sources/ci/ci-report.ts';
 import { readTable } from '../../../src/core/reading/table.ts';
-import { recogniseReport } from '../../../src/core/sources/report-types.ts';
+import { fileKind, folderFixes, recogniseReport } from '../../../src/core/sources/report-types.ts';
 import { hiddenNames, matchEnds, readRelationshipReport } from '../../../src/core/sources/relationships/relationship-report.ts';
-import { columnIndex, excelDate, parseSheet, readXlsx, readXlsxSheets } from '../../../src/core/reading/xlsx.ts';
-import { contractConfig, readSolusiFile } from '../../../src/core/sources/contracts/contract-reports.ts';
+import { columnIndex, excelDate, parseSheet, readXlsx, readXlsxSheets, withoutPrefixes } from '../../../src/core/reading/xlsx.ts';
+import { contractConfig, readContractReport, readSolusiFile } from '../../../src/core/sources/contracts/contract-reports.ts';
 import { buildRun } from '../../../src/core/cases/cases.ts';
 import { cardSummaries } from '../../../src/app/view/cards.ts';
 import { reportTiles } from '../../../src/app/view/tiles.ts';
@@ -99,6 +99,10 @@ test('xlsx helpers: column letters, Excel dates', () => {
   assert.equal(columnIndex('AA3'), 26);
   assert.equal(excelDate(45575), '2024-10-10');
   assert.equal(excelDate(1, true), '1904-01-02');
+  // Past 31 Dec 9999 (or before 1900) is no date: Power BI cannot read it either (D350).
+  assert.equal(excelDate(2958465), '9999-12-31');
+  assert.equal(excelDate(2958800), '');
+  assert.equal(excelDate(-1), '');
   assert.deepEqual(parseSheet({ sheet: '<row><c><v>1</v></c><c t="str"><v>a&lt;b</v></c></row>' }), [['1', 'a<b']]);
 });
 
@@ -115,7 +119,14 @@ test('readTable: the format comes from the content; a CSV keeps hidden character
 test('report type from the columns: CI report, Relationship report, or a clear message', () => {
   assert.equal(recogniseReport(parseCsv(sample)[0]!).type?.kind, 'ci');
   assert.equal(recogniseReport(parseCsv(relSample)[0]!).type?.kind, 'relationship');
-  assert.equal(recogniseReport(['ci.name', 'ci.sys_class_name']).type?.kind, 'ci');
+  // A CMDB Health result and the contract–CI links are known files, never a report type (D341, D342).
+  const health = recogniseReport(['description', 'ci', 'ci.asset_tag', 'ci.sys_class_name', 'ci.owned_by']);
+  assert.equal(health.type, null);
+  assert.equal(health.known?.kind, 'health');
+  assert.match(health.message, /never the CI report/);
+  assert.equal(fileKind(['ast_contract', 'ast_contract.sys_tags', 'ci_item', 'ci_item.sys_class_name']), 'links');
+  assert.equal(fileKind(['Number', 'Short description']), 'unknown');
+  assert.equal(fileKind(['name', 'sys_class_name']), 'ci');
   const unknown = recogniseReport(['Number', 'Short description', 'Parent']);
   assert.equal(unknown.type, null);
   assert.match(unknown.message, /CI report needs Name, Class \(missing: Name, Class\)/);
@@ -148,6 +159,9 @@ test('Relationship report: the field-name form and the CSV form', () => {
   assert.deepEqual(csv.relationships.filter((item) => item.excluded).map((item) => `${item.parent} > ${item.child}`), ['Index Tool > Index Tool - PROD']);
   assert.ok(csv.relationships.every((item) => item.excluded !== undefined));
   assert.equal(readRelationshipReport([['parent', 'type', 'child', 'u_excluded_from_calculation'], ['A', 'x', 'B', 'Yes']]).relationships[0]!.excluded, true);
+  // The scoped-app prefix of the instance's own fields (D351): matched by the end of the name.
+  assert.equal(readRelationshipReport([['parent', 'type', 'child', 'x_acme_crit_app_excluded_for_calculation'], ['A', 'x', 'B', 'true']]).relationships[0]!.excluded, true);
+  assert.equal(readRelationshipReport([['parent', 'type', 'child', 'notexcluded_for_calculation'], ['A', 'x', 'B', 'true']]).relationships[0]!.excluded, undefined);
   // Without the column: nothing is excluded, and the report says so.
   const one = readRelationshipReport([['Parent', 'Type', 'Child', 'Class'], ['A', 'x', 'B', 'API']]);
   assert.ok(one.notes.some((note) => /only one Class column/.test(note)));
@@ -320,4 +334,79 @@ test('xlsx with two tabs: every tab is read, and the Solusi contract file is rec
 test('the ServiceNow contract report is recognised by its columns, and is not taken for a CI report', () => {
   assert.equal(recogniseReport(['number', 'state', 'short_description', 'vendor_contract', 'sys_class_name']).type!.kind, 'contract');
   assert.equal(recogniseReport(['Name', 'Class', 'Operational status']).type!.kind, 'ci');
+});
+
+/* ------------------------------------------------------------------ R2: the real shapes (invented data) */
+
+test('xlsx: a workbook whose XML names its elements with a prefix (<x:row>) is read the same (D350)', async () => {
+  const prefixed = (xml: string): string => xml.replace(/<(\/?)(?!\?)([a-zA-Z])/g, '<$1x:$2');
+  assert.equal(withoutPrefixes('<x:row r="1"><x:c r="A1" t="s"><x:v>0</x:v></x:c></x:row>'), '<row r="1"><c r="A1" t="s"><v>0</v></c></row>');
+  assert.equal(withoutPrefixes('<sheet name="a" r:id="rId1"/>'), '<sheet name="a" r:id="rId1"/>');
+  const header = ['CONTRACT_NO', 'CONTRACT_STATUS', 'PARTNER_NAME', 'CONTRACT_END'];
+  const rows = `<row r="1">${header.map((text, at) => `<c r="${'ABCD'[at]}1" t="s"><v>${at}</v></c>`).join('')}</row>`
+    + `<row r="2"><c r="A2" t="s"><v>4</v></c><c r="B2" t="s"><v>5</v></c><c r="C2" t="s"><v>6</v></c><c r="D2" s="1"><v>2958800</v></c></row>`;
+  const strings = [...header, 'C-1', 'Concluded', 'Partner &amp; Co'].map((text) => `<si><t>${text}</t></si>`).join('');
+  const book = zip({
+    '[Content_Types].xml': '<?xml version="1.0"?><Types/>',
+    '_rels/.rels': '<Relationships><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+    'xl/workbook.xml': prefixed('<?xml version="1.0"?><workbook><sheets><sheet name="Active contracts" r:id="rId3" sheetId="1"/></sheets></workbook>'),
+    'xl/_rels/workbook.xml.rels': '<Relationships><Relationship Id="rId1" Target="sharedStrings.xml" Type="http://x/sharedStrings"/>'
+      + '<Relationship Id="rId2" Target="styles.xml" Type="http://x/styles"/><Relationship Id="rId3" Target="worksheets/sheet1.xml" Type="http://x/worksheet"/></Relationships>',
+    'xl/sharedStrings.xml': prefixed(`<sst count="7">${strings}</sst>`),
+    'xl/styles.xml': prefixed('<styleSheet><cellXfs count="2"><xf numFmtId="0"/><xf numFmtId="14"/></cellXfs></styleSheet>'),
+    'xl/worksheets/sheet1.xml': prefixed(`<worksheet><sheetData>${rows}</sheetData></worksheet>`)
+  });
+  const sheets = await readXlsxSheets(book, inflate);
+  assert.equal(sheets[0]!.name, 'Active contracts');
+  // The date number past 31 Dec 9999 is an empty cell, so the row keeps its other cells.
+  assert.deepEqual(sheets[0]!.rows, [header, ['C-1', 'Concluded', 'Partner & Co', '']]);
+});
+
+test('ServiceNow contract report: the criticality columns are matched by the end of their name, whatever the prefix (D351)', () => {
+  const config = contractConfig(references)!;
+  const header = ['number', 'vendor_contract', 'state', 'x_acme_crit_app_inherited_confidentiality', 'x_acme_crit_app_inherited_integrity'];
+  const read = readContractReport([header, ['CNTR1', 'C-1', 'Active', '3', ''], ['CNTR2', 'C-2', 'Active', '', '']], config);
+  assert.deepEqual(read.contracts.map((contract) => contract.criticality), [true, false]);
+  assert.ok(!read.notes.some((note) => /criticality/.test(note)), read.notes.join(' '));
+  assert.ok(readContractReport([['number', 'vendor_contract', 'state'], ['CNTR1', 'C-1', 'Active']], config).notes.some((note) => /criticality/.test(note)));
+});
+
+test('one report per type and day, chosen by its content (D348): columns, then rows, then the last change, then the name', () => {
+  const file = (name: string, columns: number, rows: number, modified = 0, kind = 'ci', date = '2026-11-19') => ({ name, kind, date, columns, rows, modified });
+  assert.equal(columnCount(['\uFEFFName', 'name', ' Class ', '']), 2);
+  const fuller = chooseReports([file('b.csv', 40, 10), file('a.csv', 52, 5)]);
+  assert.deepEqual(fuller.map((choice) => choice.used), [false, true]);
+  assert.equal(fuller[0]!.whyNotUsed, 'Not used: a.csv of the same day has more columns (52 against 40), so it is used.');
+  assert.match(chooseReports([file('a.csv', 52, 3277), file('b.csv', 52, 131)])[1]!.whyNotUsed, /a\.csv of the same day has more rows \(3277 against 131\)/);
+  assert.match(chooseReports([file('a.csv', 5, 5, 2), file('b.csv', 5, 5, 1)])[1]!.whyNotUsed, /same columns and rows and is used \(it was saved later\)\. Move this copy/);
+  // Same columns, rows and time: the last file name, as before (2026-11-19_cmdb… comes after 2026-11-19_1cmdb…).
+  const copies = chooseReports([file('2026-11-19_cmdb_logical_automation.csv', 5, 5), file('2026-11-19_1cmdb_logical_automation.csv', 5, 5)]);
+  assert.deepEqual(copies.map((choice) => choice.used), [true, false]);
+  assert.match(copies[1]!.whyNotUsed, /\(the last file name\)/);
+  // Another day or another type is its own choice.
+  assert.deepEqual(chooseReports([file('a.csv', 5, 5), file('b.csv', 1, 1, 0, 'ci', '2026-11-18'), file('c.csv', 1, 1, 0, 'epo')]).map((choice) => choice.used), [true, true, true]);
+});
+
+test('what to fix in the folder (D352): a missing type, the CI columns to add, the files not used, then the known files', () => {
+  const at = { date: '2026-11-19', whyNotUsed: '', message: '' };
+  const files = [
+    { ...at, name: '2026-11-19_health.csv', kind: 'health', used: false, message: 'A CMDB Health result: known.' },
+    { ...at, name: '2026-11-19_cmdb.csv', kind: 'ci', used: true },
+    { ...at, name: '2026-11-19_1cmdb.csv', kind: 'ci', used: false, whyNotUsed: 'Not used: copy.' },
+    { ...at, name: '2026-11-19_x.csv', kind: 'unknown', used: false, message: 'Not a report.' },
+    ...['relationship', 'epo', 'solusi'].map((kind) => ({ ...at, name: `${kind}.csv`, kind, used: true }))
+  ];
+  const fixes = folderFixes(files, { name: '2026-11-19_cmdb.csv', date: '2026-11-19', missing: ['support_group.active', 'sys_created_on'] });
+  assert.deepEqual(fixes.map((fix) => [fix.name, fix.readAs, fix.level]), [
+    ['No ServiceNow contract report', 'ServiceNow contract report', 'fix'], ['2026-11-19_cmdb.csv', 'CI report', 'fix'],
+    ['2026-11-19_1cmdb.csv', 'CI report', 'fix'], ['2026-11-19_x.csv', 'Not a report', 'fix'], ['2026-11-19_health.csv', 'CMDB Health result', 'known']
+  ]);
+  assert.equal(fixes[1]!.what, 'Lacks 2 columns the checks read, so some cards are grey or partly tested. Add them to the ServiceNow report: support_group.active, sys_created_on.');
+  assert.deepEqual(folderFixes(files.filter((file) => file.kind !== 'health' && file.used).concat([{ ...at, name: 'c.csv', kind: 'contract', used: true }]), null), []);
+});
+
+test('the CI report columns to add (D347): the field names the checks read that the report lacks', () => {
+  const report = readCiReport(parseCsv(sample));
+  assert.deepEqual(missingWanted(report.columns), ['owned_by.manager.user_name', 'ref_cmdb_ci_service.u_platform', 'ref_cmdb_ci_service.parent']);
+  assert.deepEqual(missingWanted(readCiReport([['name', 'sys_class_name']]).columns).slice(0, 3), ['asset_tag', 'operational_status', 'short_description']);
 });

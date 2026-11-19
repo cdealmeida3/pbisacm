@@ -15,8 +15,8 @@
 // query in powerbi/m/, never in Desktop. --check compares the M of each query, not the annotations Desktop adds.
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
-import { REPORT_TYPES } from '../../src/core/sources/report-types.ts';
-import { CLASS_ALIASES, CI_CLASSES, FIELD_ALIASES, OPERATIONAL_STATUS, PERSON_PARTS } from '../../src/core/sources/ci/ci-report.ts';
+import { KNOWN_FILES, REPORT_TYPES } from '../../src/core/sources/report-types.ts';
+import { CLASS_ALIASES, CI_CLASSES, FIELD_ALIASES, OPERATIONAL_STATUS, PERSON_PARTS, WANTED_COLUMNS } from '../../src/core/sources/ci/ci-report.ts';
 import { CHANGE_FIELDS } from '../../src/core/sources/contracts/contract-changes.ts';
 import { CHILD_CLASS, CHILD_TAG, PARENT_CLASS, PARENT_TAG, RELATIONSHIP_REPORT } from '../../src/core/sources/relationships/relationship-report.ts';
 import { APPLICATION_SUFFIX, CLASS_WORDS } from '../../src/core/checks/detectors/relationship-detectors.ts';
@@ -213,8 +213,12 @@ export function readingRules(): Record<string, unknown> {
   return {
     reportTypes: REPORT_TYPES.map((type) => ({ kind: type.kind, label: type.label, hint: type.hint, needs: type.needs,
       ...(type.staleAfter ? { staleAfter: Math.max(type.staleAfter, DEFAULT_SETTINGS.staleDays) } : {}) })),
+    // The files the Workbench knows but does not use (D341, D342): recognised after the report types, never used.
+    knownFiles: KNOWN_FILES.map((file) => ({ kind: file.kind, label: file.label, hint: file.hint, needs: file.needs, why: file.why })),
     staleDays: DEFAULT_SETTINGS.staleDays,
     ciColumns: ciColumns(),
+    // The columns of the CI report the checks read, by field name, for the copy line of Reports (D347, D352).
+    wantedColumns: WANTED_COLUMNS,
     classAliases: CLASS_ALIASES,
     operationalStatus: OPERATIONAL_STATUS,
     relationshipColumns: { parent: needOf('Parent'), type: needOf('Type'), child: needOf('Child'), parentClass: PARENT_CLASS, childClass: CHILD_CLASS, parentTag: PARENT_TAG, childTag: CHILD_TAG },

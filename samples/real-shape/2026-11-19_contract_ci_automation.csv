@@ -1,0 +1,4 @@
+"ast_contract","ast_contract.sys_tags","sys_created_on","sys_created_by","sys_updated_on","sys_updated_by","ci_item","ci_item.sys_class_name","ci_item.owned_by","ci_item.managed_by","ci_item.x_demo_crit_target_business_criticality","ci_item.sys_tags","ci_item.owned_by.user_name"
+"CNTR0000001","Target BC = 2","2026-10-01 08:00:00","ada01","2026-10-01 08:00:00","ada01","Member Portal - PROD","Service Instance","Ada Example","Cy Keeper","Critical (Vital)","","ada01"
+"CNTR0000002","","2026-10-01 08:00:00","ada01","2026-10-01 08:00:00","ada01","Ticket Desk - PROD","Service Instance","Ada Example","Ian Inactive","Significant (Necessary)","","ada01"
+"CNTR0000003","","2026-10-01 08:00:00","ada01","2026-10-01 08:00:00","ada01","Payments Platform","Service Instance","Pia Owner","Cy Keeper","Mission/Business critical","","pia01"

@@ -15,6 +15,7 @@ import { unitQuery, unitQueryNames } from './units.ts';
 import { historyStart, numberArgument, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { mText } from './generate.ts';
 import { loadedTables, probeMembers } from './probes.ts';
+import { realShapeFiles } from '../../tests/real-shape.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 export const EVAL_FOLDER = join(root, '.build', 'powerbi');
@@ -22,8 +23,50 @@ export const EVAL_FOLDER = join(root, '.build', 'powerbi');
 /** A section member name: a plain identifier stays as it is, any other is written #"...". */
 const member = (name: string): string => (/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) ? name : `#"${name.replace(/"/g, '""')}"`);
 
-/** The queries that only the answer key reads (build B7): the drafts and chats of the samples with no journal. */
-export const PARITY_QUERIES = ['DraftsRecorded', 'ChatsRecorded', 'EmailsSplit'];
+/**
+ * The queries that only the answer key reads: the drafts and chats of the samples with no journal (build B7), and the
+ * real-shape samples read by the M (D353): each file with its type, the choice of the day and what its reader read, and
+ * what to fix in that folder. parity.ts compares them with tests/recorded/real-shape.json.
+ */
+export const PARITY_QUERIES = ['DraftsRecorded', 'ChatsRecorded', 'EmailsSplit', 'RealShape', 'RealShapeFixes'];
+
+/**
+ * The members of the real-shape check (D353), only in the test connector: the model never carries these files. The
+ * files of samples/real-shape/ and the Solusi workbook of tests/real-shape.ts, typed and chosen by fnTypeFiles as the
+ * folder's files are; per file the rows its reader gives and one fact, as readRealShape counts them.
+ */
+export function realShapeMembers(): Array<{ name: string; m: string }> {
+  const files = realShapeFiles().map((file) => `\t{${mText(file.name)}, ${mText(Buffer.from(file.bytes).toString('base64'))}}`).join(',\n');
+  return [
+    { name: 'RealShapeFiles', m: `#table(type table [FileName = text, Base64 = text], {\n${files}\n})` },
+    { name: 'RealShapeTyped', m: `let
+    binary = Table.TransformColumns(RealShapeFiles, {{"Base64", (text) => Binary.FromText(text, BinaryEncoding.Base64), type binary}}),
+    files = Table.AddColumn(Table.RenameColumns(binary, {{"Base64", "Content"}}), "Modified", each null, type nullable datetime),
+    dated = Table.AddColumn(files, "ReportDate", each fnReportDate([FileName], [Modified]), type nullable date)
+in
+    fnTypeFiles(dated)` },
+    { name: 'RealShape', m: `let
+    count = (values as list) as text => Text.From(List.Count(List.Select(values, (value) => value = true))),
+    facts = Table.AddColumn(RealShapeTyped, "Facts", each
+        let rows = fnReadKind([Kind], [Read]) in
+        if rows = null then [Rows = 0, Fact = ""]
+        else [
+            Rows = Table.RowCount(rows),
+            Fact =
+                if [Kind] = "ci" then
+                    let found = fnCiColumns([Read]) in
+                    "missing: " & Text.Combine(List.Transform(List.Select(ReadingRules[wantedColumns], (entry) => not List.Contains(found, entry[column])), (entry) => entry[field]), ", ")
+                else if [Kind] = "relationship" then "excluded: " & count(rows[Excluded])
+                else if [Kind] = "solusi" then "no end: " & Text.From(List.Count(List.Select(rows[End], (value) => value = null)))
+                else if [Kind] = "contract" then "criticality: " & count(rows[Criticality])
+                else ""
+        ]),
+    expanded = Table.ExpandRecordColumn(facts, "Facts", {"Rows", "Fact"})
+in
+    Table.SelectColumns(expanded, {"FileName", "Kind", "Used", "WhyNotUsed", "Rows", "Fact"})` },
+    { name: 'RealShapeFixes', m: 'fnFolderFixes(RealShapeTyped)' }
+  ];
+}
 
 /** The names the evaluation runs: every table, the unit cases of the reading functions and the queries of the answer key. */
 export function evaluatedNames(): string[] {
@@ -62,6 +105,7 @@ export function connectorMembers(options: ConnectorOptions = {}): Array<{ name: 
     members.push({ name: table.name, m: table.partitionKind === 'calculated' ? calculatedM({ name: table.name, source: table.calculated!.source, part: table.calculated!.part, columns: table.calculated!.columns }) : table.partitionM });
   }
   unitQueryNames().forEach((name, at) => members.push({ name, m: unitQuery(at + 1) }));
+  if (!realSize) members.push(...realShapeMembers());
   if (realSize) for (const probe of probeMembers(stages)) members.push(probe);
   return members;
 }

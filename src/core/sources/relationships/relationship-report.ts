@@ -53,8 +53,11 @@ export const PARENT_CLASS = ['parent.sys_class_name', 'parent.class', 'parent_cl
 export const CHILD_CLASS = ['child.sys_class_name', 'child.class', 'child_class'];
 export const PARENT_TAG = ['parent.asset_tag', 'parent_asset_tag'];
 export const CHILD_TAG = ['child.asset_tag', 'child_asset_tag'];
-/** The column "Excluded for calculation", as a label or a field name (with or without a prefix such as u_). */
-const EXCLUDED = /^([a-z0-9]+_)?excluded_(for|from)_calculation$/;
+/**
+ * The column "Excluded for calculation", as a label or a field name, matched by the end of its name whatever the prefix
+ * (`u_`, or the long scoped-app prefix of the instance's own fields, D351).
+ */
+const EXCLUDED = /(^|_)excluded_(for|from)_calculation$/;
 const YES = ['true', 'yes', '1', 'y'];
 
 export function readRelationshipReport(rows: string[][]): RelationshipRead {

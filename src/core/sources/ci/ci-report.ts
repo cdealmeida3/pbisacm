@@ -50,6 +50,31 @@ export const FIELD_ALIASES: Record<string, string[]> = {
   updatedOn: ['sys_updated_on', 'updated']
 };
 
+/**
+ * The columns of the CI report that the checks and the emails read, by their ServiceNow field name, in the order to add
+ * them to the scheduled report (D347). `column` is the name in `columns` of ReportRead. The criticality columns are left
+ * out: their field names carry the instance's own prefix. A CI report that lacks some gets one line on the Reports page,
+ * to copy into the ServiceNow report (missingWanted, D352).
+ */
+export const WANTED_COLUMNS: ReadonlyArray<{ field: string; column: string }> = [
+  { field: 'name', column: 'name' }, { field: 'sys_class_name', column: 'className' }, { field: 'asset_tag', column: 'assetTag' },
+  { field: 'operational_status', column: 'operationalStatus' }, { field: 'short_description', column: 'description' }, { field: 'sys_tags', column: 'tags' },
+  ...(['owned_by', 'managed_by', 'supported_by'] as const).flatMap((role) => [
+    { field: role, column: role }, { field: `${role}.user_name`, column: `${role}.userId` }, { field: `${role}.email`, column: `${role}.email` },
+    { field: `${role}.active`, column: `${role}.active` }
+  ]),
+  { field: 'owned_by.manager', column: 'owned_by.manager' }, { field: 'owned_by.manager.email', column: 'owned_by.manager.email' },
+  { field: 'owned_by.manager.active', column: 'owned_by.manager.active' }, { field: 'owned_by.manager.user_name', column: 'owned_by.manager.userId' },
+  { field: 'owned_by.department.dept_head', column: 'owned_by.departmentHead' }, { field: 'owned_by.department.dept_head.email', column: 'owned_by.departmentHead.email' },
+  { field: 'support_group', column: 'supportGroup' }, { field: 'support_group.active', column: 'supportGroupActive' },
+  { field: 'sys_created_on', column: 'createdOn' }, { field: 'sys_created_by', column: 'createdBy' }, { field: 'sys_updated_on', column: 'updatedOn' },
+  { field: 'ref_cmdb_ci_service.u_service_mapped', column: 'serviceMapped' }, { field: 'ref_cmdb_ci_service.u_platform', column: 'platform' },
+  { field: 'ref_cmdb_ci_service.parent', column: 'parentService' }
+];
+
+/** The field names of WANTED_COLUMNS that a CI report lacks (`columns` of ReportRead), in their order. */
+export const missingWanted = (columns: ReadonlySet<string>): string[] => WANTED_COLUMNS.filter((entry) => !columns.has(entry.column)).map((entry) => entry.field);
+
 /** ServiceNow class labels and table names → canonical class id. Anything else keeps a normalised form of its own name. */
 export const CLASS_ALIASES: Record<string, string[]> = {
   business_capability: ['business capability', 'cmdb_ci_business_capability'],

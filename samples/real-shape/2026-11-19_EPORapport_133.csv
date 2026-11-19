@@ -1,0 +1,7 @@
+﻿"EPOID";"SystemName";"SystemDescription";"SystemStatus";"OwnerDepartment";"Owner";"Responsible1";"Responsible2";"BusinessCriticality";"PlatformBusinessCriticality";"GDPRData";"GDPRAwarenessForm";"AJOUR_TMS"
+"AST-0201";"Member Portal";"<p>Production instance of the member portal.</p>";"Kørende";"D-100";"ADA01";"CY01";"PIA01";"2";"";"Y";"Y";"10-11-2026 14:05:11"
+"AST-0203";"Ticket Desk";"<p>Production instance of the ticket desk.</p>";"Kørende";"D-100";"ADA01";"CY01";"";"3";"";"N";"Y";"12-11-2026 09:30:00"
+"AST-0205";"Old Ticket Kiosk";"<p>The kiosk of the old ticket office.</p>";"Udgående";"D-100";"IIN01";"IIN01";"";"4";"";"N";"N";"01-10-2026 10:00:00"
+"AST-0206";"Member Cards";"<p>Production instance of the member cards.</p>";"Konstruktion";"D-200";"OOW";"CY01";"";"";"";"N";"N";"18-11-2026 16:45:00"
+"AST-0207";"Newsletter";"<p>Production instance of the newsletter.</p>";"Kørende";"D-200";"ADA01";"";"";"4";"";"Y";"N";"05-11-2026 11:11:11"
+"AST-0299";"Old Archive";"<p>The old archive.</p>";"Nedlagt";"D-300";"DEE01";"";"";"";"";"N";"N";"01-01-2026 00:00:00"

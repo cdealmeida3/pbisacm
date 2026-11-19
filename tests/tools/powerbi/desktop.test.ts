@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { boundTexts, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf } from '../../../tools/powerbi/desktop.ts';
+import { blankRowQueries, boundTexts, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf } from '../../../tools/powerbi/desktop.ts';
 import type { Pictures, Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
 
 /*
@@ -147,4 +147,14 @@ test('the look of the pages as drawn (D328): low contrast, a cut text; a page no
   assert.ok(notes.some((note) => /My day: 3 texts read, the lowest contrast 2\.4:1/.test(note)));
   // The judge runs it with the other checks of the pictures.
   assert.match(judge({ opened: true, modelErrors: [], results: [] }, pictures).problems.join('\n'), /Waiting since 3 days/);
+});
+
+test('one query per relationship asks for the values of the many side with no row on the one side (D349)', () => {
+  const queries = blankRowQueries();
+  assert.ok(queries.length >= 20);
+  const inventory = queries.find((query) => query.visual === 'Inventory_Classes')!;
+  assert.equal(inventory.dax, "EVALUATE ROW ( \"v0\", COUNTROWS ( EXCEPT ( ALLNOBLANKROW ( 'Inventory'[Class] ), ALLNOBLANKROW ( 'Classes'[Id] ) ) ) + 0 )");
+  const { problems } = judge({ opened: true, modelErrors: [], results: [{ query: inventory, rows: [[2]] }, { query: queries[1]!, rows: [[0]] }] });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0]!, /Relationship Inventory_Classes .*2 values of the many side have no row on the one side/);
 });

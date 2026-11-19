@@ -11,12 +11,9 @@
         tags = all("asset_tag"),
         byPosition = (explicit as number, list as list, at as number) as number =>
             if explicit >= 0 then explicit else if List.Count(list) = 2 then list{at} else -1,
+        // "Excluded for calculation" by the end of its name, whatever the prefix (u_, or the instance's scoped-app prefix, D351).
         isExcluded = (header as text) as logical =>
-            List.AnyTrue(List.Transform({"excluded_for_calculation", "excluded_from_calculation"}, (end) =>
-                Text.EndsWith(header, end) and (
-                    let prefix = Text.Start(header, Text.Length(header) - Text.Length(end)) in
-                    prefix = "" or (Text.EndsWith(prefix, "_") and Text.Length(prefix) > 1
-                        and List.AllTrue(List.Transform(Text.ToList(Text.Start(prefix, Text.Length(prefix) - 1)), (char) => Text.Contains("abcdefghijklmnopqrstuvwxyz0123456789", char))))))),
+            List.AnyTrue(List.Transform({"excluded_for_calculation", "excluded_from_calculation"}, (end) => header = end or Text.EndsWith(header, "_" & end))),
         positions = [
             Parent = first(rules[parent]),
             Type = first(rules[type]),

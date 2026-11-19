@@ -16,6 +16,7 @@ import { readPages, readTabGroups, textsOf } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
+const MODEL_FOLDER = join(root, 'powerbi', 'SACM-Workbench.SemanticModel', 'definition');
 
 interface FieldRef { Column?: Ref; Measure?: Ref }
 interface Ref { Expression?: { SourceRef?: { Entity?: string; Source?: string } }; Property?: string }
@@ -193,6 +194,29 @@ export function queriesOf(drillValues: Map<string, string[]> = new Map()): Visua
   return queries;
 }
 
+/**
+ * One query per relationship of the model (D349): how many values of its many side have no row on its one side. Such a
+ * value gives the one side a blank row, which a visual of that table shows as "(Blank)" and a count of the whole table
+ * counts. ALLNOBLANKROW leaves out the blank row of each side itself, so only the values the table really holds count.
+ * The judge wants 0.
+ */
+export function blankRowQueries(): VisualQuery[] {
+  const text = readFileSync(join(MODEL_FOLDER, 'relationships.tmdl'), 'utf8').replace(/\r\n/g, '\n');
+  const quote = (table: string, column: string): string => `'${table.replace(/'/g, "''")}'[${column}]`;
+  const queries: VisualQuery[] = [];
+  for (const block of text.split(/\n(?=relationship )/)) {
+    const name = /^relationship (\S+)/m.exec(block)?.[1];
+    const from = /^\s*fromColumn: ([^.\n]+)\.(.+)$/m.exec(block);
+    const to = /^\s*toColumn: ([^.\n]+)\.(.+)$/m.exec(block);
+    if (!name || !from || !to) continue;
+    const many = quote(from[1]!.trim(), from[2]!.trim());
+    const one = quote(to[1]!.trim(), to[2]!.trim());
+    queries.push({ page: 'Model', pageName: 'model', visual: name, type: 'blankrow', title: `${many} → ${one}`, groups: [], values: ['Without a row'],
+      dax: `EVALUATE ROW ( "v0", COUNTROWS ( EXCEPT ( ALLNOBLANKROW ( ${many} ), ALLNOBLANKROW ( ${one} ) ) ) + 0 )` });
+  }
+  return queries;
+}
+
 /** The columns of the drill-through pages, so the runner can ask for their values first. */
 export function drillColumns(): string[] {
   const order = readJson<{ pageOrder: string[] }>(join(PAGES, 'pages.json')).pageOrder;
@@ -287,6 +311,12 @@ export function judge(results: Results, pictures?: Pictures): { problems: string
     if (error) { problems.push(`${where(query)}: the query fails, so Desktop shows the visual empty or broken: ${error.split('\n')[0]}`); continue; }
     const lines = rows ?? [];
     const groups = query.groups.length;
+    if (query.type === 'blankrow') {
+      // A value of the many side with no row on the one side gives the one side a blank row (D349).
+      const count = Number(lines[0]?.[0] ?? 0);
+      if (count > 0) problems.push(`Relationship ${query.visual} (${query.title}): ${count === 1 ? 'one value' : `${count} values`} of the many side ${count === 1 ? 'has' : 'have'} no row on the one side, so that table gets a blank row`);
+      continue;
+    }
     if (query.type === 'text') {
       // A title, the line under it or the text of a button that a measure writes: blank leaves a box without its words.
       if (!lines.length || lines[0]!.every(blank)) problems.push(`${where(query)}: the text from ${query.values.join(', ')} is blank`);
@@ -380,7 +410,7 @@ if (import.meta.main) {
   const [command, file, extra] = process.argv.slice(2);
   if (command === 'queries' && file) {
     const drills = extra && existsSync(extra) ? new Map(Object.entries(readJson<Record<string, string[]>>(extra))) : new Map<string, string[]>();
-    const queries = queriesOf(drills);
+    const queries = [...queriesOf(drills), ...blankRowQueries()];
     writeFileSync(file, JSON.stringify({ drillColumns: drillColumns(), queries }, null, 1));
     console.log(`${queries.length} queries of ${new Set(queries.map((query) => `${query.pageName}/${query.visual}`)).size} visuals written to ${file}`);
   } else if (command === 'pages' && file) {

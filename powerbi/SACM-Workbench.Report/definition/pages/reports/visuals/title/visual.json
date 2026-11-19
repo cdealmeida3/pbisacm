@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The newest report of each type, how old it is, and the files not read.",
+                    "value": "What to fix in the folder, the newest report of each type and how old it is.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

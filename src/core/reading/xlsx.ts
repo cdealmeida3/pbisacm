@@ -7,7 +7,9 @@ import { decodeBytes } from '../shared/text.ts';
  *
  * Handles what ServiceNow exports contain: inline strings (t="inlineStr"), shared strings, a wrong
  * <dimension ref="A1"/>, empty cells left out (the cell reference gives the column, never the position),
- * numbers, booleans, and dates stored as numbers (found by the cell style).
+ * numbers, booleans, and dates stored as numbers (found by the cell style). A workbook whose XML names its elements with a
+ * namespace prefix (`<x:row>`, `<x:c>`, `<x:si>`, as some tools write the Solusi file) is read the same: the prefix of
+ * every element is removed first (D350).
  */
 
 export type Inflate = (data: Uint8Array) => Promise<Uint8Array>;
@@ -57,6 +59,9 @@ async function entryBytes(bytes: Uint8Array, entry: ZipEntry, inflate: Inflate):
 }
 
 /* ------------------------------------------------------------------ XML helpers */
+
+/** The XML with the namespace prefix of every element removed (`<x:row r="1">` → `<row r="1">`); attributes are kept. */
+export const withoutPrefixes = (xml: string): string => xml.replace(/<(\/?)[A-Za-z_][\w.-]*:(?=[A-Za-z_])/g, '<$1');
 
 /** XML entities and the OOXML "_xHHHH_" escape, as text. */
 export function unescapeXml(text: string): string {
@@ -121,8 +126,15 @@ export function parseDateStyles(xml: string): boolean[] {
 
 const pad = (value: number): string => String(value).padStart(2, '0');
 
-/** An Excel date number as "yyyy-mm-dd", or "yyyy-mm-dd hh:mm:ss" when it has a time. */
+/** The last day Excel can show, 31 Dec 9999, as a date number. */
+const LAST_SERIAL = 2958465;
+
+/**
+ * An Excel date number as "yyyy-mm-dd", or "yyyy-mm-dd hh:mm:ss" when it has a time. A number outside Excel's dates
+ * (before 1900 or after 31 Dec 9999) is no date: "" (Power BI cannot read it either, D350).
+ */
 export function excelDate(serial: number, date1904 = false): string {
+  if (serial < 0 || serial >= LAST_SERIAL + 1 - (date1904 ? 1462 : 0)) return '';
   const epoch = date1904 ? Date.UTC(1904, 0, 1) : Date.UTC(1899, 11, 30);
   const date = new Date(epoch + Math.round(serial * 86400) * 1000);
   const day = `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
@@ -222,7 +234,7 @@ export async function readXlsxSheets(bytes: Uint8Array, inflate: Inflate, decode
   for (const entry of zipEntries(bytes)) entries.set(entry.name.replace(/\\/g, '/'), entry);
   const read = async (path: string): Promise<string> => {
     const entry = entries.get(path);
-    return entry ? decode(await entryBytes(bytes, entry, inflate)) : '';
+    return entry ? withoutPrefixes(decode(await entryBytes(bytes, entry, inflate))) : '';
   };
   const root = relationships(await read('_rels/.rels'), '');
   const workbookPath = root.find((item) => /\/officeDocument$/.test(item.type))?.target || 'xl/workbook.xml';

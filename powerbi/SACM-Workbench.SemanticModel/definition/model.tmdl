@@ -31,7 +31,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 ref table About
 ref table ReportTypes
 ref table ReportFiles
-ref table NotRead
+ref table FolderFixes
 ref table Inventory
 ref table Relationships
 ref table EpoSystems
