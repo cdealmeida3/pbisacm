@@ -2,6 +2,15 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.53.0 — The Power BI report: updates that never mix two versions (R1)
+
+- **Each zip unpacks into its own folder** (D339), `SACM-Workbench-0.53.0`, not into `powerbi`. Unzipping over an old folder kept the panels of build B2 on top of the new pages (the "crazy" Case and Card pages of 19 November).
+- **Update-Workbench.cmd**: unzip the new version next to the old folder and double-click it. It copies your five parameters (SourceMode, StateMode, SharePointSite, ReportsFolder, ServiceNowAddress) and the Power Apps and Refresh now buttons you added, at the places of the new version. It copies nothing else, deletes nothing and never changes the old folder. README §1 has the steps, and the manual way when a laptop refuses scripts.
+- **README §6.4 step 13 changed:** after you add or change an app, save the downloaded report over your own folder once, so the next update carries the apps. Never send those files to the repository: they hold the company's app ids.
+- **The lint knows every folder of the report** (D340): a page or a visual folder that no file names, or a visual whose name is not its folder's, fails. A Power App or the Refresh now button may sit only on the place its page keeps for it.
+- **Your answers of 19 November are recorded** (D341 to D347): a CMDB Health result is its own kind of report; the contract–CI links file too, and a new ServiceNow report on contracts; *Mine and free* first on My day and Work queue; dates day first in English; Messages as a list with the email beside it; only live cards ask people; the missing columns of the CI report. Builds R2 to R6 do them.
+- No check, number or email text changed. Until build R3: do not press Send to real people (proposed cards are still emailed); *Test to me* is safe.
+
 ## 0.52.0 — The Power BI report in My workspace: fewer refreshes
 
 - **The report lives in your My workspace** (D331): README §4A says how to publish there, share it with **Share** (each manager needs Pro or Premium Per User) and set one scheduled refresh. §4B keeps the team workspace for later.

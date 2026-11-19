@@ -121,6 +121,8 @@ A change meant to change nothing (a clean-up) must leave `tests/recorded/` as it
 
 The team takes `app/SACM-Workbench.html` from the default branch and puts it in the team folder.
 
+**The Power BI report** goes to Carlos as a zip (D339): after the merge, on `main`, run `node tools/powerbi/release.ts <folder> --label <build>`. The zip holds one folder, `SACM-Workbench-<version>/`, with `Update-Workbench.cmd`; [powerbi/README.md](../powerbi/README.md) §1 says how he updates.
+
 ## 10. Stand-ins and real values
 
 Since D266 the repository may hold the real names of the team's world: the systems, their report columns, status words and tag values. It never holds links, hosts, real email addresses or real report files. The samples stay invented. The repository is public (D286): it also never holds the first names of real colleagues, the names of the developer's computers, or words that name the employer or its industry. The words of the real reports that the app must match are listed as *kept* in `tools/placeholders.json`.

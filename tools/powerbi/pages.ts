@@ -5,7 +5,9 @@
 //   1. Every page is 1280 × 720 and fits the page (a page of GRID.tallest may be taller and fits the width).
 //   2. At most 12 visuals on a page (the rail counts as one, the Power App of the page's slot counts too); at most one
 //      Power Apps visual, and none on the first page.
-//   3. Native visuals only (D311): no custom visual, no R or Python visual, no picture from the web.
+//   3. Native visuals only (D311): no custom visual, no R or Python visual, no picture from the web. The one exception is
+//      the visual Carlos adds by hand in the service (a Power App, or the Power Automate button Refresh now): it sits
+//      exactly on the place its page keeps for it (APP_SLOTS, FLOW_SLOTS), and Update-Workbench.ps1 carries it (D339).
 //   4. The grid: every place and size on the 4 px grid, inside the page, inside the content frame (the rail apart),
 //      no two visuals over each other, and none over the place a Power Apps visual is set by hand (APP_SLOTS), or the
 //      button Refresh now on the rail of My day and Reports (FLOW_SLOTS, D333; the rail picture under it apart).
@@ -25,6 +27,9 @@
 //      word in capitals (LOOK rule 1) and no three dots (rule 2); a button has at most two words (rule 4, a number or a
 //      sign is no word), apart from the longer ones LOOK agrees. The same rules on the pages as drawn, and the contrast of
 //      every text (rule 8), are checked on the pictures of the Desktop check (desktop.ts, judgeLook).
+//  12. Folders (build R1, D340): every page folder is in pages.json and every page of pages.json has its folder; every
+//      visual folder holds its visual.json, named as the folder (Desktop silently drops a visual whose name differs, the
+//      pbip skill), and nothing else. So no panel of an old version can hide in the repository.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { APP_SLOTS, CELL_PADDING, FLOW_SLOTS, GRID, MIN_TEXT_POINTS, TABLE_CHROME, TEXT, textWidth } from './tokens.ts';
@@ -85,17 +90,18 @@ export function readTabGroups(definition = REPORT_DEFINITION): TabGroup[] {
   });
 }
 
-/** The report as the rules read it: the pages in their order, each with its visuals. */
+/** The report as the rules read it: the pages in their order, each with its visuals (a folder without visual.json is rule 12's). */
 export function readPages(definition = REPORT_DEFINITION): ReportPages {
   const folder = join(definition, 'pages');
   const order = (JSON.parse(readFileSync(join(folder, 'pages.json'), 'utf8')) as { pageOrder: string[] }).pageOrder;
   return {
     order,
-    pages: order.map((name) => {
+    pages: order.filter((name) => existsSync(join(folder, name, 'page.json'))).map((name) => {
       const page = JSON.parse(readFileSync(join(folder, name, 'page.json'), 'utf8')) as Page;
       const visualsFolder = join(folder, name, 'visuals');
       const visuals = existsSync(visualsFolder)
-        ? readdirSync(visualsFolder).sort().map((visual) => JSON.parse(readFileSync(join(visualsFolder, visual, 'visual.json'), 'utf8')) as Visual)
+        ? readdirSync(visualsFolder).sort().filter((visual) => existsSync(join(visualsFolder, visual, 'visual.json')))
+          .map((visual) => JSON.parse(readFileSync(join(visualsFolder, visual, 'visual.json'), 'utf8')) as Visual)
         : [];
       return { page, visuals };
     }),
@@ -140,6 +146,47 @@ export function readCatalogue(file = THEME_SCHEMA_FILE): Catalogue {
 export const NATIVE_TYPES = new Set(['tableEx', 'pivotTable', 'card', 'cardVisual', 'multiRowCard', 'textbox', 'actionButton', 'shape', 'slicer',
   'advancedSlicerVisual', 'listSlicer', 'textSlicer', 'lineChart', 'barChart', 'columnChart', 'clusteredBarChart', 'clusteredColumnChart',
   'lineClusteredColumnComboChart', 'pageNavigator', 'bookmarkNavigator', 'image']);
+/** A visual Carlos adds by hand in the service (a Power App or the Power Automate button): any type not in the native list. */
+export const isAppVisual = (visual: Visual): boolean => !NATIVE_TYPES.has(visual.visual?.visualType ?? '') && Boolean(visual.visual?.visualType);
+/** The place a page keeps for the visual Carlos adds by hand: its Power App, else its button Refresh now. */
+export const handPlacedSlot = (page: string): { x: number; y: number; width: number; height: number; label: string } | undefined => {
+  const app = APP_SLOTS[page];
+  if (app) return { ...app, label: `the Power Apps visual ${app.app}` };
+  const flow = FLOW_SLOTS[page];
+  return flow ? { ...flow, label: `the button Refresh now (the Power Automate visual of ${flow.flow})` } : undefined;
+};
+const samePlace = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): boolean =>
+  a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
+
+/** Rule 12: the folders of the report, so a panel of an old version (a folder no file names) never stays behind. */
+export function folderProblems(definition = REPORT_DEFINITION): string[] {
+  const problems: string[] = [];
+  const folder = join(definition, 'pages');
+  const order = (JSON.parse(readFileSync(join(folder, 'pages.json'), 'utf8')) as { pageOrder: string[] }).pageOrder;
+  const folders = readdirSync(folder, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  for (const name of folders) if (!order.includes(name)) problems.push(`Folders: pages/${name} is not a page of pages.json; Desktop would not show it. Delete the folder, or add the page to pageOrder`);
+  for (const name of order) {
+    if (!existsSync(join(folder, name, 'page.json'))) { problems.push(`Folders: the page ${name} of pages.json has no pages/${name}/page.json`); continue; }
+    const page = JSON.parse(readFileSync(join(folder, name, 'page.json'), 'utf8')) as Page;
+    if (page.name !== name) problems.push(`Folders: pages/${name}/page.json is named ${page.name}; the name and the folder must be the same (the pbip skill)`);
+    for (const entry of readdirSync(join(folder, name), { withFileTypes: true })) {
+      if (entry.name !== 'page.json' && entry.name !== 'visuals') problems.push(`Folders: pages/${name}/${entry.name} is not a part of a page (page.json and visuals/ only)`);
+    }
+    const visualsFolder = join(folder, name, 'visuals');
+    if (!existsSync(visualsFolder)) continue;
+    for (const entry of readdirSync(visualsFolder, { withFileTypes: true })) {
+      const at = `Folders: pages/${name}/visuals/${entry.name}`;
+      if (!entry.isDirectory()) { problems.push(`${at} is a file; a visual is a folder with its visual.json`); continue; }
+      const files = readdirSync(join(visualsFolder, entry.name));
+      if (!files.includes('visual.json')) { problems.push(`${at} has no visual.json: an old panel or a half copy. Delete the folder`); continue; }
+      for (const file of files) if (file !== 'visual.json' && file !== 'mobile.json') problems.push(`${at}/${file} is not a part of a visual (visual.json and mobile.json only)`);
+      const visual = JSON.parse(readFileSync(join(visualsFolder, entry.name, 'visual.json'), 'utf8')) as Visual;
+      if (visual.name !== entry.name) problems.push(`${at}: its visual.json is named ${visual.name}; Desktop drops a visual whose name is not its folder's (the pbip skill)`);
+    }
+  }
+  return problems;
+}
+
 /** The charts of that list: like a table, each shows a line under its title written by a measure. */
 const CHART_TYPES = new Set(['lineChart', 'barChart', 'columnChart', 'clusteredBarChart', 'clusteredColumnChart', 'lineClusteredColumnComboChart']);
 /** Visuals that may sit outside the content frame: the navy rail and what is on it. */
@@ -210,18 +257,26 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     // 2. How many.
     // The navy rail and what is on it (its picture, buttons, counts and foot line, tools/powerbi/rail.ts) count as one.
     // The Power App of the page's slot counts too: Carlos places it by hand, so it is not in the files (build D3).
-    const apps = visuals.filter((visual) => /powerapps/i.test(visual.visual?.visualType ?? ''));
+    const apps = visuals.filter(isAppVisual);
     const handPlaced = APP_SLOTS[page.name] && !apps.length ? 1 : 0;
-    const counted = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name)).length + (visuals.some((visual) => RAIL_VISUAL.test(visual.name)) ? 1 : 0) + handPlaced;
+    // The button Refresh now sits on the rail and counts as part of it (FLOW_SLOTS).
+    const counted = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name) && !(FLOW_SLOTS[page.name] && isAppVisual(visual))).length + (visuals.some((visual) => RAIL_VISUAL.test(visual.name)) ? 1 : 0) + handPlaced;
     if (counted > GRID.maxVisuals) problems.push(`${where}: ${counted} visuals${handPlaced ? ' with the Power App placed by hand' : ''}, more than ${GRID.maxVisuals} (design pass §8.1)`);
-    if (apps.length > 1) problems.push(`${where}: ${apps.length} Power Apps visuals; at most one on a page`);
-    if (apps.length && index === 0) problems.push(`${where}: a Power Apps visual on the first page; it opens slowly`);
+    if (apps.length > 1) problems.push(`${where}: ${apps.length} visuals added by hand (Power Apps, Power Automate); at most one on a page`);
+    if (apps.some((visual) => /powerapps/i.test(visual.visual?.visualType ?? '')) && index === 0) problems.push(`${where}: a Power Apps visual on the first page; it opens slowly`);
     const slot = APP_SLOTS[page.name];
+    const ownSlot = handPlacedSlot(page.name);
     for (const visual of visuals) {
       const at = `${where} › ${visual.name}`;
       const type = visual.visual?.visualType ?? '';
-      // 3. Native only.
-      if (!NATIVE_TYPES.has(type) && !/powerapps/i.test(type)) problems.push(`${at}: the visual type ${type || '(none)'} is not a native visual of the list (D311: no custom, R or Python visual)`);
+      // 3. Native only, apart from the visual added by hand, exactly on its place (D339).
+      const app = isAppVisual(visual) || !type;
+      if (app && !(type && ownSlot && samePlace(visual.position, ownSlot))) {
+        problems.push(ownSlot && type
+          ? `${at}: the visual type ${type} is not native; a visual added by hand sits exactly on the place of ${ownSlot.label} (${ownSlot.x}, ${ownSlot.y}, ${ownSlot.width} × ${ownSlot.height})`
+          : `${at}: the visual type ${type || '(none)'} is not a native visual of the list (D311: no custom, R or Python visual)`);
+      }
+      if (app) continue;
       if (type === 'image' && JSON.stringify(visual.visual?.objects ?? {}).includes('"url"')) problems.push(`${at}: a picture from the web; pictures are resources of the report (D311)`);
       // 4. The grid.
       const { x, y, width, height } = visual.position;

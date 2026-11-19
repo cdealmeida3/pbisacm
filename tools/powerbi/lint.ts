@@ -37,7 +37,7 @@ import { loadPackFiles } from '../../src/hosts/cli.ts';
 import { APP_FOLDERS } from './actions.ts';
 import { callProblems, catalogueProblems, columnProblems, controlProblems, flowProblems } from './app-rules.ts';
 import type { Formula } from './app-rules.ts';
-import { pageProblems, readCatalogue, readPages, THEME_SCHEMA_FILE, themeProblems } from './pages.ts';
+import { folderProblems, pageProblems, readCatalogue, readPages, THEME_SCHEMA_FILE, themeProblems } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const REPORT = join(root, 'powerbi', 'SACM-Workbench.Report');
@@ -325,8 +325,8 @@ done.push('App: the actions agree with fnCaseActions; the flows refresh only thr
 /* 10. Pages */
 const report = readPages();
 const catalogue = readCatalogue();
-problems.push(...pageProblems(report, catalogue), ...themeProblems(JSON.parse(readFileSync(THEME_FILE, 'utf8')) as never, catalogue));
-done.push(`Pages: ${report.pages.length} pages of 1280 × 720, at most 12 native visuals each, on the grid, tables fit, every empty box says why, the words keep LOOK rules 1, 2 and 4`);
+problems.push(...folderProblems(), ...pageProblems(report, catalogue), ...themeProblems(JSON.parse(readFileSync(THEME_FILE, 'utf8')) as never, catalogue));
+done.push(`Pages: ${report.pages.length} pages of 1280 × 720, at most 12 native visuals each, on the grid, tables fit, every empty box says why, the words keep LOOK rules 1, 2 and 4, every folder is a page or a visual the files name, a visual added by hand only on its place`);
 
 for (const line of done) console.log(line);
 for (const problem of problems) console.error(problem);
