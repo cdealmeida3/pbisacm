@@ -181,7 +181,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "101D"
+                  "Value": "99D"
                 }
               }
             }
@@ -195,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "93D"
+                  "Value": "91D"
                 }
               }
             }
@@ -209,7 +209,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "160D"
+                  "Value": "155D"
                 }
               }
             }
@@ -223,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "55D"
+                  "Value": "67D"
                 }
               }
             }
@@ -237,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "77D"
+                  "Value": "75D"
                 }
               }
             }
@@ -251,7 +251,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "108D"
+                  "Value": "105D"
                 }
               }
             }
@@ -265,7 +265,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "85D"
+                  "Value": "83D"
                 }
               }
             }

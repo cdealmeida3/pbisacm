@@ -73,7 +73,7 @@
               },
               "queryRef": "Replies.Body",
               "nativeQueryRef": "Body",
-              "displayName": "What they wrote"
+              "displayName": "Reply"
             },
             {
               "field": {
@@ -180,7 +180,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "88D"
+                  "Value": "80D"
                 }
               }
             }
@@ -208,7 +208,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "64D"
+                  "Value": "81D"
                 }
               }
             }
@@ -222,7 +222,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "118D"
+                  "Value": "107D"
                 }
               }
             }
