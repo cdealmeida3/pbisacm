@@ -135,12 +135,13 @@ function Fingerprint {
   return $hash
 }
 # A picture of the screen, and of the page alone (<name>-page.png, cut where the rail shows the page is: the team guide
-# and the review use it). Gives the file and what the look check reads on the canvas (Look-Texts).
+# and the review use it). Gives the file and what the look check reads on the canvas (Look-Texts). PowerShell names
+# do not care about case: the look is $seen, as $look would be the switch -Look itself.
 function Save-Picture([string]$name, [switch]$Look) {
   $bitmap = Screen-Bitmap
   $file = Join-Path $Out "$name.png"
   $bitmap.Save($file, [System.Drawing.Imaging.ImageFormat]::Png)
-  $look = $null
+  $seen = $null
   if ($Look) {
     $canvas = [PictureLook]::Canvas($bitmap, 1280, 188)
     if ($canvas.Length -eq 4) {
@@ -148,11 +149,11 @@ function Save-Picture([string]$name, [switch]$Look) {
       $page = $bitmap.Clone($rect, $bitmap.PixelFormat)
       $page.Save((Join-Path $Out "$name-page.png"), [System.Drawing.Imaging.ImageFormat]::Png)
       $page.Dispose()
-      $look = [ordered]@{ canvas = $canvas; texts = @(Look-Texts (Window) $bitmap $canvas) }
-    } else { $look = [ordered]@{ canvas = @(); texts = @() } }
+      $seen = [ordered]@{ canvas = $canvas; texts = @(Look-Texts (Window) $bitmap $canvas) }
+    } else { $seen = [ordered]@{ canvas = @(); texts = @() } }
   }
   $bitmap.Dispose()
-  return @($file, $look)
+  return @($file, $seen)
 }
 # Every text of the canvas as drawn (LOOK rules 1, 2 and 8, build D6, D328): its words, its box in points of the page
 # (1280 × 720), and the background, the text colour and their contrast measured on the picture. Only the words
