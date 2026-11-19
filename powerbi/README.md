@@ -10,8 +10,12 @@ history with an incremental refresh, reads the team's journal, replies, settings
 and works out the cases as the app does. It can be published for the team (section 4). Three Power Apps sit in the
 report (section 6): **SACM actions** (notes, statuses, assignments, *fixed* and the other actions of a case),
 **SACM messages** (sending, reminders, escalations) and, new in B8, **SACM audit** (the lifecycle review and the
-Settings screen). How it looks comes in a later design pass. Why it is built this way: decisions D268 to D309 in
-[DECISIONS.md](../docs/DECISIONS.md).
+Settings screen). The design pass (builds D1 to D6, version 0.51.0) gave it the look of design A *Guided day*: the
+navy rail, *My day* with the next steps, the email studio and the reply reader. Why it is built this way: decisions D268
+to D330 in [DECISIONS.md](../docs/DECISIONS.md).
+
+**For the team:** [GUIDE.md](GUIDE.md) shows every page with a picture and says what to do there. This README is for
+setting the report up.
 
 ## 1. Open it on your Windows PC
 

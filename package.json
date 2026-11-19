@@ -1,7 +1,7 @@
 {
   "name": "sacm-data-quality-workbench",
   "private": true,
-  "version": "0.50.0",
+  "version": "0.51.0",
   "type": "module",
   "description": "SACM Data Quality Workbench. Tests need nothing installed; the app build needs npm install once.",
   "engines": {
