@@ -75,11 +75,11 @@ table Drafts
 			VAR chosen = HASONEVALUE ( Drafts[ToName] )
 			RETURN IF ( chosen, "As it will arrive.", "The first of the list. Choose another in the list on the left." )
 
-	/// PREVIEW: a line of the email shown, blank after its last line.
-	measure 'Preview line' =
+	/// PREVIEW: the plain text of the email shown.
+	measure 'Preview body' =
 			VAR pick = [Preview id]
-			VAR n = SELECTEDVALUE ( LineNumbers[No] )
-			RETURN CALCULATE ( MAX ( DraftLines[Line] ), REMOVEFILTERS ( DraftLines ), DraftLines[DraftId] = pick, DraftLines[LineNo] = n )
+			VAR plainText = CALCULATE ( SELECTEDVALUE ( Drafts[Plain] ), Drafts[DraftId] = pick )
+			RETURN SUBSTITUTE ( SUBSTITUTE ( plainText, "%%SENDER%%", "Your name" ), "%%REF%%", "SACM-REF" )
 
 	/// The draft, D0001 first: by person in the order the newest report first names them (one refresh only: the next refresh numbers them again).
 	column DraftId

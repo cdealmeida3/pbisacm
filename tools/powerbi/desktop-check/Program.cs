@@ -50,6 +50,7 @@ var failed = new List<string>();
 foreach (var table in database.Model.Tables.Where(table => table.Partitions.Any(partition => partition.SourceType == Tom.PartitionSourceType.M)).ToList())
 {
     var started = timer.Elapsed;
+    Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Refreshing {table.Name}");
     try
     {
         // As Desktop's own Refresh: the incremental refresh policy of HistoryRun applies only in the service (a refresh
@@ -65,6 +66,7 @@ foreach (var table in database.Model.Tables.Where(table => table.Partitions.Any(
         database.Model.UndoLocalChanges();
     }
 }
+Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Calculating");
 try
 {
     database.Model.RequestRefresh(Tom.RefreshType.Calculate);

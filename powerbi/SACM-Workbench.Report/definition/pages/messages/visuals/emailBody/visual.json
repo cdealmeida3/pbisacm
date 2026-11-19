@@ -17,54 +17,21 @@
           "projections": [
             {
               "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "LineNumbers"
-                    }
-                  },
-                  "Property": "No"
-                }
-              },
-              "queryRef": "LineNumbers.No",
-              "nativeQueryRef": "No",
-              "displayName": " "
-            },
-            {
-              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Drafts"
                     }
                   },
-                  "Property": "Preview line"
+                  "Property": "Preview body"
                 }
               },
-              "queryRef": "Drafts.Preview line",
-              "nativeQueryRef": "Preview line",
+              "queryRef": "Drafts.Preview body",
+              "nativeQueryRef": "Preview body",
               "displayName": " "
             }
           ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "LineNumbers"
-                  }
-                },
-                "Property": "No"
-              }
-            },
-            "direction": "Ascending"
-          }
-        ],
-        "isDefaultSort": true
       }
     },
     "objects": {
@@ -74,27 +41,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "14D"
+                  "Value": "470D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "LineNumbers.No"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "456D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Drafts.Preview line"
+            "metadata": "Drafts.Preview body"
           }
         }
       ],
@@ -121,26 +74,6 @@
                 }
               }
             }
-          }
-        }
-      ],
-      "columnFormatting": [
-        {
-          "properties": {
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#ffffff'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "LineNumbers.No"
           }
         }
       ]

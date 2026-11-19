@@ -58,9 +58,7 @@ ref table HistoryRun
 ref table CaseLines
 ref table RepliesToRead
 ref table Drafts
-ref table DraftLines
 ref table PreviewFields
-ref table LineNumbers
 ref table ViewChoice
 ref table Exceptions
 ref table Journal

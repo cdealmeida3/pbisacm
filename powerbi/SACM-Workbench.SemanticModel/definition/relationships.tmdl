@@ -1,7 +1,3 @@
-relationship DraftLines_Drafts
-	fromColumn: DraftLines.DraftId
-	toColumn: Drafts.DraftId
-
 relationship Inventory_Classes
 	fromColumn: Inventory.Class
 	toColumn: Classes.Id
