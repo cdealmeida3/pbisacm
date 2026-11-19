@@ -222,7 +222,13 @@ function tabsByPage(): Map<string, string[]> {
  */
 function wordsOf(visuals: Parameters<typeof textsOf>[0][], tabs: string[]): string[] {
   const words = new Set<string>(tabs);
-  for (const visual of visuals) for (const { text } of textsOf(visual)) if (text.trim()) words.add(text.trim());
+  for (const visual of visuals) {
+    // A chart names its legend and its bars with the names of its series: their boxes hold the colour of the series,
+    // not the text alone, so a chart gives only its title (its colours are checked by the lint).
+    const chart = /chart/i.test(visual.visual?.visualType ?? '');
+    const own = chart && visual.visual ? { ...visual, visual: { ...visual.visual, query: undefined } } : visual;
+    for (const { text } of textsOf(own)) if (text.trim()) words.add(text.trim());
+  }
   return [...words].sort();
 }
 
