@@ -3,9 +3,9 @@
   "name": "reportTypes",
   "position": {
     "x": 224,
-    "y": 304,
+    "y": 264,
     "z": 4000,
-    "height": 240,
+    "height": 300,
     "width": 720,
     "tabOrder": 4000
   },
