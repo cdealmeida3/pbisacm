@@ -141,7 +141,7 @@ function Fingerprint {
 # A picture of the screen, and of the page alone (<name>-page.png, cut where the rail shows the page is: the team guide
 # and the review use it). Gives the file and what the look check reads on the canvas (Look-Texts). PowerShell names
 # do not care about case: the look is $seen, as $look would be the switch -Look itself.
-function Save-Picture([string]$name, [switch]$Look) {
+function Save-Picture([string]$name, [switch]$Look, [string[]]$Words = @()) {
   $bitmap = Screen-Bitmap
   $file = Join-Path $Out "$name.png"
   $bitmap.Save($file, [System.Drawing.Imaging.ImageFormat]::Png)
@@ -153,23 +153,25 @@ function Save-Picture([string]$name, [switch]$Look) {
       $page = $bitmap.Clone($rect, $bitmap.PixelFormat)
       $page.Save((Join-Path $Out "$name-page.png"), [System.Drawing.Imaging.ImageFormat]::Png)
       $page.Dispose()
-      $seen = [ordered]@{ canvas = $canvas; texts = @(Look-Texts (Window) $bitmap $canvas) }
+      $seen = [ordered]@{ canvas = $canvas; texts = @(Look-Texts (Window) $bitmap $canvas $Words) }
     } else { $seen = [ordered]@{ canvas = @(); texts = @() } }
   }
   $bitmap.Dispose()
   return @($file, $seen)
 }
-# Every text of the canvas as drawn (LOOK rules 1, 2 and 8, build D6, D328): its words, its box in points of the page
-# (1280 × 720), and the background, the text colour and their contrast measured on the picture. Only the words
-# Desktop draws on the page: its own menus and panes are outside the box of the page.
-function Look-Texts($root, $bitmap, $canvas) {
+# Every text of the canvas as drawn (LOOK rules 2 and 8, build D6, D328): its words, its box in points of the page
+# (1280 × 720), and the background, the text colour and their contrast measured on the picture. Only the words the
+# page writes itself (pages.json: titles, buttons, headers, tabs, text boxes): Desktop also names the texts of its own
+# panes, hidden behind the canvas, and the data of the samples is not sure to be drawn where its box says.
+function Look-Texts($root, $bitmap, $canvas, [string[]]$words) {
   $scale = $canvas[2] / 1280.0
   $out = @()
   $seen = New-Object System.Collections.Generic.HashSet[string]
-  $text = [System.Windows.Automation.ControlType]::Text
-  foreach ($element in $root.FindAll($Scope::Descendants, (New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::ControlTypeProperty, $text)))) {
+  $wanted = New-Object System.Collections.Generic.HashSet[string]
+  foreach ($word in $words) { [void]$wanted.Add($word) }
+  foreach ($element in $root.FindAll($Scope::Descendants, [System.Windows.Automation.Condition]::TrueCondition)) {
     $name = $element.Current.Name
-    if (-not $name -or -not $name.Trim()) { continue }
+    if (-not $name -or -not $wanted.Contains($name.Trim())) { continue }
     $r = $element.Current.BoundingRectangle
     if ($r.IsEmpty -or $element.Current.IsOffscreen) { continue }
     if ($r.X -lt $canvas[0] -or $r.Y -lt $canvas[1] -or ($r.X + $r.Width) -gt ($canvas[0] + $canvas[2]) -or ($r.Y + $r.Height) -gt ($canvas[1] + $canvas[3])) { continue }
@@ -355,7 +357,7 @@ foreach ($page in $list) {
   Pointer-Away
   Start-Sleep -Milliseconds 300
   $seconds = Wait-Drawn $clock
-  $saved = Save-Picture $slug -Look
+  $saved = Save-Picture $slug -Look -Words @($page.words)
   $file = $saved[0]
   $words = Words (Window)
   $broken = @(Broken-Words $words)
@@ -379,7 +381,7 @@ foreach ($page in $list) {
     Pointer-Away
     Start-Sleep -Milliseconds 300
     $tabSeconds = Wait-Drawn $tabClock
-    $tabSaved = Save-Picture $tabSlug -Look
+    $tabSaved = Save-Picture $tabSlug -Look -Words @($page.words)
     $tabFile = $tabSaved[0]
     $tabBroken = @(Broken-Words (Words (Window)))
     Say "$($page.displayName), tab ${label}: drawn in $tabSeconds s, $tabFile$(if ($tabBroken.Count) { ', shows: ' + ($tabBroken -join '; ') })"

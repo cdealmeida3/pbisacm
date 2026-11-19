@@ -164,7 +164,7 @@ export function wordProblems(text: string, button: boolean): string[] {
   return problems;
 }
 /** Every literal text of a visual: its title and the line under it, a button's text, a text box, the column headers. */
-function textsOf(visual: Visual): Array<{ text: string; button: boolean }> {
+export function textsOf(visual: Visual): Array<{ text: string; button: boolean }> {
   const out: Array<{ text: string; button: boolean }> = [];
   const button = visual.visual?.visualType === 'actionButton';
   for (const [group, isObjects] of [[visual.visual?.objects, true], [visual.visual?.visualContainerObjects, false]] as const) {

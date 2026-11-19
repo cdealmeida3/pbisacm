@@ -12,7 +12,7 @@
 // nothing. Only invented data: the job runs in Sample mode.
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { readTabGroups } from './pages.ts';
+import { readPages, readTabGroups, textsOf } from './pages.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -206,7 +206,7 @@ export function drillColumns(): string[] {
 }
 
 /** One page for the picture step (pictures.ps1, D318): its folder name, its tab, whether the team sees its tab. */
-export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number; tabs: string[] }
+export interface PageEntry { name: string; displayName: string; hidden: boolean; drillThrough: boolean; width: number; height: number; tabs: string[]; words: string[] }
 
 /** The tabs of each page (D323) after its first one, by their words: the picture step presses each and takes a picture. */
 function tabsByPage(): Map<string, string[]> {
@@ -215,13 +215,25 @@ function tabsByPage(): Map<string, string[]> {
   return out;
 }
 
+/**
+ * The words a page writes itself (D328): the titles, the lines a file writes, the buttons, the text boxes, the headers
+ * and the tabs. The look step measures these texts on the picture: Desktop also lists the texts of its own panes
+ * (hidden behind the canvas) and the data of the samples, and only the report's own words are sure to be drawn.
+ */
+function wordsOf(visuals: Parameters<typeof textsOf>[0][], tabs: string[]): string[] {
+  const words = new Set<string>(tabs);
+  for (const visual of visuals) for (const { text } of textsOf(visual)) if (text.trim()) words.add(text.trim());
+  return [...words].sort();
+}
+
 /** Every page in the order of pages.json: the picture step opens each from its tab (a drill-through page shows its empty state). */
 export function pageList(): PageEntry[] {
   const order = readJson<{ pageOrder: string[] }>(join(PAGES, 'pages.json')).pageOrder;
   const tabs = tabsByPage();
+  const report = readPages();
   return order.map((name) => {
     const page = readJson<{ displayName: string; visibility?: string; width: number; height: number; pageBinding?: { type?: string } }>(join(PAGES, name, 'page.json'));
-    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height, tabs: tabs.get(name) ?? [] };
+    return { name, displayName: page.displayName, hidden: page.visibility === 'HiddenInViewMode', drillThrough: page.pageBinding?.type === 'Drillthrough', width: page.width, height: page.height, tabs: tabs.get(name) ?? [], words: wordsOf(report.pages.find((entry) => entry.page.name === name)?.visuals ?? [], tabs.get(name) ?? []) };
   });
 }
 
