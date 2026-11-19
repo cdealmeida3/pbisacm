@@ -1,0 +1,174 @@
+{
+  "taken": true,
+  "minutes": 11.3,
+  "pages": [
+    {
+      "page": "myday",
+      "displayName": "My day",
+      "found": true,
+      "seconds": 2.0,
+      "file": "01-myday.png",
+      "broken": [
+        "Something's wrong with one or more fields",
+        "See details"
+      ],
+      "status": "Page 1 of 18"
+    },
+    {
+      "page": "mywork",
+      "displayName": "Work queue",
+      "found": true,
+      "seconds": 1.0,
+      "file": "02-mywork.png",
+      "broken": [
+        "Something's wrong with one or more fields",
+        "See details"
+      ],
+      "status": "Page 2 of 18"
+    },
+    {
+      "page": "messages",
+      "displayName": "Messages",
+      "found": true,
+      "seconds": 1.0,
+      "file": "03-messages.png",
+      "broken": [],
+      "status": "Page 3 of 18"
+    },
+    {
+      "page": "cards",
+      "displayName": "All cards",
+      "found": true,
+      "seconds": 2.0,
+      "file": "04-cards.png",
+      "broken": [],
+      "status": "Page 4 of 18"
+    },
+    {
+      "page": "backlog",
+      "displayName": "Mapping backlog",
+      "found": true,
+      "seconds": 1.0,
+      "file": "05-backlog.png",
+      "broken": [],
+      "status": "Page 5 of 18"
+    },
+    {
+      "page": "contracts",
+      "displayName": "Contract changes",
+      "found": true,
+      "seconds": 1.0,
+      "file": "06-contracts.png",
+      "broken": [],
+      "status": "Page 6 of 18"
+    },
+    {
+      "page": "activity",
+      "displayName": "Activity",
+      "found": true,
+      "seconds": 1.0,
+      "file": "07-activity.png",
+      "broken": [],
+      "status": "Page 7 of 18"
+    },
+    {
+      "page": "history",
+      "displayName": "History",
+      "found": true,
+      "seconds": 1.0,
+      "file": "08-history.png",
+      "broken": [],
+      "status": "Page 8 of 18"
+    },
+    {
+      "page": "audit",
+      "displayName": "Audit",
+      "found": true,
+      "seconds": 1.0,
+      "file": "09-audit.png",
+      "broken": [],
+      "status": "Page 9 of 18"
+    },
+    {
+      "page": "auditexport",
+      "displayName": "Audit export",
+      "found": true,
+      "seconds": 2.0,
+      "file": "10-auditexport.png",
+      "broken": [],
+      "status": "Page 10 of 18"
+    },
+    {
+      "page": "auditfollow",
+      "displayName": "Not followed",
+      "found": true,
+      "seconds": 1.0,
+      "file": "11-auditfollow.png",
+      "broken": [],
+      "status": "Page 11 of 18"
+    },
+    {
+      "page": "auditreview",
+      "displayName": "Lifecycle review",
+      "found": true,
+      "seconds": 1.0,
+      "file": "12-auditreview.png",
+      "broken": [],
+      "status": "Page 12 of 18"
+    },
+    {
+      "page": "reports",
+      "displayName": "Reports",
+      "found": true,
+      "seconds": 1.0,
+      "file": "13-reports.png",
+      "broken": [],
+      "status": "Page 13 of 18"
+    },
+    {
+      "page": "card",
+      "displayName": "Card",
+      "found": true,
+      "seconds": 2.0,
+      "file": "14-card.png",
+      "broken": [],
+      "status": "Page 14 of 18"
+    },
+    {
+      "page": "case",
+      "displayName": "Case",
+      "found": true,
+      "seconds": 2.0,
+      "file": "15-case.png",
+      "broken": [],
+      "status": "Page 15 of 18"
+    },
+    {
+      "page": "person",
+      "displayName": "Person",
+      "found": true,
+      "seconds": 1.0,
+      "file": "16-person.png",
+      "broken": [],
+      "status": "Page 16 of 18"
+    },
+    {
+      "page": "selfcheck",
+      "displayName": "Self-check",
+      "found": true,
+      "seconds": 1.0,
+      "file": "17-selfcheck.png",
+      "broken": [],
+      "status": "Page 17 of 18"
+    },
+    {
+      "page": "lab",
+      "displayName": "Lab",
+      "found": true,
+      "seconds": 1.0,
+      "file": "18-lab.png",
+      "broken": [],
+      "status": "Page 18 of 18"
+    }
+  ]
+}
