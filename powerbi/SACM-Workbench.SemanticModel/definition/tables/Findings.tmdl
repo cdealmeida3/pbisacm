@@ -60,6 +60,267 @@ table Findings
 	measure 'Open with note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers." )
 		displayFolder: Page notes
 
+	/// The next step with the person in view (My day, Work queue, D2): 1 a reply to read, 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked and not due yet, 6 marked fixed; blank when nothing is open with them. A reminder, an escalation and a new line count on the daily cards only (D182), from Today, so right between two refreshes.
+	measure 'Person state' =
+			VAR asOf = [Today]
+			VAR keys = VALUES ( Findings[Key] )
+			VAR answered = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] = "Answered" )
+			VAR escalation = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			VAR reminder = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] = "New", CaseLines[State] = "open", KEEPFILTERS ( Checks[Priority] <> "later" ) )
+			VAR asked = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] = "Contacted" )
+			VAR marked = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] IN { "Fix in progress", "Fixed" } )
+			RETURN
+			    SWITCH ( TRUE (), answered > 0, 1, escalation > 0, 2, reminder > 0, 3, fresh > 0, 4, asked > 0, 5, marked > 0, 6 )
+		formatString: 0
+		displayFolder: My day
+
+	/// 1 on a person with a next step today (Person state 1 to 4): the visual filter of Your next steps (My day).
+	measure 'Step mark' =
+			VAR kind = [Person state]
+			RETURN IF ( NOT ISBLANK ( kind ) && kind <= 4, 1 )
+		formatString: 0
+		displayFolder: My day
+
+	/// 1 on a person the team waits for (Person state 5 or 6): the visual filter of Waiting on others (My day).
+	measure 'Wait mark' =
+			VAR kind = [Person state]
+			RETURN IF ( kind >= 5, 1 )
+		formatString: 0
+		displayFolder: My day
+
+	/// On a line of Your next steps: what to do with the person and why, in a few words ("Read the reply · 2 CIs · Description, Support group").
+	measure Step =
+			VAR kind = [Person state]
+			VAR asOf = [Today]
+			VAR keys = VALUES ( Findings[Key] )
+			VAR mine = CALCULATETABLE ( CaseLines, TREATAS ( keys, CaseLines[Key] ) )
+			VAR lines =
+			    FILTER (
+			        mine,
+			        SWITCH (
+			            kind,
+			            1, CaseLines[Status] = "Answered",
+			            2, CaseLines[Remind] = "escalation" && CaseLines[ReminderFrom] <= asOf && RELATED ( Checks[Priority] ) <> "later",
+			            3, CaseLines[Remind] = "reminder" && CaseLines[ReminderFrom] <= asOf && RELATED ( Checks[Priority] ) <> "later",
+			            CaseLines[Status] = "New" && CaseLines[State] = "open" && RELATED ( Checks[Priority] ) <> "later"
+			        )
+			    )
+			VAR cis = COUNTROWS ( DISTINCT ( SELECTCOLUMNS ( lines, "@ci", CaseLines[CiKey] ) ) )
+			VAR cards = DISTINCT ( SELECTCOLUMNS ( lines, "@card", RELATED ( Checks[CardLabel] ) ) )
+			VAR cardCount = COUNTROWS ( cards )
+			VAR named = CONCATENATEX ( TOPN ( 2, cards, [@card], ASC ), [@card], ", ", [@card], ASC ) & IF ( cardCount > 2, " and " & ( cardCount - 2 ) & " more" )
+			VAR times = MAXX ( lines, CaseLines[Messages] )
+			VAR lastSent = MAXX ( lines, CaseLines[SentOn] )
+			VAR manager = CALCULATE ( MAX ( Findings[EscalateName] ), TREATAS ( SELECTCOLUMNS ( lines, "@key", CaseLines[Key] ), Findings[Key] ) )
+			VAR ciWords = cis & IF ( cis = 1, " CI", " CIs" )
+			RETURN
+			    SWITCH (
+			        kind,
+			        1, "Read the reply · " & ciWords & " · " & named,
+			        2, "Escalate" & IF ( manager <> "", " to " & manager ) & " · asked " & times & IF ( times = 1, " time", " times" ) & ", last " & FORMAT ( lastSent, "d mmm" ),
+			        3, "Send a reminder · asked " & FORMAT ( lastSent, "d mmm" ) & " · " & ciWords,
+			        4, "Ask them · " & ciWords & " · " & cardCount & IF ( cardCount = 1, " kind of problem", " kinds of problem" )
+			    )
+		displayFolder: My day
+
+	/// On a line of Waiting on others: what the team waits for ("Asked 5 Nov · 2 CIs · reminder from 10 Nov").
+	measure 'Person waits' =
+			VAR kind = [Person state]
+			VAR keys = VALUES ( Findings[Key] )
+			VAR asked = CALCULATETABLE ( CaseLines, TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] = "Contacted" )
+			VAR marked = CALCULATETABLE ( CaseLines, TREATAS ( keys, CaseLines[Key] ), CaseLines[Status] IN { "Fix in progress", "Fixed" } )
+			VAR askedCis = COUNTROWS ( DISTINCT ( SELECTCOLUMNS ( asked, "@ci", CaseLines[CiKey] ) ) )
+			VAR markedCis = COUNTROWS ( DISTINCT ( SELECTCOLUMNS ( marked, "@ci", CaseLines[CiKey] ) ) )
+			VAR due = MINX ( asked, CaseLines[ReminderFrom] )
+			RETURN
+			    SWITCH (
+			        kind,
+			        5, "Asked " & FORMAT ( MAXX ( asked, CaseLines[SentOn] ), "d mmm" ) & " · " & askedCis & IF ( askedCis = 1, " CI", " CIs" ) & IF ( NOT ISBLANK ( due ), " · reminder from " & FORMAT ( due, "d mmm" ) ),
+			        6, markedCis & IF ( markedCis = 1, " CI", " CIs" ) & " marked fixed · the next report checks"
+			    )
+		displayFolder: My day
+
+	/// Open lines of the daily cards that SACM fixes itself in ServiceNow: nobody to ask, a change on the SACM fix list, not marked fixed yet.
+	measure 'SACM fix lines' =
+			VAR keys = CALCULATETABLE ( VALUES ( Findings[Key] ), Findings[ContactName] = "", Findings[FixChange] <> "", Findings[State] = "open" )
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), NOT CaseLines[Status] IN { "Fix in progress", "Fixed", "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// The words of the last step of My day: the lines SACM fixes itself, on the fix lists of the cards.
+	measure 'SACM fix line' =
+			VAR n = [SACM fix lines]
+			RETURN IF ( n = 0, "No line for SACM to fix in ServiceNow today", "Fix " & n & IF ( n = 1, " line", " lines" ) & " yourself in ServiceNow: the SACM fix lists, on All cards" )
+		displayFolder: My day
+
+	/// The next steps of today (My day): each person with a step, and one more for the SACM fixes when there are any.
+	measure Steps =
+			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Step mark] = 1 ) ) + IF ( [SACM fix lines] > 0, 1, 0 )
+		formatString: #,0
+		displayFolder: My day
+
+	/// Under the title of Your next steps (My day): how many, for whom and in what order, or why the box is empty.
+	measure 'Steps note' =
+			VAR n = [Steps]
+			VAR me = [Me]
+			RETURN
+			    IF (
+			        n = 0,
+			        "Nothing to do today: no reply to read, no reminder due and nobody new to ask.",
+			        n & IF ( n = 1, " step", " steps" ) & " for " & FORMAT ( [Today], "dddd d mmmm" ) & IF ( NOT ISBLANK ( me ), " · " & me ) & ", in the order of the team's rules. Select one, then Open."
+			    )
+		displayFolder: Page notes
+
+	/// The people the team waits for (Person state 5 or 6).
+	measure 'Waiting people' =
+			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Wait mark] = 1 ) ) + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// Under the title of Waiting on others (My day).
+	measure 'Waiting note' =
+			IF ( [Waiting people] = 0, "Nobody to wait for: nobody was asked and has still to answer.", "Asked, or marked fixed: nothing to do until a reminder is due." )
+		displayFolder: Page notes
+
+	/// The first number of My day: the people whose reply is to read (Person state 1).
+	measure 'Replies tile' =
+			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 1 ) ) + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// The first number of My day: the people to escalate (Person state 2).
+	measure 'Escalations tile' =
+			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 2 ) ) + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// The first number of My day: the people to remind (Person state 3).
+	measure 'Reminders tile' =
+			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 3 ) ) + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// The first number of My day: the people never asked who have new lines (Person state 4).
+	measure 'People to ask' =
+			COUNTROWS ( FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 4 ) ) + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// Under a number of My day: who, and how many CIs ("Dee Owner · 2 CIs").
+	measure 'Replies tile line' =
+			VAR people = FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 1 )
+			VAR n = COUNTROWS ( people )
+			VAR who = CONCATENATEX ( TOPN ( 1, people, Findings[ContactName], ASC ), Findings[ContactName] )
+			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), people )
+			RETURN IF ( n = 0, "No reply to read", who & IF ( n > 1, " and " & ( n - 1 ) & " more" ) & " · " & cis & IF ( cis = 1, " CI", " CIs" ) )
+		displayFolder: My day
+
+	/// Under a number of My day: who, and how many CIs ("Dee Owner · 2 CIs").
+	measure 'Escalations tile line' =
+			VAR people = FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 2 )
+			VAR n = COUNTROWS ( people )
+			VAR who = CONCATENATEX ( TOPN ( 1, people, Findings[ContactName], ASC ), Findings[ContactName] )
+			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), people )
+			RETURN IF ( n = 0, "Nobody to escalate", who & IF ( n > 1, " and " & ( n - 1 ) & " more" ) & " · " & cis & IF ( cis = 1, " CI", " CIs" ) )
+		displayFolder: My day
+
+	/// Under a number of My day: who, and how many CIs ("Dee Owner · 2 CIs").
+	measure 'Reminders tile line' =
+			VAR people = FILTER ( VALUES ( Findings[ContactName] ), Findings[ContactName] <> "" && [Person state] = 3 )
+			VAR n = COUNTROWS ( people )
+			VAR who = CONCATENATEX ( TOPN ( 1, people, Findings[ContactName], ASC ), Findings[ContactName] )
+			VAR cis = CALCULATE ( DISTINCTCOUNT ( Findings[CiKey] ), people )
+			RETURN IF ( n = 0, "Nobody to remind", who & IF ( n > 1, " and " & ( n - 1 ) & " more" ) & " · " & cis & IF ( cis = 1, " CI", " CIs" ) )
+		displayFolder: My day
+
+	/// The fourth number of My day: new findings on the daily cards since the report before (0 when none).
+	measure 'New tile' =
+			[New (daily)] + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// Under the fourth number of My day: solved since the report before, and the people to ask.
+	measure 'New tile line' =
+			VAR solved = [Solved (daily)] + 0
+			VAR ask = [People to ask]
+			RETURN solved & " solved · " & ask & IF ( ask = 1, " person to ask", " people to ask" )
+		displayFolder: My day
+
+	/// The step or state of the person in view (My day) or of the line (Work queue) as a chip: word, icon and colour (LOOK rule 5), one meaning per colour. Its class starts with the step and the name, so a table sorted on it keeps the order of the team's rules.
+	measure 'State chip' =
+			VAR byLine = ISINSCOPE ( CaseLines[ContactName] )
+			VAR kind = IF ( byLine, [Queue state], [Person state] )
+			VAR word = SWITCH ( kind, 1, "Reply to read", 2, "Escalate", 3, "Reminder due", 4, "New", 5, "Asked", 6, "Marked fixed" )
+			VAR ink = SWITCH ( kind, 1, "#5925dc", 2, "#b42318", 3, "#7d5700", 6, "#107569", "#175cd3" )
+			VAR paper = SWITCH ( kind, 1, "#f4f3ff", 2, "#fef3f2", 3, "#fffaeb", 6, "#f0fdf9", "#eff8ff" )
+			VAR glyph = SWITCH ( kind, 1, "<path d='M9 14L4 9l5-5'/><path d='M4 9h11a5 5 0 0 1 5 5v5'/>", 2, "<path d='M12 19V5'/><path d='M5 12l7-7 7 7'/>", 3, "<path d='M6 16V11a6 6 0 1 1 12 0v5l2 2H4z'/><path d='M10 20a2 2 0 0 0 4 0'/>", 5, "<rect x='3' y='5' width='18' height='14' rx='2'/><path d='M3.5 6.5L12 13l8.5-6.5'/>", 6, "<path d='M5 12.5l4.5 4.5L19 7'/>", "<circle cx='12' cy='12' r='4'/>" )
+			VAR wide = ROUND ( LEN ( word ) * 7 + 34, 0 )
+			VAR name = IF ( byLine, SELECTEDVALUE ( CaseLines[ContactName] ), SELECTEDVALUE ( Findings[ContactName] ) )
+			VAR who = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( name, "&", "and" ), "<", "" ), "'", "" )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' class='k" & kind & " " & who & "' width='" & wide & "' height='24' viewBox='0 0 " & wide & " 24'>"
+			        & "<rect x='0' y='2' width='" & wide & "' height='20' rx='10' fill='" & paper & "'/>"
+			        & "<g transform='translate(8 6) scale(0.5)' fill='none' stroke='" & ink & "' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'>" & glyph & "</g>"
+			        & "<text x='24' y='16.5' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='" & ink & "'>" & word & "</text></svg>"
+			RETURN IF ( NOT ISBLANK ( kind ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// On a line of Your next steps: the button of the step (Read for a reply, Open for the others). The line opens the person: select it and press Open, or right-click, Drill through, Person.
+	measure 'Step button' =
+			VAR kind = [Person state]
+			VAR word = IF ( kind = 1, "Read", "Open" )
+			VAR strong = kind = 1
+			VAR wide = ROUND ( LEN ( word ) * 7 + 40, 0 )
+			VAR ink = IF ( strong, "#ffffff", "#0c1c49" )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='" & wide & "' height='24' viewBox='0 0 " & wide & " 24'>"
+			        & "<rect x='0.5' y='0.5' width='" & ( wide - 1 ) & "' height='23' rx='6' fill='" & IF ( strong, "#0c1c49", "#ffffff" ) & "' stroke='" & IF ( strong, "#0c1c49", "#cfc3b4" ) & "'/>"
+			        & "<text x='12' y='16.5' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='" & ink & "'>" & word & "</text>"
+			        & "<path d='M" & ( wide - 18 ) & " 8l4 4-4 4' fill='none' stroke='" & ink & "' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>"
+			RETURN IF ( NOT ISBLANK ( kind ) && kind <= 4, "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// The initials of the person in view in a navy circle (Waiting on others).
+	measure 'Person avatar' =
+			VAR who = SUBSTITUTE ( SUBSTITUTE ( SELECTEDVALUE ( Findings[ContactName] ), "&", "" ), "<", "" )
+			VAR gap = SEARCH ( " ", who, 1, 0 )
+			VAR letters = UPPER ( LEFT ( who, 1 ) & IF ( gap > 0, MID ( who, gap + 1, 1 ) ) )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><circle cx='12' cy='12' r='12' fill='#e6e9f4'/>"
+			        & "<text x='12' y='16.5' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='12' font-weight='700' fill='#0c1c49'>" & letters & "</text></svg>"
+			RETURN IF ( who <> "", "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// On the rail, beside its page: the next steps of today in a small pill (D2).
+	measure 'Rail badge my day' =
+			VAR n = [Steps] + 0
+			VAR words = FORMAT ( n, "0" )
+			VAR wide = LEN ( words ) * 7 + 14
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'>"
+			        & "<rect x='" & ( 32 - wide ) & "' y='3' width='" & wide & "' height='18' rx='9' fill='#ffffff' fill-opacity='0.16'/>"
+			        & "<text x='" & ( 32 - wide / 2 ) & "' y='16' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='#ffffff'>" & words & "</text></svg>"
+			RETURN "data:image/svg+xml;utf8," & IF ( n = 0, "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='24'/>", SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// On the rail, beside its page: the open lines in a small pill (D2).
+	measure 'Rail badge work queue' =
+			VAR n = [Open cases] + 0
+			VAR words = FORMAT ( n, "0" )
+			VAR wide = LEN ( words ) * 7 + 14
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'>"
+			        & "<rect x='" & ( 32 - wide ) & "' y='3' width='" & wide & "' height='18' rx='9' fill='#ffffff' fill-opacity='0.16'/>"
+			        & "<text x='" & ( 32 - wide / 2 ) & "' y='16' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='12' font-weight='600' fill='#ffffff'>" & words & "</text></svg>"
+			RETURN "data:image/svg+xml;utf8," & IF ( n = 0, "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='24'/>", SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred

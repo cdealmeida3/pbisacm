@@ -6,6 +6,8 @@
 //     HistoryRun (with its incremental refresh, D290), from the calculated tables that split them.
 //   - powerbi/SACM-Workbench.Report/StaticResources/RegisteredResources/sacm-theme.json: the theme, from the design tokens of
 //     tools/powerbi/tokens.ts (the colours of docs/LOOK.md, the text sizes, the page grid).
+//   - the navy rail of every page (tools/powerbi/rail.ts, build D2): its pictures rail-<page>.svg, registered in report.json,
+//     and the visuals named rail… of each page.
 // Same repository, same bytes (no date, no random value).
 //   node tools/powerbi/generate.ts            writes both files (npm run powerbi:generate)
 //   node tools/powerbi/generate.ts --check    fails when they are not up to date (also in npm test)
@@ -42,6 +44,7 @@ import { EXCEPTION_REASONS } from '../../src/core/audit/audit.ts';
 import { statusWord } from '../../src/app/view/cases.ts';
 import { COLUMNS, CONTRACT_COLUMNS, EPO_ROLE, MAX_CIS_PER_MESSAGE, REQUESTS, ROLE_LABEL, ROLE_REQUEST, ROLE_WORD } from '../../src/core/messages/messages.ts';
 import type { FastForm, Node } from './regex.ts';
+import { staleRail, writeRail } from './rail.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const read = (path: string): string => readFileSync(join(root, path), 'utf8');
@@ -534,6 +537,7 @@ export function staleQueries(): string[] {
   }
   if (!existsSync(THEME_FILE) || readFileSync(THEME_FILE, 'utf8').replace(/\r\n/g, '\n') !== themeText()) problems.push(`${relative(root, THEME_FILE)}: not the theme of the colours of LOOK.md`);
   for (const { file, text } of appFiles()) if (!existsSync(file) || readFileSync(file, 'utf8').replace(/\r\n/g, '\n') !== text) problems.push(`${relative(root, file)}: not what actions.json and formulas.fx give`);
+  problems.push(...staleRail());
   return problems;
 }
 
@@ -548,5 +552,6 @@ if (process.argv[1] === import.meta.filename) {
   writeFileSync(THEME_FILE, themeText());
   for (const source of SOURCE_TABLES) writeFileSync(SOURCE_FILES[source], runTmdl(source));
   for (const { file, text } of appFiles()) writeFileSync(file, text);
-  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${SOURCE_TABLES.map((source) => relative(root, SOURCE_FILES[source])).join(', ')}, ${relative(root, THEME_FILE)} and the Power App\'s formulas.`);
+  const railParts = writeRail();
+  console.log(`Power BI: wrote ${relative(root, EXPRESSIONS_FILE)} (${queries().length} queries), ${SOURCE_TABLES.map((source) => relative(root, SOURCE_FILES[source])).join(', ')}, ${relative(root, THEME_FILE)}, the Power App\'s formulas and the rail of every page (${railParts} files).`);
 }

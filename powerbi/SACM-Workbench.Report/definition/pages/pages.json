@@ -17,7 +17,8 @@
     "card",
     "case",
     "person",
-    "selfcheck"
+    "selfcheck",
+    "lab"
   ],
   "activePageName": "myday"
 }

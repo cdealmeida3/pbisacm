@@ -226,6 +226,66 @@ table History
 	measure 'Open at end note' = "Open on the newest CI report on or before " & FORMAT ( [Period to], "d mmm yyyy" ) & "."
 		displayFolder: Page notes
 
+	/// Under the title of the box Since the last report (My day): the report it compares with: what the bars mean, or why there are none.
+	measure 'Since note' =
+			VAR d = [Newest report date]
+			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( d ), "No CI report is loaded yet.",
+			        ISBLANK ( priorDate ), "One CI report so far: new and solved show from the second report.",
+			        "Since the report of " & FORMAT ( priorDate, "d mmm" ) & ", the daily cards: open before in navy, new in coral."
+			    )
+		displayFolder: Page notes
+
+	/// To solve on the newest CI report, on the daily cards (one section of My day).
+	measure 'Section open' =
+			VAR d = [Newest report date]
+			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open", KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+		formatString: #,0
+		displayFolder: My day
+
+	/// On a section of My day: the words new, solved and open, and a bar of what is open (open before in navy, new in coral), on the scale of the biggest section.
+	measure 'State bar' =
+			VAR openNow = [Section open]
+			VAR fresh = [New (daily)] + 0
+			VAR solved = [Solved (daily)] + 0
+			VAR most = MAXX ( ALL ( Checks[Section] ), [Section open] )
+			VAR unit = 176 / MAX ( most, 1 )
+			VAR older = ROUND ( MAX ( openNow - fresh, 0 ) * unit, 0 )
+			VAR added = ROUND ( MIN ( fresh, openNow ) * unit, 0 )
+			VAR words = "+" & fresh & " new · " & solved & " solved · " & openNow & " open"
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='32' viewBox='0 0 180 32'>"
+			        & "<text x='0' y='12' font-family='Segoe UI, sans-serif' font-size='12' fill='#655a52'>" & words & "</text>"
+			        & "<rect x='0' y='20' width='176' height='8' rx='4' fill='#f2f4f7'/>"
+			        & "<rect x='0' y='20' width='" & older & "' height='8' fill='#0c1c49'/>"
+			        & "<rect x='" & older & "' y='20' width='" & added & "' height='8' fill='#fd472c'/></svg>"
+			RETURN IF ( NOT ISBLANK ( [Newest report date] ), "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
+	/// A small line of what was to solve on each CI report date, oldest first, the newest as a coral dot (the daily cards of the rows in view).
+	measure Trend =
+			VAR points =
+			    ADDCOLUMNS (
+			        CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ),
+			        "@open", CALCULATE ( COUNTROWS ( History ), History[State] = "open", KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+			    )
+			VAR n = COUNTROWS ( points )
+			VAR highest = MAX ( MAXX ( points, [@open] ), 1 )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 3 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 54 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 21 - [@open] * 18 / highest, 0 ) )
+			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
+			VAR line = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
+			VAR picture =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='60' height='24' viewBox='0 0 60 24'>"
+			        & "<polyline points='" & line & "' fill='none' stroke='#0c1c49' stroke-width='1.6' stroke-linejoin='round'/>"
+			        & "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='2.5' fill='#fd472c'/></svg>"
+			RETURN IF ( n > 0, "data:image/svg+xml;utf8," & SUBSTITUTE ( picture, "#", "%23" ) )
+		displayFolder: Pictures
+		dataCategory: ImageUrl
+
 	column ReportDate
 		dataType: dateTime
 		isDataTypeInferred
