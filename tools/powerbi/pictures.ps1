@@ -101,6 +101,12 @@ function Click([double]$x, [double]$y, [switch]$Right) {
   if ($Right) { [PictureWin]::mouse_event(8, 0, 0, 0, 0); [PictureWin]::mouse_event(16, 0, 0, 0, 0) }
   else { [PictureWin]::mouse_event(2, 0, 0, 0, 0); [PictureWin]::mouse_event(4, 0, 0, 0, 0) }
 }
+# The pointer off the page, so a picture never shows a tooltip or the hover of a visual (its header "Filters and
+# slicers affecting this visual"): the bottom right corner of the screen, on the status bar.
+function Pointer-Away {
+  $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+  [PictureWin]::SetCursorPos($bounds.Width - 4, $bounds.Height - 4) | Out-Null
+}
 function Center($element) { $r = $element.Current.BoundingRectangle; return @(($r.X + $r.Width / 2), ($r.Y + $r.Height / 2)) }
 function Screen-Bitmap {
   $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
@@ -331,6 +337,7 @@ foreach ($page in $list) {
   }
   $clock = [System.Diagnostics.Stopwatch]::StartNew()
   Open-Tab $tab
+  Pointer-Away
   Start-Sleep -Milliseconds 300
   $seconds = Wait-Drawn $clock
   $saved = Save-Picture $slug -Look
@@ -354,6 +361,7 @@ foreach ($page in $list) {
     [PictureWin]::keybd_event(0x11, 0, 0, 0)
     Click $at[0] $at[1]
     [PictureWin]::keybd_event(0x11, 0, 2, 0)
+    Pointer-Away
     Start-Sleep -Milliseconds 300
     $tabSeconds = Wait-Drawn $tabClock
     $tabSaved = Save-Picture $tabSlug -Look

@@ -296,10 +296,10 @@ table History
 			    SWITCH (
 			        TRUE (),
 			        ISBLANK ( d ), "No CI report yet",
-			        ISBLANK ( priorDate ), "One CI report so far",
-			        delta = 0, "the same as on " & FORMAT ( priorDate, "d mmm" ),
-			        delta < 0, FORMAT ( -delta, "#,0" ) & " fewer than on " & FORMAT ( priorDate, "d mmm" ),
-			        FORMAT ( delta, "#,0" ) & " more than on " & FORMAT ( priorDate, "d mmm" )
+			        ISBLANK ( priorDate ), "One report so far",
+			        delta = 0, "same as " & FORMAT ( priorDate, "d mmm" ),
+			        delta < 0, FORMAT ( -delta, "#,0" ) & " fewer since " & FORMAT ( priorDate, "d mmm" ),
+			        FORMAT ( delta, "#,0" ) & " more since " & FORMAT ( priorDate, "d mmm" )
 			    )
 		displayFolder: Overview
 
@@ -314,7 +314,7 @@ table History
 	measure 'Waiting now line' =
 			VAR up = [To escalate]
 			VAR due = [Reminders due]
-			RETURN up & " to escalate · " & due & IF ( due = 1, " reminder due", " reminders due" )
+			RETURN up & " to escalate · " & due & " to remind"
 		displayFolder: Overview
 
 	/// A number of Overview: the findings the newest CI report verified as solved (gone from a tested part of a CI it still has).
@@ -326,10 +326,10 @@ table History
 	measure 'Solved now line' =
 			VAR d = [Newest report date]
 			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
-			RETURN IF ( ISBLANK ( priorDate ), "from the second CI report on", "since " & FORMAT ( priorDate, "d mmm" ) & ", verified by the report of " & FORMAT ( d, "d mmm" ) )
+			RETURN IF ( ISBLANK ( priorDate ), "after the next report", "since " & FORMAT ( priorDate, "d mmm" ) & ", verified" )
 		displayFolder: Overview
 
-	/// The open lines of each of the last 12 CI report dates as a small line, the newest a dot (Overview, Open lines). 120 × 36.
+	/// The open lines of each of the last 12 CI report dates as a small line, the newest a dot (Overview, Open lines). 72 × 36 (narrow, so the line under the number has room beside it).
 	measure 'Open trend' =
 			VAR points =
 			    ADDCOLUMNS (
@@ -340,11 +340,11 @@ table History
 			VAR highest = MAXX ( points, [@v] )
 			VAR lowest = MINX ( points, [@v] )
 			VAR span = MAX ( highest - lowest, 1 )
-			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 112 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 64 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
 			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
 			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
 			VAR picture =
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='36' viewBox='0 0 120 36'>"
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='72' height='36' viewBox='0 0 72 36'>"
 			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#0c1c49' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>" )
 			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='3' fill='#0c1c49'/>" )
 			        & "</svg>"
@@ -352,7 +352,7 @@ table History
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// The lines that waited for a person on each of the last 12 CI report dates as a small line (Overview). 120 × 36.
+	/// The lines that waited for a person on each of the last 12 CI report dates as a small line (Overview). 72 × 36 (narrow, so the line under the number has room beside it).
 	measure 'Waiting trend' =
 			VAR points =
 			    ADDCOLUMNS (
@@ -363,11 +363,11 @@ table History
 			VAR highest = MAXX ( points, [@v] )
 			VAR lowest = MINX ( points, [@v] )
 			VAR span = MAX ( highest - lowest, 1 )
-			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 112 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 64 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
 			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
 			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
 			VAR picture =
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='36' viewBox='0 0 120 36'>"
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='72' height='36' viewBox='0 0 72 36'>"
 			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#0c1c49' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>" )
 			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='3' fill='#0c1c49'/>" )
 			        & "</svg>"
@@ -375,7 +375,7 @@ table History
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// The findings verified as solved on each of the last 12 CI report dates as a small line in teal (Overview). 120 × 36.
+	/// The findings verified as solved on each of the last 12 CI report dates as a small line in teal (Overview). 72 × 36 (narrow, so the line under the number has room beside it).
 	measure 'Solved trend' =
 			VAR points =
 			    ADDCOLUMNS (
@@ -386,11 +386,11 @@ table History
 			VAR highest = MAXX ( points, [@v] )
 			VAR lowest = MINX ( points, [@v] )
 			VAR span = MAX ( highest - lowest, 1 )
-			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 112 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
+			VAR placed = ADDCOLUMNS ( points, "@x", ROUND ( 4 + ( RANKX ( points, Runs[ReportDate], , ASC, DENSE ) - 1 ) * 64 / MAX ( n - 1, 1 ), 0 ), "@y", ROUND ( 31 - ( [@v] - lowest ) * 26 / span, 0 ) )
 			VAR newest = TOPN ( 1, placed, Runs[ReportDate], DESC )
 			VAR trace = CONCATENATEX ( placed, [@x] & "," & [@y], " ", Runs[ReportDate], ASC )
 			VAR picture =
-			    "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='36' viewBox='0 0 120 36'>"
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='72' height='36' viewBox='0 0 72 36'>"
 			        & IF ( n > 1, "<polyline points='" & trace & "' fill='none' stroke='#107569' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>" )
 			        & IF ( n > 0, "<circle cx='" & MAXX ( newest, [@x] ) & "' cy='" & MAXX ( newest, [@y] ) & "' r='3' fill='#107569'/>" )
 			        & "</svg>"

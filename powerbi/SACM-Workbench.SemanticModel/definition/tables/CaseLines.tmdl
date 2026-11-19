@@ -192,10 +192,10 @@ table CaseLines
 		formatString: #,0
 		displayFolder: Overview
 
-	/// The background of a cell of Where the work sits (Overview): darker navy for more lines, on the scale of the biggest cell; the column Open (the total) on the page colour.
+	/// The background of a cell of Where the work sits (Overview): darker navy for more lines, on the scale of the biggest cell; the column Open (the total) on the page colour. The sort columns (SectionOrder, StepOrder) go into ALLSELECTED with the columns they sort: the matrix groups by them too, so without them each cell would be its own biggest cell (build D6).
 	measure 'Heat fill' =
 			VAR n = [Heat lines] + 0
-			VAR most = MAXX ( ALLSELECTED ( Checks[Section] ), MAXX ( ALLSELECTED ( CaseLines[Step] ), [Heat lines] ) )
+			VAR most = MAXX ( ALLSELECTED ( Checks[Section], Checks[SectionOrder] ), MAXX ( ALLSELECTED ( CaseLines[Step], CaseLines[StepOrder] ), [Heat lines] ) )
 			VAR share = DIVIDE ( n, most, 0 )
 			RETURN
 			    IF (
@@ -208,7 +208,7 @@ table CaseLines
 	/// The text of a cell of Where the work sits (Overview): white on the two darkest fills.
 	measure 'Heat ink' =
 			VAR n = [Heat lines] + 0
-			VAR most = MAXX ( ALLSELECTED ( Checks[Section] ), MAXX ( ALLSELECTED ( CaseLines[Step] ), [Heat lines] ) )
+			VAR most = MAXX ( ALLSELECTED ( Checks[Section], Checks[SectionOrder] ), MAXX ( ALLSELECTED ( CaseLines[Step], CaseLines[StepOrder] ), [Heat lines] ) )
 			RETURN IF ( ISINSCOPE ( CaseLines[Step] ) && DIVIDE ( n, most, 0 ) >= 0.5, "#ffffff", "#2b2623" )
 		displayFolder: Overview
 
