@@ -7,8 +7,12 @@
 //     same way. They never change, remove or clear a row of any list of the team, and write no other list.
 //   - The apps call no connector but the flows of powerbi/apps/flows.json with the trigger Power Apps (V2).
 //   - The flows refresh, wait, file a report or a reply, or send exactly what a manager pressed Send or Test on: the
-//     To, Cc, Subject and Body of a sending step are the inputs of its trigger (a test goes to the manager who ran it).
-//     A flow that starts on a new email never sends; none runs on a timer (D2, D269).
+//     To, Cc, Subject, Body and file of a sending step are the inputs of its trigger (a test goes to the manager who ran
+//     it). A flow that starts on a new email never sends; none runs on a timer (D2, D269). The flow of the button Outlook
+//     draft (F7, D315) only makes a draft in the manager's own Drafts (POST to /me/messages, never /send) and answers the
+//     app with its link: it sends nothing.
+//   - The apps use the modern controls (D317): a control is one of MODERN_CONTROLS, with only the properties Microsoft
+//     gives it (so a pasted app has no unknown property), or one of the few classic controls that have no modern one.
 //   - The catalogue (powerbi/apps/actions.json): unique ids, journal types the model reads, scopes and asks the app knows,
 //     labels the column Actions can hold; every action of scope line is one fnCaseActions gives, and the other way round.
 import { readFileSync } from 'node:fs';
@@ -101,11 +105,18 @@ export function catalogueProblems(actions: AppAction[] = appActions(), fnCaseAct
 const TRIGGERS = new Set(['Power Apps (V2)', 'Power BI button clicked', 'When a new email arrives in a shared mailbox (V2)']);
 const MAILBOX_TRIGGER = 'When a new email arrives in a shared mailbox (V2)';
 const SEND = 'Send an email from a shared mailbox (V2)';
-const STEPS = new Set(['Refresh a dataset', 'Delay', 'Create file', 'Html to text', 'Create item', SEND]);
+/** The draft of the button Outlook draft (F7, D315): Microsoft Graph through the Office 365 Outlook connector. */
+const DRAFT = 'Send an HTTP request';
+const RESPOND = 'Respond to a PowerApp or flow';
+/** The only request a flow may make: a new message in the Drafts of the person who runs it (never /send or /sendMail). */
+export const DRAFT_REQUEST = { URI: 'https://graph.microsoft.com/v1.0/me/messages', Method: 'POST', Body: '=input Message with the file Csv and the shared SACM mailbox as From', ContentType: 'application/json' };
+const STEPS = new Set(['Refresh a dataset', 'Delay', 'Create file', 'Html to text', 'Create item', SEND, DRAFT, RESPOND]);
 /** The fields of a sending step and the input of the trigger each must be. To of a test: the manager who ran the flow. */
 const SEND_FIELDS: Record<string, { input: string; or?: string; optional?: boolean }> = {
   To: { input: 'To', or: '=the user who ran it' }, CC: { input: 'Cc', optional: true }, BCC: { input: 'Bcc', optional: true },
-  Subject: { input: 'Subject' }, Body: { input: 'Body' }
+  Subject: { input: 'Subject' }, Body: { input: 'Body' },
+  // The CSV file of a long email (D314): the text the app gives, under the name the app gives; none when it is empty.
+  Attachments: { input: 'Csv as the file FileName', optional: true }
 };
 /** The other fields a sending step may set: the shared mailbox it sends from, and the importance. */
 const SEND_OTHER = new Set(['Original Mailbox Address', 'Importance']);
@@ -122,11 +133,29 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
     if (flow.concurrency !== 1) problems.push(`Flows: ${flow.id} must run one at a time (concurrency 1), so two refreshes never overlap`);
     if (flow.inputs?.length && flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} has inputs, but only a flow the app calls (Power Apps (V2)) gets them`);
     const sends = flow.steps.filter((step) => step.action === SEND);
+    const drafts = flow.steps.filter((step) => step.action === DRAFT);
     for (const step of flow.steps) {
       if (!STEPS.has(step.action)) problems.push(`Flows: ${flow.id} has the step "${step.action}": a flow refreshes, waits, files a report or a reply, or sends what a manager pressed Send on`);
-      else if (step.action !== SEND && /send|post|message|reply|forward/i.test(step.action)) problems.push(`Flows: ${flow.id} sends something ("${step.action}")`);
+      else if (step.action !== SEND && step.action !== DRAFT && /send|post|message|reply|forward/i.test(step.action)) problems.push(`Flows: ${flow.id} sends something ("${step.action}")`);
+      if (step.action === RESPOND && flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} answers a Power App, but the app does not start it`);
       if (step.action === 'Create item' && step.fields['List Name'] !== REPLIES) problems.push(`Flows: ${flow.id} adds an item to ${step.fields['List Name'] ?? 'a list'}: a flow only files replies in ${REPLIES} (the journal is the managers' own, D272)`);
       if (step.action === 'Create item' && flow.trigger !== MAILBOX_TRIGGER) problems.push(`Flows: ${flow.id} files a reply, but does not start on a new email`);
+    }
+    if (drafts.length) {
+      // The Outlook draft (D315): started by the button of the app, one draft a run, exactly the request of DRAFT_REQUEST.
+      if (flow.trigger !== 'Power Apps (V2)') problems.push(`Flows: ${flow.id} makes a draft, but does not start when a manager presses Outlook draft in the app (Power Apps (V2))`);
+      if (sends.length) problems.push(`Flows: ${flow.id} makes a draft and sends: the button Outlook draft sends nothing`);
+      if (drafts.length > 1 || drafts.some((step) => step.forEach)) problems.push(`Flows: ${flow.id} must make one draft a run`);
+      const inputs = new Set(flow.inputs ?? []);
+      for (const name of ['Message', 'Csv']) if (!inputs.has(name)) problems.push(`Flows: ${flow.id} has no input ${name}: the draft is the email the manager sees in the app`);
+      for (const step of drafts) {
+        if (step.connector !== 'Office 365 Outlook') problems.push(`Flows: ${flow.id} makes the draft with ${step.connector}: use the Office 365 Outlook connector, as the manager signed in`);
+        for (const [field, value] of Object.entries(DRAFT_REQUEST)) {
+          if (step.fields[field] !== value) problems.push(`Flows: ${flow.id} makes the draft with ${field} "${step.fields[field] ?? ''}": it must be "${value}" (a new message in the manager's own Drafts, never /send)`);
+        }
+        for (const field of Object.keys(step.fields)) if (!(field in DRAFT_REQUEST)) problems.push(`Flows: ${flow.id} makes the draft with the field ${field}`);
+      }
+      continue;
     }
     if (sends.length) {
       // Sending: only what a manager pressed in the app, one message a run, exactly as the app gives it (D2, D301).
@@ -139,10 +168,11 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
           if (value === undefined) { if (!rule.optional) problems.push(`Flows: ${flow.id} sends with no ${field}`); continue; }
           // A test goes to the manager who ran the flow: only a flow that is given no To may send there.
           if (value === rule.or && !inputs.has(rule.input)) continue;
-          if (value !== `=input ${rule.input}` || !inputs.has(rule.input)) problems.push(`Flows: ${flow.id} sends with ${field} "${value}": it must be the input ${rule.input} of the trigger, exactly what the manager sends`);
+          const needs = field === 'Attachments' ? ['Csv', 'FileName'] : [rule.input];
+          if (value !== `=input ${rule.input}` || needs.some((input) => !inputs.has(input))) problems.push(`Flows: ${flow.id} sends with ${field} "${value}": it must be the input ${rule.input} of the trigger, exactly what the manager sends`);
         }
         for (const field of Object.keys(step.fields)) {
-          if (!(field in SEND_FIELDS) && !SEND_OTHER.has(field)) problems.push(`Flows: ${flow.id} sends with the field ${field}: a message of the app has only To, Cc, Subject and Body`);
+          if (!(field in SEND_FIELDS) && !SEND_OTHER.has(field)) problems.push(`Flows: ${flow.id} sends with the field ${field}: a message of the app has only To, Cc, Subject, Body and its file`);
         }
       }
       continue;
@@ -152,5 +182,56 @@ export function flowProblems(flows: Flow[] = appFlows()): string[] {
     // A refresh started by the app or a button waits two minutes before the next run may start one.
     if (refresh >= 0 && flow.trigger !== MAILBOX_TRIGGER && flow.steps[refresh + 1]?.action !== 'Delay') problems.push(`Flows: ${flow.id} must wait (Delay) after the refresh, so the next run does not start one while it runs`);
   }
+  return problems;
+}
+
+/* ------------------------------------------------------------------ the controls of the apps (D317) */
+
+/** What every control has: place, size, whether it shows, and its words for a screen reader. */
+const BASE = ['X', 'Y', 'Width', 'Height', 'Visible', 'DisplayMode', 'AccessibleLabel', 'Tooltip', 'ContentLanguage', 'OnSelect'];
+/** The text and border properties of the modern controls (the names of their update of February 2026). */
+const MODERN_TEXT = ['BasePaletteColor', 'Font', 'Size', 'Color', 'FontWeight', 'Italic', 'Underline', 'Strikethrough',
+  'BorderColor', 'BorderStyle', 'BorderThickness', 'RadiusTopLeft', 'RadiusTopRight', 'RadiusBottomLeft', 'RadiusBottomRight',
+  'PaddingTop', 'PaddingBottom', 'PaddingLeft', 'PaddingRight'];
+/**
+ * The modern controls the apps use (Fluent 2, D317), each with the properties Microsoft's page of the control gives
+ * (learn.microsoft.com, modern controls, 2026). The version is written, so Power Apps Studio makes exactly this control
+ * when the YAML is pasted, whatever comes later.
+ */
+export const MODERN_CONTROLS: Record<string, string[]> = {
+  'ModernButton@1.0.0': [...BASE, ...MODERN_TEXT, 'Text', 'Align', 'VerticalAlign', 'Appearance', 'Icon', 'IconStyle', 'IconRotation', 'Layout'],
+  'ModernTextInput@1.0.0': [...BASE, ...MODERN_TEXT, 'Default', 'Placeholder', 'Type', 'TriggerOutput', 'MaxLength', 'Required', 'ValidationState', 'OnChange', 'Align', 'Appearance', 'Fill'],
+  'ModernCheckbox@1.0.0': [...BASE, ...MODERN_TEXT, 'Label', 'Checked', 'OnCheck', 'OnUncheck'],
+  'ModernTabList@1.0.0': [...BASE, ...MODERN_TEXT, 'Items', 'Default', 'OnChange', 'Align', 'Alignment', 'Appearance'],
+  'ModernDropdown@1.0.0': [...BASE, ...MODERN_TEXT, 'Items', 'Default', 'ItemDisplayText', 'Required', 'ValidationState', 'OnChange', 'Appearance'],
+  'ModernDatePicker@1.0.0': [...BASE, ...MODERN_TEXT, 'DefaultDate', 'Placeholder', 'Format', 'StartDate', 'EndDate', 'StartOfWeek', 'OnChange']
+};
+/**
+ * The classic controls that stay (D317): Power Apps has no modern list (gallery), HTML viewer or shape, and a label
+ * of a gallery or a panel stays a classic label (the modern Text has no scroll).
+ */
+export const CLASSIC_KEPT = new Set(['Label', 'Gallery', 'HtmlViewer', 'Rectangle']);
+
+interface Control { Control?: string; Properties?: Record<string, unknown>; Children?: Array<Record<string, Control>> }
+
+/** The problems of the controls of one screen file (the YAML of a .pa.yaml as JSON): classic controls, unknown properties. */
+export function controlProblems(file: string, json: unknown): string[] {
+  const problems: string[] = [];
+  const where = file.replace(/^.*powerbi\//, 'powerbi/');
+  const walk = (children: Array<Record<string, Control>> | undefined): void => {
+    for (const entry of children ?? []) {
+      for (const [name, control] of Object.entries(entry)) {
+        const type = control.Control ?? '';
+        const known = MODERN_CONTROLS[type];
+        if (!known && !CLASSIC_KEPT.has(type)) problems.push(`App: ${where} ${name} is a ${type || 'control with no type'}: use a modern control of MODERN_CONTROLS (D317)`);
+        if (known) for (const property of Object.keys(control.Properties ?? {})) {
+          if (!known.includes(property)) problems.push(`App: ${where} ${name} (${type}) has the property ${property}, which the control does not have`);
+        }
+        walk(control.Children);
+      }
+    }
+  };
+  const screens = (json as { Screens?: Record<string, Control> } | null)?.Screens ?? {};
+  for (const screen of Object.values(screens)) walk(screen.Children);
   return problems;
 }

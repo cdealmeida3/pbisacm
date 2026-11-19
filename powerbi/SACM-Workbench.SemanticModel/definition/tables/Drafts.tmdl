@@ -254,6 +254,18 @@ table Drafts
 		isNameInferred
 		sourceColumn: [EmailId]
 
+	/// The length of Html, for the app SACM messages (build D5): the Power Apps visual may pass a long text cut, so the app compares what it got with this and does not send a cut email.
+	column HtmlLength = LEN ( Drafts[Html] )
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+
+	/// The length of Csv, for the same check of the app.
+	column CsvLength = LEN ( Drafts[Csv] )
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+
 	partition Drafts = calculated
 		mode: import
 		source =

@@ -1,145 +1,229 @@
-# The one screen of the Power App "SACM actions" (build B6, D294 to D296), written by hand. To use it: in Power Apps Studio,
-# select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6). Structure only: the
-# visual design pass comes later.
-# What it does: the manager picks an action the selected lines all have, types or picks what it asks, and presses Save.
-# Save adds ONE row to the list SACM Journal (never changes or removes a row, D272), then asks flow F5 (SACMRefresh) to
-# refresh the report. Below: what the team did lately on these lines, read from the list at once (before the refresh).
-# Share out (build B7) adds one row per member. Nothing is sent from this app: the app SACM messages sends (build B7).
-# The visual gives the app 1,000 lines at most (Microsoft's limit), so Save is off at 1,000: the app may not have them all.
+# The one screen of the Power App "SACM actions" (builds B6 and D5, D294 to D296, D317), written by hand. To use it: in
+# Power Apps Studio, select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6.4).
+# It is drawn for the places of README §6.4 (300 wide, 300 to 620 high) and grows with a wider place. The reply reader
+# needs 480 high (Person, Case, Work queue); on the short place of Card it says to open the person.
+# Two tabs:
+#   - Actions: the manager picks an action the selected lines all have, types or picks what it asks, and presses Save.
+#     Save adds ONE row to the list SACM Journal (never changes or removes a row, D272), then asks flow F5 (SACMRefresh)
+#     to refresh the report. Below: what the team did lately on these lines, read from the list at once (before the
+#     refresh). Share out (build B7) adds one row per member.
+#   - Reply (the reply reader, design pass §7): what the person wrote (the list SACM Replies, filed by flow F3), next to
+#     the lines it is about, with a tick box each. Mark answered (the main button), Waiting until a date, or Add note
+#     add rows to SACM Journal on the ticked lines.
+# Nothing is sent from this app: the app SACM messages sends. The visual gives the app 1,000 lines at most (Microsoft's
+# limit), so Save is off at 1,000: the app may not have them all.
 Screens:
   ActionsScreen:
     Properties:
-      Fill: =RGBA(255, 255, 255, 1)
+      Fill: =ColourSurface
     Children:
       - TitleLabel:
           Control: Label
           Properties:
             Text: |-
-              ="SACM actions: " & LineCount & If(LineCount = 1, " line", " lines") & If(IsBlank(MeName), "", " · " & MeName) & If(TooManyLines, " · Too many lines: the report gives the app 1,000 at most. Select or filter fewer lines.", "")
+              =If(LineCount = 0, "SACM actions", LineCount & If(LineCount = 1, " line", " lines")) & If(TooManyLines, " · too many", "")
+            Tooltip: |-
+              =If(TooManyLines, "The report gives the app 1,000 lines at most. Select or filter fewer lines.", MeName)
+            Font: =AppFont
             FontWeight: =FontWeight.Semibold
-            Size: =14
+            Size: =11
+            Color: =If(TooManyLines, ColourRed, ColourInk)
             X: =16
             Y: =8
-            Width: =Parent.Width - 32
-            Height: =32
+            Width: =Parent.Width - 212
+            Height: =36
+      - Tabs:
+          Control: ModernTabList@1.0.0
+          Properties:
+            Items: =["Actions", "Reply"]
+            Default: =If(ToReadCount > 0, "Reply", "Actions")
+            Appearance: =TabListAppearance.Subtle
+            Alignment: =TabListAlignment.End
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            AccessibleLabel: ="Actions or the reply"
+            Visible: =LineCount > 0
+            X: =Parent.Width - 196
+            Y: =6
+            Width: =184
+            Height: =36
+      - HeadRule:
+          Control: Rectangle
+          Properties:
+            Fill: =ColourLine
+            X: =0
+            Y: =47
+            Width: =Parent.Width
+            Height: =1
       - EmptyLabel:
           Control: Label
           Properties:
             Text: |-
               ="Select lines in the report (on a card, a case or a person), then pick what to do."
+            Font: =AppFont
+            Size: =10
+            Color: =ColourMuted
             Visible: =LineCount = 0
             X: =16
-            Y: =44
+            Y: =56
             Width: =Parent.Width - 32
             Height: =48
+      # ------------------------------------------------------------------ the tab Actions
       - ActionPick:
-          Control: Classic/DropDown
+          Control: ModernDropdown@1.0.0
           Properties:
             Items: =AvailableActions
+            Default: =First(AvailableActions)
+            ItemDisplayText: =ThisItem.Value
             AccessibleLabel: ="What to do"
-            Visible: =LineCount > 0
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions"
             X: =16
-            Y: =44
+            Y: =56
             Width: =Parent.Width - 32
             Height: =36
       - StatusPick:
-          Control: Classic/DropDown
+          Control: ModernDropdown@1.0.0
           Properties:
             Items: =StatusChoices
+            ItemDisplayText: =ThisItem.Value
             AccessibleLabel: ="Status"
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",status," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",status," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =88
+            Y: =100
             Width: =Parent.Width - 32
             Height: =36
       - RequestText:
-          Control: Classic/TextInput
+          Control: ModernTextInput@1.0.0
           Properties:
             Default: =""
-            HintText: ="The request number (RITM…)"
+            Placeholder: ="The request number (RITM…)"
             AccessibleLabel: ="Request number"
+            Appearance: =Appearance.Outline
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",request," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",request," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =88
+            Y: =100
             Width: =Parent.Width - 32
             Height: =36
       - MemberPick:
-          Control: Classic/DropDown
+          Control: ModernDropdown@1.0.0
           Properties:
             Items: =TeamNames
-            Default: =MeName
+            Default: ={ Value: MeName }
+            ItemDisplayText: =ThisItem.Value
             AccessibleLabel: ="Team member"
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",member," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",member," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =88
+            Y: =100
             Width: =Parent.Width - 32
             Height: =36
       - ReasonPick:
-          Control: Classic/DropDown
+          Control: ModernDropdown@1.0.0
           Properties:
             Items: =ExceptionReasons
+            ItemDisplayText: =ThisItem.Value
             AccessibleLabel: ="Reason"
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",reason," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",reason," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =88
+            Y: =100
             Width: =Parent.Width - 32
             Height: =36
       - ReviewDate:
-          Control: Classic/DatePicker
+          Control: ModernDatePicker@1.0.0
           Properties:
             DefaultDate: =DateAdd(Today(), ExceptionMonths, TimeUnit.Months)
+            StartDate: =Today() + 1
+            Format: =DatePickerFormat.Short
             AccessibleLabel: ="Review date"
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",reviewOn," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",reviewOn," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =132
+            Y: =144
             Width: =Parent.Width - 32
             Height: =36
       - RetireDate:
-          Control: Classic/DatePicker
+          Control: ModernDatePicker@1.0.0
           Properties:
             DefaultDate: =First(Lines).RetireOn
+            Format: =DatePickerFormat.Short
+            Placeholder: ="No date (takes it away)"
             AccessibleLabel: ="Planned retirement date (empty takes it away)"
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",retireOn," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",retireOn," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =88
+            Y: =100
             Width: =Parent.Width - 32
             Height: =36
       - StagePick:
-          Control: Classic/DropDown
+          Control: ModernDropdown@1.0.0
           Properties:
             Items: =StageChoices
+            ItemDisplayText: =ThisItem.Value
             AccessibleLabel: ="Stage"
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",stage," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",stage," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =88
+            Y: =100
             Width: =Parent.Width - 32
             Height: =36
       - NoteText:
-          Control: Classic/TextInput
+          Control: ModernTextInput@1.0.0
           Properties:
             Default: =""
-            Mode: =TextMode.MultiLine
-            HintText: |-
+            Type: =TextInputType.Multiline
+            Placeholder: |-
               =If(ActionPick.Selected.Id = "stop", "Note (needed for Other): who agreed, a request number, a reference", "Note for the team")
             AccessibleLabel: ="Note"
+            Appearance: =Appearance.Outline
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
             Visible: |-
-              =",text," in "," & ActionPick.Selected.Asks & ","
+              =Tabs.Selected.Value = "Actions" && ",text," in "," & ActionPick.Selected.Asks & ","
             X: =16
-            Y: =176
+            Y: =188
             Width: =Parent.Width - 32
-            Height: =72
+            Height: =68
       - SaveButton:
-          Control: Classic/Button
+          Control: ModernButton@1.0.0
           Properties:
             Text: ="Save"
-            Visible: =LineCount > 0
+            Icon: ="Checkmark"
+            Appearance: =ButtonAppearance.Primary
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10.5
+            FontWeight: =FontWeight.Semibold
+            Tooltip: =Coalesce(SaveWhy.Text, "Add it to the journal of these lines")
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions"
             DisplayMode: |-
               =If(IsBlank(SaveWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
@@ -209,17 +293,40 @@ Screens:
                       Reset(RequestText)
                   )
               )
-            X: =16
-            Y: =256
+            X: =Parent.Width - 136
+            Y: =264
             Width: =120
+            Height: =36
+      - RefreshButton:
+          Control: ModernButton@1.0.0
+          Properties:
+            Text: ="Refresh now"
+            Icon: ="ArrowSync"
+            Appearance: =ButtonAppearance.Subtle
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Tooltip: ="Refresh the report now (about a minute)"
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions"
+            OnSelect: |-
+              =IfError(
+                  SACMRefresh.Run();
+                  Notify("The report refreshes now, in about a minute.", NotificationType.Success),
+                  Notify("The refresh could not start now. Try again in two minutes.", NotificationType.Warning)
+              )
+            X: =16
+            Y: =264
+            Width: =128
             Height: =36
       - SaveWhy:
           Control: Label
           Properties:
-            # Why Save is off: what the action still asks for. Empty when Save is on (LOOK rule 7: a grey button says why).
+            # Why Save is grey: what the action still asks for (LOOK rule 7). Empty when Save is on. Shown in the tooltip of
+            # Save and, with room, under the buttons.
             Text: |-
               =If(
-                  LineCount = 0 || IsBlank(ActionPick.Selected.Id), "",
+                  LineCount = 0, "",
+                  IsBlank(ActionPick.Selected.Id), "Pick what to do.",
                   TooManyLines, "Too many lines: select fewer than 1,000.",
                   !(ActionPick.Selected.Id in ["note", "person-note"]) && varJustSaved.Id = ActionPick.Selected.Id && varJustSaved.Keys = KeysFor.lines && Now() < DateAdd(varJustSaved.At, 3, TimeUnit.Minutes),
                   "Saved just now. The menu shows what these lines allow after the refresh, in about a minute.",
@@ -234,59 +341,345 @@ Screens:
                       "status", If(IsBlank(StatusPick.Selected.Status), "Pick the status.", ""),
                       "stage", If(IsBlank(StagePick.Selected.Id), "Pick the stage. The lines must all be of the same class.", ""),
                       "stop", If(
+                          IsBlank(ReasonPick.Selected.Value), "Pick the reason.",
                           ReviewDate.SelectedDate <= Today(), "Pick a review date after today.",
                           ReasonPick.Selected.Value = "Other" && IsBlank(Trim(NoteText.Text)), "With the reason Other, type a note.",
                           ""),
                       ""
                   )
               )
-            Visible: =LineCount > 0
-            X: =292
-            Y: =256
-            Width: =Parent.Width - 308
-            Height: =36
-      - RefreshButton:
-          Control: Classic/Button
-          Properties:
-            Text: ="Refresh now"
-            OnSelect: |-
-              =IfError(
-                  SACMRefresh.Run();
-                  Notify("The report refreshes now, in about a minute.", NotificationType.Success),
-                  Notify("The refresh could not start now. Try again in two minutes.", NotificationType.Warning)
-              )
-            X: =144
-            Y: =256
-            Width: =140
-            Height: =36
+            Font: =AppFont
+            Size: =9
+            Color: =ColourMuted
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && Parent.Height > 400
+            X: =16
+            Y: =304
+            Width: =Parent.Width - 32
+            Height: =32
       - RecentLabel:
           Control: Label
           Properties:
             Text: |-
-              =If(CountRows(RecentEvents) = 0, "Nothing done on these lines in the last 60 days.", "Done lately on these lines (also before the report shows it):")
-            Visible: =LineCount > 0
+              =If(CountRows(RecentEvents) = 0, "Nothing done on these lines in the last 60 days.", "Done lately (also before the report shows it)")
+            Font: =AppFont
+            FontWeight: =FontWeight.Semibold
+            Size: =9.5
+            Color: =ColourMuted
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && Parent.Height > 400
             X: =16
-            Y: =300
+            Y: =340
             Width: =Parent.Width - 32
-            Height: =28
+            Height: =24
       - RecentGallery:
           Control: Gallery
           Variant: Vertical
           Properties:
             Items: =RecentEvents
             TemplateSize: =44
-            Visible: =LineCount > 0
+            TemplatePadding: =0
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Actions" && Parent.Height > 400
             X: =16
-            Y: =332
+            Y: =368
             Width: =Parent.Width - 32
-            Height: =Parent.Height - 340
+            Height: =Parent.Height - 376
           Children:
             - RecentLine:
                 Control: Label
                 Properties:
                   Text: |-
-                    =Text(ThisItem.At, "d mmm hh:mm") & " · " & Coalesce(ThisItem.ByName, ThisItem.By) & " · " & ThisItem.Type & If(IsBlank(ThisItem.Text), "", ": " & ThisItem.Text)
+                    =Text(ThisItem.At, "d mmm hh:mm") & " · " & Coalesce(ThisItem.ByName, ThisItem.By) & Char(10) &
+                    ThisItem.Type & If(IsBlank(ThisItem.Text), "", ": " & ThisItem.Text)
+                  Font: =AppFont
+                  Size: =9
+                  Color: =ColourInk
                   X: =0
                   Y: =0
                   Width: =Parent.TemplateWidth
-                  Height: =Parent.TemplateHeight
+                  Height: =Parent.TemplateHeight - 1
+            - RecentRule:
+                Control: Rectangle
+                Properties:
+                  Fill: =ColourLine
+                  X: =0
+                  Y: =Parent.TemplateHeight - 1
+                  Width: =Parent.TemplateWidth
+                  Height: =1
+      # ------------------------------------------------------------------ the tab Reply (the reply reader)
+      - NoReplyLabel:
+          Control: Label
+          Properties:
+            Text: |-
+              ="No reply on these lines yet. A reply to the SACM mailbox with the reference in its subject shows here."
+            Font: =AppFont
+            Size: =10
+            Color: =ColourMuted
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && IsEmpty(LineReplies)
+            X: =16
+            Y: =56
+            Width: =Parent.Width - 32
+            Height: =56
+      - SmallLabel:
+          Control: Label
+          Properties:
+            Text: |-
+              ="The app is too small here to read the reply: press Open person (or Open CI) and read it there."
+            Font: =AppFont
+            Size: =10
+            Color: =ColourMuted
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height < 480
+            X: =16
+            Y: =56
+            Width: =Parent.Width - 32
+            Height: =56
+      - ReplyPick:
+          Control: ModernDropdown@1.0.0
+          Properties:
+            Items: =LineReplies
+            Default: =First(LineReplies)
+            ItemDisplayText: =ThisItem.From & " · " & Text(ThisItem.Received, "d mmm hh:mm")
+            AccessibleLabel: ="Which reply"
+            BasePaletteColor: =ColourViolet
+            Font: =AppFont
+            Size: =10
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            X: =16
+            Y: =56
+            Width: =Parent.Width - 32
+            Height: =32
+      - ReplySubject:
+          Control: Label
+          Properties:
+            Text: =ReplyPick.Selected.Subject
+            Font: =AppFont
+            Size: =9
+            Color: =ColourMuted
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            X: =16
+            Y: =92
+            Width: =Parent.Width - 32
+            Height: =20
+      - ReplyBody:
+          Control: Label
+          Properties:
+            # What they wrote, as the flow F3 filed it (plain text). It scrolls when it is long.
+            Text: =ReplyPick.Selected.Body
+            Font: =AppFont
+            Size: =10
+            Color: =ColourInk
+            Fill: =ColourVioletSoft
+            BorderColor: =ColourLine
+            BorderThickness: =1
+            PaddingLeft: =10
+            PaddingRight: =10
+            PaddingTop: =8
+            PaddingBottom: =8
+            VerticalAlign: =VerticalAlign.Top
+            Overflow: =Overflow.Scroll
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            X: =16
+            Y: =116
+            Width: =Parent.Width - 32
+            Height: =Max(40, (Parent.Height - 116 - 156 - 28) / 2)
+      - TickCaption:
+          Control: Label
+          Properties:
+            # Why the buttons are grey (LOOK rule 7), else how many lines they act on.
+            Text: |-
+              =With(
+                  { ticked: CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) },
+                  If(
+                      !IsBlank(varReplyDone) && varReplyDone.Ref = ReplyPick.Selected.Title && Now() < DateAdd(varReplyDone.At, 3, TimeUnit.Minutes),
+                      "Done just now. The report shows it after the refresh.",
+                      ticked = 0, "Tick the lines the reply answers.",
+                      ticked & If(ticked = 1, " line ticked: the buttons act on it.", " lines ticked: the buttons act on them.")))
+            Font: =AppFont
+            Size: =9
+            Color: =ColourMuted
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            X: =16
+            Y: =ReplyBody.Y + ReplyBody.Height + 4
+            Width: =Parent.Width - 32
+            Height: =22
+      - ReplyGallery:
+          Control: Gallery
+          Variant: Vertical
+          Properties:
+            # The lines, those of this reply's message first.
+            Items: =Sort(Lines, If(LastRef = ReplyPick.Selected.Title, 0, 1))
+            TemplateSize: =44
+            TemplatePadding: =0
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            X: =16
+            Y: =TickCaption.Y + 24
+            Width: =Parent.Width - 32
+            Height: =Max(40, Parent.Height - 156 - (TickCaption.Y + 24) - 8)
+          Children:
+            - LineCheck:
+                Control: ModernCheckbox@1.0.0
+                Properties:
+                  Label: =""
+                  Checked: =ThisItem.LastRef = ReplyPick.Selected.Title
+                  AccessibleLabel: ="The reply answers " & ThisItem.CiName
+                  BasePaletteColor: =ColourNavy
+                  X: =0
+                  Y: =6
+                  Width: =32
+                  Height: =32
+            - LineName:
+                Control: Label
+                Properties:
+                  Text: =ThisItem.CiName
+                  Font: =AppFont
+                  FontWeight: =FontWeight.Semibold
+                  Size: =9.5
+                  Color: =ColourInk
+                  X: =36
+                  Y: =2
+                  Width: =Parent.TemplateWidth - 36
+                  Height: =20
+            - LineCard:
+                Control: Label
+                Properties:
+                  Text: =Coalesce(ThisItem.Card, ThisItem.CheckId) & " · " & ThisItem.Status
+                  Font: =AppFont
+                  Size: =9
+                  Color: =ColourMuted
+                  X: =36
+                  Y: =22
+                  Width: =Parent.TemplateWidth - 36
+                  Height: =20
+            - LineRule:
+                Control: Rectangle
+                Properties:
+                  Fill: =ColourLine
+                  X: =0
+                  Y: =Parent.TemplateHeight - 1
+                  Width: =Parent.TemplateWidth
+                  Height: =1
+      - ReplyNote:
+          Control: ModernTextInput@1.0.0
+          Properties:
+            Default: =""
+            Placeholder: ="Note (what they said, optional)"
+            AccessibleLabel: ="Note"
+            Appearance: =Appearance.Outline
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            X: =16
+            Y: =Parent.Height - 148
+            Width: =Parent.Width - 32
+            Height: =36
+      - WaitDate:
+          Control: ModernDatePicker@1.0.0
+          Properties:
+            DefaultDate: =Today() + 7
+            StartDate: =Today() + 1
+            Format: =DatePickerFormat.Short
+            AccessibleLabel: ="Waiting until"
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            X: =16
+            Y: =Parent.Height - 104
+            Width: =(Parent.Width - 40) / 2
+            Height: =36
+      - WaitButton:
+          Control: ModernButton@1.0.0
+          Properties:
+            # They said they will fix it: status Fix in progress (no reminder while it stands) and a note with the date.
+            Text: ="Waiting until"
+            Icon: ="Calendar"
+            Appearance: =ButtonAppearance.Secondary
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Tooltip: ="Fix in progress, with a note of the date they gave: no reminder goes while it stands"
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            DisplayMode: |-
+              =If(
+                  CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || IsBlank(WaitDate.SelectedDate) || WaitDate.SelectedDate <= Today() || TooManyLines ||
+                  (!IsBlank(varReplyDone) && varReplyDone.Ref = ReplyPick.Selected.Title && Now() < DateAdd(varReplyDone.At, 3, TimeUnit.Minutes)),
+                  DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |-
+              =With(
+                  {
+                      keys: Concat(Filter(ReplyGallery.AllItems, LineCheck.Checked), Key, Char(10)),
+                      note: "Waiting until " & Text(WaitDate.SelectedDate, "d mmm yyyy", "en-GB") & " (reply of " & ReplyPick.Selected.From & ")" & If(IsBlank(Trim(ReplyNote.Text)), "", ": " & Trim(ReplyNote.Text))
+                  },
+                  IfError(
+                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "status", Keys: keys, Text: "Fix in progress" });
+                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: keys, Text: note });
+                      Set(varReplyDone, { Ref: ReplyPick.Selected.Title, At: Now() });
+                      Notify("Saved: Fix in progress, waiting until " & Text(WaitDate.SelectedDate, "d mmm") & ". The report shows it after the next refresh.", NotificationType.Success);
+                      Reset(ReplyNote);
+                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Notify("Not saved: " & FirstError.Message, NotificationType.Error)
+                  )
+              )
+            X: =24 + (Parent.Width - 40) / 2
+            Y: =Parent.Height - 104
+            Width: =(Parent.Width - 40) / 2
+            Height: =36
+      - NoteButton:
+          Control: ModernButton@1.0.0
+          Properties:
+            Text: ="Add note"
+            Icon: ="Note"
+            Appearance: =ButtonAppearance.Secondary
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Tooltip: =If(IsBlank(Trim(ReplyNote.Text)), "Type the note first", "Add the note to the ticked lines")
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            DisplayMode: |-
+              =If(CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || IsBlank(Trim(ReplyNote.Text)), DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |-
+              =IfError(
+                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: Concat(Filter(ReplyGallery.AllItems, LineCheck.Checked), Key, Char(10)), Text: Trim(ReplyNote.Text) });
+                  Notify("Note saved. The report shows it after the next refresh.", NotificationType.Success);
+                  Reset(ReplyNote);
+                  IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                  Notify("Not saved: " & FirstError.Message, NotificationType.Error)
+              )
+            X: =16
+            Y: =Parent.Height - 56
+            Width: =(Parent.Width - 40) / 2
+            Height: =40
+      - AnsweredButton:
+          Control: ModernButton@1.0.0
+          Properties:
+            # The main button of the reader: the reply answers the ticked lines (status Answered: no reminder goes).
+            Text: ="Mark answered"
+            Icon: ="Checkmark"
+            Appearance: =ButtonAppearance.Primary
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10.5
+            FontWeight: =FontWeight.Semibold
+            Tooltip: ="Status Answered on the ticked lines, with the note when you typed one"
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            DisplayMode: |-
+              =If(
+                  CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || TooManyLines ||
+                  (!IsBlank(varReplyDone) && varReplyDone.Ref = ReplyPick.Selected.Title && Now() < DateAdd(varReplyDone.At, 3, TimeUnit.Minutes)),
+                  DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |-
+              =With(
+                  { keys: Concat(Filter(ReplyGallery.AllItems, LineCheck.Checked), Key, Char(10)), note: Trim(ReplyNote.Text) },
+                  IfError(
+                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "status", Keys: keys, Text: "Answered" });
+                      If(!IsBlank(note), Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: Lower(User().Email), ByName: MeName, Type: "note", Keys: keys, Text: note }));
+                      Set(varReplyDone, { Ref: ReplyPick.Selected.Title, At: Now() });
+                      Notify("Marked answered. The report shows it after the next refresh.", NotificationType.Success);
+                      Reset(ReplyNote);
+                      IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
+                      Notify("Not saved: " & FirstError.Message, NotificationType.Error)
+                  )
+              )
+            X: =24 + (Parent.Width - 40) / 2
+            Y: =Parent.Height - 56
+            Width: =(Parent.Width - 40) / 2
+            Height: =40

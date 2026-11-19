@@ -68,11 +68,13 @@ export const GRID = {
  */
 export const APP_SLOTS: Record<string, { app: string; x: number; y: number; width: number; height: number }> = {
   mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 },
-  messages: { app: 'SACM messages', x: 956, y: 84, width: 300, height: 620 },
+  // The email studio (build D5, D326): the list, the email as it goes and the fields side by side, so it fills the page.
+  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620 },
   auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 },
   auditreview: { app: 'SACM audit', x: 956, y: 84, width: 300, height: 620 },
   card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 300 },
-  person: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 368 },
+  // Taller since build D5: the app reads the person's replies (the reply reader), where the table of replies was.
+  person: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 568 },
   case: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 }
 };
 

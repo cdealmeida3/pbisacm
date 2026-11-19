@@ -1,8 +1,8 @@
-// The named formulas of the Power App "SACM actions" (build B6, D294 to D296), written by hand. npm run powerbi:generate
+// The named formulas of the Power App "SACM actions" (builds B6 and D5, D294 to D296, D317), written by hand. npm run powerbi:generate
 // puts them after the catalogue of powerbi/apps/actions.json into App-Formulas.fx (to paste into App → Formulas) and
 // Src/App.pa.yaml. Words of the app: plain English, as in the report.
 //
-// Lines: the rows the Power Apps visual of the page gives (the fields of CaseLines, README §6): the lines of the page,
+// Lines: the rows the Power Apps visual of the page gives (the fields of CaseLines, README §6.4): the lines of the page,
 // or the ones selected in the report. Me: the person signed in, found by their email in the list SACM Team.
 
 Lines = PowerBIIntegration.Data;
@@ -71,3 +71,18 @@ SelectedKeys = ForAll(Lines, Key);
 RecentEvents = Filter(
     Sort(Filter('SACM Journal', At >= DateAdd(Today(), -60, TimeUnit.Days)), At, SortOrder.Descending) As event,
     CountRows(Filter(Split(event.Keys, Char(10)) As key, Trim(key.Value) in SelectedKeys.Value)) > 0);
+
+// The reply reader (build D5, design pass §7): the tab Reply shows what a person wrote next to the lines it is about.
+// A reply is filed by flow F3 in the list SACM Replies under the reference of the message it answers (its Title). The
+// app reads the newest reply of each reference of the lines (Title and Received are tested and sorted in SharePoint, so
+// they are delegated), newest first; the report shows the same replies after the refresh. A reply is read once a
+// manager acts on one of its lines: Mark answered (status Answered), Waiting until (status Fix in progress and a note
+// with the date) or a status of the tab Actions (RepliesToRead of the report).
+ReplyRefs = Distinct(Filter(Lines, !IsBlank(LastRef)), LastRef);
+LineReplies = Sort(
+    Filter(
+        ForAll(ReplyRefs As reference, First(Sort(Filter('SACM Replies', Title = reference.Value), Received, SortOrder.Descending))),
+        !IsBlank(Title)),
+    Received, SortOrder.Descending);
+// The lines that wait for a reply to be read (the step Reply to read of the report).
+ToReadCount = CountRows(Filter(Lines, Step = "Reply to read"));

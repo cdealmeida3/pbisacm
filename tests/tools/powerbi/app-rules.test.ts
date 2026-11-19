@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { appActions } from '../../../tools/powerbi/actions.ts';
-import { appFlows, callProblems, catalogueProblems, flowProblems } from '../../../tools/powerbi/app-rules.ts';
-import type { Formula } from '../../../tools/powerbi/app-rules.ts';
+import { appFlows, callProblems, catalogueProblems, controlProblems, flowProblems } from '../../../tools/powerbi/app-rules.ts';
+import type { Flow, Formula } from '../../../tools/powerbi/app-rules.ts';
 
 const root = join(import.meta.dirname, '..', '..', '..');
 const fnCaseActions = readFileSync(join(root, 'powerbi', 'm', 'fnCaseActions.pq'), 'utf8');
@@ -50,7 +50,47 @@ test('a flow sends only from the app, one message, exactly the inputs the manage
     steps: [{ action: 'Send an email from a shared mailbox (V2)', connector: 'Office 365 Outlook', fields: { To: '=the user who ran it', Subject: '=input Subject', Body: '=input Body', Attachments: 'a file' } }] };
   const more = flowProblems([given]);
   assert.ok(more.some((line) => line.includes('To "=the user who ran it"')));
-  assert.ok(more.some((line) => line.includes('the field Attachments')));
+  assert.ok(more.some((line) => line.includes('Attachments "a file"')));
+  const unknown = { ...given, steps: [{ ...given.steps[0]!, fields: { ...given.steps[0]!.fields, Attachments: '=input Csv as the file FileName', Bcc2: 'x' } }] };
+  const fields = flowProblems([unknown]);
+  assert.ok(fields.some((line) => line.includes('the field Bcc2')));
+  assert.ok(fields.some((line) => line.includes('Attachments "=input Csv as the file FileName": it must be the input Csv as the file FileName')), 'the file needs the inputs Csv and FileName');
+});
+
+test('the Outlook draft (F7, D315) is one new message in the manager\'s own Drafts, started by the app, and sends nothing', () => {
+  const f7 = appFlows().find((flow) => flow.id === 'F7')!;
+  assert.equal(f7.name, 'SACMDraft');
+  assert.deepEqual(flowProblems([f7]), []);
+  const send: Flow = { ...f7, trigger: 'When a new email arrives in a shared mailbox (V2)', inputs: [], steps: [
+    { action: 'Send an HTTP request', connector: 'Office 365 Outlook', fields: { URI: 'https://graph.microsoft.com/v1.0/me/sendMail', Method: 'POST', Body: '=input Message with the file Csv and the shared SACM mailbox as From', ContentType: 'application/json' } },
+    { action: 'Send an email from a shared mailbox (V2)', connector: 'Office 365 Outlook', fields: { To: '=input To', Subject: '=input Subject', Body: '=input Body' } },
+    { action: 'Respond to a PowerApp or flow', connector: 'Power Apps', fields: {} }
+  ] };
+  const problems = flowProblems([send]);
+  assert.ok(problems.some((line) => line.includes('does not start when a manager presses Outlook draft')));
+  assert.ok(problems.some((line) => line.includes('makes a draft and sends')));
+  assert.ok(problems.some((line) => line.includes('URI "https://graph.microsoft.com/v1.0/me/sendMail"')));
+  assert.ok(problems.some((line) => line.includes('no input Message')));
+  assert.ok(problems.some((line) => line.includes('answers a Power App, but the app does not start it')));
+});
+
+test('the apps use the modern controls, with only the properties Microsoft gives them (D317)', () => {
+  const screen = (controls: Array<Record<string, unknown>>) => ({ Screens: { S: { Children: controls } } });
+  assert.deepEqual(controlProblems('powerbi/apps/x/Src/S.pa.yaml', screen([
+    { Ok: { Control: 'ModernButton@1.0.0', Properties: { Text: '="Send"', Appearance: '=ButtonAppearance.Primary', Size: '=10' } } },
+    { List: { Control: 'Gallery', Properties: { Items: '=Emails' }, Children: [{ Line: { Control: 'Label', Properties: { Text: '=ThisItem.To' } } }] } }
+  ])), []);
+  const problems = controlProblems('powerbi/apps/x/Src/S.pa.yaml', screen([
+    { Old: { Control: 'Classic/Button', Properties: {} } },
+    { Unversioned: { Control: 'Button', Properties: {} } },
+    { List: { Control: 'Gallery', Children: [{ Box: { Control: 'ModernCheckbox@1.0.0', Properties: { Default: '=false', Checked: '=false' } } }] } },
+    { Input: { Control: 'ModernTextInput@1.0.0', Properties: { HintText: '="To"', FontSize: '=10' } } }
+  ]));
+  assert.ok(problems.some((line) => line.includes('Old is a Classic/Button')));
+  assert.ok(problems.some((line) => line.includes('Unversioned is a Button')));
+  assert.ok(problems.some((line) => line.includes('Box (ModernCheckbox@1.0.0) has the property Default')));
+  assert.ok(problems.some((line) => line.includes('has the property HintText')));
+  assert.ok(problems.some((line) => line.includes('has the property FontSize')));
 });
 
 test('the app may add a row to the journal with its columns, and run the refresh flow', () => {
@@ -76,4 +116,37 @@ test('the app SACM audit adds rows to SACM Settings with Title and Value only, a
   const problems = callProblems([audit([patch(['Title', 'Colour'], 'Defaults', 'SACM Settings'), patch(['Title'], null, 'SACM Settings'), patch(['Title'])])]);
   assert.ok(problems.some((line) => line.includes('column Colour, which SACM Settings does not have')));
   assert.ok(problems.some((line) => line.includes('Patch(SACM Settings, …)')));
+});
+
+/** The controls of a screen file, read by indentation (enough for the hand-written screens; the lint reads them with YamlDotNet). */
+function screenControls(text: string): Array<Record<string, { Control: string; Properties: Record<string, string> }>> {
+  const lines = text.split('\n');
+  const out: Array<Record<string, { Control: string; Properties: Record<string, string> }>> = [];
+  lines.forEach((line, at) => {
+    const head = /^(\s*)- (\w+):\s*$/.exec(line);
+    if (!head) return;
+    const indent = head[1]!.length + 2;
+    const control = { Control: '', Properties: {} as Record<string, string> };
+    let inProperties = -1;
+    for (let next = at + 1; next < lines.length; next++) {
+      const row = lines[next]!;
+      if (!row.trim() || row.trim().startsWith('#')) continue;
+      const depth = row.length - row.trimStart().length;
+      if (depth <= indent - 2) break;
+      if (depth === indent + 2 && /^\s*Control: /.test(row)) control.Control = row.trim().slice('Control: '.length);
+      if (depth === indent + 2) inProperties = /^\s*Properties:\s*$/.test(row) ? depth : -1;
+      else if (inProperties >= 0 && depth === inProperties + 2) { const key = /^\s*(\w+):/.exec(row); if (key) control.Properties[key[1]!] = ''; }
+    }
+    out.push({ [head[2]!]: control });
+  });
+  return out;
+}
+
+test('the three screens use only modern controls with their own properties, or the classic ones that stay (D317)', () => {
+  for (const app of ['sacm-actions/Src/ActionsScreen.pa.yaml', 'sacm-messages/Src/MessagesScreen.pa.yaml', 'sacm-audit/Src/AuditScreen.pa.yaml']) {
+    const file = join(root, 'powerbi', 'apps', app);
+    const controls = screenControls(readFileSync(file, 'utf8'));
+    assert.ok(controls.length > 10, `${app}: the controls were read`);
+    assert.deepEqual(controlProblems(file, { Screens: { S: { Children: controls } } }), [], app);
+  }
 });

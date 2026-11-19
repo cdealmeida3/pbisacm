@@ -40,7 +40,7 @@ MarkedCount = CountRows(Filter(CurrentLines, !IsBlank(Result)));
 AgreeingLines = Filter(CurrentLines, Agrees);
 AgreeNote = "Same status in the EPO systems report of " & Text(First(CurrentLines).EpoDate, "d mmm yyyy", "en-US");
 
-// The settings (D158): each number with the value that counts now: the last row of its key in SACM Settings when it is a
+// The settings (D158; rowsInEmail, D314): each number with the value that counts now: the last row of its key in SACM Settings when it is a
 // whole number in its range, else the default (CaseRules of the report reads the same).
 SettingRows = ForAll(
     SettingCatalog As setting,

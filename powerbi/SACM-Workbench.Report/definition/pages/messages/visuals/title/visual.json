@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Ready to send. Open one in the app at the right, and press Send.",
+                    "value": "Every email ready to send. Open one in the list, check the email as it will arrive, and press Send.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

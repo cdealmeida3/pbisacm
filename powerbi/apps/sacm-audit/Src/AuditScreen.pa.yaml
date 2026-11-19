@@ -1,48 +1,54 @@
-# The one screen of the Power App "SACM audit" (build B8, D306, D308), written by hand. To use it: in Power Apps Studio,
-# select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6.8). Structure only: the
-# visual design pass comes later.
+# The one screen of the Power App "SACM audit" (builds B8 and D5, D306, D308, D317), written by hand. To use it: in Power
+# Apps Studio, select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6.8). It is
+# drawn for its place on the page Lifecycle review (300 × 620, README §6.4), with the modern controls (D317).
 # What it does, on two tabs:
 #   - Lifecycle review: New review adds one row to SACM Journal with the sample the report drew from the newest CI report
 #     (D306). Then a manager ticks CIs of the newest review, picks the result (Same in EPO, Not the same, Not in EPO) and
 #     a note, and Save adds one row per CI. "Mark N same in EPO" marks at once the CIs whose status EPO shows the same.
-#   - Settings: the six numbers of the team (D158) with their ranges. Save adds one row to SACM Settings per changed
+#   - Settings: the numbers of the team (D158) with their ranges, and the lines a table of an email shows (D314). Save adds one row to SACM Settings per changed
 #     number (the last row counts, D308) and one settings row to SACM Journal that says what changed.
 # Every Save asks flow F5 (SACMRefresh) to refresh the report. The app changes and removes no row, and sends nothing.
 Screens:
   AuditScreen:
     Properties:
-      Fill: =RGBA(255, 255, 255, 1)
-      OnVisible: =Set(varTab, "review"); Set(varDone, Blank())
+      Fill: =ColourSurface
     Children:
       - TitleLabel:
           Control: Label
           Properties:
             Text: |-
               ="SACM audit" & If(IsBlank(MeName), "", " · " & MeName) & If(TooManyLines, " · The report gives the app 1,000 lines at most: filter the page.", "")
+            Font: =AppFont
             FontWeight: =FontWeight.Semibold
-            Size: =14
+            Size: =11
+            Color: =ColourInk
             X: =16
             Y: =8
             Width: =Parent.Width - 32
-            Height: =32
-      - ReviewTab:
-          Control: Classic/Button
+            Height: =28
+      - Tabs:
+          Control: ModernTabList@1.0.0
           Properties:
-            Text: ="Lifecycle review"
-            OnSelect: =Set(varTab, "review")
-            X: =16
-            Y: =44
-            Width: =180
-            Height: =36
-      - SettingsTab:
-          Control: Classic/Button
+            Items: =["Lifecycle review", "Settings"]
+            Default: ="Lifecycle review"
+            Appearance: =TabListAppearance.Underline
+            Alignment: =TabListAlignment.Start
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            AccessibleLabel: ="The review or the settings"
+            X: =8
+            Y: =40
+            Width: =Parent.Width - 16
+            Height: =40
+      - HeadRule:
+          Control: Rectangle
           Properties:
-            Text: ="Settings"
-            OnSelect: =Set(varTab, "settings")
-            X: =204
-            Y: =44
-            Width: =140
-            Height: =36
+            Fill: =ColourLine
+            X: =0
+            Y: =83
+            Width: =Parent.Width
+            Height: =1
       # ------------------------------------------------------------------ the lifecycle review
       - ReviewLine:
           Control: Label
@@ -50,17 +56,33 @@ Screens:
             Text: |-
               =If(
                   IsEmpty(CurrentLines), "No lifecycle review yet. New review draws " & CountRows(NextLines) & " CIs from the newest CI report.",
-                  "Lifecycle review " & CurrentId & ": " & MarkedCount & " of " & CountRows(CurrentLines) & " checked.")
-            Visible: =varTab = "review"
+                  "Review " & CurrentId & ": " & MarkedCount & " of " & CountRows(CurrentLines) & " CIs checked.")
+            Font: =AppFont
+            Size: =10
+            Color: =ColourInk
+            Visible: =Tabs.Selected.Value = "Lifecycle review"
             X: =16
-            Y: =88
-            Width: =Parent.Width - 200
-            Height: =36
+            Y: =92
+            Width: =Parent.Width - 32
+            Height: =40
       - NewReviewButton:
-          Control: Classic/Button
+          Control: ModernButton@1.0.0
           Properties:
             Text: ="New review"
-            Visible: =varTab = "review"
+            Icon: ="Add"
+            # The main button only while there is no review to mark (LOOK rule 6: one main button).
+            Appearance: =If(IsEmpty(CurrentLines), ButtonAppearance.Primary, ButtonAppearance.Outline)
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Tooltip: |-
+              =If(
+                  StartedToday, "A review was started today: one review a day.",
+                  IsEmpty(NextLines), "The newest CI report has no CI to draw.",
+                  IsBlank(MeEmail), "The app does not know who you are: sign in again.",
+                  TooManyLines, "The report gives the app 1,000 lines at most: filter the page.",
+                  "Draw " & CountRows(NextLines) & " CIs from the newest CI report")
+            Visible: =Tabs.Selected.Value = "Lifecycle review"
             DisplayMode: |-
               =If(StartedToday || IsEmpty(NextLines) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
@@ -70,73 +92,114 @@ Screens:
                   IfError(SACMRefresh.Run(), Notify("The refresh could not start now: the report shows it after the next refresh.", NotificationType.Warning)),
                   Notify("Not started: " & FirstError.Message, NotificationType.Error)
               )
-            X: =Parent.Width - 176
-            Y: =88
-            Width: =160
+            X: =16
+            Y: =136
+            Width: =Parent.Width - 32
             Height: =36
       - LineGallery:
           Control: Gallery
           Variant: Vertical
           Properties:
             Items: =CurrentLines
-            TemplateSize: =48
-            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            TemplateSize: =56
+            TemplatePadding: =0
+            Visible: =Tabs.Selected.Value = "Lifecycle review" && !IsEmpty(CurrentLines)
             X: =16
-            Y: =132
+            Y: =180
             Width: =Parent.Width - 32
-            Height: =Parent.Height - 332
+            Height: =Parent.Height - 180 - 196
           Children:
             - MarkCheck:
-                Control: Classic/CheckBox
+                Control: ModernCheckbox@1.0.0
                 Properties:
-                  Text: =""
-                  Default: =false
+                  Label: =""
+                  Checked: =false
                   AccessibleLabel: ="Mark " & ThisItem.CiName
+                  BasePaletteColor: =ColourNavy
                   X: =0
-                  Y: =8
+                  Y: =12
                   Width: =32
                   Height: =32
+            - MarkName:
+                Control: Label
+                Properties:
+                  Text: =ThisItem.CiName & " · " & ThisItem.ClassLabel
+                  Font: =AppFont
+                  FontWeight: =FontWeight.Semibold
+                  Size: =9.5
+                  Color: =ColourInk
+                  X: =36
+                  Y: =4
+                  Width: =Parent.TemplateWidth - 36
+                  Height: =22
             - MarkLine:
                 Control: Label
                 Properties:
                   Text: |-
-                    =ThisItem.CiName & " · " & ThisItem.ClassLabel & Char(10) &
-                    "ServiceNow: " & ThisItem.Status & " · EPO: " & Coalesce(ThisItem.EpoStatus, "not in the EPO report") & " · " & ThisItem.ResultLabel
-                  X: =40
-                  Y: =0
-                  Width: =Parent.TemplateWidth - 40
-                  Height: =Parent.TemplateHeight
+                    ="ServiceNow " & ThisItem.Status & " · EPO " & Coalesce(ThisItem.EpoStatus, "not in the report") & " · " & ThisItem.ResultLabel
+                  Font: =AppFont
+                  Size: =9
+                  Color: =ColourMuted
+                  X: =36
+                  Y: =28
+                  Width: =Parent.TemplateWidth - 36
+                  Height: =22
+            - MarkRule:
+                Control: Rectangle
+                Properties:
+                  Fill: =ColourLine
+                  X: =0
+                  Y: =Parent.TemplateHeight - 1
+                  Width: =Parent.TemplateWidth
+                  Height: =1
       - ResultPick:
-          Control: Classic/DropDown
+          Control: ModernDropdown@1.0.0
           Properties:
             Items: =ReviewResults
+            Default: =First(ReviewResults)
+            ItemDisplayText: =ThisItem.Label
             AccessibleLabel: ="Result"
-            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Visible: =Tabs.Selected.Value = "Lifecycle review" && !IsEmpty(CurrentLines)
             X: =16
-            Y: =Parent.Height - 192
-            Width: =280
+            Y: =Parent.Height - 188
+            Width: =Parent.Width - 32
             Height: =36
       - NoteText:
-          Control: Classic/TextInput
+          Control: ModernTextInput@1.0.0
           Properties:
             Default: =""
-            HintText: ="Note (what EPO says)"
+            Placeholder: ="Note (what EPO says)"
             AccessibleLabel: ="Note"
-            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
-            X: =304
-            Y: =Parent.Height - 192
-            Width: =Parent.Width - 320
+            Appearance: =Appearance.Outline
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Visible: =Tabs.Selected.Value = "Lifecycle review" && !IsEmpty(CurrentLines)
+            X: =16
+            Y: =Parent.Height - 144
+            Width: =Parent.Width - 32
             Height: =36
       - MarkButton:
-          Control: Classic/Button
+          Control: ModernButton@1.0.0
           Properties:
             Text: ="Save the mark"
-            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            Icon: ="Checkmark"
+            Appearance: =ButtonAppearance.Primary
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10.5
+            FontWeight: =FontWeight.Semibold
+            Tooltip: |-
+              =If(IsEmpty(Filter(LineGallery.AllItems, MarkCheck.Checked)), "Tick the CIs first.", IsBlank(ResultPick.Selected.Id), "Pick the result.", "Save the result on the ticked CIs")
+            Visible: =Tabs.Selected.Value = "Lifecycle review" && !IsEmpty(CurrentLines)
             DisplayMode: |-
-              =If(IsEmpty(Filter(LineGallery.AllItems, MarkCheck.Value)) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
+              =If(IsEmpty(Filter(LineGallery.AllItems, MarkCheck.Checked)) || IsBlank(ResultPick.Selected.Id) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =With(
-                  { ticked: Filter(LineGallery.AllItems, MarkCheck.Value), result: ResultPick.Selected.Id, note: Trim(NoteText.Text) },
+                  { ticked: Filter(LineGallery.AllItems, MarkCheck.Checked), result: ResultPick.Selected.Id, note: Trim(NoteText.Text) },
                   IfError(
                       ForAll(
                           ticked As line,
@@ -149,14 +212,20 @@ Screens:
                   )
               )
             X: =16
-            Y: =Parent.Height - 148
-            Width: =200
-            Height: =36
+            Y: =Parent.Height - 100
+            Width: =Parent.Width - 32
+            Height: =40
       - SameButton:
-          Control: Classic/Button
+          Control: ModernButton@1.0.0
           Properties:
             Text: ="Mark " & CountRows(AgreeingLines) & " same in EPO"
-            Visible: =varTab = "review" && !IsEmpty(CurrentLines)
+            Appearance: =ButtonAppearance.Outline
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10
+            Tooltip: |-
+              =If(IsEmpty(AgreeingLines), "No CI left whose status the EPO systems report shows the same.", "Mark at once the CIs whose status EPO shows the same")
+            Visible: =Tabs.Selected.Value = "Lifecycle review" && !IsEmpty(CurrentLines)
             DisplayMode: |-
               =If(IsEmpty(AgreeingLines) || IsBlank(MeEmail) || TooManyLines, DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
@@ -172,9 +241,9 @@ Screens:
                       Notify("Not saved: " & FirstError.Message, NotificationType.Error)
                   )
               )
-            X: =224
-            Y: =Parent.Height - 148
-            Width: =240
+            X: =16
+            Y: =Parent.Height - 52
+            Width: =Parent.Width - 32
             Height: =36
       # ------------------------------------------------------------------ the settings
       - SettingGallery:
@@ -182,42 +251,65 @@ Screens:
           Variant: Vertical
           Properties:
             Items: =Sort(SettingRows, Order)
-            TemplateSize: =56
-            Visible: =varTab = "settings"
+            TemplateSize: =76
+            TemplatePadding: =0
+            Visible: =Tabs.Selected.Value = "Settings"
             X: =16
-            Y: =88
+            Y: =92
             Width: =Parent.Width - 32
-            Height: =360
+            Height: =Parent.Height - 92 - 112
           Children:
             - SettingLabel:
                 Control: Label
                 Properties:
-                  Text: |-
-                    =ThisItem.Label & Char(10) & "A whole number from " & ThisItem.Min & " to " & ThisItem.Max & ". Default " & ThisItem.Default & "." & If(ThisItem.Unused <> "", " The saved value " & ThisItem.Unused & " is not used: the default counts.", "")
+                  Text: =ThisItem.Label
+                  Font: =AppFont
+                  FontWeight: =FontWeight.Semibold
+                  Size: =9.5
+                  Color: =ColourInk
+                  VerticalAlign: =VerticalAlign.Top
                   X: =0
-                  Y: =0
-                  Width: =Parent.TemplateWidth - 140
-                  Height: =Parent.TemplateHeight
+                  Y: =6
+                  Width: =Parent.TemplateWidth - 84
+                  Height: =36
+            - SettingHelp:
+                Control: Label
+                Properties:
+                  Text: |-
+                    =ThisItem.Min & " to " & ThisItem.Max & ", default " & ThisItem.Default & "." & If(ThisItem.Unused <> "", " The saved value " & ThisItem.Unused & " is not used: the default counts.", "")
+                  Font: =AppFont
+                  Size: =9
+                  Color: =If(ThisItem.Unused <> "", ColourRed, ColourMuted)
+                  VerticalAlign: =VerticalAlign.Top
+                  X: =0
+                  Y: =42
+                  Width: =Parent.TemplateWidth - 84
+                  Height: =32
             - ValueInput:
-                Control: Classic/TextInput
+                Control: ModernTextInput@1.0.0
                 Properties:
                   Default: =Text(ThisItem.Current)
                   AccessibleLabel: =ThisItem.Label
-                  X: =Parent.TemplateWidth - 128
+                  Appearance: =Appearance.Outline
+                  BasePaletteColor: =ColourNavy
+                  Font: =AppFont
+                  Size: =10
+                  Align: =Align.Right
+                  # A number Save refuses (D158) shows red.
+                  ValidationState: |-
+                    =If(IsMatch(Trim(Self.Text), "\d+") && Value(Trim(Self.Text)) >= ThisItem.Min && Value(Trim(Self.Text)) <= ThisItem.Max, ValidationState.None, ValidationState.Error)
+                  X: =Parent.TemplateWidth - 76
                   Y: =10
-                  Width: =120
-                  Height: =36
-            - ValueBadLine:
-                Control: Label
+                  Width: =76
+                  Height: =32
+            - SettingRule:
+                Control: Rectangle
                 Properties:
-                  # The red line under a number Save refuses (D158).
-                  Text: =""
-                  Fill: =RGBA(164, 38, 44, 1)
-                  Visible: =!(IsMatch(Trim(ValueInput.Text), "\d+") && Value(Trim(ValueInput.Text)) >= ThisItem.Min && Value(Trim(ValueInput.Text)) <= ThisItem.Max)
-                  X: =Parent.TemplateWidth - 128
-                  Y: =47
-                  Width: =120
-                  Height: =3
+                  Fill: =ColourLine
+                  X: =0
+                  Y: =Parent.TemplateHeight - 1
+                  Width: =Parent.TemplateWidth
+                  Height: =1
       - SettingsWhy:
           Control: Label
           Properties:
@@ -227,16 +319,25 @@ Screens:
                   Filter(SettingGallery.AllItems As row, !(IsMatch(Trim(row.ValueInput.Text), "\d+") && Value(Trim(row.ValueInput.Text)) >= row.Min && Value(Trim(row.ValueInput.Text)) <= row.Max)) As bad,
                   bad.Label & ": a whole number from " & bad.Min & " to " & bad.Max & ".",
                   " ")
-            Visible: =varTab = "settings"
+            Font: =AppFont
+            Size: =9
+            Color: =ColourRed
+            Visible: =Tabs.Selected.Value = "Settings"
             X: =16
-            Y: =456
+            Y: =Parent.Height - 108
             Width: =Parent.Width - 32
             Height: =48
       - SaveSettingsButton:
-          Control: Classic/Button
+          Control: ModernButton@1.0.0
           Properties:
             Text: ="Save the settings"
-            Visible: =varTab = "settings"
+            Icon: ="Save"
+            Appearance: =ButtonAppearance.Primary
+            BasePaletteColor: =ColourNavy
+            Font: =AppFont
+            Size: =10.5
+            FontWeight: =FontWeight.Semibold
+            Visible: =Tabs.Selected.Value = "Settings"
             DisplayMode: |-
               =If(!IsBlank(SettingsWhy.Text) || IsBlank(MeEmail), DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
@@ -259,6 +360,6 @@ Screens:
                   )
               )
             X: =16
-            Y: =512
-            Width: =200
-            Height: =36
+            Y: =Parent.Height - 56
+            Width: =Parent.Width - 32
+            Height: =40
