@@ -205,6 +205,13 @@
                   }
                 }
               }
+            },
+            "textWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
             }
           },
           "selector": {

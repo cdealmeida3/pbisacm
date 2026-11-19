@@ -5,7 +5,7 @@
     "x": 712,
     "y": 84,
     "z": 4600,
-    "height": 88,
+    "height": 100,
     "width": 232,
     "tabOrder": 4600
   },
@@ -203,6 +203,13 @@
                       "Value": "'#655a52'"
                     }
                   }
+                }
+              }
+            },
+            "textWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }

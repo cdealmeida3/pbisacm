@@ -218,13 +218,13 @@ table Checks
 	/// What this card asks (Card): the text of its check file, else its hint, or how to choose a card.
 	measure 'Card about' =
 			VAR cardText = SELECTEDVALUE ( Checks[CardText] )
-			VAR hint = SELECTEDVALUE ( Checks[CardHint] )
+			VAR cardHint = SELECTEDVALUE ( Checks[CardHint] )
 			RETURN
 			    SWITCH (
 			        TRUE (),
 			        NOT HASONEVALUE ( Checks[CheckId] ), "On All cards, select a card, then Open card.",
 			        cardText <> "", cardText,
-			        hint <> "", hint,
+			        cardHint <> "", cardHint,
 			        "This check has no text yet."
 			    )
 		displayFolder: Card

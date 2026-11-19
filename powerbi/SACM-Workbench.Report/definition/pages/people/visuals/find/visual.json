@@ -69,6 +69,13 @@
       "inputTextBox": [
         {
           "properties": {
+            "placeholder": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Find a person'"
+                }
+              }
+            },
             "borderShow": {
               "expr": {
                 "Literal": {
@@ -204,5 +211,73 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "withPerson",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Findings"
+              }
+            },
+            "Property": "ContactName"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "f",
+              "Entity": "Findings",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "f"
+                              }
+                            },
+                            "Property": "ContactName"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "null"
+                            }
+                          }
+                        ],
+                        [
+                          {
+                            "Literal": {
+                              "Value": "''"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }
