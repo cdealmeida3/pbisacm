@@ -7,6 +7,7 @@
 #   4. The job "powerbi-time": the refresh time on invented samples at the size of the real reports (tools/powerbi/time.ps1,
 #      D283), and the counts at that size against src/core. On a pull request it is the gate: it fails over 120 s in all,
 #      or over 60 s for one table. Started by hand, it times the sizes and stages asked for, with no gate.
+#   Before them the job runs the test of Update-Workbench.ps1 in Windows PowerShell 5.1, as Carlos's laptop has it (D339).
 #   5. The job "powerbi-desktop" (D309): Power BI Desktop itself, installed on the runner, opens the project, refreshes it on
 #      the samples and runs the query of every visual of every page (tools/powerbi/desktop.ps1); it fails when Desktop
 #      would show a visual broken or empty, a card "(Blank)", a blank line, or a measure or table with an error. Then it
@@ -81,6 +82,11 @@ jobs:
           node-version: 22.x
           cache: npm
       - run: npm ci
+      # D339: the update script as Carlos runs it, in Windows PowerShell 5.1 (the Linux job "checks" runs it in pwsh 7).
+      - name: The update script in Windows PowerShell 5.1
+        env:
+          UPDATE_SHELL: powershell
+        run: node --no-warnings --test tests/tools/powerbi/release.test.ts
       - name: Power Query SDK tools (cached)
         id: sdk
         uses: actions/cache@v4

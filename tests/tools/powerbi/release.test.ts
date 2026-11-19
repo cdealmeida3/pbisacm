@@ -96,10 +96,13 @@ test('the update script is plain ASCII (Windows PowerShell 5.1 reads a file with
 
 // ---- The script itself, in PowerShell ---------------------------------------------------------------------------
 
-const pwsh = spawnSync('pwsh', ['-NoProfile', '-Command', '$PSVersionTable.PSVersion.Major'], { encoding: 'utf8' });
-const hasPwsh = !pwsh.error && pwsh.status === 0;
-if (!hasPwsh && process.env.CI) throw new Error('pwsh is missing on the CI runner: the update script would not be tested');
-const skip = hasPwsh ? false : 'pwsh is not installed here; the CI runs this part';
+// pwsh (PowerShell 7) by default; UPDATE_SHELL=powershell runs it in Windows PowerShell 5.1, as on Carlos's laptop (the
+// job powerbi-eval of the workflow Power BI does).
+const shell = process.env.UPDATE_SHELL ?? 'pwsh';
+const probe = spawnSync(shell, ['-NoProfile', '-Command', '$PSVersionTable.PSVersion.Major'], { encoding: 'utf8' });
+const hasShell = !probe.error && probe.status === 0;
+if (!hasShell && process.env.CI) throw new Error(`${shell} is missing on the CI runner: the update script would not be tested`);
+const skip = hasShell ? false : `${shell} is not installed here; the CI runs this part`;
 
 const pages = (project: string): string => join(project, 'SACM-Workbench.Report', 'definition', 'pages');
 const modelFile = (project: string): string => join(project, 'SACM-Workbench.SemanticModel', 'definition', 'expressions.tmdl');
@@ -126,7 +129,7 @@ function previousFolder(at: string): void {
   const model = readFileSync(modelFile(old), 'utf8')
     .replace(/^(expression SourceMode = )"Sample"/m, `$1${invented.sourceMode}`)
     .replace(/^(expression ReportsFolder = )"[^"]*"/m, `$1${invented.folder}`)
-    .replace(/\n/g, '\r\n');
+    .replace(/\r?\n/g, '\r\n');
   writeFileSync(modelFile(old), model);
   const visual = (page: string, name: string, text: string): void => {
     mkdirSync(join(pages(old), page, 'visuals', name), { recursive: true });
@@ -144,7 +147,7 @@ function newFolder(at: string): string {
   return join(at, folder);
 }
 const update = (project: string, ...args: string[]) =>
-  spawnSync('pwsh', ['-NoProfile', '-NonInteractive', '-File', join(project, 'Update-Workbench.ps1'), '-Yes', ...args], { encoding: 'utf8' });
+  spawnSync(shell, ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', join(project, 'Update-Workbench.ps1'), '-Yes', ...args], { encoding: 'utf8' });
 
 test('the update script carries the parameters and the apps of the previous folder, at the places of this version, and nothing else', { skip }, () => {
   const at = mkdtempSync(join(tmpdir(), 'sacm-update-'));
@@ -160,9 +163,10 @@ test('the update script carries the parameters and the apps of the previous fold
     assert.match(model, new RegExp(`^expression SourceMode = ${invented.sourceMode} meta \\[`, 'm'));
     assert.match(model, new RegExp(`^expression ReportsFolder = ${invented.folder} meta \\[`, 'm'));
     assert.match(model, /^expression StateMode = "Sample" meta \[/m);
-    assert.doesNotMatch(model, /\r\n/, 'only the values change, not the line ends of the new file');
+    const shipped = readFileSync(join(root, 'powerbi', 'SACM-Workbench.SemanticModel', 'definition', 'expressions.tmdl'), 'utf8');
+    assert.equal(model.includes('\r\n'), shipped.includes('\r\n'), 'only the values change, not the line ends of the new file');
     assert.equal(model.replace(/^(expression SourceMode = )[^\n]*?( meta \[)/m, '$1"Sample"$2').replace(/^(expression ReportsFolder = )[^\n]*?( meta \[)/m, '$1"Shared Documents/Workbench/Reports"$2'),
-      readFileSync(join(root, 'powerbi', 'SACM-Workbench.SemanticModel', 'definition', 'expressions.tmdl'), 'utf8'), 'nothing else of the model changes');
+      shipped, 'nothing else of the model changes');
     // The apps: on Case and My day, at the places of this version; not on Overview; no old panel.
     const placed = (page: string, name: string) => JSON.parse(readFileSync(join(pages(project), page, 'visuals', name, 'visual.json'), 'utf8')) as { position: Record<string, number>; visual: { visualType: string } };
     const app = placed('case', 'a1b2c3d4e5f6a7b8c9d0');
