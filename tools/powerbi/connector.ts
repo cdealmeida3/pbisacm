@@ -12,7 +12,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { readExpressions, readTables } from './tmdl.ts';
 import { unitQuery, unitQueryNames } from './units.ts';
-import { numberArgument, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
+import { historyStart, numberArgument, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { mText } from './generate.ts';
 import { loadedTables, probeMembers } from './probes.ts';
 
@@ -49,7 +49,15 @@ export function connectorMembers(options: ConnectorOptions = {}): Array<{ name: 
   const { realSize = false, copies = REAL_SIZE_COPIES, history = 0, stages = false } = options;
   const members: Array<{ name: string; m: string }> = [];
   const scaled = (): string => `#table(type table [FileName = text, Base64 = text], {\n${scaledSampleFiles(copies, history).map((file) => `\t{${mText(file.name)}, ${mText(file.base64)}}`).join(',\n')}\n})`;
-  for (const expression of readExpressions()) members.push({ name: expression.name, m: realSize && expression.name === 'SampleFiles' ? scaled() : expression.m });
+  // With earlier dates, RangeStart moves back to the oldest of them, so the history computes every date (the timing of D336).
+  const rangeStart = (m: string): string => {
+    const [year, month, day] = historyStart(history).split('-').map(Number);
+    return m.replace(/#datetime\(\d+, \d+, \d+, 0, 0, 0\)/, `#datetime(${year}, ${month}, ${day}, 0, 0, 0)`);
+  };
+  for (const expression of readExpressions()) {
+    const m = realSize && expression.name === 'SampleFiles' ? scaled() : realSize && history > 0 && expression.name === 'RangeStart' ? rangeStart(expression.m) : expression.m;
+    members.push({ name: expression.name, m });
+  }
   for (const table of readTables()) {
     members.push({ name: table.name, m: table.partitionKind === 'calculated' ? calculatedM({ name: table.name, source: table.calculated!.source, part: table.calculated!.part, columns: table.calculated!.columns }) : table.partitionM });
   }
