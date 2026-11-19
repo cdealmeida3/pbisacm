@@ -338,7 +338,7 @@ export function judgeLook(pictures: Pictures, notes: string[] = []): string[] {
   ]);
   for (const { where, file, look } of shots) {
     if (!look) { problems.push(`${where}: the picture step gave no look of the page, so its look was not checked (picture ${file})`); continue; }
-    if (look.canvas.length !== 4) { problems.push(`${where}: the picture step did not find the page on the screen (no navy rail), so its look was not checked (picture ${file})`); continue; }
+    if (look.canvas.length !== 4) { problems.push(`${where}: the picture step did not find the page on the screen (no navy rail, or the look step failed: see the log), so its look was not checked (picture ${file})`); continue; }
     if (!look.texts.length) { problems.push(`${where}: no text of the page was read, so its look was not checked (picture ${file})`); continue; }
     let lowest: LookText | undefined;
     let unmeasured = 0;

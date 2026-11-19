@@ -24,7 +24,11 @@ public static class PictureWin {
 }
 "@
 # The look of the canvas (build D6, D328): where the page is on the screen, and the contrast of a text as drawn.
-Add-Type -ReferencedAssemblies System.Drawing, System.Drawing.Primitives -TypeDefinition @"
+# PowerShell 7 compiles against .NET: Bitmap is in System.Drawing.Common and Color in System.Drawing.Primitives (taken
+# from the types loaded above), and a list of references replaces the default one, so the collections and the runtime
+# are named too.
+$lookReferences = @([System.Drawing.Bitmap].Assembly.Location, [System.Drawing.Color].Assembly.Location, "System.Collections", "System.Runtime")
+Add-Type -ReferencedAssemblies $lookReferences -TypeDefinition @"
 using System; using System.Collections.Generic; using System.Drawing; using System.Drawing.Imaging;
 public static class PictureLook {
   // The navy of the rail (docs/LOOK.md, accent #0c1c49), a little either way for the drawing of the screen.
