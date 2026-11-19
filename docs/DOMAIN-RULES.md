@@ -339,7 +339,7 @@ A check with the status `off` is switched off: its file stays, it does not run a
 
 ## 18. Messages, reminders and escalation
 
-- **One message per person**, across all modules (D34). At most 25 CIs per message; more are split into parts, each with its own reference (D36).
+- **One message per person**, across all modules (D34). At most 25 CIs per message; more are split into parts, each with its own reference (D36). In the Power BI report the parts are one email (D314): each table shows its first 10 lines (the setting `rowsInEmail`) and the email carries the full list as a CSV file. The email is laid out for Outlook, with the same words (D313).
 - **The form of a message** (D35): the problem first in the subject and the reference last ("Inactive owner on <CI> [SACM-…]"); "Hi <first name>,"; why you get it; a table Name / EPO ID / Class / Owned by / Managed by / Operational status / Support group (and What we found when there are several kinds); the exact request with its link; one line on why it matters; thank you, the manager's name and the team signature.
 - **From the shared mailbox**, with the reference in the subject (D5). A reminder keeps the reference of the first message, so replies to either attach to the same cases.
 - **Reminder due** 3 business days (Monday to Friday) after the last message (D39). Public holidays are not known. The days count from the day the message was really sent: a message that waits in the outbox for more than one hour is *queued*, and nothing is due while it waits (D162).

@@ -1,0 +1,43 @@
+===== SACM-SPL-001 (1 draft)
+Keys: CONTRACT-PROCUREMENT:contract:ct000003:ownerLeft CONTRACT-PROCUREMENT:contract:ct000002:noVendorNumber CONTRACT-PROCUREMENT:contract:ct000003:epoRetired CONTRACT-PROCUREMENT:contract:ct000005:epoUnknown
+Subject: 3 contracts need a correction in Solusi [SACM-SPL-001]
+1. Contract owner left · 1 line
+2. No vendor number · 1 line
+3. The EPO ID names a Retired system · 1 line
+4. The EPO ID is not a known EPO ID · 1 line
+
+===== SACM-SPL-002 (3 drafts, with a file)
+Keys: CRIT-AUTO-JUSTIFICATION:member engine - prod:availability CRIT-NO-JUSTIFICATION:index tool:confidentiality
+Subject: 6 CIs need your attention in the CMDB [SACM-SPL-002]
+1. Lower criticality without a reason · 1 line
+2. Criticality exception without a justification · 1 line
+3. Mapping session · 4 lines
+4. No manager · 1 line
+5. Tagged for deletion but still Operational · 1 line
+
+===== SACM-SPL-005 (1 draft)
+Keys: DESC-QUALITY:close the month:description DESC-QUALITY:reconcile index:description RESP-INACTIVE:reconcile index:owned_by RESP-MISSING:close the month:managed_by RESP-SAME-PERSON:register a new member:owned_by TAG-MISSING:reconcile index:tags
+Subject: 3 CIs need your attention in the CMDB [SACM-SPL-005]
+1. No useful description · 2 lines
+2. Inactive owner · 1 line
+3. No manager · 1 line
+4. Same person as owner and manager · 1 line
+5. Missing tag · 1 line
+
+===== SACM-SPL-006 (1 draft)
+Keys: DESC-QUALITY:members:description NAME-STANDARD:members:bs-suffix RESP-MISSING:members:managed_by
+Subject: 1 CI needs your attention in the CMDB [SACM-SPL-006]
+1. No useful description · 1 line
+2. Name not standard · 1 line
+3. No manager · 1 line
+
+===== SACM-SPL-007 (4 drafts)
+Keys: DESC-QUALITY:members - standard:description NAME-DUPLICATE:fines hub - prod:name
+Subject: 5 CIs need your attention in the CMDB [SACM-SPL-007]
+1. No useful description · 1 line
+2. Duplicate name · 1 line
+3. No owner · 1 line
+4. Inactive Support group · 1 line
+5. No Support group · 2 lines
+6. Supported by to fill · 1 line
+7. Supported by to fill · 2 lines

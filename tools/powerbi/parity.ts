@@ -7,7 +7,7 @@
 //       notes and the rows of the tables, against src/core on the same scaled files (plan of the speed build §6.2).
 // Also checked: every table gives exactly the columns its TMDL file declares, so a refresh in Power BI Desktop does not
 // stop on a missing column.
-import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
@@ -363,6 +363,9 @@ export async function parityProblems(folder: string): Promise<string[]> {
   // 14. The messages (build B7, D300): the drafts of the samples with no journal, byte for byte as tests/recorded/
   // messages.txt and teams-messages.txt hold them; the drafts with the team's state as buildDrafts gives them.
   problems.push(...messageProblems(rows('DraftsRecorded'), rows('ChatsRecorded'), rows('Drafts'), key));
+  // 15. The emails (build D4, D313, D314): fnEmailTemplate on those drafts, and with 2 CIs per message and 2 lines per
+  // table, byte for byte as tests/recorded/emails/ and emails/split/ hold them.
+  problems.push(...emailProblems('DraftsRecorded', rows('DraftsRecorded'), 'emails'), ...emailProblems('EmailsSplit', rows('EmailsSplit'), 'emails/split'));
 
   for (const row of rows('SelfCheck')) {
     const id = norm(row.CheckId);
@@ -415,6 +418,33 @@ export function messageProblems(recordedRows: Row[], chatRows: Row[], draftRowsF
       if (norm(got[field]) !== norm(want[field])) problems.push(`Drafts ${want.Keys.split('\n')[0]}: ${field} differs at ${firstDifference(norm(got[field]), norm(want[field]))}`);
     }
   });
+  return problems;
+}
+
+/**
+ * The emails of a query (rows with Keys, Html, Csv, Summary, EmailSubject, First) against tests/recorded/<folder>/: the
+ * draft that holds an email is matched by the keys of its first part (index.txt), its reference put in for %%REF%%.
+ */
+export function emailProblems(query: string, found: Row[], folder: string): string[] {
+  const problems: string[] = [];
+  const dir = join(import.meta.dirname, '..', '..', 'tests', 'recorded', ...folder.split('/'));
+  const blocks = readFileSync(join(dir, 'index.txt'), 'utf8').replace(/\r\n/g, '\n').split(/^===== /m).filter(Boolean).map((block) => {
+    const lines = block.replace(/\n+$/, '').split('\n');
+    return { ref: lines[0]!.split(' ')[0]!, keys: lines[1]!.replace(/^Keys: /, ''), subject: lines[2]!.replace(/^Subject: /, ''), summary: lines.slice(3).join('\n') };
+  });
+  const emails = found.map((row, at) => ({ row, at })).filter(({ row, at }) => Number(row.First) === at);
+  if (emails.length !== blocks.length) problems.push(`${query}: ${emails.length} emails, tests/recorded/${folder}/ has ${blocks.length}`);
+  for (const want of blocks) {
+    const got = emails.find(({ row }) => norm(row.Keys) === want.keys)?.row;
+    if (!got) { problems.push(`${query}: no email whose first draft has the keys of ${want.ref}`); continue; }
+    const fill = (value: unknown): string => norm(value).split(REF_TOKEN).join(want.ref).split(SENDER_TOKEN).join(SAMPLE_SENDER);
+    const csvFile = join(dir, `${want.ref}.csv`);
+    const fields: Array<[string, string, string]> = [['Html', fill(got.Html), readFileSync(join(dir, `${want.ref}.html`), 'utf8')],
+      ['Csv', norm(got.Csv), existsSync(csvFile) ? readFileSync(csvFile, 'utf8') : ''], ['Summary', norm(got.Summary), want.summary], ['EmailSubject', fill(got.EmailSubject), want.subject]];
+    for (const [field, value, expected] of fields) if (value !== expected) problems.push(`${query} ${want.ref}: ${field} differs from tests/recorded/${folder}/ at ${firstDifference(value, expected)}`);
+  }
+  // A part of a long message holds no email of its own.
+  for (const [at, row] of found.entries()) if (Number(row.First) !== at && (norm(row.Html) || norm(row.Csv))) problems.push(`${query}: a part (keys ${norm(row.Keys)}) of an email holds an email too`);
   return problems;
 }
 

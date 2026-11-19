@@ -45,6 +45,49 @@ export interface Draft {
   mailbox?: boolean;
   /** The message goes to the people of a team of the settings (Process Management, D195): nobody is copied. */
   team?: boolean;
+  /** The same message as data, part by part, for the email template of the Power BI report (D313). The app does not read it. */
+  layout: DraftLayout;
+}
+
+/**
+ * One part of a message as data (D313): what Body shows for one check and route (and kind of problem), with the cells of
+ * its table as text (not escaped). The Power BI report lays the email out from it (tools/powerbi/email.ts and
+ * fnEmailTemplate); the words are those of Body.
+ */
+export interface LayoutSection {
+  /** The check, route and kind of problem: two parts of one email with the same key are one kind of problem. */
+  key: string;
+  /** The heading of the half of a reminder the part is in ("Still open (our message of …)", "New since then"), or "". Text. */
+  group: string;
+  /** The heading of the part: HTML, and the same as text. */
+  heading: string;
+  title: string;
+  /** The text above the table (why you, when each part says it, and the intro). HTML. */
+  lead: string;
+  /** The column of the role of the person asked ("Owned by", "Managed by"), or "". */
+  role: string;
+  contract: boolean;
+  /** Body shows the column "What we found". */
+  found: boolean;
+  /** CI: name, EPO ID, class, Owned by, Managed by, status, Support group, what we found. Contract: number, name, vendor, what we found. */
+  rows: string[][];
+  /** HTML; "" when Body has none (an escalation asks nothing; the parts of one check share one "why it matters"). */
+  ask: string;
+  why: string;
+}
+
+/** A message as data (D313). `opening`: the paragraphs before the parts, HTML, without `why`, the line why they get it (HTML, or ""). */
+export interface DraftLayout {
+  opening: string[];
+  why: string;
+  sections: LayoutSection[];
+  /** The name of the first CI or contract, for a subject about one. */
+  firstName: string;
+  /** The CIs (or contracts) of the message, each once: the parts of a long message can name one CI twice. */
+  cis: string[];
+  noun: 'CI' | 'contract';
+  sender: string;
+  signature: string;
 }
 
 /**
@@ -103,6 +146,8 @@ export interface DraftOptions {
   escalateTo?: { name: string; email: string };
   /** "Send one more reminder" instead of the escalation. */
   remindInstead?: boolean;
+  /** The CIs a message holds before it is split: MAX_CIS_PER_MESSAGE unless a test asks for fewer (tools/powerbi/email.ts). */
+  maxCis?: number;
 }
 
 /** A message holds at most this many CIs. A longer one is split into parts, each with its own reference. A message to a mailbox (For Procurement) or a team is never split. */
@@ -388,7 +433,7 @@ export function buildDrafts(cases: Case[], packs: CheckPack[], settings: Message
     let current: Case[] = [];
     let seen = new Set<string>();
     for (const item of items) {
-      if (!whole && !seen.has(item.fact.ciKey) && seen.size >= MAX_CIS_PER_MESSAGE) { chunks.push(current); current = []; seen = new Set(); }
+      if (!whole && !seen.has(item.fact.ciKey) && seen.size >= (options.maxCis ?? MAX_CIS_PER_MESSAGE)) { chunks.push(current); current = []; seen = new Set(); }
       seen.add(item.fact.ciKey);
       current.push(item);
     }
@@ -404,8 +449,18 @@ export function buildDrafts(cases: Case[], packs: CheckPack[], settings: Message
   return { drafts, skipped };
 }
 
-/** The body of the tables of a message: one part per check and route (and kind of problem), each with its intro, table, ask and why. */
-function sectionsBody(items: Case[], kind: DraftKind, packOf: (id: string) => CheckPack | undefined, settings: MessageSettings, sameWhy: boolean): Rich[] {
+/** The cells of a line of a table, as text: those of `table` and `contractTable`, with "what we found" always last. */
+function rowCells(item: Case): string[] {
+  if (isContract(item)) { const contract = item.fact.ci!.contract!; return [contract.number, contract.name, contract.vendor, item.fact.detail]; }
+  const ci = item.fact.ci;
+  return [item.fact.ciName, ci?.epoId ?? '', item.fact.classLabel, ci?.ownedBy ?? '', ci?.managedBy ?? '', ci?.status ?? '', ci?.supportGroup ?? '', item.fact.detail];
+}
+
+/** The column of the role the person asked holds for a part ("Owned by"), or "". */
+const roleColumn = (via: string): string => (via === 'owned by' ? 'Owned by' : via === 'managed by' ? 'Managed by' : '');
+
+/** The body of the tables of a message: one part per check and route (and kind of problem), each with its intro, table, ask and why; and the same as data (D313). */
+function sectionsBody(items: Case[], kind: DraftKind, packOf: (id: string) => CheckPack | undefined, settings: MessageSettings, sameWhy: boolean, group = ''): { body: Rich[]; layout: LayoutSection[] } {
   const sections = new Map<string, Section>();
   for (const item of items) {
     const pack = packOf(item.fact.checkId)!;
@@ -416,22 +471,30 @@ function sectionsBody(items: Case[], kind: DraftKind, packOf: (id: string) => Ch
     sections.set(key, section);
   }
   const several = sections.size > 1;
-  const parts = Array.from(sections.values()).map((section) => ({ section, texts: sectionTexts(section, settings) }));
+  const parts = Array.from(sections.entries()).map(([key, section]) => ({ key, section, texts: sectionTexts(section, settings) }));
   const body: Rich[] = [];
-  parts.forEach(({ section, texts }, index) => {
+  const layout: LayoutSection[] = [];
+  parts.forEach(({ key, section, texts }, index) => {
     // "What we found" is shown when the lines differ, and always when a line says what the source holds (D190).
     const found = several || new Set(section.items.map((item) => item.fact.detail)).size > 1 || section.items.some((item) => !!item.fact.source);
     // A part of a check with one table per kind of problem says how many contracts it holds.
     const count = section.problem ? ` (${section.items.length})` : '';
     if (several) body.push({ html: `<h3 style="margin:18px 0 6px">${texts.heading.html}${count}</h3>`, text: `\n${texts.heading.text.toUpperCase()}${count}` });
-    body.push(p(join([kind !== 'escalation' && !sameWhy ? plain(texts.whyYou) : plain(''), texts.intro])));
+    const lead = join([kind !== 'escalation' && !sameWhy ? plain(texts.whyYou) : plain(''), texts.intro]);
+    body.push(p(lead));
     body.push(table(section.items, found));
     if (kind !== 'escalation') body.push(p(texts.ask));
     // The parts of one check with a table per kind of problem share the line "why it matters": it comes once, after the last.
     const next = parts[index + 1];
-    if (!(section.problem && next && next.section.pack.id === section.pack.id && next.section.problem)) body.push(p(texts.why));
+    const shareWhy = !!(section.problem && next && next.section.pack.id === section.pack.id && next.section.problem);
+    if (!shareWhy) body.push(p(texts.why));
+    layout.push({
+      key, group, heading: texts.heading.html, title: texts.heading.text, lead: lead.html, role: roleColumn(section.items[0]!.fact.contactVia),
+      contract: section.items.every(isContract), found: found || section.items.every(isContract), rows: section.items.map(rowCells),
+      ask: kind !== 'escalation' ? texts.ask.html : '', why: shareWhy ? '' : texts.why.html
+    });
   });
-  return body;
+  return { body, layout };
 }
 
 /** How many parts (check, route, kind of problem) a set of cases makes in a message. */
@@ -503,20 +566,26 @@ function draftOf(items: Case[], group: Group, ref: string, part: Draft['part'], 
       : `${what} ${below.charAt(0).toUpperCase()}${below.slice(1)} ${new Set(still.map((item) => item.fact.ciKey)).size === 1 ? 'is' : 'are'} still open.`));
   }
   if (group.kind === 'escalation') opening.push(plain(escalationOpening(items, person, group)));
+  const layoutOpening = opening.map((piece) => piece.html);
+  let whyLine = '';
   if (group.kind !== 'escalation' && sameWhy) {
     const why = whyYou(items[0]!.fact.contactVia, belowWords(items));
+    whyLine = escapeHtml(why);
     opening.push(plain(kinds > 1 ? `${why} We found ${plural(kinds, 'kind')} of problem.` : why));
   }
 
   const body: Rich[] = opening.map(p);
+  const sectionsLayout: LayoutSection[] = [];
+  const add = (part: { body: Rich[]; layout: LayoutSection[] }): void => { body.push(...part.body); sectionsLayout.push(...part.layout); };
   if (two) {
     const first = firstContact(still);
     const heading = (text: string): Rich => ({ html: `<h2 style="margin:22px 0 4px;font-size:16px">${escapeHtml(text)}</h2>`, text: `\n== ${text.toUpperCase()} ==` });
-    body.push(heading(first ? `Still open (our message of ${longDate(first.on)})` : 'Still open'));
-    body.push(...sectionsBody(still, group.kind, packOf, settings, sameWhy));
+    const stillTitle = first ? `Still open (our message of ${longDate(first.on)})` : 'Still open';
+    body.push(heading(stillTitle));
+    add(sectionsBody(still, group.kind, packOf, settings, sameWhy, stillTitle));
     body.push(heading('New since then'));
-    body.push(...sectionsBody(fresh, group.kind, packOf, settings, sameWhy));
-  } else body.push(...sectionsBody(items, group.kind, packOf, settings, sameWhy));
+    add(sectionsBody(fresh, group.kind, packOf, settings, sameWhy, 'New since then'));
+  } else add(sectionsBody(items, group.kind, packOf, settings, sameWhy));
   body.push(p(plain(`When you reply, please keep the reference [${ref}] in the subject.`)));
   const sender = (settings.senderName ?? '').trim();
   const signature = (settings.signature || 'SACM team').trim();
@@ -542,7 +611,8 @@ function draftOf(items: Case[], group: Group, ref: string, part: Draft['part'], 
     ...(items.every((item) => toTeam(item.fact)) ? { team: true } : {}),
     subject: `${topic}${partText} [${ref}]`,
     body: body.map((piece) => piece.html).join(''),
-    plain: body.map((piece) => piece.text).join('\n\n').replace(/\n{3,}/g, '\n\n').trim()
+    plain: body.map((piece) => piece.text).join('\n\n').replace(/\n{3,}/g, '\n\n').trim(),
+    layout: { opening: layoutOpening, why: whyLine, sections: sectionsLayout, firstName: items[0]!.fact.ciName, cis: Array.from(new Set(items.map((item) => item.fact.ciKey))), noun, sender, signature }
   };
 }
 

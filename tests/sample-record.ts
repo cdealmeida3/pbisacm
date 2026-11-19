@@ -36,6 +36,8 @@ import { capabilitySheet } from '../src/core/mapping/capability-sheet.ts';
 import { reportTiles } from '../src/app/view/tiles.ts';
 import type { AppRun } from '../src/app/view/people.ts';
 import { loadPacks, loadReferences } from '../src/hosts/cli.ts';
+import { emailsOf } from '../tools/powerbi/email.ts';
+import type { Draft } from '../src/core/messages/messages.ts';
 
 /** The day the reports are loaded. Fixed, so the record never depends on the day the tests run. */
 export const RECORD_DATE = '2026-11-11';
@@ -156,6 +158,12 @@ export async function recordReports(files: RecordFiles): Promise<Record<string, 
     `To: ${draft.to}`, `Cc: ${draft.cc}`, `Subject: ${draft.subject}`, `Keys: ${draft.keys.join(' ')}`,
     '--- text', draft.plain, '--- html', draft.body, ''
   ].join('\n')).join('\n') + `\n===== skipped: ${caseKeys(skipped).join(' ')}\n`;
+  // The emails of the Power BI report (D313, D314, tools/powerbi/email.ts): the drafts above laid out as emails, and the
+  // same cases with at most 2 CIs per message and 2 lines per table, so the joined parts and the attached file are recorded too.
+  Object.assign(out, recordEmails('emails', drafts, 10));
+  let split = 0;
+  const splitDrafts = buildDrafts(cases.filter((item) => item.state === 'open'), packs, SETTINGS, () => `SACM-SPL-${String(++split).padStart(3, '0')}`, { maxCis: 2 }).drafts;
+  Object.assign(out, recordEmails('emails/split', splitDrafts, 2));
   out['teams-messages.txt'] = cards.filter((card) => card.open.length).map((card) =>
     `===== ${card.id}\n${chatMessage(card.open, packs, SETTINGS, `SACM-CHAT-${card.id}`)}\n`).join('\n');
 
@@ -168,5 +176,22 @@ export async function recordReports(files: RecordFiles): Promise<Record<string, 
   out['exports/contract-changes.csv'] = changesCsv(contractChanges(solusiEarlier, solusi));
   out['exports/capability-sheet.csv'] = exportCapabilityCsv(run.capabilities ?? []);
   out['contract-information.json'] = json(contractInformation(solusi.contracts, RECORD_DATE, config));
+  return out;
+}
+
+/** The emails of `drafts` as files of `folder`: <ref>.html, <ref>.csv when there is a file, and index.txt with the subject and "In this email" of each. */
+function recordEmails(folder: string, drafts: Draft[], rowsInEmail: number): Record<string, string> {
+  const out: Record<string, string> = {};
+  const index: string[] = [];
+  const emails = emailsOf(drafts, (at) => drafts[at]!.ref, rowsInEmail);
+  emails.forEach((email, at) => {
+    if (email.first !== at) return;
+    const ref = drafts[at]!.ref;
+    const parts = emails.filter((other) => other.first === at).length;
+    out[`${folder}/${ref}.html`] = email.html;
+    if (email.csv) out[`${folder}/${ref}.csv`] = email.csv;
+    index.push(`===== ${ref} (${parts} ${parts === 1 ? 'draft' : 'drafts'}${email.csv ? ', with a file' : ''})`, `Keys: ${drafts[at]!.keys.join(' ')}`, `Subject: ${email.subject}`, email.summary, '');
+  });
+  out[`${folder}/index.txt`] = index.join('\n');
   return out;
 }

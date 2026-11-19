@@ -23,7 +23,7 @@ export const EVAL_FOLDER = join(root, '.build', 'powerbi');
 const member = (name: string): string => (/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) ? name : `#"${name.replace(/"/g, '""')}"`);
 
 /** The queries that only the answer key reads (build B7): the drafts and chats of the samples with no journal. */
-export const PARITY_QUERIES = ['DraftsRecorded', 'ChatsRecorded'];
+export const PARITY_QUERIES = ['DraftsRecorded', 'ChatsRecorded', 'EmailsSplit'];
 
 /** The names the evaluation runs: every table, the unit cases of the reading functions and the queries of the answer key. */
 export function evaluatedNames(): string[] {

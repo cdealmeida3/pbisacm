@@ -466,6 +466,12 @@ What to know:
   reference when you open it in the list.
 - Until the refresh, a message you sent stays in the list: the app keeps **Send** off on it for 10 minutes.
 - **Copy** in the app copies text only. To keep the table of a long message, use **Send** or **Test** instead.
+- **The email template** (D313, D314): each message is also laid out as an email for Outlook, in the columns
+  *Html* (the email), *Csv* (the file of a long email), *Summary* ("In this email" as text), *EmailSubject* and
+  *EmailId*. A long message is one email on its first part; its other parts point to it in *EmailId*. Each table shows
+  its first 10 lines; the setting `rowsInEmail` of *SACM Settings* (a row with Title `rowsInEmail` and a whole number
+  from 1 to 100 as Value) changes that. The app and the flows use these columns from build D5; until then they send
+  *Body* as before.
 
 ### 6.7 The settings the messages read
 
@@ -481,6 +487,7 @@ app ([DATA-MODEL.md](../docs/DATA-MODEL.md) §3, the settings).
 | `procurementLeadName`, `procurementLeadEmail` | The Procurement lead (no escalation when empty) |
 | `request.<id>.name`, `request.<id>.link` | A request of the Service Portal: its name and link. The ids: `owned-by-update`, `managed-by-update`, `support-group-update`, `modify-service-offering`, `criticality`, `service-mapping` |
 | `team.<id>.name`, `team.<id>.people` | A team responsible for records (D195): its name, and its people as `Name <address>; Name <address>` |
+| `rowsInEmail` | The lines a table of an email shows before "and N more in the attached file" (D314): a whole number from 1 to 100, default 10 |
 
 The real links and addresses go into the list only, never into the repository.
 

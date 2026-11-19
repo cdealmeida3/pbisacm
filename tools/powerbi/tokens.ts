@@ -96,3 +96,29 @@ export function textWidth(text: string, points: number, semibold = false): numbe
   const per = CHAR_WIDTH[points] ?? (points * 0.71);
   return Math.ceil(text.length * per * (semibold ? SEMIBOLD_FACTOR : 1));
 }
+
+/**
+ * The colours of the email template (D313, tools/powerbi/email.ts and fnEmailTemplate, which generate.ts gives them as
+ * EmailStyle): the light colours of LOOK where the email has the same part, and the few of the email lab (design pass
+ * §6.2) that only an email has. Text is never lighter than `muted` (contrast 4.5:1, LOOK rule 8).
+ */
+export function emailColours(): Record<string, string> {
+  const light = lightColours();
+  return {
+    ink: light.ink!, muted: light.muted!, navy: light.accent!, onNavy: light['on-accent']!, deco: light.deco!, line: light.line!, box: light['surface-2']!,
+    surface: light.surface!,
+    /** Around the email (the email lab). */
+    page: '#f4f1ec',
+    /** The reference in the navy band: light on navy. */
+    navyMuted: '#c9cfe0',
+    /** The header of a table. */
+    head: '#eef1f8',
+    /** Every second line of a table. */
+    zebra: '#faf8f5',
+    /** The box "What we ask". */
+    ask: '#f3f5fa'
+  };
+}
+
+/** The fonts of the email: Segoe UI as in the report, then what Outlook on a Mac or a phone has. */
+export const EMAIL_FONT = "'Segoe UI',Aptos,Calibri,Arial,sans-serif";
