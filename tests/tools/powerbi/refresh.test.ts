@@ -78,3 +78,18 @@ test('the reader of the reports folder skips its sub-folders, so a folder Archiv
   const query = readFileSync(join(root, 'powerbi', 'm', 'fnSharePointFiles.pq'), 'utf8');
   assert.match(query, /Table\.SelectRows\(folder, each Value\.Is\(\[Content\], type binary\)\)/);
 });
+
+test('the copy pack holds the gate of refresh.json and the formulas and screens of the three apps as they are now', async () => {
+  const { copyPack } = await import('../../../tools/powerbi/copy-pack.ts');
+  const page = copyPack();
+  const esc = (text: string): string => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  for (const [name, expression] of Object.entries(gateExpressions(rule))) {
+    if (name !== 'Now') assert.ok(page.includes(esc(expression)), `the copy pack has the expression ${name}`);
+  }
+  assert.ok(page.includes(esc(refreshRuleText(rule))));
+  for (const folder of APP_FOLDERS) {
+    const formulas = readFileSync(join(folder, 'App-Formulas.fx'), 'utf8').replace(/\r\n/g, '\n').replace(/\n$/, '');
+    assert.ok(page.includes(esc(formulas)), `the copy pack has the App-Formulas.fx of ${folder}`);
+  }
+  assert.doesNotMatch(page, /https?:\/\/(?!(?:graph|teams)\.microsoft\.com\/)/, 'no link but those of the Outlook draft and the Teams chat');
+});
