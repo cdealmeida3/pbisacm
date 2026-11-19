@@ -150,10 +150,12 @@ How a file is read:
   links are known files: listed there as "known", never read as a report (D341, D342).
 - The date of a report is the `yyyy-MM-dd_` at the start of its file name (for example `2026-11-17_cmdb_ci.csv`), else the
   day the file was last changed. The newest file of each kind is the one the checks use.
-- Two files of one kind with the same date (a copy such as `…_1cmdb…`): the report uses the one with the most columns,
+- Two files of one kind with the same date (a copy such as `…_1cmdb…`): the report uses the one with the most of the
+  needed columns (for a CI report, the columns the checks read),
   then the most rows, then the one changed last, then the last name (D348). The box says which file is not used and
   why; move it into the sub-folder *Archive*.
-- The box also lists the columns the newest CI report lacks, in one line to copy into the ServiceNow report (D347).
+- The box also lists the columns the newest CI report lacks, alone in the line *Columns to add*: right-click it,
+  **Copy**, **Copy value**, and paste it into the ServiceNow report (D347).
 
 To go back to the samples, set **SourceMode** to `Sample` again.
 

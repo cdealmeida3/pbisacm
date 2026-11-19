@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
 import { zipOf } from '../tools/powerbi/release.ts';
 import { checksInUse, runChecks } from '../src/core/checks/engine.ts';
-import { chooseReports, columnCount, dateInName } from '../src/core/memory/finder.ts';
+import { chooseReports, dateInName } from '../src/core/memory/finder.ts';
 import { readTable } from '../src/core/reading/table.ts';
 import type { Table } from '../src/core/reading/table.ts';
 import { missingWanted, readCiReport } from '../src/core/sources/ci/ci-report.ts';
@@ -24,7 +24,7 @@ import { epoConfig, readEpoReport } from '../src/core/sources/epo/epo-report.ts'
 import type { EpoInput } from '../src/core/sources/epo/epo-report.ts';
 import { readRelationshipReport } from '../src/core/sources/relationships/relationship-report.ts';
 import type { Relationship } from '../src/core/sources/relationships/relationship-report.ts';
-import { fileKind, folderFixes, recogniseReport, REPORT_TYPES } from '../src/core/sources/report-types.ts';
+import { fileKind, folderFixes, neededColumns, recogniseReport, REPORT_TYPES } from '../src/core/sources/report-types.ts';
 import type { FolderFix } from '../src/core/sources/report-types.ts';
 import { loadPacks, loadReferences } from '../src/hosts/cli.ts';
 
@@ -168,7 +168,7 @@ export async function readRealShape(files: RealShapeFile[] = realShapeFiles()): 
   const kinds = tables.map(({ table }) => fileKind(table.rows[0] ?? []));
   const reportKinds = new Set(REPORT_TYPES.map((type) => type.kind as string));
   const choices = chooseReports(tables.flatMap(({ file, table }, at) => reportKinds.has(kinds[at]!)
-    ? [{ name: file.name, kind: kinds[at]!, date: dateInName(file.name), columns: columnCount(table.rows[0] ?? []), rows: Math.max(0, table.rows.length - 1), modified: 0 }] : []));
+    ? [{ name: file.name, kind: kinds[at]!, date: dateInName(file.name), columns: neededColumns(kinds[at]!, table.rows[0] ?? []), rows: Math.max(0, table.rows.length - 1), modified: 0 }] : []));
   const choiceOf = new Map(choices.map((choice) => [choice.name, choice]));
   let ci: { name: string; table: Table } | null = null;
   let relationships: Relationship[] | null = null;

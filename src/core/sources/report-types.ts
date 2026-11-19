@@ -1,6 +1,7 @@
 import { recogniseAmong } from '../reading/table.ts';
 import type { Recognised, ReportType } from '../reading/table.ts';
-import { CI_REPORT } from './ci/ci-report.ts';
+import { CI_REPORT, missingWanted, readCiReport, WANTED_COLUMNS } from './ci/ci-report.ts';
+import { normaliseHeader } from '../reading/headers.ts';
 import { RELATIONSHIP_REPORT } from './relationships/relationship-report.ts';
 import { EPO_REPORT } from './epo/epo-report.ts';
 import { CONTRACT_REPORT, SOLUSI_FILE } from './contracts/contract-reports.ts';
@@ -94,6 +95,18 @@ const plural = (count: number, word: string): string => `${count} ${word}${count
  * that is not used, every file of no type, then the files the Workbench knows but does not use. Empty when the folder
  * needs nothing.
  */
+/**
+ * The columns that make one file of a type fuller than another of the same day (D348, rule 2 of the plan): for a CI
+ * report the columns the checks read (WANTED_COLUMNS) that it has, for any other type its distinct named columns.
+ */
+/** The name of the line that holds only the columns to add, to copy. */
+export const COLUMNS_TO_ADD = 'Columns to add';
+
+export function neededColumns(kind: string, headers: string[]): number {
+  if (kind === CI_REPORT.kind) return WANTED_COLUMNS.length - missingWanted(readCiReport([headers]).columns).length;
+  return new Set(headers.map((header) => normaliseHeader(header.replace(/^\uFEFF/, ''))).filter(Boolean)).size;
+}
+
 export function folderFixes(files: FolderFile[], newestCi: { name: string; date: string; missing: string[] } | null): FolderFix[] {
   const fixes: FolderFix[] = [];
   for (const type of REPORT_TYPES) {
@@ -105,9 +118,11 @@ export function folderFixes(files: FolderFile[], newestCi: { name: string; date:
     const count = newestCi.missing.length;
     fixes.push({
       name: newestCi.name, date: newestCi.date, readAs: CI_REPORT.label,
-      what: `Lacks ${plural(count, 'column')} the checks read, so some cards are grey or partly tested. Add ${count === 1 ? 'it' : 'them'} to the ServiceNow report: ${newestCi.missing.join(', ')}.`,
+      what: `Lacks ${plural(count, 'column')} the checks read, so some cards are grey or partly tested. Add ${count === 1 ? 'it' : 'them'} to the ServiceNow report: copy the next line (right-click it, Copy, Copy value).`,
       level: 'fix'
     });
+    // The columns alone, so a copy of the cell is the list and nothing else (D347).
+    fixes.push({ name: COLUMNS_TO_ADD, date: newestCi.date, readAs: CI_REPORT.label, what: newestCi.missing.join(', '), level: 'fix' });
   }
   const byName = (a: FolderFile, b: FolderFile): number => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   const label = (kind: string): string => reportType(kind)?.label ?? KNOWN_FILES.find((known) => known.kind === kind)?.label ?? 'Not a report';

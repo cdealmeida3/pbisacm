@@ -12,9 +12,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
 import { readTable } from '../../src/core/reading/table.ts';
-import { fileKind, folderFixes, recogniseReport, REPORT_TYPES } from '../../src/core/sources/report-types.ts';
+import { fileKind, folderFixes, neededColumns, recogniseReport, REPORT_TYPES } from '../../src/core/sources/report-types.ts';
 import type { FolderFix } from '../../src/core/sources/report-types.ts';
-import { chooseReports, columnCount } from '../../src/core/memory/finder.ts';
+import { chooseReports } from '../../src/core/memory/finder.ts';
 import { csvRealShapeFiles, readRealShape } from '../../tests/real-shape.ts';
 import { missingWanted, PERSON_PARTS, readCiReport } from '../../src/core/sources/ci/ci-report.ts';
 import { readRelationshipReport } from '../../src/core/sources/relationships/relationship-report.ts';
@@ -158,7 +158,7 @@ export async function parityProblems(folder: string): Promise<string[]> {
     read[file.name] = table;
     // A file of no report type is "unknown" (R2): the table ReportTypes has a row for it, so no blank row (D349).
     const kind = fileKind(table.rows[0] ?? []);
-    sampleFolder.push({ name: `${date}_${file.name}`, date, kind, message: recogniseReport(table.rows[0] ?? []).message, columns: columnCount(table.rows[0] ?? []), rows: Math.max(0, table.rows.length - 1) });
+    sampleFolder.push({ name: `${date}_${file.name}`, date, kind, message: recogniseReport(table.rows[0] ?? []).message, columns: neededColumns(kind, table.rows[0] ?? []), rows: Math.max(0, table.rows.length - 1) });
     const count = kind === 'ci' ? readCiReport(table.rows).cis.length
       : kind === 'relationship' ? readRelationshipReport(table.rows).relationships.length
       : kind === 'epo' ? readEpoReport(table.rows, epoConfig(references)!).systems.length

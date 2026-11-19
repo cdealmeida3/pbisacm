@@ -5,12 +5,12 @@ import { join } from 'node:path';
 import { deflateRawSync, inflateRawSync } from 'node:zlib';
 import { parseCsv } from '../../../src/core/reading/csv.ts';
 import { runChecks } from '../../../src/core/checks/engine.ts';
-import { chooseReports, columnCount, reportCandidates } from '../../../src/core/memory/finder.ts';
+import { chooseReports, reportCandidates } from '../../../src/core/memory/finder.ts';
 import { archiveFolderOf, removedFolderOf, runFolder } from '../../../src/core/memory/memory.ts';
 import { hiddenCharacters, identityKey, nameKey } from '../../../src/core/shared/names.ts';
 import { hiddenNotes, missingWanted, readCiReport } from '../../../src/core/sources/ci/ci-report.ts';
 import { readTable } from '../../../src/core/reading/table.ts';
-import { fileKind, folderFixes, recogniseReport } from '../../../src/core/sources/report-types.ts';
+import { fileKind, folderFixes, neededColumns, recogniseReport } from '../../../src/core/sources/report-types.ts';
 import { hiddenNames, matchEnds, readRelationshipReport } from '../../../src/core/sources/relationships/relationship-report.ts';
 import { columnIndex, excelDate, parseSheet, readXlsx, readXlsxSheets, withoutPrefixes } from '../../../src/core/reading/xlsx.ts';
 import { contractConfig, readContractReport, readSolusiFile } from '../../../src/core/sources/contracts/contract-reports.ts';
@@ -160,7 +160,7 @@ test('Relationship report: the field-name form and the CSV form', () => {
   assert.ok(csv.relationships.every((item) => item.excluded !== undefined));
   assert.equal(readRelationshipReport([['parent', 'type', 'child', 'u_excluded_from_calculation'], ['A', 'x', 'B', 'Yes']]).relationships[0]!.excluded, true);
   // The scoped-app prefix of the instance's own fields (D351): matched by the end of the name.
-  assert.equal(readRelationshipReport([['parent', 'type', 'child', 'x_acme_crit_app_excluded_for_calculation'], ['A', 'x', 'B', 'true']]).relationships[0]!.excluded, true);
+  assert.equal(readRelationshipReport([['parent', 'type', 'child', 'x_demo_crit_excluded_for_calculation'], ['A', 'x', 'B', 'true']]).relationships[0]!.excluded, true);
   assert.equal(readRelationshipReport([['parent', 'type', 'child', 'notexcluded_for_calculation'], ['A', 'x', 'B', 'true']]).relationships[0]!.excluded, undefined);
   // Without the column: nothing is excluded, and the report says so.
   const one = readRelationshipReport([['Parent', 'Type', 'Child', 'Class'], ['A', 'x', 'B', 'API']]);
@@ -364,7 +364,7 @@ test('xlsx: a workbook whose XML names its elements with a prefix (<x:row>) is r
 
 test('ServiceNow contract report: the criticality columns are matched by the end of their name, whatever the prefix (D351)', () => {
   const config = contractConfig(references)!;
-  const header = ['number', 'vendor_contract', 'state', 'x_acme_crit_app_inherited_confidentiality', 'x_acme_crit_app_inherited_integrity'];
+  const header = ['number', 'vendor_contract', 'state', 'x_demo_crit_inherited_confidentiality', 'x_demo_crit_inherited_integrity'];
   const read = readContractReport([header, ['CNTR1', 'C-1', 'Active', '3', ''], ['CNTR2', 'C-2', 'Active', '', '']], config);
   assert.deepEqual(read.contracts.map((contract) => contract.criticality), [true, false]);
   assert.ok(!read.notes.some((note) => /criticality/.test(note)), read.notes.join(' '));
@@ -373,10 +373,12 @@ test('ServiceNow contract report: the criticality columns are matched by the end
 
 test('one report per type and day, chosen by its content (D348): columns, then rows, then the last change, then the name', () => {
   const file = (name: string, columns: number, rows: number, modified = 0, kind = 'ci', date = '2026-11-19') => ({ name, kind, date, columns, rows, modified });
-  assert.equal(columnCount(['\uFEFFName', 'name', ' Class ', '']), 2);
+  assert.equal(neededColumns('epo', ['\uFEFFName', 'name', ' Class ', '']), 2);
+  // A CI report counts the columns the checks read: an extra column does not make it fuller.
+  assert.equal(neededColumns('ci', ['name', 'sys_class_name', 'u_extra']), 2);
   const fuller = chooseReports([file('b.csv', 40, 10), file('a.csv', 52, 5)]);
   assert.deepEqual(fuller.map((choice) => choice.used), [false, true]);
-  assert.equal(fuller[0]!.whyNotUsed, 'Not used: a.csv of the same day has more columns (52 against 40), so it is used.');
+  assert.equal(fuller[0]!.whyNotUsed, 'Not used: a.csv of the same day has more of the needed columns (52 against 40), so it is used.');
   assert.match(chooseReports([file('a.csv', 52, 3277), file('b.csv', 52, 131)])[1]!.whyNotUsed, /a\.csv of the same day has more rows \(3277 against 131\)/);
   assert.match(chooseReports([file('a.csv', 5, 5, 2), file('b.csv', 5, 5, 1)])[1]!.whyNotUsed, /same columns and rows and is used \(it was saved later\)\. Move this copy/);
   // Same columns, rows and time: the last file name, as before (2026-11-19_cmdb… comes after 2026-11-19_1cmdb…).
@@ -398,10 +400,12 @@ test('what to fix in the folder (D352): a missing type, the CI columns to add, t
   ];
   const fixes = folderFixes(files, { name: '2026-11-19_cmdb.csv', date: '2026-11-19', missing: ['support_group.active', 'sys_created_on'] });
   assert.deepEqual(fixes.map((fix) => [fix.name, fix.readAs, fix.level]), [
-    ['No ServiceNow contract report', 'ServiceNow contract report', 'fix'], ['2026-11-19_cmdb.csv', 'CI report', 'fix'],
+    ['No ServiceNow contract report', 'ServiceNow contract report', 'fix'], ['2026-11-19_cmdb.csv', 'CI report', 'fix'], ['Columns to add', 'CI report', 'fix'],
     ['2026-11-19_1cmdb.csv', 'CI report', 'fix'], ['2026-11-19_x.csv', 'Not a report', 'fix'], ['2026-11-19_health.csv', 'CMDB Health result', 'known']
   ]);
-  assert.equal(fixes[1]!.what, 'Lacks 2 columns the checks read, so some cards are grey or partly tested. Add them to the ServiceNow report: support_group.active, sys_created_on.');
+  assert.equal(fixes[1]!.what, 'Lacks 2 columns the checks read, so some cards are grey or partly tested. Add them to the ServiceNow report: copy the next line (right-click it, Copy, Copy value).');
+  // The next line holds the columns alone, so a copy is the list and nothing else (D347).
+  assert.equal(fixes[2]!.what, 'support_group.active, sys_created_on');
   assert.deepEqual(folderFixes(files.filter((file) => file.kind !== 'health' && file.used).concat([{ ...at, name: 'c.csv', kind: 'contract', used: true }]), null), []);
 });
 

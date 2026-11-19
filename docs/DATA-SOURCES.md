@@ -21,7 +21,7 @@ Not used yet: the criticality approval tasks with their creation date (for appro
 | A CMDB Health result | The columns `ci` and `ci.sys_class_name` (every CI column has the prefix `ci.`) | It has a name, a class and owners, but it is a list of problems, not the CIs. It is never the CI report (D341) |
 | The links between contracts and CIs | The columns `ast_contract` and `ci_item` | Not used yet. The ServiceNow contract report is the export of the contracts table `ast_contract` (D342) |
 
-**One report per type and day** (D348). When the folder holds two files of one type with the same date (a copy, a second export), the Workbench uses the one with the most named columns, then the most rows, then the one changed last, then the last file name. The other is listed in *What to fix in the folder* with the reason; move it into the sub-folder *Archive*. The history uses the same choice for every date.
+**One report per type and day** (D348). When the folder holds two files of one type with the same date (a copy, a second export), the Workbench uses the one with the most of the needed columns (for a CI report, the columns the checks read), then the most rows, then the one changed last, then the last file name. The other is listed in *What to fix in the folder* with the reason; move it into the sub-folder *Archive*. The history uses the same choice for every date.
 
 Format: CSV or Excel (`.xlsx`). The app recognises each report by its columns, not by its file name. Limit: 20,000 rows per report (the logical classes are far below it). One report can cover all nine classes.
 

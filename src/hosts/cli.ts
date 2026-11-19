@@ -8,10 +8,10 @@
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
-import { chooseReports, columnCount, dateInName } from '../core/memory/finder.ts';
+import { chooseReports, dateInName } from '../core/memory/finder.ts';
 import { identityKey } from '../core/shared/names.ts';
 import { readTable } from '../core/reading/table.ts';
-import { fileKind, folderFixes, recogniseReport, unhandledKind } from '../core/sources/report-types.ts';
+import { fileKind, folderFixes, neededColumns, recogniseReport, unhandledKind } from '../core/sources/report-types.ts';
 import { hiddenNames, matchEnds, readRelationshipReport } from '../core/sources/relationships/relationship-report.ts';
 import type { Relationship } from '../core/sources/relationships/relationship-report.ts';
 import { checksInUse, compareRuns, runChecks } from '../core/checks/engine.ts';
@@ -75,33 +75,31 @@ if (process.argv[1] === import.meta.filename) {
     given.push({ path, table, type: found.type, date });
   }
   // One file per type: the newest date, and of that date the fuller file (D348).
-  const choices = chooseReports(given.map((item) => ({ name: basename(item.path), kind: item.type.kind, date: item.date, columns: columnCount(item.table.rows[0] ?? []), rows: Math.max(0, item.table.rows.length - 1), modified: statSync(item.path).mtimeMs })));
+  const choices = chooseReports(given.map((item) => ({ name: basename(item.path), kind: item.type.kind, date: item.date, columns: neededColumns(item.type.kind, item.table.rows[0] ?? []), rows: Math.max(0, item.table.rows.length - 1), modified: statSync(item.path).mtimeMs })));
   const newestOf = new Map<string, string>();
   for (const item of given) if (item.date > (newestOf.get(item.type.kind) ?? '')) newestOf.set(item.type.kind, item.date);
   for (const [at, { path, table, type, date }] of given.entries()) {
     const choice = choices[at]!;
     if (!choice.used) { console.log(`${path}: ${type.label}. ${choice.whyNotUsed}`); continue; }
     if (date !== newestOf.get(type.kind)) { console.log(`${path}: ${type.label}. Not used: a newer ${type.label} is given.`); continue; }
-    const found = { type };
-    const fileDate = date;
-    if (found.type.kind === 'solusi') {
+    if (type.kind === 'solusi') {
       const read = readSolusiFile(table.sheets ?? [{ name: '', rows: table.rows }], contractConfig(references)!);
-      contracts.solusi = { contracts: read.contracts, date: fileDate, report: basename(path) };
+      contracts.solusi = { contracts: read.contracts, date, report: basename(path) };
       console.log(`${path}: Solusi contract file (${table.format}), ${read.contracts.length} contracts (${read.contracts.filter((contract) => contract.sheet === 'terminated').length} terminated in the last 7 days).${read.notes.map((note) => ` ${note}`).join('')}`);
-    } else if (found.type.kind === 'contract') {
+    } else if (type.kind === 'contract') {
       const read = readContractReport(table.rows, contractConfig(references)!);
-      contracts.servicenow = { contracts: read.contracts, date: fileDate, report: basename(path) };
+      contracts.servicenow = { contracts: read.contracts, date, report: basename(path) };
       console.log(`${path}: ServiceNow contract report (${table.format}), ${read.contracts.length} contracts.${read.notes.map((note) => ` ${note}`).join('')}`);
-    } else if (found.type.kind === 'epo') {
+    } else if (type.kind === 'epo') {
       const read = readEpoReport(table.rows, epoConfig(references)!);
       epo = { systems: read.systems, date: dateInName(basename(path)) || new Date().toISOString().slice(0, 10), report: basename(path), previousDate: process.env.EPO_PREVIOUS ?? '' };
       console.log(`${path}: EPO systems report (${table.format}), ${read.systems.length} systems.${read.notes.map((note) => ` ${note}`).join('')}`);
-    } else if (found.type.kind === 'relationship') {
+    } else if (type.kind === 'relationship') {
       const read = readRelationshipReport(table.rows);
       relationships = read.relationships;
       console.log(`${path}: Relationship report (${table.format}), ${read.relationships.length} relationships.${read.notes.map((note) => ` ${note}`).join('')}`);
-    } else if (found.type.kind === 'ci') { reportPath = path; ciTable = table; console.log(`${path}: CI report (${table.format}).`); }
-    else unhandledKind(found.type);
+    } else if (type.kind === 'ci') { reportPath = path; ciTable = table; console.log(`${path}: CI report (${table.format}).`); }
+    else unhandledKind(type);
   }
   if (!ciTable) { console.error('Usage: node src/hosts/cli.ts <report.csv|.xlsx> [more reports] [previous findings.json]. No CI report given.'); process.exit(1); }
   const report = readCiReport(ciTable.rows, { lossless: ciTable.lossless, knownHidden: !ciTable.lossless && relationships ? hiddenNames(relationships) : undefined });

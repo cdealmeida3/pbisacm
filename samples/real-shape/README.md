@@ -9,7 +9,7 @@ that the Workbench reads the real reports correctly. All the data is invented: a
 | `2026-11-19_1cmdb_logical_automation.csv` | The same file a second time, as a copy in the folder | The choice of the day: the same columns and rows, so the last file name is used and the copy is not (D348) |
 | `2026-11-19_health_orphan_automation.csv` | A CMDB Health result about orphan CIs | A file with `ci`, `ci.sys_class_name` and owner columns is never the CI report (D341) |
 | `2026-11-19_rel_ci_automation.csv` | The Relationship report, with its field names | *Excluded for calculation* matched by the end of its name (D351) |
-| `2026-11-19_EPORapport_133.csv` | The EPO systems report: `;`, a byte order mark, every field quoted | The EPO reader |
+| `2026-11-19_EPORapport.csv` | The EPO systems report: `;`, a byte order mark, every field quoted | The EPO reader |
 | `2026-11-19_contract_ci_automation.csv` | The links between contracts and CIs | A known file, not used yet (D342) |
 | `2026-11-19_ast_contract_automation.csv` | The ServiceNow contract report (the contracts table) | The inherited criticality columns with a scoped-app prefix (D351) |
 | `2026-11-19_Contracts to ServiceNow Report 202611160700.xlsx` | The Solusi workbook. Not a file here: `tests/real-shape.ts` builds it | Every XML element with a prefix (`<x:row>`), two tabs, labels on row 2, a date past Excel's last day (D350) |

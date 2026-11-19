@@ -34,7 +34,9 @@ test('real shape: each file has its type, the copy of the day and the known file
 
 test('real shape: what to fix in the folder names the CI columns to add and the copy, then the known files', async () => {
   const { fixes } = await readRealShape();
-  assert.deepEqual(fixes.map((fix) => fix.level), ['fix', 'fix', 'known', 'known']);
+  assert.deepEqual(fixes.map((fix) => fix.level), ['fix', 'fix', 'fix', 'known', 'known']);
+  assert.equal(fixes[1]!.name, 'Columns to add');
+  assert.match(fixes[1]!.what, /^managed_by.user_name, managed_by.active, /);
   assert.match(fixes[0]!.what, /^Lacks 14 columns the checks read/);
 });
 

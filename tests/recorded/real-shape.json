@@ -17,7 +17,7 @@
       "fact": "no end: 1"
     },
     {
-      "name": "2026-11-19_EPORapport_133.csv",
+      "name": "2026-11-19_EPORapport.csv",
       "kind": "epo",
       "used": true,
       "whyNotUsed": "",
@@ -70,7 +70,14 @@
       "name": "2026-11-19_cmdb_logical_automation.csv",
       "date": "2026-11-19",
       "readAs": "CI report",
-      "what": "Lacks 14 columns the checks read, so some cards are grey or partly tested. Add them to the ServiceNow report: managed_by.user_name, managed_by.active, supported_by.user_name, supported_by.active, owned_by.manager.active, owned_by.manager.user_name, owned_by.department.dept_head, owned_by.department.dept_head.email, support_group.active, sys_created_on, sys_created_by, sys_updated_on, ref_cmdb_ci_service.u_service_mapped, ref_cmdb_ci_service.parent.",
+      "what": "Lacks 14 columns the checks read, so some cards are grey or partly tested. Add them to the ServiceNow report: copy the next line (right-click it, Copy, Copy value).",
+      "level": "fix"
+    },
+    {
+      "name": "Columns to add",
+      "date": "2026-11-19",
+      "readAs": "CI report",
+      "what": "managed_by.user_name, managed_by.active, supported_by.user_name, supported_by.active, owned_by.manager.active, owned_by.manager.user_name, owned_by.department.dept_head, owned_by.department.dept_head.email, support_group.active, sys_created_on, sys_created_by, sys_updated_on, ref_cmdb_ci_service.u_service_mapped, ref_cmdb_ci_service.parent",
       "level": "fix"
     },
     {

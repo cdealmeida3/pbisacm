@@ -1,5 +1,4 @@
 import { isReportFile } from '../reading/table.ts';
-import { normaliseHeader } from '../reading/headers.ts';
 
 /**
  * Finds the newest report among the .csv and .xlsx files of the workspace folder. Pure: the caller lists the files.
@@ -58,7 +57,7 @@ export interface ChoiceFile {
   kind: string;
   /** The report date, yyyy-mm-dd. */
   date: string;
-  /** Its named columns (columnCount). */
+  /** The columns that count for its type (neededColumns of src/core/sources/report-types.ts). */
   columns: number;
   /** Its rows under the header. */
   rows: number;
@@ -68,25 +67,24 @@ export interface ChoiceFile {
 
 export interface Choice { name: string; used: boolean; whyNotUsed: string }
 
-/** The number of distinct named columns of a header row, as the choice counts them. */
-export const columnCount = (headers: string[]): number => new Set(headers.map((header) => normaliseHeader(header.replace(/^\uFEFF/, ''))).filter(Boolean)).size;
 
 const fuller = (a: ChoiceFile, b: ChoiceFile): number =>
   b.columns - a.columns || b.rows - a.rows || b.modified - a.modified || (a.name < b.name ? 1 : a.name > b.name ? -1 : 0);
 
 /**
- * Which file of each type and report date is the report of that day (D348): the one with the most columns, then the
- * most rows, then the one changed last, then the last file name. A file name never decides alone. The others are not
+ * Which file of each type and report date is the report of that day (D348): the one with the most of the needed columns
+ * (for a CI report, the columns the checks read), then the most rows, then the one changed last, then the last file name. A file name never decides alone. The others are not
  * used, with the reason, in plain words. The answer is in the order of `files`.
  */
 export function chooseReports(files: ChoiceFile[]): Choice[] {
+  const keyOf = (file: ChoiceFile): string => `${file.kind}|${file.date}`;
   const groups = new Map<string, ChoiceFile[]>();
-  for (const file of files) groups.set(`${file.kind}|${file.date}`, [...(groups.get(`${file.kind}|${file.date}`) ?? []), file]);
+  for (const file of files) groups.set(keyOf(file), [...(groups.get(keyOf(file)) ?? []), file]);
   return files.map((file): Choice => {
-    const best = [...groups.get(`${file.kind}|${file.date}`)!].sort(fuller)[0]!;
+    const best = [...groups.get(keyOf(file))!].sort(fuller)[0]!;
     if (best === file) return { name: file.name, used: true, whyNotUsed: '' };
     const why = best.columns !== file.columns
-      ? `${best.name} of the same day has more columns (${best.columns} against ${file.columns}), so it is used.`
+      ? `${best.name} of the same day has more of the needed columns (${best.columns} against ${file.columns}), so it is used.`
       : best.rows !== file.rows
         ? `${best.name} of the same day has more rows (${best.rows} against ${file.rows}), so it is used.`
         : `${best.name} of the same day has the same columns and rows and is used (${best.modified !== file.modified ? 'it was saved later' : 'the last file name'}). Move this copy into the sub-folder Archive.`;

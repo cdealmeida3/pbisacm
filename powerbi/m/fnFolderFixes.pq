@@ -1,6 +1,6 @@
 // What to fix in the reports folder, the first box of the Reports page (D352,
 // src/core/sources/report-types.ts, folderFixes). In the order of the box: each report type with no file, the columns
-// the newest CI report lacks (one line to copy into the ServiceNow report, D347), every file of a report type that is
+// the newest CI report lacks (a line that says so, then a line "Columns to add" with the list alone, to copy, D347), every file of a report type that is
 // not used (two of one type and day, D348), every file of no type, then the files the Workbench knows but does not use
 // (D341, D342). FileName is the file, or "No <type>" for a type with no file, so every line has its own name: the page
 // sorts the lines by it (sortByColumn Order). Level: "fix" to act on, "known" to know. Empty when the folder needs nothing.
@@ -29,7 +29,9 @@
                     if count = 0 then {}
                     else {{file[FileName], file[ReportDate], labelOf("ci"),
                         "Lacks " & Text.From(count) & (if count = 1 then " column" else " columns") & " the checks read, so some cards are grey or partly tested. Add "
-                            & (if count = 1 then "it" else "them") & " to the ServiceNow report: " & Text.Combine(missing, ", ") & ".", "fix"}},
+                            & (if count = 1 then "it" else "them") & " to the ServiceNow report: copy the next line (right-click it, Copy, Copy value).", "fix"},
+                        // The columns alone, so a copy of the cell is the list and nothing else (D347).
+                        {"Columns to add", file[ReportDate], labelOf("ci"), Text.Combine(missing, ", "), "fix"}},
         byName = (rows as list) as list => List.Sort(rows, (a, b) => Comparer.Ordinal(a[FileName], b[FileName])),
         records = Table.ToRecords(Table.SelectColumns(files, {"FileName", "ReportDate", "Kind", "Used", "WhyNotUsed", "Message"})),
         notUsed = List.Transform(byName(List.Select(records, (file) => not file[Used] and not List.Contains(knownKinds, file[Kind]))), (file) =>

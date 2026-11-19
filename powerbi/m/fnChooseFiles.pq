@@ -1,5 +1,6 @@
 // One report per type and day, chosen by its content (D348, src/core/memory/finder.ts, chooseReports): of the files of
-// one report type and one report date, the one with the most named columns, then the most rows, then the one changed
+// one report type and one report date, the one with the most of the needed columns (for a CI report the columns the
+// checks read, else its named columns: neededColumns of report-types.ts), then the most rows, then the one changed
 // last, then the last file name, is the report of that day (Used). The others are not used, with the reason in
 // WhyNotUsed; a file name never decides alone. A file of no report type (Kind "unknown", or a file the Workbench knows
 // but does not use) is never used. Only a date with two files of one type is measured, so one file a day costs nothing.
@@ -15,12 +16,14 @@
             if List.Contains(twice, [ChoiceKey]) and List.Contains(reportKinds, [Kind]) then
                 [
                     FileName = [FileName],
-                    Columns = List.Count(List.Distinct(List.Select([Read][Headers], (header) => header <> ""))),
+                    Columns = if [Kind] = "ci" then
+                        let found = fnCiColumns([Read]) in List.Count(List.Select(ReadingRules[wantedColumns], (entry) => List.Contains(found, entry[column])))
+                    else List.Count(List.Distinct(List.Select([Read][Headers], (header) => header <> ""))),
                     Rows = Table.RowCount([Read][Rows]),
                     Modified = if [Modified] = null then 0 else Number.From([Modified])
                 ]
             else null)),
-        // Fuller first: more columns, more rows, changed later, the last file name (Comparer.Ordinal: as JavaScript's < ).
+        // Fuller first: more of the needed columns, more rows, changed later, the last file name (Comparer.Ordinal: as JavaScript's < ).
         fuller = (a as record, b as record) as number =>
             if a[Columns] <> b[Columns] then (if a[Columns] > b[Columns] then -1 else 1)
             else if a[Rows] <> b[Rows] then (if a[Rows] > b[Rows] then -1 else 1)
@@ -31,7 +34,7 @@
         whyOf = (best as record, file as record) as text =>
             "Not used: " & best[FileName] & " of the same day " & (
                 if best[Columns] <> file[Columns] then
-                    "has more columns (" & Text.From(best[Columns]) & " against " & Text.From(file[Columns]) & "), so it is used."
+                    "has more of the needed columns (" & Text.From(best[Columns]) & " against " & Text.From(file[Columns]) & "), so it is used."
                 else if best[Rows] <> file[Rows] then
                     "has more rows (" & Text.From(best[Rows]) & " against " & Text.From(file[Rows]) & "), so it is used."
                 else
