@@ -482,8 +482,8 @@ table CaseLines
 		isNameInferred
 		sourceColumn: [ShareTo]
 
-	/// The step of an open line for Where the work sits (Overview, build D3): SACM fixes when nobody is asked, else the first of Reply to read (the person wrote back), Escalate, Reminder due (by the date of the newest refresh), New, Asked. The same order as the next step of the Work queue (Queue state).
-	column Step =
+	/// The step of an open line for Where the work sits (Overview, build D3), as a number: 6 SACM fixes when nobody is asked, else the first of 5 Reply to read (the person wrote back), 4 Escalate, 3 Reminder due (by the date of the newest refresh), 1 New, 2 Asked. The same order as the next step of the Work queue (Queue state). The column Step says it in words and sorts by it (so the words come from the number: a sort column may not use the column it sorts).
+	column StepOrder =
 			VAR asOf = IF ( MAX ( About[SourceMode] ) = "Sample", MAX ( About[SampleDate] ), TODAY () )
 			VAR mail = LOOKUPVALUE ( Findings[ContactEmail], Findings[Key], CaseLines[Key], "" )
 			VAR wrote = mail <> "" && NOT ISEMPTY ( FILTER ( RepliesToRead, RepliesToRead[From] = mail ) )
@@ -491,22 +491,22 @@ table CaseLines
 			RETURN
 			    SWITCH (
 			        TRUE (),
-			        CaseLines[ContactName] = "", "SACM fixes",
-			        wrote, "Reply to read",
-			        CaseLines[Remind] = "escalation" && due, "Escalate",
-			        CaseLines[Remind] = "reminder" && due, "Reminder due",
-			        CaseLines[Status] = "New", "New",
-			        "Asked"
+			        CaseLines[ContactName] = "", 6,
+			        wrote, 5,
+			        CaseLines[Remind] = "escalation" && due, 4,
+			        CaseLines[Remind] = "reminder" && due, 3,
+			        CaseLines[Status] = "New", 1,
+			        2
 			    )
-		dataType: string
-		summarizeBy: none
-		sortByColumn: StepOrder
-
-	/// The order of the steps of Where the work sits: New, Asked, Reminder due, Escalate, Reply to read, SACM fixes.
-	column StepOrder = SWITCH ( CaseLines[Step], "New", 1, "Asked", 2, "Reminder due", 3, "Escalate", 4, "Reply to read", 5, 6 )
 		dataType: int64
 		formatString: 0
 		summarizeBy: none
+
+	/// The step of an open line in words, the columns of Where the work sits: New, Asked, Reminder due, Escalate, Reply to read, SACM fixes (in the order of StepOrder).
+	column Step = SWITCH ( CaseLines[StepOrder], 1, "New", 2, "Asked", 3, "Reminder due", 4, "Escalate", 5, "Reply to read", "SACM fixes" )
+		dataType: string
+		summarizeBy: none
+		sortByColumn: StepOrder
 
 	partition CaseLines = calculated
 		mode: import
