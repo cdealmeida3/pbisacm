@@ -2,6 +2,17 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.48.0 — The Power BI report, the design pass part 3: the work pages (D3)
+
+- **People** (D321): one line per person with open lines, in the order of the team's rules: the next step, a bar of the open lines in the colours of their states, the kinds of problem, the cards and the last time asked. **Find a person** searches the names; **Open person** opens the one selected.
+- **Overview** (from design D): the open lines, the lines waiting on a person and the lines solved since the last report, each with a small line of the last reports; the reports as chips; where the work sits (section by status, darker is more); open lines per report; who holds the most.
+- **Audit** is now the summary of a period (from design D): the CI reports received, the problems found, closed and verified, the median days to an answer, found and closed per CI report, and every escalation. The verification record is its part **Record**.
+- **All cards** has two tabs: **Sections** (each card with a badge and a small line) and **List** (the table as before). **Card** and **Case** show their tables as tabs (D323), with **Back** at the top left. **Case** now fits the screen (720 high): move its app to 956, 84, 300 × 620 (README §6.4). **Person** has three numbers, the lines open with them, their replies, **Prepare the email** and **Open CI**.
+- **Activity is the tab What happened of History**, with an icon per kind of event, a search box and a row of kinds.
+- **The chip of the reports is on every page** (D322), at the top right; a press opens Reports.
+- A drill-through opens with a button on the row selected (**Open card**, **Open person**, **Open CI**); the card page opens on the card's label (D324).
+- No check, number or message changed; the HTML app is as before.
+
 ## 0.47.0 — The Power BI report, the design pass part 2: the rail, My day and the Work queue (D2)
 
 - **A navy rail on every page** (D319): one item per page with its icon (My day, Work queue, Messages, Cards, Mapping, Contracts, History, Activity, Audit, Reports). A press opens the page. The page in view is lighter, with a coral line; *Card* lights *Cards*, *Person* and *Case* light *Work queue*. Beside *My day* the number of next steps, beside *Work queue* the open lines. On the four Audit pages their parts (*Record*, *Export*, *Not followed*, *Lifecycle review*) show under *Audit*.
