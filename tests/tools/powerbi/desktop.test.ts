@@ -158,3 +158,9 @@ test('one query per relationship asks for the values of the many side with no ro
   assert.equal(problems.length, 1);
   assert.match(problems[0]!, /Relationship Inventory_Classes .*2 values of the many side have no row on the one side/);
 });
+
+test('the values a many side holds on purpose (contract findings, notes about the run) are left out of the blank-row query', () => {
+  const findings = blankRowQueries().find((query) => query.visual === 'Findings_Inventory')!;
+  assert.match(findings.dax, /FILTER \( EXCEPT \( ALLNOBLANKROW \( 'Findings'\[CiKey\] \), ALLNOBLANKROW \( 'Inventory'\[Key\] \) \), NOT LEFT \( 'Findings'\[CiKey\], 9 \) = "contract:" \)/);
+  assert.match(blankRowQueries().find((query) => query.visual === 'HistoryNotes_Checks')!.dax, /NOT 'HistoryNotes'\[CheckId\] IN \{ "RELATIONSHIPS", "PARKED", "SOURCE-FIRST", "Routing", "Listing" \}/);
+});

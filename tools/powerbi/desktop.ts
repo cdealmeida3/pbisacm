@@ -17,6 +17,8 @@ import { readPages, readTabGroups, textsOf } from './pages.ts';
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
 const MODEL_FOLDER = join(root, 'powerbi', 'SACM-Workbench.SemanticModel', 'definition');
+/** The ids of the notes about a run as a whole, which no card has (fnNotesPart.pq). */
+const RUN_NOTES = ['RELATIONSHIPS', 'PARKED', 'SOURCE-FIRST', 'Routing', 'Listing'];
 
 interface FieldRef { Column?: Ref; Measure?: Ref }
 interface Ref { Expression?: { SourceRef?: { Entity?: string; Source?: string } }; Property?: string }
@@ -200,6 +202,18 @@ export function queriesOf(drillValues: Map<string, string[]> = new Map()): Visua
  * counts. ALLNOBLANKROW leaves out the blank row of each side itself, so only the values the table really holds count.
  * The judge wants 0.
  */
+/**
+ * The values a many side holds on purpose with no row on its one side, by relationship: a finding of a contract has the
+ * key "contract:<number>", not a CI (D349); a note about the run as a whole (fnCheckRun, fnSourceFirst) has no card.
+ * The query leaves them out; the measures that count those tables count DISTINCT keys, so their blank row counts nowhere.
+ */
+const runNote = (column: string): string => `NOT ${column} IN { ${RUN_NOTES.map((id) => `"${id}"`).join(', ')} }`;
+export const EXPECTED_WITHOUT_ROW: Record<string, { why: string; keep: (column: string) => string }> = {
+  Findings_Inventory: { why: 'the findings of contracts', keep: (column) => `NOT LEFT ( ${column}, 9 ) = "contract:"` },
+  Notes_Checks: { why: 'the notes about the run as a whole', keep: runNote },
+  HistoryNotes_Checks: { why: 'the notes about the run as a whole', keep: runNote }
+};
+
 export function blankRowQueries(): VisualQuery[] {
   const text = readFileSync(join(MODEL_FOLDER, 'relationships.tmdl'), 'utf8').replace(/\r\n/g, '\n');
   const quote = (table: string, column: string): string => `'${table.replace(/'/g, "''")}'[${column}]`;
@@ -211,8 +225,10 @@ export function blankRowQueries(): VisualQuery[] {
     if (!name || !from || !to) continue;
     const many = quote(from[1]!.trim(), from[2]!.trim());
     const one = quote(to[1]!.trim(), to[2]!.trim());
+    const missing = `EXCEPT ( ALLNOBLANKROW ( ${many} ), ALLNOBLANKROW ( ${one} ) )`;
+    const expected = EXPECTED_WITHOUT_ROW[name];
     queries.push({ page: 'Model', pageName: 'model', visual: name, type: 'blankrow', title: `${many} → ${one}`, groups: [], values: ['Without a row'],
-      dax: `EVALUATE ROW ( "v0", COUNTROWS ( EXCEPT ( ALLNOBLANKROW ( ${many} ), ALLNOBLANKROW ( ${one} ) ) ) + 0 )` });
+      dax: `EVALUATE ROW ( "v0", COUNTROWS ( ${expected ? `FILTER ( ${missing}, ${expected.keep(many)} )` : missing} ) + 0 )` });
   }
   return queries;
 }
