@@ -2,8 +2,11 @@
 # engine, then run every visual (tools/powerbi/desktop-check/) and judge what Desktop would show (tools/powerbi/desktop.ts).
 # Then the picture step (D318, tools/powerbi/pictures.ps1): a picture of every page as Desktop draws it, and the time it
 # took. The job "powerbi-desktop" runs it. Invented samples only (Sample mode); nothing is written to the repository.
-#   ./tools/powerbi/desktop.ps1 [-Out .build/desktop]
-param([string]$Out = ".build/desktop")
+#   ./tools/powerbi/desktop.ps1 [-Out .build/desktop] [-RealSize packed|folder] [-History <k>]
+# -RealSize (R4 step 0): the invented samples at the size of the real reports (tools/powerbi/scaled.ts) in the copy Desktop
+# opens: "packed" inside the file as Sample mode packs them, "folder" in a folder of the runner read as the SharePoint
+# folder is (desktop.ts realsize). -History: that many earlier dates of the CI and Relationship report.
+param([string]$Out = ".build/desktop", [string]$RealSize = "", [int]$History = 0)
 $ErrorActionPreference = "Stop"
 New-Item -ItemType Directory -Force $Out | Out-Null
 $Out = (Resolve-Path $Out).Path
@@ -79,6 +82,17 @@ foreach ($file in Get-ChildItem -Recurse -Filter "page.json" (Join-Path $copy "S
   $text = Get-Content -Raw $file.FullName
   $visible = $text -replace ',\s*"visibility":\s*"HiddenInViewMode"', '' -replace '"visibility":\s*"HiddenInViewMode",\s*', ''
   if ($visible -ne $text) { Set-Content -NoNewline -Encoding utf8NoBOM $file.FullName $visible }
+}
+if ($RealSize -ne "") {
+  $expressions = Join-Path $copy "SACM-Workbench.SemanticModel\definition\expressions.tmdl"
+  $folder = "C:\sacm-real-size"
+  if ($RealSize -eq "folder") {
+    if (Test-Path $folder) { Remove-Item -Recurse -Force $folder }
+    node tools/powerbi/scaled.ts --write $folder --history $History
+    if ($LASTEXITCODE -ne 0) { throw "scaled.ts failed" }
+  }
+  node tools/powerbi/desktop.ts realsize $expressions $RealSize --folder $folder --history $History
+  if ($LASTEXITCODE -ne 0) { throw "desktop.ts realsize failed" }
 }
 $project = (Resolve-Path (Join-Path $copy "SACM-Workbench.pbip")).Path
 Write-Output "$(Get-Date -Format HH:mm:ss) Opening $project"
