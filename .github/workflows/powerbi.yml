@@ -198,6 +198,11 @@ jobs:
         run: |
           node tools/powerbi/scaled.ts --write C:\preview-data --history 1
           python tools/preview/people.py C:\preview-data
+      - name: PREVIEW ONLY - Windows set to day-first dates, like a European PC
+        shell: pwsh
+        run: |
+          Set-Culture en-GB
+          Get-Culture
       - name: Open the report in Power BI Desktop and run every visual
         run: ./tools/powerbi/desktop.ps1 -Out .build/desktop
       - name: What Desktop would show wrong
