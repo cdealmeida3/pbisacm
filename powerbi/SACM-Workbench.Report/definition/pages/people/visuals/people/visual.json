@@ -73,7 +73,7 @@
               },
               "queryRef": "Findings.Person kinds",
               "nativeQueryRef": "Person kinds",
-              "displayName": "Kinds"
+              "displayName": "Kinds of problem"
             },
             {
               "field": {
@@ -191,7 +191,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "64D"
+                  "Value": "128D"
                 }
               }
             }
@@ -205,7 +205,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "288D"
+                  "Value": "224D"
                 }
               }
             }

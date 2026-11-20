@@ -68,27 +68,12 @@
                       "Entity": "History"
                     }
                   },
-                  "Property": "Field"
+                  "Property": "Part"
                 }
               },
-              "queryRef": "History.Field",
-              "nativeQueryRef": "Field",
-              "displayName": "Field"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "History"
-                    }
-                  },
-                  "Property": "Open first seen"
-                }
-              },
-              "queryRef": "History.Open first seen",
-              "nativeQueryRef": "Open first seen",
-              "displayName": "First seen"
+              "queryRef": "History.Part",
+              "nativeQueryRef": "Part",
+              "displayName": "Part"
             },
             {
               "field": {
@@ -103,7 +88,7 @@
               },
               "queryRef": "History.Open age",
               "nativeQueryRef": "Open age",
-              "displayName": "Age in days"
+              "displayName": "Days open"
             },
             {
               "field": {
@@ -118,7 +103,7 @@
               },
               "queryRef": "History.ContactName",
               "nativeQueryRef": "ContactName",
-              "displayName": "Person asked"
+              "displayName": "Asked"
             },
             {
               "field": {
@@ -128,11 +113,11 @@
                       "Entity": "History"
                     }
                   },
-                  "Property": "State"
+                  "Property": "StateLabel"
                 }
               },
-              "queryRef": "History.State",
-              "nativeQueryRef": "State",
+              "queryRef": "History.StateLabel",
+              "nativeQueryRef": "StateLabel",
               "displayName": "Listed as"
             }
           ]
@@ -225,7 +210,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "98D"
+                  "Value": "93D"
                 }
               }
             }
@@ -239,7 +224,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "88D"
+                  "Value": "87D"
                 }
               }
             }
@@ -253,7 +238,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "51D"
+                  "Value": "106D"
                 }
               }
             }
@@ -267,13 +252,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "50D"
+                  "Value": "112D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "History.Field"
+            "metadata": "History.Part"
           }
         },
         {
@@ -281,21 +266,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "84D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "History.Open first seen"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "91D"
+                  "Value": "78D"
                 }
               }
             }
@@ -309,7 +280,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "99D"
+                  "Value": "90D"
                 }
               }
             }
@@ -329,7 +300,7 @@
             }
           },
           "selector": {
-            "metadata": "History.State"
+            "metadata": "History.StateLabel"
           }
         }
       ]

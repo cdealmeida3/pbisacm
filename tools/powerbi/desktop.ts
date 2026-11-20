@@ -17,6 +17,7 @@ import { join } from 'node:path';
 import { readPages, readTabGroups, textsOf } from './pages.ts';
 import { historyStart, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { mText } from './generate.ts';
+import { CELL_PADDING, TEXT, textWidth } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -42,6 +43,8 @@ export interface VisualQuery {
   groups: string[]; values: string[];
   /** For a drill-through page: the drill column and its value ("" for the page opened from its tab). */
   drill?: { column: string; value: string };
+  /** For a table: the width of each column in px, by the name of its result column (build R5, the broken words). */
+  widths?: Record<string, number>;
   dax: string;
 }
 
@@ -160,6 +163,60 @@ export function boundTexts(visual: VisualFile): Array<[string, FieldRef]> {
   return out;
 }
 
+/** The width of each column of a table visual, by the name its query gives the column (the header, else the field). */
+export function columnWidths(visual: VisualFile, projections: Projection[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const entry of visual.visual?.objects?.columnWidth ?? []) {
+    const ref = (entry.selector as { metadata?: string } | undefined)?.metadata;
+    const value = (entry.properties as Record<string, { expr?: Literal }> | undefined)?.value?.expr?.Literal?.Value;
+    const projection = projections.find((item) => item.queryRef === ref);
+    if (!projection || !value) continue;
+    out[projection.displayName ?? daxField(projection.field).name] = Number(value.replace(/D$/, ''));
+  }
+  return out;
+}
+
+/**
+ * Tables where a word may break (D370): the tab Export of Card has the nine columns of the SACM template (FEATURES, Get a
+ * list for Excel) in 680 px, for *Export data*; they cannot all fit their longest word.
+ */
+export const BREAKS_ALLOWED = new Set(['card/export']);
+
+/**
+ * The words of a text as Power BI wraps it: at spaces and after a hyphen that follows a letter, the brackets and the
+ * punctuation around a word left out. An address, a file name, a relationship type or a setting (a word with @, _, /,
+ * :: or a dot inside) is not a word of the language: Power BI breaks it at its punctuation, so it is left out (D370).
+ */
+export function wrappedWords(text: string): string[] {
+  return text.split(/\s+/)
+    .map((word) => word.replace(/^[(\["']+/, '').replace(/[)\]"',;:.!?]+$/, ''))
+    .filter((word) => word && !/[@_/]|::|\.\S/.test(word))
+    .flatMap((word) => word.split(/(?<=[A-Za-z]-)/));
+}
+
+/**
+ * The words of a table that do not fit their column (build R5, LOOK rule 3, D370: no word broken over two lines): Power BI
+ * wraps a text at its spaces, and breaks a word longer than the column ("Descriptio n", "NAME-DUPLICA TE"). The width of
+ * a word is the estimate of the lint (tokens.ts); a picture, a link, a date and a number are left out.
+ */
+export function brokenWords(query: VisualQuery, rows: Array<Array<string | null>>): string[] {
+  const problems: string[] = [];
+  const names = [...query.groups, ...query.values];
+  names.forEach((name, at) => {
+    const width = query.widths?.[name];
+    if (!width) return;
+    let longest = '';
+    for (const row of rows) {
+      const value = row[at];
+      if (typeof value !== 'string' || /^(data:|https?:)/.test(value) || /^\d{4}-\d{2}-\d{2}/.test(value) || /^-?[\d.,]+$/.test(value)) continue;
+      for (const word of wrappedWords(value)) if (word.length > longest.length) longest = word;
+    }
+    const need = textWidth(longest, TEXT.table) + CELL_PADDING;
+    if (longest && need > width) problems.push(`${where(query)}: the column "${name}" is ${width} px and "${longest}" needs ${need}: Power BI breaks the word over two lines (LOOK rule 3)`);
+  });
+  return problems;
+}
+
 /** Every query of the report: one per visual, and on a drill-through page one more per drill value (`drillValues`). */
 export function queriesOf(drillValues: Map<string, string[]> = new Map()): VisualQuery[] {
   const queries: VisualQuery[] = [];
@@ -191,9 +248,10 @@ export function queriesOf(drillValues: Map<string, string[]> = new Map()): Visua
       if (!state) continue;
       const projections = Object.entries(state).flatMap(([role, value]) => (value.projections ?? []).map((projection) => ({ role, projection })));
       if (!projections.length) continue;
+      const widths = base.type === 'tableEx' ? columnWidths(visual, projections.map(({ projection }) => projection)) : undefined;
       for (const drill of runs) {
         const query = queryOf(projections, filters, drillOf(drill));
-        queries.push({ ...base, ...query, ...(drill ? { drill } : {}) });
+        queries.push({ ...base, ...query, ...(drill ? { drill } : {}), ...(widths ? { widths } : {}) });
       }
     }
   }
@@ -323,6 +381,7 @@ const where = (query: VisualQuery): string => `${query.page} › ${query.visual}
 export function judge(results: Results, pictures?: Pictures): { problems: string[]; notes: string[] } {
   const problems: string[] = [];
   const notes: string[] = [];
+  const brokenSeen = new Set<string>();
   if (pictures) problems.push(...judgePictures(pictures, notes), ...judgeLook(pictures, notes));
   if (!results.opened) { problems.push(`Desktop did not open the project: ${results.openError ?? 'no reason given'}`); return { problems, notes }; }
   if (results.refreshError) problems.push(`The refresh failed: ${results.refreshError}`);
@@ -352,6 +411,17 @@ export function judge(results: Results, pictures?: Pictures): { problems: string
       // A blank value is a button or an item "(Blank)" in a slicer.
       if (groups && lines.some((line) => line.slice(0, groups).every(blank))) problems.push(`${where(query)}: the slicer shows "(Blank)" (${query.groups.join(', ')})`);
       continue;
+    }
+    if (query.pageName === 'selfcheck' && query.visual === 'same') {
+      // One word, one number (D366): every pair of numbers of two pages agrees, on the samples as on any data.
+      for (const line of lines) if (line.at(-1) !== 'Yes') problems.push(`${where(query)}: "${line[0]}" do not agree (${line[1]} and ${line[2]}): two pages give two numbers for one word`);
+    }
+    if (query.type === 'tableEx' && !BREAKS_ALLOWED.has(`${query.pageName}/${query.visual}`)) {
+      // One problem per visual and column, not one per drill value: the same column breaks for every CI.
+      for (const problem of brokenWords(query, lines)) {
+        const once = problem.replace(/ \(drilled to [^)]*\)/, '').replace(/ and "[^"]*" needs \d+/, '');
+        if (!brokenSeen.has(once)) { brokenSeen.add(once); problems.push(problem); }
+      }
     }
     if (groups === 0) continue;
     const blankRows = lines.filter((line) => line.slice(0, groups).every(blank)).length;

@@ -233,10 +233,8 @@ table History
 			    )
 		displayFolder: Page notes
 
-	/// To solve on the newest CI report, on the daily cards (one section of My day).
-	measure 'Section open' =
-			VAR d = [Newest report date]
-			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open", KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+	/// The open lines (D366) of the daily cards of one section of My day.
+	measure 'Section open' = CALCULATE ( [Open lines], KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
 		formatString: #,0
 		displayFolder: My day
 
@@ -253,7 +251,7 @@ table History
 			VAR points =
 			    ADDCOLUMNS (
 			        CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ),
-			        "@open", CALCULATE ( COUNTROWS ( History ), History[State] = "open", KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+			        "@open", CALCULATE ( COUNTROWS ( History ), History[State] = "open", KEEPFILTERS ( Checks[Priority] <> "later" ), KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
 			    )
 			VAR n = COUNTROWS ( points )
 			VAR highest = MAX ( MAXX ( points, [@open] ), 1 )
@@ -273,19 +271,17 @@ table History
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// A number of Overview: what the newest CI report has to solve, on every card.
-	measure 'Open now' =
-			VAR d = [Newest report date]
-			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open" ) + 0
+	/// A number of Overview: the open lines (CaseLines, D366), the lines SACM fixes too: the same number as the total of Where the work sits. Waiting now is the part with a person (People, the Work queue with Everyone).
+	measure 'Open now' = [Open lines]
 		formatString: #,0
 		displayFolder: Overview
 
-	/// Under the number of open lines (Overview): how it moved since the report before.
+	/// Under the number of open lines (Overview): the open lines now against the open lines of the live cards in the report before (the history of the reports, D366).
 	measure 'Open now line' =
 			VAR d = [Newest report date]
 			VAR priorDate = CALCULATE ( MAX ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] < d )
-			VAR openBefore = CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = priorDate, History[State] = "open" ) + 0
-			VAR delta = [Open now] - openBefore
+			VAR openBefore = CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = priorDate, History[State] = "open", KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
+			VAR delta = [Open lines] - openBefore
 			RETURN
 			    SWITCH (
 			        TRUE (),
@@ -297,10 +293,8 @@ table History
 			    )
 		displayFolder: Overview
 
-	/// A number of Overview: the lines of the newest CI report that wait for a person (a person or a team is named).
-	measure 'Waiting now' =
-			VAR d = [Newest report date]
-			RETURN CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, History[State] = "open", History[ContactName] <> "" ) + 0
+	/// A number of Overview: the open lines that wait for a person (a person or a team is named, D366): the sum of Who holds the most, the Work queue with Everyone.
+	measure 'Waiting now' = [Open lines with a person]
 		formatString: #,0
 		displayFolder: Overview
 
@@ -323,12 +317,14 @@ table History
 			RETURN IF ( ISBLANK ( priorDate ), "after the next report", "since " & FORMAT ( priorDate, "d mmm" ) & ", verified" )
 		displayFolder: Overview
 
-	/// The open lines of each of the last 12 CI report dates as a small line, the newest a dot (Overview, Open lines). 72 × 36 (narrow, so the line under the number has room beside it).
+	/// The open lines of each of the last 12 CI report dates as a small line, the newest a dot, which is the number of the tile (Open lines, D366; Overview). 72 × 36 (narrow, so the line under the number has room beside it).
 	measure 'Open trend' =
+			VAR newestDay = [Newest report date]
+			VAR shownNow = [Open lines]
 			VAR points =
 			    ADDCOLUMNS (
 			        TOPN ( 12, CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ), Runs[ReportDate], DESC ),
-			        "@v", CALCULATE ( COUNTROWS ( History ), History[State] = "open" ) + 0
+			        "@v", IF ( Runs[ReportDate] = newestDay, shownNow, CALCULATE ( COUNTROWS ( History ), History[State] = "open", KEEPFILTERS ( Checks[Status] = "live" ) ) + 0 )
 			    )
 			VAR n = COUNTROWS ( points )
 			VAR highest = MAXX ( points, [@v] )
@@ -346,12 +342,14 @@ table History
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// The lines that waited for a person on each of the last 12 CI report dates as a small line (Overview). 72 × 36 (narrow, so the line under the number has room beside it).
+	/// The lines that waited for a person on each of the last 12 CI report dates as a small line, the newest the number of the tile (Waiting now, D366; Overview). 72 × 36 (narrow, so the line under the number has room beside it).
 	measure 'Waiting trend' =
+			VAR newestDay = [Newest report date]
+			VAR shownNow = [Open lines with a person]
 			VAR points =
 			    ADDCOLUMNS (
 			        TOPN ( 12, CALCULATETABLE ( VALUES ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ) ), Runs[ReportDate], DESC ),
-			        "@v", CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] <> "" ) + 0
+			        "@v", IF ( Runs[ReportDate] = newestDay, shownNow, CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] <> "", KEEPFILTERS ( Checks[Status] = "live" ) ) + 0 )
 			    )
 			VAR n = COUNTROWS ( points )
 			VAR highest = MAXX ( points, [@v] )
@@ -392,13 +390,23 @@ table History
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// A line of Open lines per report (Overview): the lines of a CI report date that wait for a person.
-	measure 'With a person' = CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] <> "" ) + 0
+	/// A line of Open lines per report (Overview): the lines of a CI report date that wait for a person, live cards only; at the newest date the open lines with a person, as every page counts them (D366).
+	measure 'With a person' =
+			IF (
+			    MAX ( Runs[ReportDate] ) = [Newest report date],
+			    [Open lines with a person],
+			    CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] <> "", KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
+			)
 		formatString: #,0
 		displayFolder: Overview
 
-	/// A line of Open lines per report (Overview): the lines of a CI report date that SACM fixes itself (no person is named).
-	measure 'SACM fixes' = CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] = "" ) + 0
+	/// A line of Open lines per report (Overview): the lines of a CI report date that SACM fixes itself (no person is named), live cards only; at the newest date the open lines SACM fixes, as every page counts them (D366).
+	measure 'SACM fixes' =
+			IF (
+			    MAX ( Runs[ReportDate] ) = [Newest report date],
+			    [Open lines SACM fixes],
+			    CALCULATE ( COUNTROWS ( History ), History[State] = "open", History[ContactName] = "", KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
+			)
 		formatString: #,0
 		displayFolder: Overview
 
@@ -522,6 +530,67 @@ table History
 			RETURN IF ( NOT ISBLANK ( d ) && ISBLANK ( shownNext ) && NOT ISBLANK ( partTested ) && NOT ISBLANK ( ciChecked ), d )
 		dataType: dateTime
 		formatString: d mmm yyyy
+		summarizeBy: none
+
+	/// Build R5 (D369, rule 9 of the real-data plan): the part of the check the line is about, in words ("Managed by", "End date"), for the tables of Audit export: never the field name of the report or the id of a part. An id not in the list gets its words from the id ("target.availability" is "Target availability").
+	column Part =
+			VAR f = History[Field]
+			VAR known =
+			    SWITCH (
+			        f,
+					"owned_by", "Owned by",
+					"managed_by", "Managed by",
+					"supported_by", "Supported by",
+					"support_group", "Support group",
+					"support_group.active", "Support group (active)",
+					"name", "Name",
+					"description", "Description",
+					"short_description", "Description",
+					"tags", "Tags",
+					"sys_tags", "Tags",
+					"status", "Status",
+					"operational_status", "Operational status",
+					"record", "The record",
+					"twice", "Related twice",
+					"type", "Relationship type",
+					"mapping", "Mapping",
+					"target", "Target criticality",
+					"bs-suffix", "Name suffix",
+					"bc-below", "Capability below",
+					"ownerLeft", "Owner left",
+					"noVendorNumber", "No vendor number",
+					"epoRetired", "EPO ID of a retired system",
+					"epoUnknown", "Unknown EPO ID",
+					"endPassed", "End date passed",
+					"end", "End date",
+					"start", "Start date",
+					"dailyResponsible", "Daily responsible",
+					"vendor", "Vendor",
+					"vendorNumber", "Vendor number",
+					"procurementPartner", "Procurement partner",
+					"epoId", "EPO ID",
+					"asset_tag", "EPO ID",
+					"category", "Category",
+					"duration", "Duration",
+					"owner", "Owner",
+					"exception_justification", "Exception justification",
+					"ref_cmdb_ci_service.parent", "Parent",
+					"ref_cmdb_ci_service.u_service_mapped", "Service mapped",
+					"ref_cmdb_ci_service.u_platform", "Platform",
+					"sys_class_name", "Class",
+					"sys_created_by", "Created by",
+					"sys_created_on", "Created",
+					"sys_updated_on", "Updated",
+			        ""
+			    )
+			VAR spaced = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( f, "_", " " ), "-", " " ), ".", " " )
+			RETURN IF ( known <> "", known, UPPER ( LEFT ( spaced, 1 ) ) & MID ( spaced, 2, 200 ) )
+		dataType: string
+		summarizeBy: none
+
+	/// Build R5 (D369): how the line is listed, in words (To solve, To check, Waiting, Known), as the Card page says it.
+	column StateLabel = SWITCH ( History[State], "open", "To solve", "review", "To check", "waiting", "Waiting", "known", "Known", History[State] )
+		dataType: string
 		summarizeBy: none
 
 	partition History = calculated

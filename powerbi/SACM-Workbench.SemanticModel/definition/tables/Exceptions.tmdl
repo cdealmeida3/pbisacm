@@ -100,6 +100,11 @@ table Exceptions
 		isNameInferred
 		sourceColumn: [Order]
 
+	/// Build R5 (D369, rule 9 of the real-data plan): the card of the exception by its label, never its check id; "Every card" for a standing exception on every check (*). No relationship to Checks: the * would give Checks a blank row.
+	column CardLabel = IF ( Exceptions[CheckId] = "*", "Every card", LOOKUPVALUE ( Checks[CardLabel], Checks[CheckId], Exceptions[CheckId], "A card no longer in the report" ) )
+		dataType: string
+		summarizeBy: none
+
 	partition Exceptions = calculated
 		mode: import
 		source =

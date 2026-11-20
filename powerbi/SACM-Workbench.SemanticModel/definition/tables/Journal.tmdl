@@ -133,6 +133,32 @@ table Journal
 		dataType: string
 		sourceColumn: CiName
 
+	/// Build R5 (D369, rule 9 of the real-data plan): the event in words, as the auditor's export of the HTML app names it (src/core/audit/audit.ts, actionOf), never the event type of the journal.
+	column Action =
+			VAR kind = Journal[Type]
+			RETURN
+			    SWITCH (
+			        kind,
+			        "message", IF ( Journal[Channel] = "teams", "Teams chat", SWITCH ( Journal[Kind], "reminder", "Reminder", "escalation", "Escalation", "Email" ) ),
+			        "request", "Request",
+			        "status", IF ( Journal[Text] = "Waived", "Not followed up", "Status" ),
+			        "exception", IF ( Journal[Text] = "Ended by hand", "Followed up again", "Not followed up" ),
+			        "assign", "Assigned",
+			        "handover", "Handover",
+			        "report", IF ( LEFT ( Journal[Text], 16 ) = "Removed the load", "Load removed", "Report loaded" ),
+			        "settings", "Settings changed",
+			        "review", "Lifecycle review",
+			        "retirement", "Planned retirement date",
+			        "reviewed", "Reviewed by SACM",
+			        "stage", "Mapping stage",
+			        "no-process", "Process does not exist",
+			        "note", "Note",
+			        "person-note", "Note about a person",
+			        "Note"
+			    )
+		dataType: string
+		summarizeBy: none
+
 	partition Journal = m
 		mode: import
 		source = JournalRows

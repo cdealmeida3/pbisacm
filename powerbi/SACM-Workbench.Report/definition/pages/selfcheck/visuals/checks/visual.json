@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "SelfCheck"
+                      "Entity": "Checks"
                     }
                   },
-                  "Property": "CheckId"
+                  "Property": "CardLabel"
                 }
               },
-              "queryRef": "SelfCheck.CheckId",
-              "nativeQueryRef": "CheckId",
+              "queryRef": "Checks.CardLabel",
+              "nativeQueryRef": "CardLabel",
               "displayName": "Check"
             },
             {
@@ -145,10 +145,10 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "SelfCheck"
+                    "Entity": "Checks"
                   }
                 },
-                "Property": "CheckId"
+                "Property": "CardLabel"
               }
             },
             "direction": "Ascending"
@@ -231,7 +231,7 @@
             }
           },
           "selector": {
-            "metadata": "SelfCheck.CheckId"
+            "metadata": "Checks.CardLabel"
           }
         },
         {

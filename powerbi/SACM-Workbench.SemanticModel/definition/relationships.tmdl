@@ -86,3 +86,7 @@ relationship Journal_Date
 relationship Activity_Date
 	fromColumn: Activity.Day
 	toColumn: Date.Date
+
+relationship MappingBacklog_BacklogStates
+	fromColumn: MappingBacklog.StateLabel
+	toColumn: BacklogStates.Label

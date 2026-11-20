@@ -8,7 +8,7 @@ Every screen keeps these rules, light and dark, on a laptop (1366 × 768), a mon
 
 1. **No capitals.** No text in capital letters, no letter spacing for capitals. Headings are in sentence case.
 2. **No three dots.** Not on a button, a list option, a menu or a cut text. A long text shows its first part and **Show all**.
-3. **No wrapped and no cut label.** A label, title, button, chip, tab or table header stays on one line and is not cut. A CI name is data and may take two lines.
+3. **No wrapped and no cut label.** A label, title, button, chip, tab or table header stays on one line and is not cut. A CI name is data and may take two lines, but between words: no word of a table is broken over two lines (D370).
 4. **Few words on a button.** At most two (a number is not a word: **Mark 3 fixed**, **Remind 1 of 2**), apart from the agreed longer ones (Escalate to (name), Mark N fixed, Mapping done: ask owner, Ask the owner, Send from mailbox, Hand over to (name), Try the demo, Tell Process Management).
 5. **One meaning per colour**, always with a word and an icon (section 2).
 6. **One meaning per icon** (section 4). One main button per screen or window. Selected never looks like a main button.

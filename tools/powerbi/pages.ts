@@ -30,6 +30,8 @@
 //  12. Folders (build R1, D340): every page folder is in pages.json and every page of pages.json has its folder; every
 //      visual folder holds its visual.json, named as the folder (Desktop silently drops a visual whose name differs, the
 //      pbip skill), and nothing else. So no panel of an old version can hide in the repository.
+//  13. Codes (build R5, D369, rule 9 of the real-data plan): no table, matrix, chart or slicer shows a column that holds
+//      a code of the model (a check id, a module, a field name, a state or status id, an event type), only its words.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { APP_SLOTS, CELL_PADDING, FLOW_SLOTS, GRID, MIN_TEXT_POINTS, TABLE_CHROME, TEXT, textWidth } from './tokens.ts';
@@ -243,6 +245,29 @@ const overlap = (a: { x: number; y: number; width: number; height: number }, b: 
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 const inside = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): boolean =>
   a.x >= b.x && a.y >= b.y && a.x + a.width <= b.x + b.width && a.y + a.height <= b.y + b.height;
+/**
+ * Rule 13: the columns that hold a code, not words (build R5, D369): by name in any table, or as Table.Column. Each has
+ * a column of words beside it (CardLabel, Section, StateLabel, StatusLabel, Action, Part, ResultLabel, GroupLabel).
+ */
+export const CODE_COLUMN_NAMES = new Set(['CheckId', 'CiKey', 'Key', 'ContactId', 'Module', 'Dimension', 'Route', 'Family', 'DetectorType', 'Path', 'ReasonIds', 'StageId', 'Keys']);
+export const CODE_COLUMNS = new Set(['Journal.Type', 'Journal.Kind', 'Journal.Channel', 'Activity.Type', 'Activity.Icon', 'History.Field', 'History.State', 'CaseLines.Field',
+  'CaseLines.State', 'CaseLines.Status', 'CaseLines.Remind', 'Findings.Field', 'Findings.State', 'Exceptions.State', 'MappingBacklog.State', 'Checks.Status', 'Checks.Kind',
+  'ReviewLines.Result', 'ReviewLines.Group', 'ReviewLines.Review', 'ReviewLines.CaseStatus', 'Drafts.Kind']);
+/** Columns of codes a page shows on purpose: the Data check names the columns of the CI report to add, for whoever builds it (D159, D357). */
+export const CODES_SHOWN = new Set(['DataColumns.Field']);
+/** Rule 13 for one visual: the code columns it shows. */
+export function codeColumns(visual: Visual): string[] {
+  const out: string[] = [];
+  for (const projection of projectionsOf(visual)) {
+    const column = (projection.field as { Column?: { Expression?: { SourceRef?: { Entity?: string } }; Property?: string } }).Column;
+    if (!column?.Property) continue;
+    const name = `${column.Expression?.SourceRef?.Entity ?? ''}.${column.Property}`;
+    if (CODES_SHOWN.has(name)) continue;
+    if (CODE_COLUMN_NAMES.has(column.Property) || CODE_COLUMNS.has(name)) out.push(name);
+  }
+  return out;
+}
+
 /** The pages that are a drill-through target and a page of the team's tabs too (build R4, D362: Messages opens on a person). */
 export const SHOWN_DRILL_PAGES = new Set(['messages']);
 
@@ -339,6 +364,10 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
           }
         }
       }
+      // 13. Codes.
+      if (/^(tableEx|pivotTable)$/.test(visual.visual?.visualType ?? '') && projectionsOf(visual).some((projection) => (projection as { active?: boolean }).active))
+        problems.push(`${at}: a column of the table is "active": Power BI then shows that column only`);
+      for (const code of codeColumns(visual)) problems.push(`${at}: shows the column ${code}, which holds a code; show its words (rule 9 of the real-data plan, D369)`);
       // 11. Words.
       for (const { text, button } of textsOf(visual)) for (const problem of wordProblems(text, button)) problems.push(`${at}: "${text}": ${problem}`);
       // 6. Titles and the line under them.

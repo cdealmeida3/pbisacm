@@ -173,6 +173,11 @@ table ReviewLines
 		isNameInferred
 		sourceColumn: [CheckedOn]
 
+	/// The status of that case in the words of the Work queue (D369): Asked, In progress, Marked fixed.
+	column CaseStatusLabel = SWITCH ( ReviewLines[CaseStatus], "Contacted", "Asked", "Fix in progress", "In progress", "Fixed", "Marked fixed", ReviewLines[CaseStatus] )
+		dataType: string
+		summarizeBy: none
+
 	/// The status of the case a "Not the same" opened; Verified once the newest report shows another status.
 	column CaseStatus
 		dataType: string

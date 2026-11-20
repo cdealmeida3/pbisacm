@@ -38,21 +38,6 @@
                       "Entity": "ReviewLines"
                     }
                   },
-                  "Property": "ReviewLabel"
-                }
-              },
-              "queryRef": "ReviewLines.ReviewLabel",
-              "nativeQueryRef": "ReviewLabel",
-              "displayName": "Review"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ReviewLines"
-                    }
-                  },
                   "Property": "GroupLabel"
                 }
               },
@@ -240,7 +225,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "48D"
+                  "Value": "40D"
                 }
               }
             }
@@ -254,21 +239,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "69D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "ReviewLines.ReviewLabel"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "56D"
+                  "Value": "70D"
                 }
               }
             }
@@ -282,7 +253,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "120D"
+                  "Value": "130D"
                 }
               }
             }
@@ -296,7 +267,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "100D"
+                  "Value": "110D"
                 }
               }
             }
@@ -310,7 +281,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "69D"
+                  "Value": "70D"
                 }
               }
             }
@@ -324,7 +295,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "96D"
+                  "Value": "100D"
                 }
               }
             }
@@ -338,7 +309,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "49D"
+                  "Value": "90D"
                 }
               }
             }
@@ -352,7 +323,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "69D"
+                  "Value": "70D"
                 }
               }
             }

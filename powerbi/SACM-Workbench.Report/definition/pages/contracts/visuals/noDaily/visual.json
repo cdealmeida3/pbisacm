@@ -53,21 +53,6 @@
                       "Entity": "ContractChanges"
                     }
                   },
-                  "Property": "Vendor"
-                }
-              },
-              "queryRef": "ContractChanges.Vendor",
-              "nativeQueryRef": "Vendor",
-              "displayName": "Vendor"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ContractChanges"
-                    }
-                  },
                   "Property": "Status"
                 }
               },
@@ -131,7 +116,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "75D"
+                  "Value": "112D"
                 }
               }
             }
@@ -145,21 +130,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "ContractChanges.Vendor"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "58D"
+                  "Value": "112D"
                 }
               }
             }

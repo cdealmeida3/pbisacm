@@ -194,12 +194,16 @@ function Look-Texts($root, $bitmap, $canvas, [string[]]$words) {
 function Find-Tab($root, [string]$name) {
   $window = $root.Current.BoundingRectangle
   $best = $null
+  $bestExact = $false
   foreach ($element in $root.FindAll($Scope::Descendants, [System.Windows.Automation.Condition]::TrueCondition)) {
     $text = $element.Current.Name
     if (-not $text -or ($text -ne $name -and -not $text.StartsWith("$name,") -and -not $text.StartsWith("$name "))) { continue }
     $r = $element.Current.BoundingRectangle
     if ($r.IsEmpty -or $r.Height -gt 60 -or $r.Width -lt 10 -or $r.Y -lt ($window.Y + $window.Height - 140)) { continue }
-    if (-not $best -or $r.Y -gt $best.Current.BoundingRectangle.Y) { $best = $element }
+    # The tab's own name first: a text of the page that starts with the same words ("Not followed up" in a table of
+    # Audit export, build R5) must not win over the tab "Not followed".
+    $exact = $text -eq $name
+    if (-not $best -or ($exact -and -not $bestExact) -or ($exact -eq $bestExact -and $r.Y -gt $best.Current.BoundingRectangle.Y)) { $best = $element; $bestExact = $exact }
   }
   return $best
 }

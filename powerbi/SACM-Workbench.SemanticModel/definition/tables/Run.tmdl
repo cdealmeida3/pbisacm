@@ -68,6 +68,11 @@ table Run
 		summarizeBy: none
 		sourceColumn: CapabilitySheet.Order
 
+	column 'CapabilitySheet.AssetTag'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: CapabilitySheet.AssetTag
+
 	column 'CaseLines.Key'
 		dataType: string
 		summarizeBy: none

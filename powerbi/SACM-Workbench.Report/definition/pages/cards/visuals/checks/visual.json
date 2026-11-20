@@ -62,21 +62,6 @@
             },
             {
               "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Checks"
-                    }
-                  },
-                  "Property": "CheckId"
-                }
-              },
-              "queryRef": "Checks.CheckId",
-              "nativeQueryRef": "CheckId",
-              "displayName": "Check"
-            },
-            {
-              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
@@ -242,7 +227,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "53D"
+                  "Value": "40D"
                 }
               }
             }
@@ -256,7 +241,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "113D"
+                  "Value": "110D"
                 }
               }
             }
@@ -270,27 +255,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "139D"
+                  "Value": "180D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "Checks.CardLabel"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "85D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Checks.CheckId"
           }
         },
         {
@@ -326,7 +297,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "61D"
+                  "Value": "68D"
                 }
               }
             }
@@ -354,7 +325,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "193D"
+                  "Value": "253D"
                 }
               }
             }

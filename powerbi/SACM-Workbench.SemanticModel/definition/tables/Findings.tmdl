@@ -371,8 +371,7 @@ table Findings
 
 	/// On the rail, beside its page: the open lines with a person to ask in a small pill, the same on every page (no filter of the page counts), for Mine and free, the choice Work queue opens with (D343): the lines assigned to me or to nobody.
 	measure 'Rail badge work queue' =
-			VAR me = [Me]
-			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), REMOVEFILTERS (), NOT CaseLines[Status] IN { "Verified", "Not followed up" }, CaseLines[ContactName] <> "", CaseLines[AssignedTo] IN { "", me } ) + 0
+			VAR n = [Work queue count]
 			VAR words = FORMAT ( n, "0" )
 			VAR wide = LEN ( words ) * 7 + 14
 			VAR picture =
@@ -385,14 +384,14 @@ table Findings
 
 	/// The open lines with the person in view (People, Person, Overview): their lines of the newest report, not verified and not set aside; blank hides the person. With no person in view (the Person page opened without one) 0, so its tile says so (D363). The rows of People and Overview are each a person in view.
 	measure 'Person lines' =
-			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), CaseLines[IsOpen] = TRUE () )
 			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), 0, IF ( n > 0, n ) )
 		formatString: #,0
 		displayFolder: People
 
 	/// Under the number of open lines (Person): on how many CIs.
 	measure 'Person lines line' =
-			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), CaseLines[IsOpen] = TRUE () ) + 0
 			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), "Choose a person first", "on " & n & IF ( n = 1, " CI", " CIs" ) )
 		displayFolder: People
 
@@ -404,21 +403,21 @@ table Findings
 	measure 'Person step ink' = SWITCH ( [Person state], 1, "#5925dc", 2, "#b42318", 3, "#7d5700", 4, "#175cd3", 6, "#107569", "#475467" )
 		displayFolder: People
 
-	/// Under the next step with the person in view: the kinds of problem, one part each in the email.
+	/// Under the next step with the person in view: the kinds of problem (build R5: short, it fits the tile).
 	measure 'Person step line' =
 			VAR n = [Person kinds]
-			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), "Choose a person first", n & IF ( n = 1, " kind of problem", " kinds of problem" ) & " · one part each in the email" )
+			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), "Choose a person first", n & IF ( n = 1, " kind of problem", " kinds of problem" ) )
 		displayFolder: People
 
 	/// The kinds of problem (cards) of the open lines with the person in view (Person): one part each in the email.
 	measure 'Person kinds' =
-			CALCULATE ( DISTINCTCOUNT ( CaseLines[CheckId] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			CALCULATE ( DISTINCTCOUNT ( CaseLines[CheckId] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), CaseLines[IsOpen] = TRUE () ) + 0
 		formatString: #,0
 		displayFolder: People
 
 	/// The cards of the open lines with the person in view (People): the first two by name, and how many more.
 	measure 'Person cards' =
-			VAR lines = CALCULATETABLE ( CaseLines, TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			VAR lines = CALCULATETABLE ( CaseLines, TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), CaseLines[IsOpen] = TRUE () )
 			VAR cards = DISTINCT ( SELECTCOLUMNS ( lines, "@card", RELATED ( Checks[CardLabel] ) ) )
 			VAR cardCount = COUNTROWS ( cards )
 			RETURN IF ( cardCount > 0, CONCATENATEX ( TOPN ( 2, cards, [@card], ASC ), [@card], ", ", [@card], ASC ) & IF ( cardCount > 2, " and " & ( cardCount - 2 ) & " more" ) )
@@ -457,7 +456,7 @@ table Findings
 	/// The open lines with the person in view as a bar of their next steps (People, Overview): the number, then one part per step in the colour of its chip (reply to read, escalate, reminder due, new, asked, marked fixed), as long as the lines on the scale of the person with the most. 128 × 24, the size of the state chip: a table gives all its pictures one size. The number comes first in the picture, so a table sorted on it has the most lines first.
 	measure 'State bar' =
 			VAR asOf = [Today]
-			VAR mine = CALCULATETABLE ( CaseLines, TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			VAR mine = CALCULATETABLE ( CaseLines, TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), CaseLines[IsOpen] = TRUE () )
 			VAR shown = COUNTROWS ( mine ) + 0
 			VAR ranked =
 			    ADDCOLUMNS (
@@ -479,7 +478,7 @@ table Findings
 			            ADDCOLUMNS ( VALUES ( CaseLines[ContactName] ), "@n", CALCULATE ( COUNTROWS ( CaseLines ) ) ),
 			            REMOVEFILTERS ( CaseLines ),
 			            CaseLines[ContactName] <> "",
-			            NOT CaseLines[Status] IN { "Verified", "Not followed up" }
+			            CaseLines[IsOpen] = TRUE ()
 			        ),
 			        [@n]
 			    )
@@ -512,7 +511,7 @@ table Findings
 
 	/// Under the title of Who holds the most (Overview): the lines that wait for nobody.
 	measure 'Holders line' =
-			VAR sacm = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[ContactName] = "", CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), NOT CaseLines[Status] IN { "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
+			VAR sacm = [Open lines SACM fixes]
 			RETURN IF ( sacm = 0, "The most open lines first. Every open line waits for a person.", "The most open lines first. " & sacm & IF ( sacm = 1, " line has", " lines have" ) & " no person: SACM fixes them, on the fix list of each card." )
 		displayFolder: Page notes
 

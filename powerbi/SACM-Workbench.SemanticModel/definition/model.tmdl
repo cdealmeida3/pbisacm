@@ -1,5 +1,5 @@
 model Model
-	culture: en-US
+	culture: en-GB
 	defaultPowerBIDataSourceVersion: powerBI_V3
 	sourceQueryCulture: en-US
 	dataAccessOptions
@@ -65,6 +65,8 @@ ref table Replies
 ref table Settings
 ref table Team
 ref table WorkScope
+ref table SameNumbers
+ref table BacklogStates
 ref table PeopleCheck
 ref table DataColumns
 ref table SettingsCheck

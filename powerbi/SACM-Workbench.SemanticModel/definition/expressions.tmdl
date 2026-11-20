@@ -39,7 +39,7 @@ expression EmailStyle = Json.Document("{""colours"":{""ink"":""#2b2623"",""muted
 	queryGroup: Packed
 
 /// GENERATED from tools/powerbi/history.ts. What the HTML app counts on the samples over the two report dates and the team's state, for the Self-check page.
-expression ExpectedHistory = "[{""metric"":""Report dates"",""expected"":2},{""metric"":""Findings in the newest report"",""expected"":67},{""metric"":""Findings in the report before"",""expected"":45},{""metric"":""New since the last report"",""expected"":23},{""metric"":""Solved since the last report"",""expected"":2},{""metric"":""Days to fix"",""expected"":7},{""metric"":""Open cases"",""expected"":65},{""metric"":""Reminders due"",""expected"":1},{""metric"":""To escalate"",""expected"":3},{""metric"":""Replies to read"",""expected"":1},{""metric"":""Mine"",""expected"":2},{""metric"":""Not followed up"",""expected"":2}]"
+expression ExpectedHistory = "[{""metric"":""Report dates"",""expected"":2},{""metric"":""Findings in the newest report"",""expected"":67},{""metric"":""Findings in the report before"",""expected"":45},{""metric"":""New since the last report"",""expected"":23},{""metric"":""Solved since the last report"",""expected"":2},{""metric"":""Days to fix"",""expected"":7},{""metric"":""Open cases"",""expected"":42},{""metric"":""Reminders due"",""expected"":1},{""metric"":""To escalate"",""expected"":1},{""metric"":""Replies to read"",""expected"":1},{""metric"":""Mine"",""expected"":0},{""metric"":""Not followed up"",""expected"":2}]"
 	queryGroup: Packed
 
 /// GENERATED from tests/recorded/cards.json. What the HTML app finds on the samples, for the Self-check page.
@@ -119,6 +119,7 @@ expression RunColumnTypes =
 		    {"CapabilitySheet.ManagedBy", type nullable text},
 		    {"CapabilitySheet.HiddenCharacters", type nullable text},
 		    {"CapabilitySheet.Order", Int64.Type},
+		    {"CapabilitySheet.AssetTag", type nullable text},
 		    {"CaseLines.Key", type nullable text},
 		    {"CaseLines.CheckId", type nullable text},
 		    {"CaseLines.CiKey", type nullable text},
@@ -395,7 +396,7 @@ expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"","
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.56.0"
+expression WorkbenchVersion = "0.57.0"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
@@ -523,7 +524,7 @@ expression fnCanonicalClass =
 		        if List.IsEmpty(found) then Text.Combine(List.Select(Text.SplitAny(text, " #(tab)#(cr)#(lf)"), each _ <> ""), "_") else found{0}
 	queryGroup: Reading
 
-/// The part CapabilitySheet of the table Run (D284), which the DAX table CapabilitySheet shows (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and hidden characters, sorted by name. For the talks with Enterprise Architecture and Process Management: the table's Export data gives the file. Empty without a Relationship report (the page says so). `run` is CheckRun (null when no CI report is loaded).
+/// The part CapabilitySheet of the table Run (D284), which the DAX table CapabilitySheet shows (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and hidden characters, sorted by name, and its asset tag (build R5: the page names two capabilities of one name apart). For the talks with Enterprise Architecture and Process Management: the table's Export data gives the file. Empty without a Relationship report (the page says so). `run` is CheckRun (null when no CI report is loaded).
 expression fnCapabilitySheetPart =
 		(run as nullable record) as table =>
 		    let
@@ -545,12 +546,12 @@ expression fnCapabilitySheetPart =
 		            {
 		                ci[Name], ci[Status], namesOf(linked(ci, "up", "business_capability")), namesOf(linked(ci, "down", "business_capability")),
 		                namesOf(linked(ci, "down", "business_process")), ci[Description], Text.Combine(ci[TagList], ", "), personOf(ci, "owned_by"), personOf(ci, "managed_by"),
-		                Text.Combine(ci[HiddenCharacters], ", "), position + 1
+		                Text.Combine(ci[HiddenCharacters], ", "), position + 1, ci[AssetTag]
 		            }
 		    in
 		        #table(
 		            type table [Name = text, Status = text, CapabilitiesAbove = text, CapabilitiesBelow = text, ProcessesBelow = text, Description = text, Tags = text,
-		                OwnedBy = text, ManagedBy = text, HiddenCharacters = text, Order = Int64.Type],
+		                OwnedBy = text, ManagedBy = text, HiddenCharacters = text, Order = Int64.Type, AssetTag = text],
 		            List.Transform(List.Positions(sorted), row))
 	queryGroup: Reading
 
@@ -5767,6 +5768,10 @@ expression ActivityRows =
 		        {{"At", Order.Descending}, {"Id", Order.Descending}})
 	queryGroup: Tables
 
+/// Table BacklogStates (D367, build R5): the four states of a line of the Mapping backlog, so the buttons above the table show all four, in the order of the work, also when a state has no line (dimmed). The words are those of fnMappingBacklogPart (stateWords); MappingBacklog[StateLabel] → BacklogStates[Label].
+expression BacklogStatesRows = #table(type table [Label = text, Order = Int64.Type], {{"To solve", 1}, {"To check", 2}, {"Waiting", 3}, {"Planned", 4}})
+	queryGroup: Tables
+
 /// Table Checks: one row per check file that is not "off" (D141), from the check files packed by the generator (CheckFiles). The check files stay the one place where a check is described (D16).
 expression ChecksRows =
 		let
@@ -6045,6 +6050,17 @@ expression RunRows =
 		    withDate = Table.AddColumn(typed, "ReportDate", each if run = null then null else run[Date], type nullable date)
 		in
 		    Table.ReorderColumns(withDate, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(withDate), (column) => column <> "Part" and column <> "ReportDate"))
+	queryGroup: Tables
+
+/// Table SameNumbers (D366, build R5): the numbers that must be the same on two pages (rule 8 of the real-data plan, "one word, one number"). The page Self-check shows each pair and whether they agree; the measures Same left, Same right and Same match of the table work them out. They hold on any data, the real reports too.
+expression SameNumbersRows =
+		#table(type table [Pair = text, Order = Int64.Type], {
+		    {"Rail badge of Work queue = the line under People to ask (Mine and free)", 1},
+		    {"Overview Open lines = the total of Where the work sits", 2},
+		    {"Overview Waiting on a person = the sum of Who holds the most", 3},
+		    {"Overview Waiting on a person = Work queue with Everyone", 4},
+		    {"Overview Open lines = the newest point of Open lines per report", 5}
+		})
 	queryGroup: Tables
 
 /// Table ServiceNowContracts: the contracts of the newest ServiceNow contract report.

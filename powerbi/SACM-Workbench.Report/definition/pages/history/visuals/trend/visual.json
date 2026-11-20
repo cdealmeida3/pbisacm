@@ -23,11 +23,11 @@
                       "Entity": "Runs"
                     }
                   },
-                  "Property": "ReportDate"
+                  "Property": "Day"
                 }
               },
-              "queryRef": "Runs.ReportDate",
-              "nativeQueryRef": "ReportDate",
+              "queryRef": "Runs.Day",
+              "nativeQueryRef": "Day",
               "displayName": "Report date",
               "active": true
             }
@@ -93,7 +93,7 @@
                     "Entity": "Runs"
                   }
                 },
-                "Property": "ReportDate"
+                "Property": "Day"
               }
             },
             "direction": "Ascending"
@@ -162,7 +162,22 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "axisType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Categorical'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
   },
   "isHidden": true
 }

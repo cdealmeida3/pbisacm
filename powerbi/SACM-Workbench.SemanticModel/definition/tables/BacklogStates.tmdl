@@ -1,0 +1,20 @@
+/// The four states of a line of the Mapping backlog (D367): the buttons above its table show all four, in the order of the work, the empty ones dimmed.
+table BacklogStates
+
+	/// The colour of the words of a state button (Mapping backlog): muted when no line of the backlog is in the state (still 4.5:1, LOOK rule 8).
+	measure 'Backlog state ink' = IF ( CALCULATE ( COUNTROWS ( MappingBacklog ) ) + 0 = 0, "#655a52", "#2b2623" )
+
+	column Label
+		dataType: string
+		sortByColumn: Order
+		sourceColumn: Label
+
+	column Order
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition BacklogStates = m
+		mode: import
+		source = BacklogStatesRows

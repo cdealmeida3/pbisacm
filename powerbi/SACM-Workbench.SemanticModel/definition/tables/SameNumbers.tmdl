@@ -1,0 +1,56 @@
+/// The numbers that must be the same on two pages (D366, rule 8 of the real-data plan): one row per pair, on the page Self-check. They hold on any data.
+table SameNumbers
+
+	/// The first number of the pair in view.
+	measure 'Same left' =
+			VAR pair = SELECTEDVALUE ( SameNumbers[Order] )
+			RETURN
+			    SWITCH (
+			        pair,
+			        1, [Work queue count],
+			        2, [Open now],
+			        3, [Waiting now],
+			        4, [Waiting now],
+			        5, [Open now]
+			    )
+		formatString: #,0
+
+	/// The second number of the pair in view, worked out as its page does.
+	measure 'Same right' =
+			VAR pair = SELECTEDVALUE ( SameNumbers[Order] )
+			VAR newestDay = [Newest report date]
+			RETURN
+			    SWITCH (
+			        pair,
+			        1, CALCULATE ( [Queue open lines], REMOVEFILTERS (), WorkScope[Choice] = "Mine and free" ),
+			        2, SUMX ( CALCULATETABLE ( SUMMARIZE ( CaseLines, Checks[Section], CaseLines[Step] ), REMOVEFILTERS () ), [Heat lines] + 0 ),
+			        3, SUMX ( CALCULATETABLE ( VALUES ( Findings[ContactName] ), REMOVEFILTERS (), Findings[ContactName] <> "" ), [Person lines] + 0 ),
+			        4, CALCULATE ( [Queue open lines], REMOVEFILTERS (), WorkScope[Choice] = "Everyone" ),
+			        5, CALCULATE ( [With a person] + [SACM fixes], REMOVEFILTERS (), Runs[ReportDate] = newestDay )
+			    )
+		formatString: #,0
+
+	/// Yes when the two numbers of the pair agree.
+	measure 'Same match' = IF ( HASONEVALUE ( SameNumbers[Order] ), IF ( [Same left] = [Same right], "Yes", "No" ) )
+
+	/// Under the title of the pairs (Self-check).
+	measure 'Same note' =
+			VAR pairs = COUNTROWS ( ALL ( SameNumbers ) )
+			VAR agree = COUNTROWS ( FILTER ( ALL ( SameNumbers[Order] ), [Same match] = "Yes" ) ) + 0
+			RETURN agree & " of " & pairs & " pairs agree · on any data, the real reports too"
+		displayFolder: Page notes
+
+	column Pair
+		dataType: string
+		sortByColumn: Order
+		sourceColumn: Pair
+
+	column Order
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition SameNumbers = m
+		mode: import
+		source = SameNumbersRows

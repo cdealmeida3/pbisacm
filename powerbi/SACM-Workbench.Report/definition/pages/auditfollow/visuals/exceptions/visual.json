@@ -38,11 +38,11 @@
                       "Entity": "Exceptions"
                     }
                   },
-                  "Property": "CheckId"
+                  "Property": "CardLabel"
                 }
               },
-              "queryRef": "Exceptions.CheckId",
-              "nativeQueryRef": "CheckId",
+              "queryRef": "Exceptions.CardLabel",
+              "nativeQueryRef": "CardLabel",
               "displayName": "Check"
             },
             {
@@ -225,7 +225,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "110D"
                 }
               }
             }
@@ -239,13 +239,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "60D"
+                  "Value": "106D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Exceptions.CheckId"
+            "metadata": "Exceptions.CardLabel"
           }
         },
         {
@@ -253,7 +253,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "77D"
+                  "Value": "80D"
                 }
               }
             }
@@ -267,7 +267,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "74D"
+                  "Value": "70D"
                 }
               }
             }
@@ -281,7 +281,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "94D"
+                  "Value": "84D"
                 }
               }
             }
@@ -295,7 +295,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "94D"
+                  "Value": "84D"
                 }
               }
             }
@@ -309,7 +309,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "88D"
+                  "Value": "78D"
                 }
               }
             }
@@ -323,7 +323,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "74D"
+                  "Value": "68D"
                 }
               }
             }

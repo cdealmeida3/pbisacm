@@ -23,11 +23,11 @@
                       "Entity": "CapabilitySheet"
                     }
                   },
-                  "Property": "Name"
+                  "Property": "NameShown"
                 }
               },
-              "queryRef": "CapabilitySheet.Name",
-              "nativeQueryRef": "Name",
+              "queryRef": "CapabilitySheet.NameShown",
+              "nativeQueryRef": "NameShown",
               "displayName": "Name"
             },
             {
@@ -178,7 +178,7 @@
                     "Entity": "CapabilitySheet"
                   }
                 },
-                "Property": "Name"
+                "Property": "NameShown"
               }
             },
             "direction": "Ascending"
@@ -213,7 +213,7 @@
             }
           },
           "selector": {
-            "metadata": "CapabilitySheet.Name"
+            "metadata": "CapabilitySheet.NameShown"
           }
         },
         {

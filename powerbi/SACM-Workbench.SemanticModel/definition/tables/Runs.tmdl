@@ -50,10 +50,10 @@ table Runs
 			RETURN IF ( ISBLANK ( openingDate ), "no CI report in the period", "from " & FORMAT ( openingDate, "d mmm" ) & " to " & FORMAT ( closingDate, "d mmm yyyy" ) )
 		displayFolder: Audit
 
-	/// Under a number of Audit: the findings found in the period that were new in it.
+	/// Under Problems found (Audit): what the number counts (build R5: every finding shown in the period, solved ones too, so it is not Open lines of Overview) and how many were new in it.
 	measure 'Found line' =
 			VAR fresh = [New in the period] + 0
-			RETURN fresh & " new in the period"
+			RETURN "in the period, solved ones too · " & fresh & " new"
 		displayFolder: Audit
 
 	column ReportDate
@@ -100,6 +100,12 @@ table Runs
 		isDataTypeInferred
 		isNameInferred
 		sourceColumn: [ContractFile]
+
+	/// The CI report date as the axis of a chart shows it, day and month (History, Overview; D344, build R5).
+	column Day = Runs[ReportDate]
+		dataType: dateTime
+		formatString: d mmm
+		summarizeBy: none
 
 	/// The Monday of the week of the CI report date (Found and closed per week, Audit; build D3).
 	column Week = Runs[ReportDate] - WEEKDAY ( Runs[ReportDate], 2 ) + 1

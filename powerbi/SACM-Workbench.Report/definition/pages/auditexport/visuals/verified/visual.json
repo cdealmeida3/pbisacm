@@ -68,12 +68,12 @@
                       "Entity": "History"
                     }
                   },
-                  "Property": "Field"
+                  "Property": "Part"
                 }
               },
-              "queryRef": "History.Field",
-              "nativeQueryRef": "Field",
-              "displayName": "Field"
+              "queryRef": "History.Part",
+              "nativeQueryRef": "Part",
+              "displayName": "Part"
             },
             {
               "field": {
@@ -225,7 +225,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "213D"
+                  "Value": "200D"
                 }
               }
             }
@@ -239,7 +239,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "127D"
+                  "Value": "120D"
                 }
               }
             }
@@ -253,7 +253,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "128D"
+                  "Value": "140D"
                 }
               }
             }
@@ -267,13 +267,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "89D"
+                  "Value": "110D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "History.Field"
+            "metadata": "History.Part"
           }
         },
         {
@@ -281,7 +281,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "117D"
+                  "Value": "105D"
                 }
               }
             }
@@ -295,7 +295,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "123D"
+                  "Value": "100D"
                 }
               }
             }
@@ -309,7 +309,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "110D"
+                  "Value": "100D"
                 }
               }
             }
@@ -323,7 +323,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "83D"
+                  "Value": "80D"
                 }
               }
             }

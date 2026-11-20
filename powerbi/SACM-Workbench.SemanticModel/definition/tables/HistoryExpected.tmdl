@@ -26,7 +26,12 @@ table HistoryExpected
 	/// The line of the Self-check page.
 	measure 'History self-check' =
 			VAR ok = COUNTROWS ( FILTER ( VALUES ( HistoryExpected[Metric] ), [History match] = "Yes" ) ) + 0
-			RETURN ok & " of " & COUNTROWS ( HistoryExpected ) & " history counts match"
+			RETURN
+			    IF (
+			        SELECTEDVALUE ( About[SourceMode] ) = "Sample",
+			        ok & " of " & COUNTROWS ( HistoryExpected ) & " history counts match",
+			        "These counts compare the invented samples only: switch SourceMode to Sample to run them"
+			    )
 
 	column Metric
 		dataType: string

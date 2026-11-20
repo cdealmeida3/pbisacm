@@ -1,30 +1,45 @@
 /// One line per case of the newest report (D292): its status, how it is listed, who has it, the messages and replies, the decision to stop following it. From the journal and the replies of the team.
 table CaseLines
 
+	/// Build R5 (rule 8 of the real-data plan, D366): the open lines, one meaning on every page. A line of the newest CI report, to solve (not to check, waiting or known), not verified, not set aside, of a live card: the column IsOpen. Overview Open lines, the total of Where the work sits, People, Person and the Work queue all count these.
+	measure 'Open lines' = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ) ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
+	/// The open lines that wait for a person (a person or a team is named): Overview Waiting on a person, the sum of Who holds the most, the Work queue with Everyone and no status chosen.
+	measure 'Open lines with a person' = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( CaseLines[ContactName] <> "" ) ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
+	/// The open lines nobody is asked about: SACM fixes or checks them itself.
+	measure 'Open lines SACM fixes' = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( CaseLines[ContactName] = "" ) ) + 0
+		formatString: #,0
+		displayFolder: Overview
+
 	/// Every case of the newest report.
 	measure Cases = COUNTROWS ( DISTINCT ( CaseLines[Key] ) ) + 0
 		formatString: #,0
 
-	/// The cases that are not closed (not Verified, not Not followed up).
-	measure 'Open cases' = CALCULATE ( COUNTROWS ( CaseLines ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+	/// The open lines (D366) under the name the Self-check of the history gives them: the same as Open lines.
+	measure 'Open cases' = [Open lines]
 		formatString: #,0
 
 	/// Cases on a daily card that were asked, did not answer, and whose working days to the reminder have passed (D39, D182); counted from Today, so right between two refreshes.
 	measure 'Reminders due' =
 			VAR asOf = [Today]
-			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "reminder", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
 		formatString: #,0
 
 	/// Cases on a daily card that got every reminder and still no answer (D40).
 	measure 'To escalate' =
 			VAR asOf = [Today]
-			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[Remind] = "escalation", CaseLines[ReminderFrom] <= asOf, KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
 		formatString: #,0
 
 	/// The open cases assigned to the manager who opens the report (the measure Me).
 	measure Mine =
 			VAR me = [Me]
-			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[AssignedTo] = me, NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[AssignedTo] = me, CaseLines[IsOpen] = TRUE () ) + 0
 		formatString: #,0
 
 	/// On a line of the box Reminders due: its CIs with a reminder due; blank hides the line.
@@ -44,7 +59,7 @@ table CaseLines
 	/// On a line of My work: the open CIs assigned to me; blank hides the line.
 	measure 'My CIs' =
 			VAR me = [Me]
-			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[AssignedTo] = me, NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), CaseLines[AssignedTo] = me, CaseLines[IsOpen] = TRUE () )
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 
@@ -121,13 +136,13 @@ table CaseLines
 			VAR me = [Me]
 			VAR everyone = [Everyone chosen]
 			VAR holders = FILTER ( ALL ( CaseLines[AssignedTo] ), everyone || CaseLines[AssignedTo] = "" || CaseLines[AssignedTo] = me )
-			VAR mails = CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), TREATAS ( CALCULATETABLE ( VALUES ( CaseLines[Key] ), KEEPFILTERS ( holders ) ), Findings[Key] ), Findings[ContactEmail] <> "" )
+			VAR mails = CALCULATETABLE ( VALUES ( Findings[ContactEmail] ), TREATAS ( CALCULATETABLE ( VALUES ( CaseLines[Key] ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) ), Findings[Key] ), Findings[ContactEmail] <> "" )
 			VAR answered = CALCULATE ( COUNTROWS ( RepliesToRead ), TREATAS ( mails, RepliesToRead[From] ) )
-			VAR escalation = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "escalation" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ), KEEPFILTERS ( holders ) )
-			VAR reminder = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "reminder" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ), KEEPFILTERS ( holders ) )
-			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "New" ), KEEPFILTERS ( CaseLines[State] = "open" ), KEEPFILTERS ( holders ) )
-			VAR asked = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "Contacted" ), KEEPFILTERS ( holders ) )
-			VAR marked = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] IN { "Fix in progress", "Fixed" } ), KEEPFILTERS ( holders ) )
+			VAR escalation = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "escalation" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
+			VAR reminder = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Remind] = "reminder" ), KEEPFILTERS ( CaseLines[ReminderFrom] <= asOf ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
+			VAR fresh = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "New" ), KEEPFILTERS ( CaseLines[State] = "open" ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
+			VAR asked = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] = "Contacted" ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
+			VAR marked = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[Status] IN { "Fix in progress", "Fixed" } ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
 			RETURN
 			    SWITCH ( TRUE (), answered > 0, 1, escalation > 0, 2, reminder > 0, 3, fresh > 0, 4, asked > 0, 5, marked > 0, 6 )
 		formatString: 0
@@ -138,7 +153,7 @@ table CaseLines
 			VAR me = [Me]
 			VAR everyone = [Everyone chosen]
 			VAR holders = FILTER ( ALL ( CaseLines[AssignedTo] ), everyone || CaseLines[AssignedTo] = "" || CaseLines[AssignedTo] = me )
-			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( holders ) )
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 		displayFolder: Work queue
@@ -157,7 +172,7 @@ table CaseLines
 			VAR me = [Me]
 			VAR everyone = [Everyone chosen]
 			VAR holders = FILTER ( ALL ( CaseLines[AssignedTo] ), everyone || CaseLines[AssignedTo] = "" || CaseLines[AssignedTo] = me )
-			VAR lines = CALCULATETABLE ( CaseLines, KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( holders ) )
+			VAR lines = CALCULATETABLE ( CaseLines, KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
 			VAR cards = DISTINCT ( SELECTCOLUMNS ( lines, "@card", RELATED ( Checks[CardLabel] ) ) )
 			VAR cardCount = COUNTROWS ( cards )
 			RETURN IF ( cardCount > 0, CONCATENATEX ( TOPN ( 3, cards, [@card], ASC ), [@card], ", ", [@card], ASC ) & IF ( cardCount > 3, " and " & ( cardCount - 3 ) & " more" ) )
@@ -168,7 +183,7 @@ table CaseLines
 			VAR me = [Me]
 			VAR everyone = [Everyone chosen]
 			VAR holders = FILTER ( ALL ( CaseLines[AssignedTo] ), everyone || CaseLines[AssignedTo] = "" || CaseLines[AssignedTo] = me )
-			VAR lastSent = CALCULATE ( MAX ( CaseLines[SentOn] ), KEEPFILTERS ( holders ) )
+			VAR lastSent = CALCULATE ( MAX ( CaseLines[SentOn] ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( holders ) )
 			RETURN IF ( ISBLANK ( lastSent ), "never", FORMAT ( lastSent, "d mmm" ) )
 		displayFolder: Work queue
 
@@ -177,7 +192,7 @@ table CaseLines
 			VAR me = [Me]
 			VAR everyone = [Everyone chosen]
 			VAR holders = FILTER ( ALL ( CaseLines[AssignedTo] ), everyone || CaseLines[AssignedTo] = "" || CaseLines[AssignedTo] = me )
-			VAR lines = CALCULATETABLE ( CaseLines, KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( CaseLines[AssignedTo] <> "" ), KEEPFILTERS ( holders ) )
+			VAR lines = CALCULATETABLE ( CaseLines, KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( CaseLines[AssignedTo] <> "" ), KEEPFILTERS ( holders ) )
 			VAR names = DISTINCT ( SELECTCOLUMNS ( lines, "@name", CaseLines[AssignedTo] ) )
 			RETURN IF ( COUNTROWS ( names ) > 0, CONCATENATEX ( names, [@name], ", ", [@name], ASC ), "free" )
 		displayFolder: Work queue
@@ -188,24 +203,38 @@ table CaseLines
 		formatString: #,0
 		displayFolder: Work queue
 
-	/// Under the title of the people to ask (Work queue): how many lines with how many people, or why the box is empty.
-	measure 'Queue note' =
+	/// The open lines with a person in the Work queue (D366): the status chosen, and with Mine and free only the lines assigned to me or to nobody (D343). With Everyone and no status chosen, the same as Waiting on a person (Overview).
+	measure 'Queue open lines' =
 			VAR me = [Me]
 			VAR everyone = [Everyone chosen]
 			VAR holders = FILTER ( ALL ( CaseLines[AssignedTo] ), everyone || CaseLines[AssignedTo] = "" || CaseLines[AssignedTo] = me )
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( CaseLines[IsOpen] = TRUE () ), KEEPFILTERS ( CaseLines[ContactName] <> "" ), KEEPFILTERS ( holders ) ) + 0
+		formatString: #,0
+		displayFolder: Work queue
+
+	/// The count on the rail beside Work queue (D366): the open lines with a person that are mine or free, the choice Work queue opens with, whatever the page filters.
+	measure 'Work queue count' =
+			VAR me = [Me]
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), REMOVEFILTERS (), CaseLines[IsOpen] = TRUE (), CaseLines[ContactName] <> "", CaseLines[AssignedTo] IN { "", me } ) + 0
+		formatString: #,0
+		displayFolder: Work queue
+
+	/// Under the title of the people to ask (Work queue): how many lines with how many people, or why the box is empty.
+	measure 'Queue note' =
+			VAR everyone = [Everyone chosen]
 			VAR people = [Queue people]
-			VAR lines = CALCULATE ( COUNTROWS ( CaseLines ), KEEPFILTERS ( NOT CaseLines[Status] IN { "Verified", "Not followed up" } ), KEEPFILTERS ( CaseLines[ContactName] <> "" ), KEEPFILTERS ( holders ) ) + 0
+			VAR lines = [Queue open lines]
 			RETURN
 			    IF (
 			        people = 0,
 			        IF ( everyone, "Nobody to ask in the status chosen: choose another status, or none.", "Nobody to ask in " & [Scope words] & ": choose Everyone, or another status." ),
-			        lines & IF ( lines = 1, " open line", " open lines" ) & " with " & people & IF ( people = 1, " person", " people" ) & " · " & [Scope words] & ", in the order of the team's rules. Select lines for the app at the right."
+			        lines & IF ( lines = 1, " open line", " open lines" ) & " with " & people & IF ( people = 1, " person", " people" ) & " · " & [Scope words] & " · the lines SACM fixes are on Cards, not here. Select lines for the app at the right."
 			    )
 		displayFolder: Page notes
 
 	/// A cell of Where the work sits (Overview): the open lines of the newest report on the live cards (a proposed card asks nobody, D346) of the section (row) at the step (column, Step); blank leaves the cell empty. The column Open is the total of the row.
 	measure 'Heat lines' =
-			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Status] = "live" ) )
+			VAR n = [Open lines]
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 		displayFolder: Overview
@@ -237,8 +266,9 @@ table CaseLines
 
 	/// Under the title of Where the work sits (Overview).
 	measure 'Heat note' =
-			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
-			RETURN IF ( n = 0, "Nothing open on the live cards: the newest report finds nothing to solve.", FORMAT ( n, "#,0" ) & " open lines of the live cards by section and next step · darker is more" )
+			VAR n = [Open lines]
+			VAR withPerson = [Open lines with a person]
+			RETURN IF ( n = 0, "Nothing open on the live cards: the newest report finds nothing to solve.", FORMAT ( n, "#,0" ) & IF ( n = 1, " open line", " open lines" ) & ": " & FORMAT ( withPerson, "#,0" ) & " with a person, " & FORMAT ( n - withPerson, "#,0" ) & " SACM fixes · by section and next step · darker is more" )
 		displayFolder: Page notes
 
 	column Key
@@ -327,6 +357,7 @@ table CaseLines
 		isDataTypeInferred
 		isNameInferred
 		sourceColumn: [StatusLabel]
+		sortByColumn: StatusOrder
 
 	column AssignedTo
 		dataType: string
@@ -534,6 +565,17 @@ table CaseLines
 	/// The title of the card of the line, for the reply reader of the app SACM actions (build D5): a reply is read next to the lines it answers, each with its card.
 	column Card = RELATED ( Checks[Title] )
 		dataType: string
+		summarizeBy: none
+
+	/// Build R5 (rule 8 of the real-data plan, D366): whether the line is an open line, the one meaning of "open lines" on every page: in the newest CI report, to solve (not to check, waiting or known), not verified, not set aside (Not followed up), of a live card (a proposed card asks nobody, D346).
+	column IsOpen = CaseLines[InLatest] && CaseLines[State] = "open" && NOT CaseLines[Status] IN { "Verified", "Not followed up" } && RELATED ( Checks[Status] ) = "live"
+		dataType: boolean
+		summarizeBy: none
+
+	/// Build R5 (D368): the order of the status buttons of the Work queue, the order of the work: New, Asked, In progress, Answered, Marked fixed, then the closed ones. From Status, not from StatusLabel (a sort column may not use the column it sorts).
+	column StatusOrder = SWITCH ( CaseLines[Status], "New", 1, "Contacted", 2, "Fix in progress", 3, "Answered", 4, "Fixed", 5, "Not followed up", 6, 7 )
+		dataType: int64
+		formatString: 0
 		summarizeBy: none
 
 	partition CaseLines = calculated
