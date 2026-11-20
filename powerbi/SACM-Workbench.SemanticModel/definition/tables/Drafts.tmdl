@@ -77,7 +77,7 @@ table Drafts
 			VAR chosen = [Chosen email]
 			VAR theirs = who <> "" && CALCULATE ( COUNTROWS ( Drafts ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen, Drafts[ToName] = who || Drafts[About] = who ) > 0
 			VAR noAddress = CALCULATE ( COUNTROWS ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] && Drafts[To] = "" ) ), REMOVEFILTERS ( Drafts ) ) + 0
-			VAR titles = CALCULATE ( CONCATENATEX ( VALUES ( Drafts[AddressSetting] ), Drafts[AddressSetting], ", ", Drafts[AddressSetting], ASC ), REMOVEFILTERS ( Drafts ), Drafts[AddressSetting] <> "" )
+			VAR titles = CONCATENATEX ( SUMMARIZE ( FILTER ( ALL ( Drafts ), Drafts[DraftId] = Drafts[EmailId] && Drafts[AddressSetting] <> "" ), Drafts[AddressSetting] ), Drafts[AddressSetting], ", ", Drafts[AddressSetting], ASC )
 			VAR addressText =
 			    IF (
 			        noAddress > 0,

@@ -227,7 +227,7 @@ test('build R6 (D371, D374): Messages keeps the kind buttons and the list at the
     assert.ok(visual, `Messages has the visual ${name}`);
     assert.ok(visual.position.x + visual.position.width <= slot.x, `${name} is left of the app`);
   }
-  assert.equal(JSON.stringify(messages.find((one) => one.name === 'kinds')!.visual.query).includes('"KindLabel"'), true);
+  assert.equal(JSON.stringify(messages.find((one) => one.name === 'kinds')!.visual).includes('"KindLabel"'), true);
   assert.deepEqual([slot.width, slot.height], [580, 620]);
   const card = APP_SLOTS.card!;
   assert.equal(card.height, 476);

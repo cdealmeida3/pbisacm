@@ -684,7 +684,8 @@ the app joins them (D372).
 - **At the top**, the kind and who gets it, the time of the report's data, and **Refresh now**.
 - **The fields.** From is the shared SACM mailbox. **To**, **Cc** and **Subject** can be changed. A new email shows
   *new reference* in the subject: it gets its reference at your first *Test to me*, *Send*, *Outlook draft* or
-  *Teams*, and keeps it while it stays chosen. A reminder keeps the reference of the first message (D5).
+  *Teams*, and keeps it while it stays chosen. Keep the words *new reference* when you change the subject: they
+  become the reference. A reminder keeps the reference of the first message (D5).
 - **One line on what happens**: sent, or a colleague wrote to this person or about these cases in the last 24 hours
   (D302): then the buttons wait until you tick **Send anyway**. The tick counts for this email only.
 - **The email as it will arrive**, with your name. A long email shows each table's first lines (the setting

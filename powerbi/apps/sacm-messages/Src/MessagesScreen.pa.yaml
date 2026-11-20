@@ -36,8 +36,8 @@ Screens:
             Text: |-
               =If(
                   DraftCount = 0, "No email chosen",
-                  Switch(ThisEmail.Kind, "first", "First message", "reminder", "Reminder", "escalation", "Escalation", ThisEmail.KindLabel) &
-                  " to " & Coalesce(ThisEmail.ToName, ThisEmail.To, "nobody known yet"))
+                  ThisEmail.KindLabel &
+                  " to " & Coalesce(ThisEmail.ToName, ThisEmail.To, "no address yet"))
             Font: =AppFont
             FontWeight: =FontWeight.Semibold
             Size: =12
@@ -339,9 +339,10 @@ Screens:
                   EmailCount > 1, "The app got " & EmailCount & " emails: give its Power Apps visual the filter Selected email is 1 (README 6.6).",
                   !IsBlank(varAsk) && varAsk.Keys <> ThisEmail.Keys, "Answer first whether the email to " & varAsk.To & " went: choose it in the list again.",
                   (ThisEmail.IsSent || ThisEmail.SentKey in varSentIds), "Sent. It leaves the list after the next refresh.",
-                  ThisEmail.Whole = "cut", "The app got only part of this email. Press Refresh in the report's top bar; if it stays, lower rowsInEmail in Settings.",
+                  ThisEmail.Whole = "cut", "The app got only part of this email. Press Refresh in the report's top bar; if it stays, give its Power Apps visual every field of AppEmail (README 6.6).",
                   ThisEmail.Whole = "unknown", "Add the fields HtmlLength and CsvLength of AppEmail to the Power Apps visual (README 6.6).",
                   IsBlank(Trim(ToText.Text)), Coalesce(ThisEmail.AddressWhy, "Fill in To first."),
+                  IsBlank(RefValue.Text) && !(NewRefWords in SubjectText.Text), "Keep the words " & NewRefWords & " in Subject: they become the reference a reply is found by.",
                   !IsBlank(WarnLabel.Text) && varAnyway <> ThisEmail.SentKey, "Read the warning, then tick Send anyway.",
                   "")
             Visible: =false

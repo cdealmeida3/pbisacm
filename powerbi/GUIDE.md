@@ -31,7 +31,7 @@ How the report is set up (the workspace, the lists, the apps and the flows) is i
 2. **Select a step and press *Open person*.** The *Person* page shows the next step, the open lines, the last contact
    and everything open with them.
 3. **Select a line of *Open with them* and press *Prepare email*.** The page *Messages* opens with the email studio:
-   at the left the kind buttons (First, Reminder, Escalation) and the list of emails, at the right the app with the
+   at the left the kind buttons (Email, Reminder, Escalation) and the list of emails, at the right the app with the
    email to that person as it will arrive, and From, To, Cc and Subject. Choose another email in the list and the app
    shows that one. An email with no address says why and what to add.
 4. **Press *Send*.** The email goes out from the shared SACM mailbox, with the full list as a CSV file when it is long.
