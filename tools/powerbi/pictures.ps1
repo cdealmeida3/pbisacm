@@ -189,7 +189,7 @@ function Look-Texts($root, $bitmap, $canvas, [string[]]$words) {
   }
   return $out
 }
-# The page tab of a page: the element with its name lowest in the window (the tabs sit at the bottom). A hidden page's tab
+# The page tab of a page: the element with its name at the foot of the window (the tabs sit at the bottom), leftmost. A hidden page's tab
 # carries the same name with an icon; Desktop may add words, so a name that starts with the page name counts too.
 function Find-Tab($root, [string]$name) {
   $window = $root.Current.BoundingRectangle
@@ -202,8 +202,10 @@ function Find-Tab($root, [string]$name) {
     if ($r.IsEmpty -or $r.Height -gt 60 -or $r.Width -lt 10 -or $r.Y -lt ($window.Y + $window.Height - 140)) { continue }
     # The tab's own name first: a text of the page that starts with the same words ("Not followed up" in a table of
     # Audit export, build R5) must not win over the tab "Not followed".
+    # Then the leftmost: the page tabs start at the left, and a button of a pane at the right can carry the same name
+    # at the same height (build R6: a button "History" at the foot of the panes took the click of the tab History).
     $exact = $text -eq $name
-    if (-not $best -or ($exact -and -not $bestExact) -or ($exact -eq $bestExact -and $r.Y -gt $best.Current.BoundingRectangle.Y)) { $best = $element; $bestExact = $exact }
+    if (-not $best -or ($exact -and -not $bestExact) -or ($exact -eq $bestExact -and $r.X -lt $best.Current.BoundingRectangle.X)) { $best = $element; $bestExact = $exact }
   }
   return $best
 }
