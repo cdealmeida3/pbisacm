@@ -18,10 +18,10 @@ import { askedName, classesOf, groupChip, groupStatusWord, memoryWords, nextStep
 import { peopleIndex, peopleOf } from '../../../src/app/view/people.ts';
 import type { AppRun } from '../../../src/app/view/people.ts';
 import { chatMessage, recipientOf } from '../../../src/core/messages/messages.ts';
-import { editSample, withoutTeams } from '../../helpers.ts';
+import { asLive, editSample, withoutTeams } from '../../helpers.ts';
 
 const sample = readFileSync(join(import.meta.dirname, '../../..', 'samples', 'cmdb_ci-sample.csv'), 'utf8');
-const packs = loadPacks();
+const packs = asLive(loadPacks());
 // The generic tests ask the people of a CI, also on the Business Processes of the sample; the team of reference/record-teams
 // (Process Management, D195) has its own tests.
 const allReferences = loadReferences();

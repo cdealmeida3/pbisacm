@@ -282,6 +282,17 @@ function referencesIn(condition: Condition): string[] {
 /** A check whose `status` is "off": its file stays, but it does not run and has no card (it comes back with one word). */
 export const isSwitchedOff = (pack: Pick<CheckPack, 'status'>): boolean => pack.status === 'off';
 
+/**
+ * A check that asks people (D346): only a *live* one. The findings of a proposed (or pilot, retired) check are listed on
+ * its card like any other, but nobody is asked about them: no contact, so no email, no step of the day, no line of the
+ * queue, until SACM confirms the check and sets it live (D114).
+ */
+export const asksPeople = (pack: Pick<CheckPack, 'status'> | undefined): boolean => !!pack && pack.status === 'live';
+
+/** Why nobody is asked about a finding of a check that is not live, in words: "Proposed: nobody is asked until the card is live". */
+export const notLiveWhy = (pack: Pick<CheckPack, 'status'>): string =>
+  pack.status === 'proposed' ? 'Proposed: nobody is asked until the card is live' : `Not live (${pack.status}): nobody is asked until the card is live`;
+
 /** The checks that run and have a card: every check that is not switched off. */
 export const checksInUse = <T extends Pick<CheckPack, 'status'>>(packs: T[]): T[] => packs.filter((pack) => !isSwitchedOff(pack));
 

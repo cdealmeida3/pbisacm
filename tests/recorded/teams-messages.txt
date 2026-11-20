@@ -101,7 +101,7 @@ Reference: SACM-CHAT-RESP-MISSING
 ===== RESP-SAME-PERSON
 Hi, this is the SACM team. The same person is Owned by and Managed by.
 - Register a New Member
-Could you name a second person for Managed by? Please answer in this chat with the name for each process, and we will update ServiceNow.
+Could you name a second person for Managed by? You can reply, or raise the request "Managed by – update" in the Service Portal (https://portal.example.com/sacm).
 Reference: SACM-CHAT-RESP-SAME-PERSON
 
 ===== SUPPORT-GROUP-INACTIVE
@@ -128,7 +128,7 @@ Reference: SACM-CHAT-SUPPORTED-BY
 ===== TAG-MISSING
 Hi, this is the SACM team. A mandatory tag is missing on these CIs.
 - Reconcile Index
-Is each process customer facing or internal? Please answer in this chat, and we will set the tag in ServiceNow.
+Could you tell us the right value for each CI? We will update ServiceNow for you.
 Reference: SACM-CHAT-TAG-MISSING
 
 ===== TAG-STATUS-CONFLICT

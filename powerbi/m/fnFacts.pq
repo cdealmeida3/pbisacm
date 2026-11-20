@@ -1,7 +1,10 @@
 // The findings of a run as facts: each finding with who to ask about it, where it is fixed and how it is listed
 // (src/core/cases/cases.ts, buildRun). Procurement problems go to the Procurement mailbox; a record a team is
 // responsible for goes to the team (reference/record-teams, D195); a detector may name another CI whose people are asked
-// (ContactCi); a CI from EPO where nobody can be asked goes to the EPO inventory owner (D47). Nothing is sent here.
+// (ContactCi); a CI from EPO where nobody can be asked goes to the EPO inventory owner (D47). Only a live check asks
+// people (D346): a finding of a proposed check has nobody to ask. NobodyWhy says why nobody is asked, when nobody is
+// (rule 10 of the real-data plan, fnContact): "SACM fixes it", "SACM checks it", "Proposed: nobody is asked until the
+// card is live", or "Nobody to ask: " and the reasons; "" when someone is. Nothing is sent here.
 (findings as list, run as record, packs as list) as list =>
     let
         cis = run[Cis],
@@ -51,20 +54,28 @@
                         [To = theirs[To] & [Via = theirs[To][Via] & " of " & (if other[SourceClass] <> "" then other[SourceClass] else "Business Service") & " " & other[Name]], Cc = theirs[Cc]]
                     else fnContact(ci, finding[Field], audience, columnsOf(ci)),
                 to = contact[To],
-                above = if to = null then null else to[Above]
+                above = if to = null then null else to[Above],
+                status = if pack = null then "" else Record.FieldOrDefault(pack, "status", ""),
+                why = if to <> null then ""
+                    else if List.Contains(audience, "sacm") then (if Record.FieldOrDefault(pack, "reviewOnly", false) = true then "SACM checks it" else "SACM fixes it")
+                    else if contact[Why] <> "" then "Nobody to ask: " & contact[Why]
+                    else "Nobody to ask"
             in
-                if List.Contains(audience, "procurement") then
-                    base & [ContactName = "Procurement", ContactEmail = "", ContactId = ReadingRules[procurement][id], ContactVia = ReadingRules[procurement][via], Cc = {}] & nobody
+                if pack <> null and status <> "live" then
+                    base & [ContactName = "", ContactEmail = "", ContactId = "", ContactVia = "", Cc = {}, EscalateName = "", EscalateEmail = "", EscalateVia = "",
+                        NobodyWhy = if status = "proposed" then "Proposed: nobody is asked until the card is live" else "Not live (" & status & "): nobody is asked until the card is live"]
+                else if List.Contains(audience, "procurement") then
+                    base & [ContactName = "Procurement", ContactEmail = "", ContactId = ReadingRules[procurement][id], ContactVia = ReadingRules[procurement][via], Cc = {}] & nobody & [NobodyWhy = ""]
                 else if team <> null then
-                    base & [Route = "", ContactName = team[name], ContactEmail = "", ContactId = "team:" & team[id], ContactVia = team[name] & " team", Cc = {}] & nobody
+                    base & [Route = "", ContactName = team[name], ContactEmail = "", ContactId = "team:" & team[id], ContactVia = team[name] & " team", Cc = {}] & nobody & [NobodyWhy = ""]
                 else if route <> "" and to = null then
-                    base & [ContactName = ReadingRules[epoOwner][name], ContactEmail = "", ContactId = ReadingRules[epoOwner][id], ContactVia = ReadingRules[epoOwner][via], Cc = {}] & nobody
+                    base & [ContactName = ReadingRules[epoOwner][name], ContactEmail = "", ContactId = ReadingRules[epoOwner][id], ContactVia = ReadingRules[epoOwner][via], Cc = {}] & nobody & [NobodyWhy = ""]
                 else
                     base & [
                         ContactName = if to = null then "" else to[Name], ContactEmail = if to = null then "" else to[Email],
                         ContactId = if to = null then "" else to[Id], ContactVia = if to = null then "" else to[Via], Cc = contact[Cc],
                         EscalateName = if above = null then "" else above[Name], EscalateEmail = if above = null then "" else above[Email],
-                        EscalateVia = if above = null then "" else above[Via]
+                        EscalateVia = if above = null then "" else above[Via], NobodyWhy = why
                     ]
     in
         List.Transform(findings, factOf)

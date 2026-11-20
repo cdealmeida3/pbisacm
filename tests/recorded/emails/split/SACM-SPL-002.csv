@@ -1,9 +1,0 @@
-﻿Part,Name,EPO ID,Class,Owned by,Managed by,Status,Support group,What we found
-Lower criticality without a reason,Member Engine - PROD,AST-0006,Service Instance,Dee Owner,Bo Leaver (inactive),Operational,Core Team,"Target availability is Significant (Necessary), inherited availability is Critical (Vital); exception justification holds only the automatic text"
-Criticality exception without a justification,Index Tool,AST-0005,Business Application,Dee Owner,,Operational,Finance Team,"Target confidentiality is Significant (Necessary), inherited confidentiality is Critical (Vital); no justification for confidentiality; exception justification is empty"
-Mapping session,Event Desk,AST-0017,Business Application,Dee Owner,Cy Keeper,Operational,Finance Team,Business Application without a Business Process above; Business Application without a Service Instance
-Mapping session,Event Engine,AST-0016,Business Application,Dee Owner,Cy Keeper,Operational,Core Team,Business Application without a Business Process above; Business Application without a Service Instance
-Mapping session,Event Gateway - PROD,AST-0020,Service Instance,Dee Owner,Cy Keeper,Operational,Core Team,Service Instance without a Business Application
-Mapping session,Fines  Hub - PROD,AST-0012,Service Instance,Dee Owner,Cy Keeper,Operational,,Service Instance without a Business Application
-No manager,Event Gateway - PROD,AST-0020,Service Instance,Dee Owner,Cy Keeper,Operational,Core Team,"Managed by is empty in EPO (Primary Responsible); ServiceNow still shows Cy Keeper (cy01), because the sync never clears a field"
-Tagged for deletion but still Operational,Fines  Hub - PROD,AST-0012,Service Instance,Dee Owner,Cy Keeper,Operational,,Tagged To be deleted; operational status is Operational

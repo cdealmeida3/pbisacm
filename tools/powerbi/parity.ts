@@ -251,7 +251,7 @@ export async function parityProblems(folder: string): Promise<string[]> {
     Key: fact.key, ReportDate: run.date, CheckId: fact.checkId, CiKey: fact.ciKey, CiName: fact.ciName, Class: fact.className, ClassLabel: fact.classLabel,
     Field: fact.field, Severity: fact.severity, Detail: fact.detail, Module: fact.module, Route: fact.route, State: fact.state ?? 'open', StateWhy: fact.stateWhy,
     Source: fact.source, Wait: fact.wait, Review: fact.review, ContactId: fact.contactId, ContactName: fact.contactName, ContactEmail: fact.contactEmail,
-    ContactVia: fact.contactVia, Cc: fact.cc.join('; '), EscalateName: fact.escalateName, EscalateEmail: fact.escalateEmail, EscalateVia: fact.escalateVia,
+    ContactVia: fact.contactVia, AskWho: fact.contactName ? `${fact.contactName} (${fact.contactVia})` : fact.nobodyWhy ?? '', Cc: fact.cc.join('; '), EscalateName: fact.escalateName, EscalateEmail: fact.escalateEmail, EscalateVia: fact.escalateVia,
     FixChange: fact.fix?.change, FixCurrent: fact.fix?.current, FixSet: fact.fix?.set, FixValue: fact.fix?.value, FixRelatedTo: fact.fix?.relatedTo, FixNote: fact.fix?.note,
     EpoId: fact.ci?.epoId, Status: fact.ci?.status, SupportGroup: fact.ci?.supportGroup, OwnedBy: fact.ci?.ownedBy, ManagedBy: fact.ci?.managedBy, SupportedBy: supportedBy(fact.ciKey),
     Chips: (fact.ci?.chips ?? []).join(', '), Tags: (fact.ci?.tags ?? []).join(', '), ServiceNowLink: recordSearch('https://contoso.service-now.com', fact),

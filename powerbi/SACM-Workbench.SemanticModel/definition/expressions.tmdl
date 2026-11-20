@@ -1666,7 +1666,7 @@ expression fnFastMatch =
 		        else oneOf(words, (word) => Text.Contains(text, word))
 	queryGroup: Reading
 
-/// The part Findings of the table Run (D284), which the DAX table Findings shows: one row per finding of the newest CI report (fnCheckRun), with who is asked, how it is listed, where it is fixed and the CI as the message table shows it (DATA-MODEL §3, a fact). Key never changes: <check>:<CI key>:<field>. Group: the findings of one check that go to the same person by the same route, in the same state (one piece of work). Mapping: the reasons of a case of the mapping backlog, by id. EpoCorrection: what EPO already says (fnEpoCorrections). Problem: the kind of problem a line is listed under (a problem of the contract data, a field of the upload check; D146), "" for most checks. `run` is CheckRun (null when no CI report is loaded).
+/// The part Findings of the table Run (D284), which the DAX table Findings shows: one row per finding of the newest CI report (fnCheckRun), with who is asked, how it is listed, where it is fixed and the CI as the message table shows it (DATA-MODEL §3, a fact). AskWho: "Name (via)", or why nobody is asked (fnFacts, NobodyWhy). Key never changes: <check>:<CI key>:<field>. Group: the findings of one check that go to the same person by the same route, in the same state (one piece of work). Mapping: the reasons of a case of the mapping backlog, by id. EpoCorrection: what EPO already says (fnEpoCorrections). Problem: the kind of problem a line is listed under (a problem of the contract data, a field of the upload check; D146), "" for most checks. `run` is CheckRun (null when no CI report is loaded).
 expression fnFindingsPart =
 		(run as nullable record) as table =>
 		    let
@@ -1683,7 +1683,7 @@ expression fnFindingsPart =
 		                    run[Date], fact[Key], fact[CheckId], fact[CiKey], fact[CiName], fact[Class], fact[ClassLabel], fact[Field], fact[Severity], fact[Detail],
 		                    fact[Module], fact[Route], fact[State], Record.Field(words, fact[State]), fact[StateWhy], fact[Source], fact[Wait], fact[Review],
 		                    fact[ContactId], fact[ContactName], fact[ContactEmail], fact[ContactVia],
-		                    if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else "Nobody to ask",
+		                    if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else fact[NobodyWhy],
 		                    Text.Combine(fact[Cc], "; "), fact[EscalateName], fact[EscalateEmail], fact[EscalateVia],
 		                    fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"), fix(fact, "Note"),
 		                    fact[CheckId] & "|" & fact[Route] & "|" & person & (if fact[State] = "open" then "" else "|" & fact[State]),
@@ -3813,7 +3813,7 @@ expression fnCheckRun =
 		        ]
 	queryGroup: Checks
 
-/// Who to write to about a finding (src/core/cases/contact.ts, resolveContact; DOMAIN-RULES §5). `audience` is an ordered list; the first entry that gives a reachable person wins: a role ("owned_by"), "otherRoles" (the first other filled role), "managerOf(<role>)", "departmentHeadOf(<role>)", where "<role>" may be "field" (the role the finding is about). The role the finding is about is never the contact, and nobody marked inactive is. The other reachable roles are copied (Cc, their emails). Returns [To, Cc]; To is [Name, Email, Id, Via, Above] or null, Above the escalation ([Name, Email, Id, Via]) or null.
+/// Who to write to about a finding (src/core/cases/contact.ts, resolveContact; DOMAIN-RULES §5). `audience` is an ordered list; the first entry that gives a reachable person wins: a role ("owned_by"), "otherRoles" (the first other filled role), "managerOf(<role>)", "departmentHeadOf(<role>)", where "<role>" may be "field" (the role the finding is about). The role the finding is about is never the contact, and nobody marked inactive is. The other reachable roles are copied (Cc, their emails). Returns [To, Cc, Why]; To is [Name, Email, Id, Via, Above] or null, Above the escalation ([Name, Email, Id, Via]) or null. Why (src/core/cases/contact.ts, nobodyWhy; rule 10 of the real-data plan): when To is null, one reason per entry of the audience in its order, without repeats ("Managed by has no email in the CI report; Owned by has no manager in the CI report"), the role the finding is about skipped; "" when To is found or the audience names nobody.
 expression fnContact =
 		(ci as record, field as text, audience as list, columns as list) as record =>
 		    let
@@ -3867,9 +3867,40 @@ expression fnContact =
 		                else null,
 		        to = List.Accumulate(audience, null, (found, entry) => if found <> null then found else fromEntry(entry)),
 		        toEmail = if to = null then "" else Text.Lower(to[Email], "en-US"),
-		        cc = List.Select(List.Transform(others, (role) => personOf(role)[Email]), (email) => Text.Lower(email, "en-US") <> toEmail)
+		        cc = List.Select(List.Transform(others, (role) => personOf(role)[Email]), (email) => Text.Lower(email, "en-US") <> toEmail),
+		        // Why nobody is asked: the words of a role in a sentence ("Owned by"), then one reason per entry.
+		        labelOf = (role as text) as text => let spaced = Text.Replace(role, "_", " ") in Text.Upper(Text.Start(spaced, 1), "en-US") & Text.Middle(spaced, 1),
+		        personWhy = (person as nullable record, label as text) as text =>
+		            if person = null then "the CI report has no column " & label
+		            else if person[Name] = "" and person[Email] = "" then label & " is empty"
+		            else if person[Email] = "" then label & " has no email in the CI report"
+		            else if person[Active] = false then label & " is inactive"
+		            else "",
+		        reasonOf = (entry as text) as text =>
+		            let
+		                isManager = Text.StartsWith(entry, "managerOf(") and Text.EndsWith(entry, ")") and Text.Length(entry) > 11,
+		                isHead = Text.StartsWith(entry, "departmentHeadOf(") and Text.EndsWith(entry, ")") and Text.Length(entry) > 18,
+		                inner = if isManager then Text.Middle(entry, 10, Text.Length(entry) - 11) else if isHead then Text.Middle(entry, 17, Text.Length(entry) - 18) else "",
+		                role = if inner = "field" then field else inner,
+		                person = if isManager or isHead then personOf(role) else null,
+		                label = labelOf(role)
+		            in
+		                if isManager or isHead then
+		                    (if person = null then "the CI report has no column " & label
+		                    else if person[Name] = "" and person[Email] = "" then label & " is empty, so nobody above it is known"
+		                    else if isManager then
+		                        (if person[ManagerEmail] = "" then (if person[Manager] <> "" then "the manager of " & label & " has no email in the CI report" else label & " has no manager in the CI report")
+		                        else if person[ManagerActive] = false then "the manager of " & label & " is inactive"
+		                        else "")
+		                    else if person[DepartmentHeadEmail] = "" then label & " has no department head in the CI report"
+		                    else "")
+		                else if entry = "otherRoles" then (if List.IsEmpty(others) then "no other role has an active person with an email" else "")
+		                else if List.Contains(roles, entry) and entry <> field then personWhy(personOf(entry), labelOf(entry))
+		                else "",
+		        reasons = List.Distinct(List.Select(List.Transform(audience, reasonOf), (reason) => reason <> "")),
+		        why = if to <> null then "" else let text = Text.Combine(reasons, "; ") in Text.Upper(Text.Start(text, 1), "en-US") & Text.Middle(text, 1)
 		    in
-		        [To = to, Cc = cc]
+		        [To = to, Cc = cc, Why = why]
 	queryGroup: Checks
 
 /// The two contract files matched (src/core/sources/contracts/contract-reports.ts, compareContracts): the Solusi contract number is the Vendor contract of ServiceNow. Worked out once per run, when a contract check reads it. `solusi` and `servicenow` are the files of fnPairedFile. Returns [Solusi, ServiceNow] (each [Contracts, Date, Report]), Pairs (each [Solusi, ServiceNow, Subject, Differences]), NotInSolusi (a Solusi number the Solusi file does not hold), NoNumber (no Solusi number: typed in by hand), NotInServiceNow (not imported yet) and ServiceNowOf (Solusi number in lower case -> the ServiceNow contract of its pair). Differences: the fields Solusi holds and ServiceNow shows differently (contract-detectors.ts, fieldDifferences); a field empty in Solusi is not one (that is the card "To clear by hand").
@@ -5249,7 +5280,7 @@ expression fnEpoTested =
 		        ]
 	queryGroup: Checks
 
-/// The findings of a run as facts: each finding with who to ask about it, where it is fixed and how it is listed (src/core/cases/cases.ts, buildRun). Procurement problems go to the Procurement mailbox; a record a team is responsible for goes to the team (reference/record-teams, D195); a detector may name another CI whose people are asked (ContactCi); a CI from EPO where nobody can be asked goes to the EPO inventory owner (D47). Nothing is sent here.
+/// The findings of a run as facts: each finding with who to ask about it, where it is fixed and how it is listed (src/core/cases/cases.ts, buildRun). Procurement problems go to the Procurement mailbox; a record a team is responsible for goes to the team (reference/record-teams, D195); a detector may name another CI whose people are asked (ContactCi); a CI from EPO where nobody can be asked goes to the EPO inventory owner (D47). Only a live check asks people (D346): a finding of a proposed check has nobody to ask. NobodyWhy says why nobody is asked, when nobody is (rule 10 of the real-data plan, fnContact): "SACM fixes it", "SACM checks it", "Proposed: nobody is asked until the card is live", or "Nobody to ask: " and the reasons; "" when someone is. Nothing is sent here.
 expression fnFacts =
 		(findings as list, run as record, packs as list) as list =>
 		    let
@@ -5300,20 +5331,28 @@ expression fnFacts =
 		                        [To = theirs[To] & [Via = theirs[To][Via] & " of " & (if other[SourceClass] <> "" then other[SourceClass] else "Business Service") & " " & other[Name]], Cc = theirs[Cc]]
 		                    else fnContact(ci, finding[Field], audience, columnsOf(ci)),
 		                to = contact[To],
-		                above = if to = null then null else to[Above]
+		                above = if to = null then null else to[Above],
+		                status = if pack = null then "" else Record.FieldOrDefault(pack, "status", ""),
+		                why = if to <> null then ""
+		                    else if List.Contains(audience, "sacm") then (if Record.FieldOrDefault(pack, "reviewOnly", false) = true then "SACM checks it" else "SACM fixes it")
+		                    else if contact[Why] <> "" then "Nobody to ask: " & contact[Why]
+		                    else "Nobody to ask"
 		            in
-		                if List.Contains(audience, "procurement") then
-		                    base & [ContactName = "Procurement", ContactEmail = "", ContactId = ReadingRules[procurement][id], ContactVia = ReadingRules[procurement][via], Cc = {}] & nobody
+		                if pack <> null and status <> "live" then
+		                    base & [ContactName = "", ContactEmail = "", ContactId = "", ContactVia = "", Cc = {}, EscalateName = "", EscalateEmail = "", EscalateVia = "",
+		                        NobodyWhy = if status = "proposed" then "Proposed: nobody is asked until the card is live" else "Not live (" & status & "): nobody is asked until the card is live"]
+		                else if List.Contains(audience, "procurement") then
+		                    base & [ContactName = "Procurement", ContactEmail = "", ContactId = ReadingRules[procurement][id], ContactVia = ReadingRules[procurement][via], Cc = {}] & nobody & [NobodyWhy = ""]
 		                else if team <> null then
-		                    base & [Route = "", ContactName = team[name], ContactEmail = "", ContactId = "team:" & team[id], ContactVia = team[name] & " team", Cc = {}] & nobody
+		                    base & [Route = "", ContactName = team[name], ContactEmail = "", ContactId = "team:" & team[id], ContactVia = team[name] & " team", Cc = {}] & nobody & [NobodyWhy = ""]
 		                else if route <> "" and to = null then
-		                    base & [ContactName = ReadingRules[epoOwner][name], ContactEmail = "", ContactId = ReadingRules[epoOwner][id], ContactVia = ReadingRules[epoOwner][via], Cc = {}] & nobody
+		                    base & [ContactName = ReadingRules[epoOwner][name], ContactEmail = "", ContactId = ReadingRules[epoOwner][id], ContactVia = ReadingRules[epoOwner][via], Cc = {}] & nobody & [NobodyWhy = ""]
 		                else
 		                    base & [
 		                        ContactName = if to = null then "" else to[Name], ContactEmail = if to = null then "" else to[Email],
 		                        ContactId = if to = null then "" else to[Id], ContactVia = if to = null then "" else to[Via], Cc = contact[Cc],
 		                        EscalateName = if above = null then "" else above[Name], EscalateEmail = if above = null then "" else above[Email],
-		                        EscalateVia = if above = null then "" else above[Via]
+		                        EscalateVia = if above = null then "" else above[Via], NobodyWhy = why
 		                    ]
 		    in
 		        List.Transform(findings, factOf)

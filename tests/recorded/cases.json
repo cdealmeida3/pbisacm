@@ -27,6 +27,7 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -87,6 +88,7 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -145,6 +147,7 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -205,6 +208,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -265,6 +269,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -325,6 +330,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -622,6 +628,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -691,6 +698,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -756,6 +764,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -820,6 +829,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -888,6 +898,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -954,11 +965,10 @@
       "contactEmail": "",
       "contactId": "",
       "contactVia": "",
-      "cc": [
-        "olga.owner@example.com"
-      ],
+      "cc": [],
       "escalateName": "",
-      "escalateEmail": ""
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1021,11 +1031,10 @@
       "contactEmail": "",
       "contactId": "",
       "contactVia": "",
-      "cc": [
-        "olga.owner@example.com"
-      ],
+      "cc": [],
       "escalateName": "",
-      "escalateEmail": ""
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1088,11 +1097,10 @@
       "contactEmail": "",
       "contactId": "",
       "contactVia": "",
-      "cc": [
-        "olga.owner@example.com"
-      ],
+      "cc": [],
       "escalateName": "",
-      "escalateEmail": ""
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1152,11 +1160,10 @@
       "contactEmail": "",
       "contactId": "",
       "contactVia": "",
-      "cc": [
-        "olga.owner@example.com"
-      ],
+      "cc": [],
       "escalateName": "",
-      "escalateEmail": ""
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1216,11 +1223,10 @@
       "contactEmail": "",
       "contactId": "",
       "contactVia": "",
-      "cc": [
-        "olga.owner@example.com"
-      ],
+      "cc": [],
       "escalateName": "",
-      "escalateEmail": ""
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1281,6 +1287,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -1346,6 +1353,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -1411,6 +1419,7 @@
         }
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -1634,6 +1643,7 @@
       },
       "state": "review",
       "stateWhy": "SACM checks the mapping: no criticality reaches these CIs",
+      "nobodyWhy": "SACM checks it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -1693,6 +1703,7 @@
       },
       "state": "known",
       "stateWhy": "Tagged BIA is pending",
+      "nobodyWhy": "SACM checks it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -1750,6 +1761,7 @@
       },
       "state": "waiting",
       "stateWhy": "Inherited is set: ServiceNow copies it to Target after 2 weeks",
+      "nobodyWhy": "SACM checks it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -1806,11 +1818,14 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
-      "contactName": "Process Management",
+      "contactName": "",
       "contactEmail": "",
-      "contactId": "team:process-management",
-      "contactVia": "Process Management team",
-      "cc": []
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1856,14 +1871,14 @@
         "managedBy": ""
       },
       "state": "open",
-      "contactName": "Ada Example",
-      "contactEmail": "ada@example.com",
-      "contactId": "ada01",
-      "contactVia": "owned by",
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
       "cc": [],
-      "escalateName": "Max Manager",
-      "escalateEmail": "max@example.com",
-      "escalateVia": "manager"
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1909,16 +1924,14 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
-      "contactName": "Cy Keeper",
-      "contactEmail": "cy@example.com",
-      "contactId": "cy01",
-      "contactVia": "managed by",
-      "cc": [
-        "ada@example.com"
-      ],
-      "escalateName": "Ada Example",
-      "escalateEmail": "ada@example.com",
-      "escalateVia": "owner"
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -1967,11 +1980,14 @@
         ]
       },
       "state": "open",
-      "contactName": "Process Management",
+      "contactName": "",
       "contactEmail": "",
-      "contactId": "team:process-management",
-      "contactVia": "Process Management team",
-      "cc": []
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -2023,6 +2039,7 @@
         "managedBy": "Bo Leaver (inactive)"
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2090,6 +2107,7 @@
         ]
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2146,6 +2164,7 @@
       },
       "state": "review",
       "stateWhy": "ServiceNow should follow EPO by itself: listed for a review of the sync",
+      "nobodyWhy": "SACM checks it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2209,17 +2228,14 @@
         ]
       },
       "state": "open",
-      "contactName": "Dee Owner",
-      "contactEmail": "dee@example.com",
-      "contactId": "dee01",
-      "contactVia": "owned by",
-      "cc": [
-        "cy@example.com",
-        "cy@example.com"
-      ],
-      "escalateName": "Max Manager",
-      "escalateEmail": "max@example.com",
-      "escalateVia": "manager"
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -2270,16 +2286,14 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
-      "contactName": "Dee Owner",
-      "contactEmail": "dee@example.com",
-      "contactId": "dee01",
-      "contactVia": "owned by",
-      "cc": [
-        "cy@example.com"
-      ],
-      "escalateName": "Max Manager",
-      "escalateEmail": "max@example.com",
-      "escalateVia": "manager"
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -2333,16 +2347,14 @@
         ]
       },
       "state": "open",
-      "contactName": "Dee Owner",
-      "contactEmail": "dee@example.com",
-      "contactId": "dee01",
-      "contactVia": "owned by",
-      "cc": [
-        "cy@example.com"
-      ],
-      "escalateName": "Max Manager",
-      "escalateEmail": "max@example.com",
-      "escalateVia": "manager"
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -2392,17 +2404,14 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
-      "contactName": "Dee Owner",
-      "contactEmail": "dee@example.com",
-      "contactId": "dee01",
-      "contactVia": "owned by",
-      "cc": [
-        "cy@example.com",
-        "cy@example.com"
-      ],
-      "escalateName": "Max Manager",
-      "escalateEmail": "max@example.com",
-      "escalateVia": "manager"
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -2517,6 +2526,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: Managed by is empty; Owned by is empty; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2574,6 +2584,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: Managed by is empty; Owned by is empty; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2626,14 +2637,14 @@
         "managedBy": ""
       },
       "state": "open",
-      "contactName": "Ada Example",
-      "contactEmail": "ada@example.com",
-      "contactId": "ada01",
-      "contactVia": "owned by",
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
       "cc": [],
-      "escalateName": "Max Manager",
-      "escalateEmail": "max@example.com",
-      "escalateVia": "manager"
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -2679,6 +2690,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: Owned by is empty; Managed by is empty; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2731,6 +2743,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: Owned by is empty; Managed by is empty; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2789,6 +2802,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -2850,6 +2864,7 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
+      "nobodyWhy": "SACM fixes it",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -3063,6 +3078,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: Managed by is empty; no other role has an active person with an email; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -3115,6 +3131,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: Managed by is empty; no other role has an active person with an email; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -3220,6 +3237,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: No other role has an active person with an email; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -3272,6 +3290,7 @@
         "managedBy": ""
       },
       "state": "open",
+      "nobodyWhy": "Nobody to ask: No other role has an active person with an email; Owned by is empty, so nobody above it is known",
       "contactName": "",
       "contactEmail": "",
       "contactId": "",
@@ -3380,11 +3399,14 @@
         ]
       },
       "state": "open",
-      "contactName": "Process Management",
+      "contactName": "",
       "contactEmail": "",
-      "contactId": "team:process-management",
-      "contactVia": "Process Management team",
-      "cc": []
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -3776,11 +3798,14 @@
         "managedBy": "Cy Keeper"
       },
       "state": "open",
-      "contactName": "Process Management",
+      "contactName": "",
       "contactEmail": "",
-      "contactId": "team:process-management",
-      "contactVia": "Process Management team",
-      "cc": []
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",
@@ -3829,17 +3854,14 @@
         ]
       },
       "state": "open",
-      "contactName": "Dee Owner",
-      "contactEmail": "dee@example.com",
-      "contactId": "dee01",
-      "contactVia": "owned by",
-      "cc": [
-        "cy@example.com",
-        "cy@example.com"
-      ],
-      "escalateName": "Max Manager",
-      "escalateEmail": "max@example.com",
-      "escalateVia": "manager"
+      "contactName": "",
+      "contactEmail": "",
+      "contactId": "",
+      "contactVia": "",
+      "cc": [],
+      "escalateName": "",
+      "escalateEmail": "",
+      "nobodyWhy": "Proposed: nobody is asked until the card is live"
     },
     "state": "open",
     "status": "New",

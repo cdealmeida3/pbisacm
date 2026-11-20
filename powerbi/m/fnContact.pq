@@ -2,8 +2,11 @@
 // list; the first entry that gives a reachable person wins: a role ("owned_by"), "otherRoles" (the first other filled
 // role), "managerOf(<role>)", "departmentHeadOf(<role>)", where "<role>" may be "field" (the role the finding is about).
 // The role the finding is about is never the contact, and nobody marked inactive is. The other reachable roles are
-// copied (Cc, their emails). Returns [To, Cc]; To is [Name, Email, Id, Via, Above] or null, Above the escalation
-// ([Name, Email, Id, Via]) or null.
+// copied (Cc, their emails). Returns [To, Cc, Why]; To is [Name, Email, Id, Via, Above] or null, Above the escalation
+// ([Name, Email, Id, Via]) or null. Why (src/core/cases/contact.ts, nobodyWhy; rule 10 of the real-data plan): when To is
+// null, one reason per entry of the audience in its order, without repeats ("Managed by has no email in the CI report;
+// Owned by has no manager in the CI report"), the role the finding is about skipped; "" when To is found or the audience
+// names nobody.
 (ci as record, field as text, audience as list, columns as list) as record =>
     let
         roles = ReadingRules[roles],
@@ -56,6 +59,37 @@
                 else null,
         to = List.Accumulate(audience, null, (found, entry) => if found <> null then found else fromEntry(entry)),
         toEmail = if to = null then "" else Text.Lower(to[Email], "en-US"),
-        cc = List.Select(List.Transform(others, (role) => personOf(role)[Email]), (email) => Text.Lower(email, "en-US") <> toEmail)
+        cc = List.Select(List.Transform(others, (role) => personOf(role)[Email]), (email) => Text.Lower(email, "en-US") <> toEmail),
+        // Why nobody is asked: the words of a role in a sentence ("Owned by"), then one reason per entry.
+        labelOf = (role as text) as text => let spaced = Text.Replace(role, "_", " ") in Text.Upper(Text.Start(spaced, 1), "en-US") & Text.Middle(spaced, 1),
+        personWhy = (person as nullable record, label as text) as text =>
+            if person = null then "the CI report has no column " & label
+            else if person[Name] = "" and person[Email] = "" then label & " is empty"
+            else if person[Email] = "" then label & " has no email in the CI report"
+            else if person[Active] = false then label & " is inactive"
+            else "",
+        reasonOf = (entry as text) as text =>
+            let
+                isManager = Text.StartsWith(entry, "managerOf(") and Text.EndsWith(entry, ")") and Text.Length(entry) > 11,
+                isHead = Text.StartsWith(entry, "departmentHeadOf(") and Text.EndsWith(entry, ")") and Text.Length(entry) > 18,
+                inner = if isManager then Text.Middle(entry, 10, Text.Length(entry) - 11) else if isHead then Text.Middle(entry, 17, Text.Length(entry) - 18) else "",
+                role = if inner = "field" then field else inner,
+                person = if isManager or isHead then personOf(role) else null,
+                label = labelOf(role)
+            in
+                if isManager or isHead then
+                    (if person = null then "the CI report has no column " & label
+                    else if person[Name] = "" and person[Email] = "" then label & " is empty, so nobody above it is known"
+                    else if isManager then
+                        (if person[ManagerEmail] = "" then (if person[Manager] <> "" then "the manager of " & label & " has no email in the CI report" else label & " has no manager in the CI report")
+                        else if person[ManagerActive] = false then "the manager of " & label & " is inactive"
+                        else "")
+                    else if person[DepartmentHeadEmail] = "" then label & " has no department head in the CI report"
+                    else "")
+                else if entry = "otherRoles" then (if List.IsEmpty(others) then "no other role has an active person with an email" else "")
+                else if List.Contains(roles, entry) and entry <> field then personWhy(personOf(entry), labelOf(entry))
+                else "",
+        reasons = List.Distinct(List.Select(List.Transform(audience, reasonOf), (reason) => reason <> "")),
+        why = if to <> null then "" else let text = Text.Combine(reasons, "; ") in Text.Upper(Text.Start(text, 1), "en-US") & Text.Middle(text, 1)
     in
-        [To = to, Cc = cc]
+        [To = to, Cc = cc, Why = why]
