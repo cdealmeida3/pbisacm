@@ -1,6 +1,6 @@
 {
   "taken": true,
-  "minutes": 15.1,
+  "minutes": 8.1,
   "pages": [
     {
       "page": "myday",
@@ -420,10 +420,10 @@
             "ratio": 13.9
           },
           {
-            "text": "Every email ready to send. Choose one in the list: the app at the right shows it, with Send.",
+            "text": "Every email ready to send. In the published report the app SACM messages shows them, with Send.",
             "x": 224.0,
             "y": 47.0,
-            "width": 473.0,
+            "width": 526.0,
             "height": 18.0,
             "background": "#faf6f1",
             "colour": "#2b262f",
@@ -446,8 +446,8 @@
             "width": 199.0,
             "height": 18.0,
             "background": "#f6f0e8",
-            "colour": "#655a52",
-            "ratio": 5.91
+            "colour": "#2b2666",
+            "ratio": 11.8
           },
           {
             "text": "The email studio: Send, Test to me, Outlook draft and Teams, for each email of the list.",
@@ -460,9 +460,19 @@
             "ratio": 13.21
           },
           {
+            "text": "It gets the emails ready to send (Drafts). Below: the list and the email chosen, as Desktop shows them.",
+            "x": 237.0,
+            "y": 141.0,
+            "width": 539.0,
+            "height": 17.0,
+            "background": "#f6f0e8",
+            "colour": "#655a52",
+            "ratio": 5.91
+          },
+          {
             "text": "Emails ready",
             "x": 237.0,
-            "y": 165.0,
+            "y": 193.0,
             "width": 418.0,
             "height": 18.0,
             "background": "#ffffff",
@@ -472,8 +482,8 @@
           {
             "text": "Who",
             "x": 238.0,
-            "y": 207.0,
-            "width": 121.0,
+            "y": 236.0,
+            "width": 97.0,
             "height": 36.0,
             "background": "#e6e9f4",
             "colour": "#2b2623",
@@ -481,18 +491,18 @@
           },
           {
             "text": "Kind",
-            "x": 358.0,
-            "y": 207.0,
-            "width": 82.0,
+            "x": 334.0,
+            "y": 236.0,
+            "width": 73.0,
             "height": 36.0,
             "background": "#e6e9f4",
-            "colour": "#302623",
-            "ratio": 12.14
+            "colour": "#2b2629",
+            "ratio": 12.27
           },
           {
             "text": "CIs",
-            "x": 438.0,
-            "y": 207.0,
+            "x": 406.0,
+            "y": 236.0,
             "width": 41.0,
             "height": 36.0,
             "background": "#e6e9f4",
@@ -501,9 +511,19 @@
           },
           {
             "text": "Subject",
-            "x": 478.0,
-            "y": 207.0,
-            "width": 161.0,
+            "x": 446.0,
+            "y": 236.0,
+            "width": 129.0,
+            "height": 36.0,
+            "background": "#e6e9f4",
+            "colour": "#2b2623",
+            "ratio": 12.34
+          },
+          {
+            "text": "State",
+            "x": 574.0,
+            "y": 236.0,
+            "width": 65.0,
             "height": 36.0,
             "background": "#e6e9f4",
             "colour": "#2b2623",
@@ -512,7 +532,7 @@
           {
             "text": "The email chosen",
             "x": 690.0,
-            "y": 165.0,
+            "y": 193.0,
             "width": 558.0,
             "height": 18.0,
             "background": "#ffffff",
@@ -522,7 +542,7 @@
           {
             "text": "To",
             "x": 691.0,
-            "y": 207.0,
+            "y": 236.0,
             "width": 177.0,
             "height": 36.0,
             "background": "#e6e9f4",
@@ -532,7 +552,7 @@
           {
             "text": "Cc",
             "x": 867.0,
-            "y": 207.0,
+            "y": 236.0,
             "width": 129.0,
             "height": 36.0,
             "background": "#e6e9f4",
@@ -542,7 +562,7 @@
           {
             "text": "Subject",
             "x": 995.0,
-            "y": 207.0,
+            "y": 236.0,
             "width": 234.0,
             "height": 36.0,
             "background": "#e6e9f4",
@@ -552,7 +572,7 @@
           {
             "text": "Start of the email",
             "x": 690.0,
-            "y": 309.0,
+            "y": 337.0,
             "width": 558.0,
             "height": 18.0,
             "background": "#ffffff",
@@ -914,7 +934,7 @@
       "page": "backlog",
       "displayName": "Mapping backlog",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "06-backlog.png",
       "broken": [],
       "status": "Page 6 of 20",
@@ -1084,7 +1104,7 @@
       "page": "contracts",
       "displayName": "Contract changes",
       "found": true,
-      "seconds": 1.0,
+      "seconds": 2.0,
       "file": "07-contracts.png",
       "broken": [],
       "status": "Page 7 of 20",
@@ -1652,7 +1672,7 @@
       "page": "overview",
       "displayName": "Overview",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 1.0,
       "file": "09-overview.png",
       "broken": [],
       "status": "Page 9 of 20",
@@ -3267,7 +3287,7 @@
         {
           "tab": "To check",
           "found": true,
-          "seconds": 1.0,
+          "seconds": 2.0,
           "file": "16-card-tab2.png",
           "broken": [],
           "look": {
@@ -3824,7 +3844,7 @@
       "page": "case",
       "displayName": "Case",
       "found": true,
-      "seconds": 2.0,
+      "seconds": 1.0,
       "file": "17-case.png",
       "broken": [],
       "status": "Page 17 of 20",
@@ -4226,9 +4246,9 @@
                 "y": 175.0,
                 "width": 148.0,
                 "height": 41.0,
-                "background": "#ffffff",
-                "colour": "#2b2623",
-                "ratio": 14.95
+                "background": "#0c1c49",
+                "colour": "#ffffff",
+                "ratio": 16.43
               },
               {
                 "text": "People",
@@ -4236,9 +4256,9 @@
                 "y": 175.0,
                 "width": 132.0,
                 "height": 41.0,
-                "background": "#ffffff",
-                "colour": "#2b2623",
-                "ratio": 14.95
+                "background": "#0c1c49",
+                "colour": "#ffffff",
+                "ratio": 16.43
               },
               {
                 "text": "Relationships",
@@ -4246,9 +4266,9 @@
                 "y": 175.0,
                 "width": 148.0,
                 "height": 41.0,
-                "background": "#0c1c49",
-                "colour": "#ffffff",
-                "ratio": 16.43
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
               },
               {
                 "text": "Relationships",
@@ -4256,9 +4276,9 @@
                 "y": 175.0,
                 "width": 132.0,
                 "height": 41.0,
-                "background": "#0c1c49",
-                "colour": "#ffffff",
-                "ratio": 16.43
+                "background": "#ffffff",
+                "colour": "#2b2623",
+                "ratio": 14.95
               },
               {
                 "text": "Timeline",
@@ -4267,8 +4287,8 @@
                 "width": 149.0,
                 "height": 41.0,
                 "background": "#ffffff",
-                "colour": "#0c1c49",
-                "ratio": 16.43
+                "colour": "#2b2623",
+                "ratio": 14.95
               },
               {
                 "text": "Timeline",
@@ -4301,7 +4321,7 @@
                 "ratio": 14.95
               },
               {
-                "text": "Relationships",
+                "text": "People",
                 "x": 237.0,
                 "y": 241.0,
                 "width": 697.0,
@@ -4311,58 +4331,8 @@
                 "ratio": 14.95
               },
               {
-                "text": "No.",
+                "text": "Card",
                 "x": 238.0,
-                "y": 283.0,
-                "width": 41.0,
-                "height": 36.0,
-                "background": "#e6e9f4",
-                "colour": "#2b2623",
-                "ratio": 12.34
-              },
-              {
-                "text": "Its",
-                "x": 278.0,
-                "y": 283.0,
-                "width": 49.0,
-                "height": 36.0,
-                "background": "#e6e9f4",
-                "colour": "#2b2623",
-                "ratio": 12.34
-              },
-              {
-                "text": "CI",
-                "x": 325.0,
-                "y": 283.0,
-                "width": 137.0,
-                "height": 36.0,
-                "background": "#e6e9f4",
-                "colour": "#2b2623",
-                "ratio": 12.34
-              },
-              {
-                "text": "Class",
-                "x": 462.0,
-                "y": 283.0,
-                "width": 97.0,
-                "height": 36.0,
-                "background": "#e6e9f4",
-                "colour": "#2b2623",
-                "ratio": 12.34
-              },
-              {
-                "text": "Status",
-                "x": 558.0,
-                "y": 283.0,
-                "width": 73.0,
-                "height": 36.0,
-                "background": "#e6e9f4",
-                "colour": "#2b2623",
-                "ratio": 12.34
-              },
-              {
-                "text": "Type",
-                "x": 630.0,
                 "y": 283.0,
                 "width": 121.0,
                 "height": 36.0,
@@ -4371,20 +4341,20 @@
                 "ratio": 12.34
               },
               {
-                "text": "Counts",
-                "x": 750.0,
+                "text": "Email",
+                "x": 498.0,
                 "y": 283.0,
-                "width": 73.0,
+                "width": 141.0,
                 "height": 36.0,
                 "background": "#e6e9f4",
                 "colour": "#2b2623",
                 "ratio": 12.34
               },
               {
-                "text": "Excluded",
-                "x": 822.0,
+                "text": "Copied",
+                "x": 638.0,
                 "y": 283.0,
-                "width": 97.0,
+                "width": 90.0,
                 "height": 36.0,
                 "background": "#e6e9f4",
                 "colour": "#2b2623",
