@@ -129,7 +129,7 @@ void ShowEngine(string why)
 }
 
 var timer = Stopwatch.StartNew();
-// One step of the refresh on its own thread: null when it ended, else why not. After 3 minutes the log gets what the
+// One step of the refresh on its own thread: null when it ended, else why not. Halfway the log gets what the
 // engine is doing; after tableMinutes the check stops waiting.
 string? Timed(string what, Action step)
 {
@@ -139,7 +139,7 @@ string? Timed(string what, Action step)
     while (!work.Wait(TimeSpan.FromMinutes(1)))
     {
         var took = (timer.Elapsed - started).TotalMinutes;
-        if (!shown && took >= 3) { ShowEngine($"{what} after 3 minutes"); shown = true; }
+        if (!shown && took >= tableMinutes / 2) { ShowEngine($"{what} after {tableMinutes / 2} minutes"); shown = true; }
         if (took >= tableMinutes) break;
     }
     if (!work.IsCompleted)
@@ -157,21 +157,40 @@ void Stalled(List<string> failures)
     traceFile.Flush();
     Environment.Exit(0);
 }
-// One table at a time, so a failing query names itself (a refresh of the whole model says only "An unexpected
-// exception occurred"), then the calculated tables and columns.
+// Every M table in one transaction, as Desktop's own Refresh does (R4 step 0, D360). A commit after each table let Desktop
+// start its own write in between (it creates the model's culture, its Q&A words, once data is there) and wait for the
+// lock of the next table's refresh, while that refresh waited for Desktop to evaluate its query: with a file source the
+// refresh stood still at the table after HistoryRun (JournalKeys) for as long as the job ran. Only when the one refresh
+// fails, one table at a time, so a failing query names itself (a refresh of the whole model says only "An unexpected
+// exception occurred"). Then the calculated tables and columns.
 var failed = new List<string>();
-foreach (var table in database.Model.Tables.Where(table => table.Partitions.Any(partition => partition.SourceType == Tom.PartitionSourceType.M)).ToList())
+var mTables = database.Model.Tables.Where(table => table.Partitions.Any(partition => partition.SourceType == Tom.PartitionSourceType.M)).ToList();
+Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Refreshing the {mTables.Count} tables of Power Query in one transaction");
+// As Desktop's own Refresh: the incremental refresh policy of HistoryRun applies only in the service (a refresh that
+// applies it in Desktop fails with "An unexpected exception occurred").
+var together = Timed("the tables of Power Query", () =>
 {
-    var started = timer.Elapsed;
-    Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Refreshing {table.Name}");
-    // As Desktop's own Refresh: the incremental refresh policy of HistoryRun applies only in the service (a refresh
-    // that applies it in Desktop fails with "An unexpected exception occurred").
-    var problem = Timed(table.Name, () => { table.RequestRefresh(Tom.RefreshType.DataOnly, Tom.RefreshPolicyBehavior.Ignore); database.Model.SaveChanges(); });
-    if (problem == null) { Console.WriteLine($"Refreshed {table.Name} in {(timer.Elapsed - started).TotalSeconds:0.0} s"); continue; }
-    failed.Add($"{table.Name}: {problem}");
-    Console.WriteLine($"Refresh of {table.Name} failed: {problem}");
-    if (problem.StartsWith("STALLED")) Stalled(failed);
+    foreach (var table in mTables) table.RequestRefresh(Tom.RefreshType.DataOnly, Tom.RefreshPolicyBehavior.Ignore);
+    database.Model.SaveChanges();
+});
+if (together == null) Console.WriteLine($"Refreshed the tables of Power Query in {timer.Elapsed.TotalSeconds:0.0} s");
+else if (together.StartsWith("STALLED")) { failed.Add($"the tables of Power Query: {together}"); Stalled(failed); }
+else
+{
+    Console.WriteLine($"The refresh failed ({together.Split('\n')[0]}): one table at a time, to find which");
     database.Model.UndoLocalChanges();
+    foreach (var table in mTables)
+    {
+        var started = timer.Elapsed;
+        Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Refreshing {table.Name}");
+        var problem = Timed(table.Name, () => { table.RequestRefresh(Tom.RefreshType.DataOnly, Tom.RefreshPolicyBehavior.Ignore); database.Model.SaveChanges(); });
+        if (problem == null) { Console.WriteLine($"Refreshed {table.Name} in {(timer.Elapsed - started).TotalSeconds:0.0} s"); continue; }
+        failed.Add($"{table.Name}: {problem}");
+        Console.WriteLine($"Refresh of {table.Name} failed: {problem}");
+        if (problem.StartsWith("STALLED")) Stalled(failed);
+        database.Model.UndoLocalChanges();
+    }
+    if (failed.Count == 0) failed.Add($"the tables of Power Query: {together}");
 }
 Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Calculating");
 var calculated = Timed("Calculate", () => { database.Model.RequestRefresh(Tom.RefreshType.Calculate); database.Model.SaveChanges(); });

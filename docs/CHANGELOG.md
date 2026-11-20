@@ -4,7 +4,7 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 
 ## 0.56.0 — The Power BI report: Desktop shows the whole way (R4)
 
-- STALL-LINE
+- **The refresh at real size does not stall** (D360). The stall at *JournalKeys* came from the Desktop check, not from the report: it refreshed one table at a time, and Desktop's own work got in between. The check now refreshes like Desktop's Refresh button, in one go, and runs at real size on demand. Nothing changes for your refresh.
 - **A grey box under every app** (D359). In Desktop each place of a Power App says which app goes there, what it does and the data it gets, and the place of *Refresh now* on My day and Reports says it is a button of the published report. In the service the app covers its box.
 - **Messages in Desktop** (D361): the list of the emails at the left (who, kind, CIs, subject) and the email chosen at the right (To, Cc, Subject and its first lines). In the service the app *SACM messages* stays where it is; build R6 redraws it for one email and moves it to the right.
 - ***Prepare email* opens Messages on the person** (D362). On *Person*, select a line of *Open with them*, then press *Prepare email*: Messages shows only their emails. The table has a new first column *To*. For the app: add the visual filter *Drafts → For the person is 1* (README §6.6 step 1).
