@@ -45,6 +45,87 @@ table Drafts
 			VAR ref = SELECTEDVALUE ( Drafts[Ref] )
 			RETURN IF ( HASONEVALUE ( Drafts[DraftId] ), SUBSTITUTE ( subjectText, "%%REF%%", IF ( ref <> "", ref, "reference given at Send" ) ) )
 
+	/// Build R4 (D361, D362): the email the right side of Messages shows, and the one the app SACM messages gets from build R6: the email chosen in the list; with none chosen, the first email to (or about) the person of Prepare email (a drill-through on Findings[ContactName], which Power BI keeps until the next drill); else the first of the list (by name). Its EmailId; blank when no email is ready.
+	measure 'Chosen email' =
+			VAR emails = CALCULATETABLE ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] ), ALLSELECTED ( Drafts ) )
+			VAR every = CALCULATE ( COUNTROWS ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] ) ), REMOVEFILTERS ( Drafts ) )
+			VAR picked = COUNTROWS ( emails ) < every
+			VAR drilled = ISFILTERED ( Findings[ContactName] )
+			VAR people = VALUES ( Findings[ContactName] )
+			VAR theirs = COUNTROWS ( FILTER ( emails, Drafts[ToName] IN people || Drafts[About] IN people ) ) + 0
+			VAR onlyTheirs = drilled && NOT picked && theirs > 0
+			VAR shown = FILTER ( emails, NOT onlyTheirs || Drafts[ToName] IN people || Drafts[About] IN people )
+			VAR firstName = MINX ( shown, Drafts[ToName] )
+			RETURN MINX ( FILTER ( shown, Drafts[ToName] = firstName ), Drafts[EmailId] )
+
+	/// Build R4 (D361): 1 on the drafts of the chosen email (all its parts). From build R6 the filter of the Power Apps visual of Messages; now the filter of the email Desktop shows under it.
+	measure 'Selected email' =
+			VAR chosen = [Chosen email]
+			RETURN IF ( NOT ISBLANK ( chosen ) && SELECTEDVALUE ( Drafts[EmailId] ) = chosen, 1 )
+		formatString: 0
+
+	/// The CIs of the email on a line of the list of Messages: every part of it.
+	measure 'Email CIs' =
+			VAR ids = VALUES ( Drafts[EmailId] )
+			RETURN CALCULATE ( SUM ( Drafts[CiCount] ), REMOVEFILTERS ( Drafts ), TREATAS ( ids, Drafts[EmailId] ) )
+		formatString: #,0
+
+	/// The state of the email on a line of the list of Messages: Ready, or No address when the report knows nobody to send it to (the app then asks for To).
+	measure 'Email state' =
+			VAR ids = VALUES ( Drafts[EmailId] )
+			VAR noAddress = CALCULATE ( COUNTROWS ( Drafts ), REMOVEFILTERS ( Drafts ), TREATAS ( ids, Drafts[EmailId] ), Drafts[To] = "" )
+			RETURN IF ( COUNTROWS ( ids ) > 0, IF ( noAddress > 0, "No address", "Ready" ) )
+
+	/// The line under the title of the list of Messages: how many emails, and which one the right side shows first.
+	measure 'Email list note' =
+			VAR n = CALCULATE ( COUNTROWS ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] ) ), REMOVEFILTERS ( Drafts ) ) + 0
+			VAR who = IF ( ISFILTERED ( Findings[ContactName] ), SELECTEDVALUE ( Findings[ContactName] ) )
+			VAR chosen = [Chosen email]
+			VAR theirs = who <> "" && CALCULATE ( COUNTROWS ( Drafts ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen, Drafts[ToName] = who || Drafts[About] = who ) > 0
+			RETURN
+				SWITCH (
+					TRUE (),
+					n = 0, "No email is ready to send. After the next report, or when a reminder is due, it is listed here.",
+					theirs, n & IF ( n = 1, " email", " emails" ) & ". At the right: the email to " & who & " (Prepare email), until you choose another.",
+					n & IF ( n = 1, " email", " emails" ) & ". Choose one: it shows on the right as it will arrive."
+				)
+
+	/// A field of the chosen email, for the email Desktop shows under the app (build R4): To with the name, Cc, Subject.
+	measure 'Chosen to' =
+			VAR chosen = [Chosen email]
+			VAR toName = CALCULATE ( MAX ( Drafts[ToName] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen )
+			VAR toAddress = CALCULATE ( MAX ( Drafts[To] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen )
+			RETURN IF ( NOT ISBLANK ( chosen ), toName & IF ( toAddress = "", " (no address: type it in the app)", " <" & toAddress & ">" ) )
+
+	/// The Cc of the chosen email.
+	measure 'Chosen cc' =
+			VAR chosen = [Chosen email]
+			VAR copyTo = CALCULATE ( MAX ( Drafts[Cc] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen )
+			RETURN IF ( NOT ISBLANK ( chosen ), IF ( copyTo = "", "Nobody", copyTo ) )
+
+	/// The subject of the chosen email.
+	measure 'Chosen subject' =
+			VAR chosen = [Chosen email]
+			RETURN IF ( NOT ISBLANK ( chosen ), CALCULATE ( MAX ( Drafts[ListSubject] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen ) )
+
+	/// The start of the chosen email as text (its first part), with your name and its reference as words, for Desktop.
+	measure 'Chosen start' =
+			VAR chosen = [Chosen email]
+			VAR plainText = CALCULATE ( MAX ( Drafts[Plain] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen )
+			VAR filled = SUBSTITUTE ( SUBSTITUTE ( plainText, "%%SENDER%%", "your name" ), "%%REF%%", "the reference" )
+			VAR shortText = LEFT ( filled, 1200 )
+			RETURN IF ( NOT ISBLANK ( chosen ), IF ( LEN ( filled ) > 1200, shortText & " [The email goes on: the app shows all of it.]", filled ) )
+
+	/// The line under the title of the start of the email Desktop shows on Messages.
+	measure 'Chosen body note' =
+			VAR chosen = [Chosen email]
+			RETURN IF ( ISBLANK ( chosen ), "No email to show.", "Your name and the reference go in when you send." )
+
+	/// The line under the title of the email Desktop shows on Messages.
+	measure 'Chosen note' =
+			VAR chosen = [Chosen email]
+			RETURN IF ( ISBLANK ( chosen ), "No email to show.", "The email chosen in the list, as text. The published report shows the app here." )
+
 	/// The draft, D0001 first: by person in the order the newest report first names them (one refresh only: the next refresh numbers them again).
 	column DraftId
 		dataType: string
@@ -253,6 +334,14 @@ table Drafts
 		isDataTypeInferred
 		isNameInferred
 		sourceColumn: [EmailId]
+
+	/// Build R4 (D361): the subject of the email of this draft as the list of Messages shows it: the subject of its first part, with its reference, or the words that say when it gets one. One value per email (the subject names the person, the reference or who did not answer), so the list shows each email on one line.
+	column ListSubject =
+			VAR firstSubject = LOOKUPVALUE ( Drafts[EmailSubject], Drafts[DraftId], Drafts[EmailId] )
+			VAR ref = LOOKUPVALUE ( Drafts[Ref], Drafts[DraftId], Drafts[EmailId] )
+			RETURN SUBSTITUTE ( firstSubject, "%%REF%%", IF ( ref <> "", ref, "reference given at Send" ) )
+		dataType: string
+		summarizeBy: none
 
 	/// The length of Html, for the app SACM messages (build D5): the Power Apps visual may pass a long text cut, so the app compares what it got with this and does not send a cut email.
 	column HtmlLength = LEN ( Drafts[Html] )

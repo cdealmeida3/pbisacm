@@ -1,0 +1,175 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "appBoxHead",
+  "position": {
+    "x": 676,
+    "y": 180,
+    "z": 3,
+    "height": 136,
+    "width": 580,
+    "tabOrder": 3100
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "Chosen to"
+                }
+              },
+              "queryRef": "Drafts.Chosen to",
+              "nativeQueryRef": "Chosen to",
+              "displayName": "To"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "Chosen cc"
+                }
+              },
+              "queryRef": "Drafts.Chosen cc",
+              "nativeQueryRef": "Chosen cc",
+              "displayName": "Cc"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "Chosen subject"
+                }
+              },
+              "queryRef": "Drafts.Chosen subject",
+              "nativeQueryRef": "Chosen subject",
+              "displayName": "Subject"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "176D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Drafts.Chosen to"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "128D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Drafts.Chosen cc"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "232D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Drafts.Chosen subject"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The email chosen'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The email chosen in the list: To, Cc and Subject'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "Chosen note"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

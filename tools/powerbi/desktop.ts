@@ -7,12 +7,16 @@
 //   node tools/powerbi/desktop.ts pages <out.json>               the pages in their order, for the pictures (pictures.ps1)
 //   node tools/powerbi/desktop.ts judge <results.json> [pictures.json]
 //                                                                what Desktop would show wrong (judge); exit 1 on a problem
+//   node tools/powerbi/desktop.ts realsize <expressions.tmdl> packed|folder [--folder <path>] [--copies <n>] [--history <k>]
+//                                                                the copy Desktop opens with the samples at real size (R4)
 // 0.44.0 showed why the lint is not enough: visuals that said "Select or drag fields" (a measure Desktop dropped), a
 // card that said "(Blank)", blank rows at the top of tables and lines that exist only because a measure gave text for
 // nothing. Only invented data: the job runs in Sample mode.
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { readPages, readTabGroups, textsOf } from './pages.ts';
+import { historyStart, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
+import { mText } from './generate.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -420,6 +424,48 @@ export function judgeLook(pictures: Pictures, notes: string[] = []): string[] {
   return problems;
 }
 
+/* ------------------------------------------------------------------ real size (R4 step 0) */
+
+/** expressions.tmdl with the M of one expression replaced (its lines up to its queryGroup line), in the generator's form. */
+export function withExpression(tmdl: string, name: string, m: string): string {
+  const block = new RegExp(`^expression ${name} =[\\s\\S]*?\\n(\\tqueryGroup: \\w+\\n)`, 'm');
+  const found = block.exec(tmdl);
+  if (!found) throw new Error(`expressions.tmdl has no expression ${name}`);
+  const body = m.includes('\n') ? `\n${m.split('\n').map((line) => (line ? `\t\t${line}` : '')).join('\n')}` : ` ${m}`;
+  return tmdl.slice(0, found.index) + `expression ${name} =${body}\n${found[1]}` + tmdl.slice(found.index + found[0].length);
+}
+
+/**
+ * expressions.tmdl of the copy Desktop opens, with the invented samples at the size of the real reports (scaled.ts), for
+ * the Desktop check at real size (R4 step 0; the repository's files never change):
+ *   packed: SampleFiles holds the scaled files, as the timing connector does (no data source, as Sample mode);
+ *   folder: SourceMode is SharePoint and the files come from a folder of the runner (Folder.Files, only the folder
+ *           itself, as fnSharePointFiles reads the team's folder), so the refresh reads a data source as Carlos's does.
+ * With `history` earlier dates, RangeStart moves back to the oldest of them.
+ */
+export function realSizeExpressions(tmdl: string, mode: 'packed' | 'folder', options: { folder?: string; copies?: number; history?: number } = {}): string {
+  const { folder = 'C:\\sacm-real-size', copies = REAL_SIZE_COPIES, history = 0 } = options;
+  let out = tmdl;
+  if (history > 0) {
+    const [year, month, day] = historyStart(history).split('-').map(Number);
+    out = out.replace(/^(expression RangeStart = )#datetime\(\d+, \d+, \d+, 0, 0, 0\)/m, `$1#datetime(${year}, ${month}, ${day}, 0, 0, 0)`);
+  }
+  if (mode === 'packed') {
+    const rows = scaledSampleFiles(copies, history).map((file) => `\t{${mText(file.name)}, ${mText(file.base64)}}`).join(',\n');
+    return withExpression(out, 'SampleFiles', `#table(type table [FileName = text, Base64 = text], {\n${rows}\n})`);
+  }
+  const path = folder.replace(/[\\/]+$/, '') + '\\';
+  out = out.replace(/^(expression SourceMode = )"Sample"/m, '$1"SharePoint"');
+  return withExpression(out, 'fnSharePointFiles', `() as table =>
+    let
+        files = Folder.Files(${mText(path)}),
+        top = Table.SelectRows(files, each Text.Lower([Folder Path], "en-US") = ${mText(path.toLowerCase())}),
+        selected = Table.SelectColumns(top, {"Name", "Date modified", "Content"}),
+        renamed = Table.RenameColumns(selected, {{"Name", "FileName"}, {"Date modified", "Modified"}})
+    in
+        Table.TransformColumnTypes(renamed, {{"FileName", type text}, {"Modified", type nullable datetime}, {"Content", type binary}})`);
+}
+
 /* ------------------------------------------------------------------ the command line */
 
 if (import.meta.main) {
@@ -448,8 +494,17 @@ if (import.meta.main) {
     for (const problem of problems) console.log(`PROBLEM: ${problem}`);
     console.log(problems.length ? `Desktop check: ${problems.length} problem${problems.length === 1 ? '' : 's'}.` : 'Desktop check: no problem.');
     process.exit(problems.length ? 1 : 0);
+  } else if (command === 'realsize' && file && (extra === 'packed' || extra === 'folder')) {
+    // file: expressions.tmdl of the copy Desktop opens; the rest: --folder <path> --copies <n> --history <k>.
+    const rest = process.argv.slice(5);
+    const option = (name: string): string | undefined => { const at = rest.indexOf(name); return at >= 0 ? rest[at + 1] : undefined; };
+    const copies = Number(option('--copies') ?? REAL_SIZE_COPIES);
+    const history = Number(option('--history') ?? 0);
+    // The runner checks out with CRLF: the expressions are matched line by line in LF.
+    writeFileSync(file, realSizeExpressions(readFileSync(file, 'utf8').replace(/\r\n/g, '\n'), extra, { folder: option('--folder'), copies, history }));
+    console.log(`${file}: the samples at real size (${extra}, ${copies} copies, ${history} earlier dates)`);
   } else {
-    console.error('Usage: node tools/powerbi/desktop.ts queries <out.json> [drill-values.json] | pages <out.json> | judge <results.json> [pictures.json]');
+    console.error('Usage: node tools/powerbi/desktop.ts queries <out.json> [drill-values.json] | pages <out.json> | judge <results.json> [pictures.json] | realsize <expressions.tmdl> packed|folder [--folder <path>] [--copies <n>] [--history <k>]');
     process.exit(2);
   }
 }

@@ -39,43 +39,168 @@ while (watch.Elapsed < TimeSpan.FromMinutes(5))
 if (database?.Model == null || database.Model.Tables.Count == 0) { result["openError"] = "no model in the engine after 5 minutes"; Save(); return 0; }
 result["opened"] = true;
 Console.WriteLine($"Model: {database.Model.Tables.Count} tables, {database.Model.Tables.Sum(table => table.Measures.Count)} measures, compatibility {database.CompatibilityLevel}");
+
+// 2. Refresh on the samples, as Desktop's Refresh does.
+// A trace of the engine, every session (R4 step 0): what it begins and ends, so a refresh that stalls says where. Every
+// event goes to trace.log; the log gets the steps that took more than 2 s, and, when a table stalls, what is still open.
+var traceFile = new StreamWriter(Path.Combine(outFolder, "trace.log")) { AutoFlush = true };
+var openSteps = new System.Collections.Concurrent.ConcurrentDictionary<string, (DateTime At, string Text)>();
+var lastEvents = new System.Collections.Concurrent.ConcurrentQueue<string>();
+Tom.Trace? trace = null;
+try
+{
+    trace = server.Traces.Add($"DesktopCheck-{Guid.NewGuid():N}");
+    var progress = new[] { Microsoft.AnalysisServices.TraceEventClass.ProgressReportBegin, Microsoft.AnalysisServices.TraceEventClass.ProgressReportEnd, Microsoft.AnalysisServices.TraceEventClass.ProgressReportError };
+    foreach (var eventClass in progress)
+    {
+        var traceEvent = trace.Events.Add(eventClass);
+        traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.EventClass);
+        traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.EventSubclass);
+        traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.ObjectName);
+        traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.ObjectPath);
+        traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.CurrentTime);
+        traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.SessionID);
+        traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.TextData);
+        if (eventClass != Microsoft.AnalysisServices.TraceEventClass.ProgressReportBegin) traceEvent.Columns.Add(Microsoft.AnalysisServices.TraceColumn.Duration);
+    }
+    trace.OnEvent += (sender, e) =>
+    {
+        try
+        {
+            var what = $"{e.EventSubclass} {e.ObjectPath}";
+            var text = (e.TextData ?? "").Replace("\r", " ").Replace("\n", " ");
+            if (text.Length > 300) text = text.Substring(0, 300);
+            var line = $"{DateTime.UtcNow:HH:mm:ss} {e.EventClass} {what}{(e.EventClass == Microsoft.AnalysisServices.TraceEventClass.ProgressReportBegin ? "" : $" {e.Duration} ms")} {text}";
+            traceFile.WriteLine(line);
+            lastEvents.Enqueue(line);
+            while (lastEvents.Count > 60) lastEvents.TryDequeue(out _);
+            var key = $"{e.SessionID}|{what}";
+            if (e.EventClass == Microsoft.AnalysisServices.TraceEventClass.ProgressReportBegin) openSteps[key] = (DateTime.UtcNow, text);
+            else
+            {
+                openSteps.TryRemove(key, out _);
+                if (e.Duration > 2000) Console.WriteLine($"  step {what}: {e.Duration / 1000.0:0.0} s");
+            }
+        }
+        catch { }
+    };
+    trace.Update();
+    trace.Start();
+    Console.WriteLine("Engine trace started");
+}
+catch (Exception error) { Console.WriteLine($"No engine trace: {error.Message}"); trace = null; }
+
 // Desktop still loads its queries for a while after the model is there ("Loading queries"); a refresh then can clash.
 Thread.Sleep(TimeSpan.FromSeconds(45));
 
-// 2. Refresh on the samples, as Desktop's Refresh does.
-var timer = Stopwatch.StartNew();
-// One table at a time, so a failing query names itself (a refresh of the whole model says only "An unexpected
-// exception occurred"), then the calculated tables and columns.
-var failed = new List<string>();
-foreach (var table in database.Model.Tables.Where(table => table.Partitions.Any(partition => partition.SourceType == Tom.PartitionSourceType.M)).ToList())
+// The minutes one table may take before the check stops and says what the engine is doing (the job's own limit is
+// far away). DESKTOP_TABLE_MINUTES changes it.
+var tableMinutes = int.TryParse(Environment.GetEnvironmentVariable("DESKTOP_TABLE_MINUTES"), out var minutes) ? minutes : 12;
+void ShowEngine(string why)
 {
-    var started = timer.Elapsed;
+    Console.WriteLine($"ENGINE ({why}): steps still open:");
+    foreach (var step in openSteps.OrderBy(entry => entry.Value.At)) Console.WriteLine($"  OPEN since {step.Value.At:HH:mm:ss} {step.Key} {step.Value.Text}");
+    Console.WriteLine("ENGINE: the last events:");
+    foreach (var line in lastEvents) Console.WriteLine($"  {line}");
     try
     {
-        // As Desktop's own Refresh: the incremental refresh policy of HistoryRun applies only in the service (a refresh
-        // that applies it in Desktop fails with "An unexpected exception occurred").
-        table.RequestRefresh(Tom.RefreshType.DataOnly, Tom.RefreshPolicyBehavior.Ignore);
-        database.Model.SaveChanges();
-        Console.WriteLine($"Refreshed {table.Name} in {(timer.Elapsed - started).TotalSeconds:0.0} s");
+        using var look = new AdomdConnection($"Data Source=localhost:{port}");
+        look.Open();
+        foreach (var dmv in new[] { "$SYSTEM.DISCOVER_COMMANDS", "$SYSTEM.DISCOVER_LOCKS", "$SYSTEM.DISCOVER_SESSIONS" })
+        {
+            using var command = new AdomdCommand($"SELECT * FROM {dmv}", look) { CommandTimeout = 60 };
+            using var reader = command.ExecuteReader();
+            Console.WriteLine($"ENGINE: {dmv}");
+            while (reader.Read())
+            {
+                var cells = new List<string>();
+                for (var at = 0; at < reader.FieldCount; at++)
+                {
+                    var value = reader.GetValue(at)?.ToString() ?? "";
+                    if (value == "" || value == "0") continue;
+                    value = value.Replace("\r", " ").Replace("\n", " ");
+                    cells.Add($"{reader.GetName(at)}={(value.Length > 400 ? value.Substring(0, 400) : value)}");
+                }
+                Console.WriteLine("  " + string.Join("; ", cells));
+            }
+        }
     }
-    catch (Exception error)
+    catch (Exception error) { Console.WriteLine($"ENGINE: no DMV: {error.Message}"); }
+}
+
+var timer = Stopwatch.StartNew();
+// One step of the refresh on its own thread: null when it ended, else why not. Halfway the log gets what the
+// engine is doing; after tableMinutes the check stops waiting.
+string? Timed(string what, Action step)
+{
+    var started = timer.Elapsed;
+    var work = Task.Run(step);
+    var shown = false;
+    while (!work.Wait(TimeSpan.FromMinutes(1)))
     {
-        failed.Add($"{table.Name}: {error.Message}");
-        Console.WriteLine($"Refresh of {table.Name} failed: {error.Message}");
+        var took = (timer.Elapsed - started).TotalMinutes;
+        if (!shown && took >= tableMinutes / 2) { ShowEngine($"{what} after {tableMinutes / 2} minutes"); shown = true; }
+        if (took >= tableMinutes) break;
+    }
+    if (!work.IsCompleted)
+    {
+        ShowEngine($"{what} after {tableMinutes} minutes");
+        return $"STALLED: did not end in {tableMinutes} minutes (see ENGINE in the log)";
+    }
+    return work.IsFaulted ? work.Exception!.GetBaseException().Message : null;
+}
+void Stalled(List<string> failures)
+{
+    result["refreshError"] = string.Join("\n", failures);
+    Save();
+    Console.WriteLine("The refresh stalled: the check stops here.");
+    traceFile.Flush();
+    Environment.Exit(0);
+}
+// Every M table in one transaction, as Desktop's own Refresh does (R4 step 0, D360). A commit after each table let
+// Desktop start a write of its own: it creates the model's culture (its Q&A words) once there is data. That write waited
+// for the lock of the next table's refresh, and the refresh waited for Desktop to run its query. With a file source the
+// check stood still at JournalKeys. Only when the one refresh fails, one table at a time, so a failing query names
+// itself (a refresh of the whole model says only "An unexpected exception occurred"). Then the calculated tables.
+var failed = new List<string>();
+var mTables = database.Model.Tables.Where(table => table.Partitions.Any(partition => partition.SourceType == Tom.PartitionSourceType.M)).ToList();
+Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Refreshing the {mTables.Count} tables of Power Query in one transaction");
+// As Desktop's own Refresh: the incremental refresh policy of HistoryRun applies only in the service (a refresh that
+// applies it in Desktop fails with "An unexpected exception occurred").
+var together = Timed("the tables of Power Query", () =>
+{
+    foreach (var table in mTables) table.RequestRefresh(Tom.RefreshType.DataOnly, Tom.RefreshPolicyBehavior.Ignore);
+    database.Model.SaveChanges();
+});
+if (together == null) Console.WriteLine($"Refreshed the tables of Power Query in {timer.Elapsed.TotalSeconds:0.0} s");
+else if (together.StartsWith("STALLED")) { failed.Add($"the tables of Power Query: {together}"); Stalled(failed); }
+else
+{
+    Console.WriteLine($"The refresh failed ({together.Split('\n')[0]}): one table at a time, to find which");
+    database.Model.UndoLocalChanges();
+    foreach (var table in mTables)
+    {
+        var started = timer.Elapsed;
+        Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Refreshing {table.Name}");
+        var problem = Timed(table.Name, () => { table.RequestRefresh(Tom.RefreshType.DataOnly, Tom.RefreshPolicyBehavior.Ignore); database.Model.SaveChanges(); });
+        if (problem == null) { Console.WriteLine($"Refreshed {table.Name} in {(timer.Elapsed - started).TotalSeconds:0.0} s"); continue; }
+        failed.Add($"{table.Name}: {problem}");
+        Console.WriteLine($"Refresh of {table.Name} failed: {problem}");
+        if (problem.StartsWith("STALLED")) Stalled(failed);
         database.Model.UndoLocalChanges();
     }
+    if (failed.Count == 0) failed.Add($"the tables of Power Query: {together}");
 }
-try
+Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Calculating");
+var calculated = Timed("Calculate", () => { database.Model.RequestRefresh(Tom.RefreshType.Calculate); database.Model.SaveChanges(); });
+if (calculated == null) Console.WriteLine($"Calculated in {timer.Elapsed.TotalSeconds:0} s in all");
+else
 {
-    database.Model.RequestRefresh(Tom.RefreshType.Calculate);
-    database.Model.SaveChanges();
-    Console.WriteLine($"Calculated in {timer.Elapsed.TotalSeconds:0} s in all");
+    failed.Add($"calculate: {calculated}");
+    Console.WriteLine($"Calculate failed: {calculated}");
+    if (calculated.StartsWith("STALLED")) Stalled(failed);
 }
-catch (Exception error)
-{
-    failed.Add($"calculate: {error.Message}");
-    Console.WriteLine($"Calculate failed: {error.Message}");
-}
+try { trace?.Stop(); } catch { }
 if (failed.Count > 0) result["refreshError"] = string.Join("\n", failed);
 
 // 3. Every object with an error, as Desktop marks it with a warning (a measure with an error is left out of the field

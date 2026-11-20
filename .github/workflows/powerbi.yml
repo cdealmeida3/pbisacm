@@ -57,6 +57,9 @@ on:
         description: Commit the pictures of the pages to this branch (never main), to review them
         type: boolean
         default: false
+      realsize:
+        description: The Desktop check on the samples at real size (packed or folder; empty for the samples)
+        default: ""
 
 permissions:
   contents: read
@@ -202,7 +205,10 @@ jobs:
       - name: Build the runner
         run: dotnet build tools/powerbi/desktop-check -c Release
       - name: Open the report in Power BI Desktop and run every visual
-        run: ./tools/powerbi/desktop.ps1 -Out .build/desktop
+        env:
+          REALSIZE: ${{ inputs.realsize || '' }}
+          HISTORY: ${{ inputs.history || '0' }}
+        run: ./tools/powerbi/desktop.ps1 -Out .build/desktop -RealSize "$env:REALSIZE" -History ([int]$env:HISTORY)
       - name: What Desktop would show wrong
         run: node tools/powerbi/desktop.ts judge .build/desktop/results.json .build/desktop/pictures/pictures.json
       - uses: actions/upload-artifact@v4

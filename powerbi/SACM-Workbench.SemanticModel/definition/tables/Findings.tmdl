@@ -46,8 +46,23 @@ table Findings
 	measure 'Lines note' = SWITCH ( TRUE (), NOT HASONEVALUE ( Checks[CheckId] ), "No card chosen: on All cards, select a card, then Open card.", COUNTROWS ( Findings ) + 0 = 0, "No line: the newest report finds nothing on this card.", "Who is asked about which CI. Owned by, Managed by and Tags are in the export." )
 		displayFolder: Page notes
 
+	/// Build R4 (D363): 1 when the page Card was opened on a card. The filter of the tables of Card: opened from its tab, with no card, they show no line.
+	measure 'Card chosen' = IF ( ISFILTERED ( Checks[CardLabel] ) || ISFILTERED ( Checks[CheckId] ), 1 )
+		formatString: 0
+		displayFolder: Page notes
+
+	/// Build R4 (D363): 1 when the page Case was opened on a CI. The filter of the tables of Case.
+	measure 'CI chosen' = IF ( ISFILTERED ( Findings[CiName] ), 1 )
+		formatString: 0
+		displayFolder: Page notes
+
+	/// Build R4 (D363): 1 when the page Person was opened on a person. The filter of the table of Person, which shows the person on each line (so a line selected opens Messages on them): the filter of that line is put aside to see the page's own.
+	measure 'Person chosen' = IF ( CALCULATE ( ISFILTERED ( Findings[ContactName] ), ALLSELECTED ( Findings[ContactName] ) ), 1 )
+		formatString: 0
+		displayFolder: Page notes
+
 	/// Under the title of the SACM fix list (Card): only a card SACM fixes itself has lines.
-	measure 'Fix list note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "No fix list: on this card the person asked fixes the CI.", "The change to make in ServiceNow, line by line." )
+	measure 'Fix list note' = IF ( [Card chosen] <> 1, "No card chosen: on All cards, select a card, then Open card.", IF ( COUNTROWS ( Findings ) + 0 = 0, "No fix list: on this card the person asked fixes the CI.", "The change to make in ServiceNow, line by line." ) )
 		displayFolder: Page notes
 
 	/// Under the title of the lines by kind of problem (Card): only the contract cards have them.
@@ -55,7 +70,7 @@ table Findings
 		displayFolder: Page notes
 
 	/// Under the title of the export (Card): how to get the file.
-	measure 'Export note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing to export.", "The columns of the SACM template: More options, Export data." )
+	measure 'Export note' = IF ( [Card chosen] <> 1, "No card chosen: on All cards, select a card, then Open card.", IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing to export.", "The columns of the SACM template: More options, Export data." ) )
 		displayFolder: Page notes
 
 	/// Under the title of the CI (Case).
@@ -63,19 +78,19 @@ table Findings
 		displayFolder: Page notes
 
 	/// Under the title of the problems of a CI (Case).
-	measure 'Case problems note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "No problem: the newest report finds nothing on this CI.", "Each problem of the newest report, its state and who is asked." )
+	measure 'Case problems note' = IF ( [CI chosen] <> 1, "No CI chosen: on a card or a person, select a line, then Open CI.", IF ( COUNTROWS ( Findings ) + 0 = 0, "No problem: the newest report finds nothing on this CI.", "Each problem of the newest report, its state and who is asked." ) )
 		displayFolder: Page notes
 
 	/// Under the title of the people of a CI (Case).
-	measure 'People note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nobody is asked about this CI.", "Who is asked, who is copied, and who gets an escalation." )
+	measure 'People note' = IF ( [CI chosen] <> 1, "No CI chosen: on a card or a person, select a line, then Open CI.", IF ( COUNTROWS ( Findings ) + 0 = 0, "Nobody is asked about this CI.", "Who is asked, who is copied, and who gets an escalation." ) )
 		displayFolder: Page notes
 
 	/// Under the title of the person (Person). Opened from its tab, the page says how to choose a person.
-	measure 'Person note' = IF ( NOT ISFILTERED ( Findings[ContactName] ), "No person chosen: on My day, People or Overview, select a name, then Open person.", "Who they are and why the team asks them." )
+	measure 'Person note' = IF ( [Person chosen] <> 1, "No person chosen: on My day, People or Overview, select a name, then Open person.", "Who they are and why the team asks them." )
 		displayFolder: Page notes
 
 	/// Under the title of what is open with a person (Person).
-	measure 'Open with note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers." )
+	measure 'Open with note' = IF ( [Person chosen] <> 1, "No person chosen: on My day, People or Overview, select a name, then Open person.", IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers. Select a line, then Prepare email." ) )
 		displayFolder: Page notes
 
 	/// The next step with the person in view (My day, Work queue, D2): 1 a reply to read (RepliesToRead, from their address), 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked and not due yet, 6 marked fixed; blank when nothing is open with them. Replies, reminders, escalations and new lines count on the daily cards only (D182), from Today, so right between two refreshes. The order is the one of nextStep in src/app/view/groups.ts. With Mine and free chosen (WorkScope, D343) only the lines assigned to me or to nobody count, and a reply only when the person has such a line.
@@ -221,12 +236,13 @@ table Findings
 		formatString: #,0
 		displayFolder: My day
 
-	/// Under the title of Your next steps (My day): how many, for whom and in what order, or why the box is empty.
+	/// Under the title of Your next steps (My day): how many, for whom and in what order, or why the box is empty. Build R4 (D364): the first time, before the lists SACM Team and SACM Settings have a row, it says first that the set-up is not finished.
 	measure 'Steps note' =
 			VAR n = [Steps]
 			VAR fixes = IF ( [SACM fix lines] > 0, " The lines SACM fixes itself are below." )
+			VAR setUp = IF ( COUNTROWS ( ALL ( Team ) ) + 0 = 0 || COUNTROWS ( ALL ( Settings ) ) + 0 = 0, "Set-up is not finished: open Data check on the page Reports. " )
 			RETURN
-			    IF (
+			    setUp & IF (
 			        n = 0,
 			        "Nobody to write to today: no reply to read, no reminder due and nobody new to ask." & fixes,
 			        n & IF ( n = 1, " step", " steps" ) & " for " & FORMAT ( [Today], "dddd d mmmm" ) & " · " & [Scope words] & ", in the order of the team's rules. Select one, then Open person." & fixes
@@ -367,21 +383,21 @@ table Findings
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// The open lines with the person in view (People, Person, Overview): their lines of the newest report, not verified and not set aside; blank hides the person.
+	/// The open lines with the person in view (People, Person, Overview): their lines of the newest report, not verified and not set aside; blank hides the person. With no person in view (the Person page opened without one) 0, so its tile says so (D363). The rows of People and Overview are each a person in view.
 	measure 'Person lines' =
 			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
-			RETURN IF ( n > 0, n )
+			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), 0, IF ( n > 0, n ) )
 		formatString: #,0
 		displayFolder: People
 
 	/// Under the number of open lines (Person): on how many CIs.
 	measure 'Person lines line' =
 			VAR n = CALCULATE ( DISTINCTCOUNT ( CaseLines[CiKey] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
-			RETURN "on " & n & IF ( n = 1, " CI", " CIs" )
+			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), "Choose a person first", "on " & n & IF ( n = 1, " CI", " CIs" ) )
 		displayFolder: People
 
 	/// The next step with the person in view (Person, build D3): the word of the chip, Nothing open when nothing is.
-	measure 'Person step' = SWITCH ( [Person state], 1, "Reply to read", 2, "Escalate", 3, "Reminder due", 4, "New", 5, "Asked", 6, "Marked fixed", "Nothing open" )
+	measure 'Person step' = IF ( NOT ISFILTERED ( Findings[ContactName] ), "No person", SWITCH ( [Person state], 1, "Reply to read", 2, "Escalate", 3, "Reminder due", 4, "New", 5, "Asked", 6, "Marked fixed", "Nothing open" ) )
 		displayFolder: People
 
 	/// The colour of the next step with the person in view: the colour of its chip (LOOK rule 5).
@@ -391,7 +407,7 @@ table Findings
 	/// Under the next step with the person in view: the kinds of problem, one part each in the email.
 	measure 'Person step line' =
 			VAR n = [Person kinds]
-			RETURN n & IF ( n = 1, " kind of problem", " kinds of problem" ) & " · one part each in the email"
+			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), "Choose a person first", n & IF ( n = 1, " kind of problem", " kinds of problem" ) & " · one part each in the email" )
 		displayFolder: People
 
 	/// The kinds of problem (cards) of the open lines with the person in view (Person): one part each in the email.
@@ -411,13 +427,13 @@ table Findings
 	/// The day the team last wrote to the person in view, or never (People, Person).
 	measure 'Person last asked' =
 			VAR lastSent = CALCULATE ( MAX ( CaseLines[SentOn] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ) )
-			RETURN IF ( ISBLANK ( lastSent ), "never", FORMAT ( lastSent, "d mmm" ) )
+			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), "–", IF ( ISBLANK ( lastSent ), "never", FORMAT ( lastSent, "d mmm" ) ) )
 		displayFolder: People
 
 	/// Under the last contact (Person): how many emails the team sent, or never asked.
 	measure 'Person asked line' =
 			VAR times = CALCULATE ( MAX ( CaseLines[Messages] ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ) ) + 0
-			RETURN IF ( times = 0, "never asked", "asked " & times & IF ( times = 1, " time", " times" ) )
+			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), "Choose a person first", IF ( times = 0, "never asked", "asked " & times & IF ( times = 1, " time", " times" ) ) )
 		displayFolder: People
 
 	/// The name at the top of the Person page, or what to do when the page was opened from its tab.
