@@ -115,7 +115,7 @@ table CaseLines
 	measure 'Not followed note' = IF ( COUNTROWS ( DISTINCT ( CaseLines[Key] ) ) + 0 = 0, "No case is set aside: the team follows every case.", "Select lines, then Follow again in the app." )
 		displayFolder: Page notes
 
-	/// The next step with the person of a line of the Work queue (the same steps as Person state, from the lines in view, every card, not only the daily ones): 1 a reply to read, 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked, 6 marked fixed. The status chosen above the table keeps its lines only; with Mine and free (Scope, D343) only the lines assigned to me or to nobody.
+	/// The next step with the person of a line of the Work queue (the same steps as Person state, from the lines in view, every card, not only the daily ones): 1 a reply to read, 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked, 6 marked fixed. The status chosen above the table keeps its lines only; with Mine and free (WorkScope, D343) only the lines assigned to me or to nobody.
 	measure 'Queue state' =
 			VAR asOf = [Today]
 			VAR me = [Me]

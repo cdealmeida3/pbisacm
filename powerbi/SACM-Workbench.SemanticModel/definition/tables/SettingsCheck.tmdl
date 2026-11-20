@@ -10,12 +10,12 @@ table SettingsCheck
 	/// The line under the title of Data check: who opens the report, and whether they are on the list SACM Team.
 	measure 'You line' =
 			VAR login = LOWER ( USERPRINCIPALNAME () )
-			VAR member = CALCULATE ( MAX ( Team[Name] ), REMOVEFILTERS ( Team ), Team[Email] = login )
+			VAR teamName = CALCULATE ( MAX ( Team[Name] ), REMOVEFILTERS ( Team ), Team[Email] = login )
 			VAR counted = [Me]
 			RETURN
 			    IF (
-			        NOT ISBLANK ( member ),
-			        "You are " & member & " (" & login & "), member of SACM Team: yes.",
+			        NOT ISBLANK ( teamName ),
+			        "You are " & teamName & " (" & login & "), member of SACM Team: yes.",
 			        "You are " & login & ", member of SACM Team: no. Add your address to the list SACM Team."
 			            & IF ( ISBLANK ( counted ), "", " The samples count you as " & counted & "." )
 			    )

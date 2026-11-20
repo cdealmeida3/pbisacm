@@ -78,7 +78,7 @@ table Findings
 	measure 'Open with note' = IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers." )
 		displayFolder: Page notes
 
-	/// The next step with the person in view (My day, Work queue, D2): 1 a reply to read (RepliesToRead, from their address), 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked and not due yet, 6 marked fixed; blank when nothing is open with them. Replies, reminders, escalations and new lines count on the daily cards only (D182), from Today, so right between two refreshes. The order is the one of nextStep in src/app/view/groups.ts. With Mine and free chosen (Scope, D343) only the lines assigned to me or to nobody count, and a reply only when the person has such a line.
+	/// The next step with the person in view (My day, Work queue, D2): 1 a reply to read (RepliesToRead, from their address), 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked and not due yet, 6 marked fixed; blank when nothing is open with them. Replies, reminders, escalations and new lines count on the daily cards only (D182), from Today, so right between two refreshes. The order is the one of nextStep in src/app/view/groups.ts. With Mine and free chosen (WorkScope, D343) only the lines assigned to me or to nobody count, and a reply only when the person has such a line.
 	measure 'Person state' =
 			VAR asOf = [Today]
 			VAR me = [Me]
@@ -342,7 +342,7 @@ table Findings
 
 	/// On the rail, beside its page: the next steps of today (the people, and the SACM fixes as one) in a small pill, the same on every page (no filter of the page counts), for Mine and free, the choice My day opens with (D343).
 	measure 'Rail badge my day' =
-			VAR n = CALCULATE ( [Steps] + IF ( [SACM fix lines] > 0, 1, 0 ), REMOVEFILTERS (), Scope[Choice] = "Mine and free" ) + 0
+			VAR n = CALCULATE ( [Steps] + IF ( [SACM fix lines] > 0, 1, 0 ), REMOVEFILTERS (), WorkScope[Choice] = "Mine and free" ) + 0
 			VAR words = FORMAT ( n, "0" )
 			VAR wide = LEN ( words ) * 7 + 14
 			VAR picture =

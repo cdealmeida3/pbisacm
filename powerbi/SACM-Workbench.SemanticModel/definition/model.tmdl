@@ -64,7 +64,7 @@ ref table JournalKeys
 ref table Replies
 ref table Settings
 ref table Team
-ref table Scope
+ref table WorkScope
 ref table PeopleCheck
 ref table DataColumns
 ref table SettingsCheck

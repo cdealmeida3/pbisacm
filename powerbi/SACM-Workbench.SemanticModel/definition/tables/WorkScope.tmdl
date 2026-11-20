@@ -1,8 +1,8 @@
 /// The choice above My day and Work queue (D343): Mine and free (the lines assigned to you and the lines nobody has) or Everyone. No relationship: the measures of the two pages read it.
-table Scope
+table WorkScope
 
 	/// TRUE when the whole team's work is shown: Everyone chosen, or no choice on the page (People, Person and Overview show everyone). My day and Work queue choose Mine and free when they open.
-	measure 'Everyone chosen' = SELECTEDVALUE ( Scope[Choice], "Everyone" ) = "Everyone"
+	measure 'Everyone chosen' = SELECTEDVALUE ( WorkScope[Choice], "Everyone" ) = "Everyone"
 
 	/// The words of the choice for the line under a title: "yours and the free lines", or "everyone's".
 	measure 'Scope words' =
@@ -21,6 +21,6 @@ table Scope
 		summarizeBy: none
 		sourceColumn: Order
 
-	partition Scope = m
+	partition WorkScope = m
 		mode: import
 		source = ScopeRows

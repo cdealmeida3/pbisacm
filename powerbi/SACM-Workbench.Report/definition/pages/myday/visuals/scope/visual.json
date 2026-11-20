@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Scope"
+                      "Entity": "WorkScope"
                     }
                   },
                   "Property": "Choice"
                 }
               },
-              "queryRef": "Scope.Choice",
+              "queryRef": "WorkScope.Choice",
               "nativeQueryRef": "Choice",
               "active": true
             }
