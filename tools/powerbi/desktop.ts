@@ -500,7 +500,8 @@ if (import.meta.main) {
     const option = (name: string): string | undefined => { const at = rest.indexOf(name); return at >= 0 ? rest[at + 1] : undefined; };
     const copies = Number(option('--copies') ?? REAL_SIZE_COPIES);
     const history = Number(option('--history') ?? 0);
-    writeFileSync(file, realSizeExpressions(readFileSync(file, 'utf8'), extra, { folder: option('--folder'), copies, history }));
+    // The runner checks out with CRLF: the expressions are matched line by line in LF.
+    writeFileSync(file, realSizeExpressions(readFileSync(file, 'utf8').replace(/\r\n/g, '\n'), extra, { folder: option('--folder'), copies, history }));
     console.log(`${file}: the samples at real size (${extra}, ${copies} copies, ${history} earlier dates)`);
   } else {
     console.error('Usage: node tools/powerbi/desktop.ts queries <out.json> [drill-values.json] | pages <out.json> | judge <results.json> [pictures.json] | realsize <expressions.tmdl> packed|folder [--folder <path>] [--copies <n>] [--history <k>]');
