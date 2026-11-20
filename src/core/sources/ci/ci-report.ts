@@ -300,3 +300,42 @@ export function hiddenNotes(report: ReportRead): string[] {
   }
   return [];
 }
+
+/** How many CIs of a CI report name a person of a role, and how fully (the page Data check of the Power BI report, build R3). */
+export interface PeopleCount {
+  /** owned_by, managed_by, supported_by, or owned_by.manager (the manager of Owned by, the escalation). */
+  role: string;
+  label: string;
+  /** The report has the column of the role (of the manager, for owned_by.manager). */
+  inReport: boolean;
+  cis: number; name: number; email: number; userId: number;
+  /** Marked active, marked inactive, and named but with no word on it (the report has no column active, or it is empty). */
+  active: number; inactive: number; notSaid: number;
+}
+
+/** The roles the Data check counts, in its order: the three roles a message asks, then the manager of Owned by. */
+export const PEOPLE_CHECK: Array<{ role: string; label: string }> = [
+  { role: 'owned_by', label: 'Owned by' }, { role: 'managed_by', label: 'Managed by' }, { role: 'supported_by', label: 'Supported by' },
+  { role: 'owned_by.manager', label: 'Manager of Owned by' }
+];
+
+/** For each role of PEOPLE_CHECK: the CIs of the report with a name, an email, a user ID, marked active or inactive. */
+export function peopleCoverage(cis: Ci[], columns: ReadonlySet<string>): PeopleCount[] {
+  return PEOPLE_CHECK.map(({ role, label }) => {
+    const manager = role.endsWith('.manager');
+    const people = cis.map((ci) => {
+      const person = ci.roles[(manager ? 'owned_by' : role) as Role];
+      if (!person) return null;
+      return manager
+        ? { name: person.manager, email: person.managerEmail, userId: person.managerUserId, active: person.managerActive }
+        : { name: person.name, email: person.email, userId: person.userId, active: person.active };
+    });
+    const count = (test: (person: NonNullable<typeof people[number]>) => boolean): number => people.filter((person) => !!person && test(person)).length;
+    return {
+      role, label, inReport: columns.has(role), cis: cis.length,
+      name: count((person) => person.name !== ''), email: count((person) => person.email !== ''), userId: count((person) => person.userId !== ''),
+      active: count((person) => person.active === true), inactive: count((person) => person.active === false),
+      notSaid: count((person) => (person.name !== '' || person.email !== '') && person.active === null)
+    };
+  });
+}

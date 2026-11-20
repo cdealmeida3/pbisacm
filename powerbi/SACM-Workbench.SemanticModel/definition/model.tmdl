@@ -65,6 +65,9 @@ ref table Replies
 ref table Settings
 ref table Team
 ref table Scope
+ref table PeopleCheck
+ref table DataColumns
+ref table SettingsCheck
 ref table ReviewLines
 ref table Activity
 ref table HistoryExpected

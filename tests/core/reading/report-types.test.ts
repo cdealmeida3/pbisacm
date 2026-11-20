@@ -8,7 +8,7 @@ import { runChecks } from '../../../src/core/checks/engine.ts';
 import { chooseReports, reportCandidates } from '../../../src/core/memory/finder.ts';
 import { archiveFolderOf, removedFolderOf, runFolder } from '../../../src/core/memory/memory.ts';
 import { hiddenCharacters, identityKey, nameKey } from '../../../src/core/shared/names.ts';
-import { hiddenNotes, missingWanted, readCiReport } from '../../../src/core/sources/ci/ci-report.ts';
+import { hiddenNotes, missingWanted, peopleCoverage, readCiReport } from '../../../src/core/sources/ci/ci-report.ts';
 import { readTable } from '../../../src/core/reading/table.ts';
 import { fileKind, folderFixes, neededColumns, recogniseReport } from '../../../src/core/sources/report-types.ts';
 import { hiddenNames, matchEnds, readRelationshipReport } from '../../../src/core/sources/relationships/relationship-report.ts';
@@ -413,4 +413,21 @@ test('the CI report columns to add (D347): the field names the checks read that 
   const report = readCiReport(parseCsv(sample));
   assert.deepEqual(missingWanted(report.columns), ['owned_by.manager.user_name', 'ref_cmdb_ci_service.u_platform', 'ref_cmdb_ci_service.parent']);
   assert.deepEqual(missingWanted(readCiReport([['name', 'sys_class_name']]).columns).slice(0, 3), ['asset_tag', 'operational_status', 'short_description']);
+});
+
+test('the people of the CI report for the Data check (build R3): name, email, user ID, active, per role and for the manager of Owned by', () => {
+  const rows = [
+    ['name', 'sys_class_name', 'owned_by', 'owned_by.email', 'owned_by.active', 'owned_by.manager', 'owned_by.manager.email', 'managed_by'],
+    ['A', 'cmdb_ci_service', 'Ann Owner', 'ann@example.com', 'true', 'Mo Manager', 'mo@example.com', 'Bo'],
+    ['B', 'cmdb_ci_service', 'Cy Owner', '', 'false', '', '', ''],
+    ['C', 'cmdb_ci_service', '', '', '', '', '', '']
+  ];
+  const report = readCiReport(rows);
+  const [owned, managed, supported, manager] = peopleCoverage(report.cis, report.columns);
+  assert.deepEqual(owned, { role: 'owned_by', label: 'Owned by', inReport: true, cis: 3, name: 2, email: 1, userId: 0, active: 1, inactive: 1, notSaid: 0 });
+  // Managed by has no column active: a named person has no word on it.
+  assert.deepEqual(managed, { role: 'managed_by', label: 'Managed by', inReport: true, cis: 3, name: 1, email: 0, userId: 0, active: 0, inactive: 0, notSaid: 1 });
+  assert.deepEqual(supported, { role: 'supported_by', label: 'Supported by', inReport: false, cis: 3, name: 0, email: 0, userId: 0, active: 0, inactive: 0, notSaid: 0 });
+  assert.equal(manager!.label, 'Manager of Owned by');
+  assert.deepEqual([manager!.inReport, manager!.name, manager!.email, manager!.notSaid], [true, 1, 1, 1]);
 });

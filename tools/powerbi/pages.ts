@@ -253,8 +253,8 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     const fit = page.height === GRID.height ? 'FitToPage' : 'FitToWidth';
     if (page.displayOption !== fit) problems.push(`${where}: the page shows as ${page.displayOption ?? 'its default'}; a page of this height shows as ${fit}`);
     // 9. Hidden pages.
-    if ((page.pageBinding?.type === 'Drillthrough' || page.name === 'selfcheck') && page.visibility !== 'HiddenInViewMode') {
-      problems.push(`${where}: a drill-through page and Self-check are hidden from the team's tabs (visibility HiddenInViewMode)`);
+    if ((page.pageBinding?.type === 'Drillthrough' || page.name === 'selfcheck' || page.name === 'datacheck') && page.visibility !== 'HiddenInViewMode') {
+      problems.push(`${where}: a drill-through page, Self-check and Data check are hidden from the team's tabs (visibility HiddenInViewMode)`);
     }
     if (index === 0 && page.visibility === 'HiddenInViewMode') problems.push(`${where}: the first page is hidden`);
     // 2. How many.

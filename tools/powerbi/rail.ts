@@ -70,8 +70,8 @@ export const AUDIT_PARTS: Array<{ page: string; label: string }> = [
   { page: 'auditfollow', label: 'Not followed' },
   { page: 'auditreview', label: 'Lifecycle review' }
 ];
-/** The item a page that is not on the rail lights: a card belongs to Cards, a person to People, a CI to the Work queue. */
-const BELONGS: Record<string, string> = { card: 'cards', person: 'people', case: 'mywork', auditrecord: 'audit', auditexport: 'audit', auditfollow: 'audit', auditreview: 'audit' };
+/** The item a page that is not on the rail lights: a card belongs to Cards, a person to People, a CI to the Work queue, the Data check to Reports. */
+const BELONGS: Record<string, string> = { datacheck: 'reports', card: 'cards', person: 'people', case: 'mywork', auditrecord: 'audit', auditexport: 'audit', auditfollow: 'audit', auditreview: 'audit' };
 
 /** Where things are on the rail, in px. */
 const RAIL = { width: 188, first: 52, pitch: 36, height: 32, partPitch: 32, partHeight: 28, x: 8, itemWidth: 172, badgeX: 136, badgeWidth: 32, badgeHeight: 24 };

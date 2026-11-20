@@ -1,0 +1,101 @@
+/// The page Data check (build R3): for Owned by, Managed by, Supported by and the manager of Owned by, how many CIs of the newest CI report name a person, with an email, a user ID, marked active or inactive.
+table PeopleCheck
+
+	/// Under the title of the box: what the counts are, or why the box is empty.
+	measure 'People check note' =
+			VAR cis = MAX ( PeopleCheck[CIs] )
+			RETURN IF ( COUNTROWS ( PeopleCheck ) + 0 = 0, "No CI report is loaded, so nothing is counted.", "Of the " & FORMAT ( cis, "#,0" ) & " CIs of the newest CI report: how many name a person, and how fully. Messages need a name, an email and active." )
+		displayFolder: Page notes
+
+	column Order
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Order]
+
+	column Role
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Role]
+
+	column Label
+		dataType: string
+		isDataTypeInferred
+		sortByColumn: Order
+		isNameInferred
+		sourceColumn: [Label]
+
+	column InReport
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [InReport]
+
+	column CIs
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CIs]
+
+	column WithName
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WithName]
+
+	column WithEmail
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WithEmail]
+
+	column WithUserId
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WithUserId]
+
+	column Active
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Active]
+
+	column Inactive
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Inactive]
+
+	column NotSaid
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [NotSaid]
+
+	partition PeopleCheck = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "PeopleCheck" ),
+					"Order", Run[PeopleCheck.Order],
+					"Role", Run[PeopleCheck.Role],
+					"Label", Run[PeopleCheck.Label],
+					"InReport", Run[PeopleCheck.InReport],
+					"CIs", Run[PeopleCheck.CIs],
+					"WithName", Run[PeopleCheck.WithName],
+					"WithEmail", Run[PeopleCheck.WithEmail],
+					"WithUserId", Run[PeopleCheck.WithUserId],
+					"Active", Run[PeopleCheck.Active],
+					"Inactive", Run[PeopleCheck.Inactive],
+					"NotSaid", Run[PeopleCheck.NotSaid]
+				)

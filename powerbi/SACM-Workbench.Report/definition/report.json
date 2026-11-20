@@ -115,6 +115,11 @@
           "name": "rail-selfcheck.svg",
           "path": "rail-selfcheck.svg",
           "type": "Image"
+        },
+        {
+          "name": "rail-datacheck.svg",
+          "path": "rail-datacheck.svg",
+          "type": "Image"
         }
       ]
     }

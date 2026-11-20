@@ -16,7 +16,8 @@ import { fileKind, folderFixes, neededColumns, recogniseReport, REPORT_TYPES } f
 import type { FolderFix } from '../../src/core/sources/report-types.ts';
 import { chooseReports } from '../../src/core/memory/finder.ts';
 import { csvRealShapeFiles, readRealShape } from '../../tests/real-shape.ts';
-import { missingWanted, PERSON_PARTS, readCiReport } from '../../src/core/sources/ci/ci-report.ts';
+import { missingWanted, peopleCoverage, PERSON_PARTS, readCiReport, WANTED_COLUMNS } from '../../src/core/sources/ci/ci-report.ts';
+import { REQUESTS } from '../../src/core/messages/messages.ts';
 import { readRelationshipReport } from '../../src/core/sources/relationships/relationship-report.ts';
 import { epoConfig, readEpoReport } from '../../src/core/sources/epo/epo-report.ts';
 import { contractConfig, readContractReport, readSolusiFile } from '../../src/core/sources/contracts/contract-reports.ts';
@@ -280,6 +281,27 @@ export async function parityProblems(folder: string): Promise<string[]> {
 
   const parked = rows('Parked').map((row) => norm(row.Line)).join(' | ');
   if (parked !== (run.parked?.lines ?? []).join(' | ')) problems.push(`Parked: [${parked}], expected [${(run.parked?.lines ?? []).join(' | ')}]`);
+
+  // 7b. The page Data check (build R3): the people of the CI report as src/core counts them (peopleCoverage), the columns
+  // the checks read (WANTED_COLUMNS), and the settings the emails need from the sample list SACM Settings.
+  const ciRead = readCiReport(read[SAMPLE_FILES.ci.name]!.rows);
+  const coverage = peopleCoverage(ciRead.cis, ciRead.columns).map((count, at) => ({
+    Order: `${at + 1}`, Role: count.role, Label: count.label, InReport: count.inReport ? 'Yes' : 'No column', CIs: count.cis, WithName: count.name, WithEmail: count.email,
+    WithUserId: count.userId, Active: count.active, Inactive: count.inactive, NotSaid: count.notSaid
+  }));
+  problems.push(...compare('PeopleCheck', rows('PeopleCheck'), coverage, 'Order', ['Role', 'Label', 'InReport', 'CIs', 'WithName', 'WithEmail', 'WithUserId', 'Active', 'Inactive', 'NotSaid']));
+  const wanted = WANTED_COLUMNS.map((entry, at) => ({ Order: `${at + 1}`, Field: entry.field, State: ciRead.columns.has(entry.column) ? 'Found' : 'Missing' }));
+  problems.push(...compare('DataColumns', rows('DataColumns'), wanted, 'Order', ['Field', 'State']));
+  const sampleSettingRows = readFileSync(join(import.meta.dirname, '..', '..', 'powerbi', 'samples', 'state', 'settings.csv'), 'utf8').trim().split(/\r?\n/).slice(1)
+    .map((line) => [line.slice(0, line.indexOf(',')), line.slice(line.indexOf(',') + 1)] as [string, string]);
+  const setting = (key: string): string => sampleSettingRows.filter(([title]) => title === key).at(-1)?.[1].trim() ?? '';
+  const teams = (references['reference/record-teams'] as { teams: Array<{ id: string; name: string }> }).teams;
+  const settingKeys = ['portalLink', 'signature', 'procurementEmail', 'procurementLeadEmail', 'epoOwnerEmail',
+    ...teams.map((team) => `team.${team.id}.people`), ...REQUESTS.map((request) => `request.${request.id}.link`)];
+  const expectedSettings = settingKeys.map((key, at) => ({
+    Order: `${at + 1}`, Setting: key, State: key === 'signature' ? (setting(key) && setting(key) !== 'SACM team' ? 'Set' : 'Default') : setting(key) ? 'Set' : 'Missing'
+  }));
+  problems.push(...compare('SettingsCheck', rows('SettingsCheck'), expectedSettings, 'Order', ['Setting', 'State']));
 
   // 8. The capability sheet (D205), line by line, as the app keeps it with the run.
   const capabilities = (run as Run & { capabilities?: string[][] }).capabilities ?? [];

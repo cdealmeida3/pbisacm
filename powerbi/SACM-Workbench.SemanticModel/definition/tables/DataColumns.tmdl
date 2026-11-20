@@ -1,0 +1,44 @@
+/// The page Data check (build R3): each column of the CI report the checks and the emails read (D347), and whether the newest CI report has it.
+table DataColumns
+
+	/// Under the title of the box: how many columns are found, or why the box is empty.
+	measure 'Columns note' =
+			VAR total = COUNTROWS ( DataColumns ) + 0
+			VAR found = CALCULATE ( COUNTROWS ( DataColumns ), DataColumns[State] = "Found" ) + 0
+			RETURN
+			    IF (
+			        total = 0,
+			        "No CI report is loaded.",
+			        IF ( found = total, "The newest CI report has all " & total & " columns the checks read.", "The newest CI report has " & found & " of the " & total & " columns the checks read. Reports lists the missing ones to copy." )
+			    )
+		displayFolder: Page notes
+
+	column Order
+		dataType: int64
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Order]
+
+	column Field
+		dataType: string
+		isDataTypeInferred
+		sortByColumn: Order
+		isNameInferred
+		sourceColumn: [Field]
+
+	column State
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [State]
+
+	partition DataColumns = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "DataColumns" ),
+					"Order", Run[DataColumns.Order],
+					"Field", Run[DataColumns.Field],
+					"State", Run[DataColumns.State]
+				)

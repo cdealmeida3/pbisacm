@@ -158,6 +158,9 @@ expression RunColumnTypes =
 		    {"CaseLines.Stages", type nullable text},
 		    {"CaseLines.StageId", type nullable text},
 		    {"CaseLines.ShareTo", type nullable text},
+		    {"DataColumns.Order", Int64.Type},
+		    {"DataColumns.Field", type nullable text},
+		    {"DataColumns.State", type nullable text},
 		    {"Drafts.DraftId", type nullable text},
 		    {"Drafts.Ref", type nullable text},
 		    {"Drafts.Kind", type nullable text},
@@ -271,6 +274,17 @@ expression RunColumnTypes =
 		    {"Notes.Order", Int64.Type},
 		    {"Parked.Line", type nullable text},
 		    {"Parked.Order", Int64.Type},
+		    {"PeopleCheck.Order", Int64.Type},
+		    {"PeopleCheck.Role", type nullable text},
+		    {"PeopleCheck.Label", type nullable text},
+		    {"PeopleCheck.InReport", type nullable text},
+		    {"PeopleCheck.CIs", Int64.Type},
+		    {"PeopleCheck.WithName", Int64.Type},
+		    {"PeopleCheck.WithEmail", Int64.Type},
+		    {"PeopleCheck.WithUserId", Int64.Type},
+		    {"PeopleCheck.Active", Int64.Type},
+		    {"PeopleCheck.Inactive", Int64.Type},
+		    {"PeopleCheck.NotSaid", Int64.Type},
 		    {"RelationshipLinks.CiKey", type nullable text},
 		    {"RelationshipLinks.Relation", type nullable text},
 		    {"RelationshipLinks.Other", type nullable text},
@@ -381,7 +395,7 @@ expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"","
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.54.0"
+expression WorkbenchVersion = "0.55.0"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.
@@ -932,6 +946,18 @@ expression fnCountBy =
 		        grouped = Table.Group(Table.FromColumns({values}, {"Value"}), {"Value"}, {{"Count", Table.RowCount, Int64.Type}})
 		    in
 		        Record.FromList(grouped[Count], grouped[Value])
+	queryGroup: Reading
+
+/// The part DataColumns of the table Run (build R3), which the DAX table DataColumns of the page Data check shows: each column of the CI report that the checks and the emails read (ReadingRules[wantedColumns], WANTED_COLUMNS of src/core/sources/ci/ci-report.ts, D347), in its order, by its ServiceNow field name, and whether the newest CI report has it (State: Found or Missing). No rows when no CI report is loaded. `run` is CheckRun.
+expression fnDataColumnsPart =
+		(run as nullable record) as table =>
+		    let
+		        wanted = ReadingRules[wantedColumns],
+		        columns = if run = null then {} else run[Columns]
+		    in
+		        #table(
+		            type table [Order = Int64.Type, Field = text, State = text],
+		            if run = null then {} else List.Transform(List.Positions(wanted), (at) => {at + 1, wanted{at}[field], if List.Contains(columns, wanted{at}[column]) then "Found" else "Missing"}))
 	queryGroup: Reading
 
 /// The text of a report file: UTF-8, else Windows-1252 (as ServiceNow CSV exports can be). A byte order mark is removed.
@@ -2288,6 +2314,40 @@ expression fnPartners =
 expression fnPascal =
 		(name as text) as text =>
 		    Text.Combine(List.Transform(List.Select(Text.SplitAny(name, "._"), (part) => part <> ""), (part) => Text.Upper(Text.Start(part, 1), "en-US") & Text.Middle(part, 1)))
+	queryGroup: Reading
+
+/// The part PeopleCheck of the table Run (build R3), which the DAX table PeopleCheck of the page Data check shows: for Owned by, Managed by, Supported by and the manager of Owned by (the escalation), how many CIs of the newest CI report name a person, with an email, with a user ID, marked active or inactive, and named with no word on active (src/core/sources/ci/ci-report.ts, peopleCoverage). InReport: Yes when the report has the column of the role, else No column. No rows when no CI report is loaded. `run` is CheckRun.
+expression fnPeopleCheckPart =
+		(run as nullable record) as table =>
+		    let
+		        cis = if run = null then {} else run[Cis],
+		        columns = if run = null then {} else run[Columns],
+		        roles = {
+		            [Role = "owned_by", Label = "Owned by", Of = "owned_by", Manager = false], [Role = "managed_by", Label = "Managed by", Of = "managed_by", Manager = false],
+		            [Role = "supported_by", Label = "Supported by", Of = "supported_by", Manager = false], [Role = "owned_by.manager", Label = "Manager of Owned by", Of = "owned_by", Manager = true]
+		        },
+		        row = (at as number) as list =>
+		            let
+		                entry = roles{at},
+		                people = List.Buffer(List.Transform(cis, (ci) =>
+		                    let person = fnPerson(ci, entry[Of], columns) in
+		                    if person = null then null
+		                    else if entry[Manager] then [Name = person[Manager], Email = person[ManagerEmail], UserId = person[ManagerUserId], Active = person[ManagerActive]]
+		                    else [Name = person[Name], Email = person[Email], UserId = person[UserId], Active = person[Active]])),
+		                named = List.Buffer(List.RemoveNulls(people)),
+		                count = (test as function) as number => List.Count(List.Select(named, test))
+		            in
+		                {
+		                    at + 1, entry[Role], entry[Label], if List.Contains(columns, entry[Role]) then "Yes" else "No column", List.Count(cis),
+		                    count((person) => person[Name] <> ""), count((person) => person[Email] <> ""), count((person) => person[UserId] <> ""),
+		                    count((person) => person[Active] = true), count((person) => person[Active] = false),
+		                    count((person) => (person[Name] <> "" or person[Email] <> "") and person[Active] = null)
+		                }
+		    in
+		        #table(
+		            type table [Order = Int64.Type, Role = text, Label = text, InReport = text, CIs = Int64.Type, WithName = Int64.Type, WithEmail = Int64.Type,
+		                WithUserId = Int64.Type, Active = Int64.Type, Inactive = Int64.Type, NotSaid = Int64.Type],
+		            if run = null then {} else List.Transform(List.Positions(roles), row))
 	queryGroup: Reading
 
 /// A person of a CI by role (owned_by, managed_by, supported_by, assigned_to), as src/core/sources/ci/ci-report.ts reads it: null when the report has no column for the role. Active and ManagerActive are null when the report does not say.
@@ -5949,7 +6009,7 @@ expression ReportTypesRows =
 		            & List.Transform(List.Positions(others), (at) => row(others{at}, List.Count(types) + at, false)))
 	queryGroup: Tables
 
-/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of thirteen parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add the journal of the team, D292; from build B7 Drafts, the messages ready to send, D300). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules). From build B8 the run also holds the lines of the lifecycle review (fnWithReviews, the journal's marks, D306), and the part ReviewLines the reviews and the sample of the next one. The Self-check compares the checks of the reports alone (the HTML app's recorded result has no journal), so it leaves the lines of the review out.
+/// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of fifteen parts. Power Query computes a shared query again for every table that reads it, so the tables that show a result of the checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked, MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add the journal of the team, D292; from build B7 Drafts, the messages ready to send, D300; from build R3 PeopleCheck and DataColumns, for the page Data check). Part: the name of the part; every other column of a part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun (ARCHITECTURE §12, the speed rules). From build B8 the run also holds the lines of the lifecycle review (fnWithReviews, the journal's marks, D306), and the part ReviewLines the reviews and the sample of the next one. The Self-check compares the checks of the reports alone (the HTML app's recorded result has no journal), so it leaves the lines of the review out.
 expression RunRows =
 		let
 		    run = fnWithReviews(CheckRun),
@@ -5963,7 +6023,8 @@ expression RunRows =
 		        {"CapabilitySheet", fnCapabilitySheetPart(run)},
 		        {"SelfCheck", fnSelfCheckPart(Table.SelectRows(findings, each [CheckId] <> review), Table.SelectRows(tested, each [CheckId] <> review))},
 		        {"CaseLines", fnCaseLinesPart(cases)}, {"RepliesToRead", fnRepliesToReadPart(cases)}, {"Exceptions", fnExceptionsPart(run)},
-		        {"Drafts", fnDraftsPart(cases)}, {"ReviewLines", fnReviewLinesPart(run, cases)}
+		        {"Drafts", fnDraftsPart(cases)}, {"ReviewLines", fnReviewLinesPart(run, cases)},
+		        {"PeopleCheck", fnPeopleCheckPart(run)}, {"DataColumns", fnDataColumnsPart(run)}
 		    },
 		    // Each part with its columns named <Part>.<Column> and a column Part. The type of each column is the data type of the
 		    // calculated table that shows it (RunColumnTypes, generated), so Run and the calculated tables never differ. Each part
@@ -5992,6 +6053,36 @@ expression ScopeRows = #table(type table [Choice = text, Order = Int64.Type], {{
 
 /// Table ServiceNowContracts: the contracts of the newest ServiceNow contract report.
 expression ServiceNowContractsRows = fnNewestRows("contract")
+	queryGroup: Tables
+
+/// Table SettingsCheck (build R3): the settings of the list SACM Settings that the emails need, for the page Data check. One row per setting, in the order of the box: the Service Portal, the signature, the Procurement mailbox and its lead, the EPO inventory owner, the people of each team of reference/record-teams, the link of each request of the Service Portal. Value: what the emails use (MessageSettings, with its defaults). State: Set, Default (the signature only) or Missing; Why: what an email lacks while it is missing. Setting is the Title to type in SACM Settings.
+expression SettingsCheckRows =
+		let
+		    settings = MessageSettings,
+		    line = (order as number, setting as text, label as text, value as text, missing as text) as list =>
+		        {order, setting, label, value, if value = "" then "Missing" else "Set", if value = "" then missing else ""},
+		    fixed = {
+		        line(1, "portalLink", "Service Portal link", settings[PortalLink], "The emails name the Service Portal without a link."),
+		        {2, "signature", "Signature", settings[Signature], if settings[Signature] = "SACM team" then "Default" else "Set", ""},
+		        line(3, "procurementEmail", "Procurement mailbox", settings[ProcurementEmail], "The emails of the cards for Procurement have no To."),
+		        line(4, "procurementLeadEmail", "Procurement lead", settings[ProcurementLeadEmail], "Procurement gets no escalation."),
+		        line(5, "epoOwnerEmail", "EPO inventory owner", settings[EpoOwnerEmail], "A line of EPO that nobody else can answer has no To.")
+		    },
+		    teams = Record.FieldOrDefault(Record.FieldOrDefault(ReferenceFiles, "record-teams", []), "teams", {}),
+		    teamLines = List.Transform(List.Positions(teams), (at) =>
+		        let
+		            team = teams{at},
+		            people = Record.Field(settings[Teams], team[id])[People],
+		            value = Text.Combine(List.Transform(people, (person) => if person[Name] = "" then person[Email] else person[Name] & " <" & person[Email] & ">"), "; ")
+		        in
+		            line(6 + at, "team." & team[id] & ".people", "Team " & team[name], value, "The lines of this team have no To.")),
+		    requests = MessageWords[requests],
+		    requestLines = List.Transform(List.Positions(requests), (at) =>
+		        let request = requests{at} in
+		        line(6 + List.Count(teams) + at, "request." & request[id] & ".link", "Request " & request[name], Record.Field(settings[Requests], request[id])[Link],
+		            "The emails name the request without its link."))
+		in
+		    #table(type table [Order = Int64.Type, Setting = text, Label = text, Value = text, State = text, Why = text], fixed & teamLines & requestLines)
 	queryGroup: Tables
 
 /// Table Settings (D291): the settings of the list SACM Settings, one row per setting (Key): the value of its last row, as the Settings screen of the Power App adds a row for each change (build B8, D308), and for the seven numbers (the six of CaseRules and rowsInEmail of the emails, D314) the value that counts (CaseRules): a value that is not a whole number in its range is not used, so the page says which value counts.
