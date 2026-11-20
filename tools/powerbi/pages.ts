@@ -45,7 +45,7 @@ export interface Visual {
   name: string;
   /** Hidden when the page opens (a tab that is not the first, D323). */
   isHidden?: boolean;
-  position: { x: number; y: number; width: number; height: number };
+  position: { x: number; y: number; width: number; height: number; z?: number };
   visual?: {
     visualType: string;
     query?: { queryState?: Record<string, { projections?: Projection[] }> };
@@ -194,6 +194,8 @@ export function folderProblems(definition = REPORT_DEFINITION): string[] {
 const CHART_TYPES = new Set(['lineChart', 'barChart', 'columnChart', 'clusteredBarChart', 'clusteredColumnChart', 'lineClusteredColumnComboChart']);
 /** Visuals that may sit outside the content frame: the navy rail and what is on it. */
 const RAIL_VISUAL = /^rail/;
+/** A stand-in under the place of a Power App (build R4, D359): the box standIn and the visuals drawn under it (standIn…). */
+const STAND_IN = /^standIn/;
 
 const literal = (entry: Literal | undefined): string | undefined => entry?.expr?.Literal?.Value;
 
@@ -239,6 +241,10 @@ const projectionsOf = (visual: Visual): Projection[] => Object.values(visual.vis
 const header = (projection: Projection): string => projection.displayName ?? Object.values(projection.field)[0]?.Property ?? projection.queryRef;
 const overlap = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): boolean =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+const inside = (a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }): boolean =>
+  a.x >= b.x && a.y >= b.y && a.x + a.width <= b.x + b.width && a.y + a.height <= b.y + b.height;
+/** The pages that are a drill-through target and a page of the team's tabs too (build R4, D362: Messages opens on a person). */
+export const SHOWN_DRILL_PAGES = new Set(['messages']);
 
 /** The problems of the pages, each as one line that names the page and the visual. */
 export function pageProblems(report: ReportPages, catalogue: Catalogue): string[] {
@@ -253,7 +259,7 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     const fit = page.height === GRID.height ? 'FitToPage' : 'FitToWidth';
     if (page.displayOption !== fit) problems.push(`${where}: the page shows as ${page.displayOption ?? 'its default'}; a page of this height shows as ${fit}`);
     // 9. Hidden pages.
-    if ((page.pageBinding?.type === 'Drillthrough' || page.name === 'selfcheck' || page.name === 'datacheck') && page.visibility !== 'HiddenInViewMode') {
+    if (((page.pageBinding?.type === 'Drillthrough' && !SHOWN_DRILL_PAGES.has(page.name)) || page.name === 'selfcheck' || page.name === 'datacheck') && page.visibility !== 'HiddenInViewMode') {
       problems.push(`${where}: a drill-through page, Self-check and Data check are hidden from the team's tabs (visibility HiddenInViewMode)`);
     }
     if (index === 0 && page.visibility === 'HiddenInViewMode') problems.push(`${where}: the first page is hidden`);
@@ -265,12 +271,25 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     const handPlaced = APP_SLOTS[page.name] && !apps.length ? 1 : 0;
     // The button Refresh now sits on the rail and counts as part of it (FLOW_SLOTS).
     const frame = (visual: { name: string }): boolean => RAIL_VISUAL.test(visual.name) || visual.name === 'reportsChip';
-    const counted = visuals.filter((visual) => !frame(visual) && !(FLOW_SLOTS[page.name] && isAppVisual(visual))).length + (visuals.some(frame) ? 1 : 0) + handPlaced;
+    // The stand-in box under the app's place (build R4) counts as the app: the app covers it in the service.
+    const counted = visuals.filter((visual) => !frame(visual) && visual.name !== 'standIn' && !(FLOW_SLOTS[page.name] && isAppVisual(visual))).length + (visuals.some(frame) ? 1 : 0) + handPlaced;
     if (counted > GRID.maxVisuals) problems.push(`${where}: ${counted} visuals${handPlaced ? ' with the Power App placed by hand' : ''}, more than ${GRID.maxVisuals} (design pass §8.1)`);
     if (apps.length > 1) problems.push(`${where}: ${apps.length} visuals added by hand (Power Apps, Power Automate); at most one on a page`);
     if (apps.some((visual) => /powerapps/i.test(visual.visual?.visualType ?? '')) && index === 0) problems.push(`${where}: a Power Apps visual on the first page; it opens slowly`);
     const slot = APP_SLOTS[page.name];
     const ownSlot = handPlacedSlot(page.name);
+    // Rule 6 of the real-data plan (build R4, D359): the place of an app, or of the button Refresh now, has its stand-in,
+    // which rail.ts writes, at the top of the place and under every other visual of the page (the rail picture apart).
+    if (slot) {
+      const standIn = visuals.find((visual) => visual.name === 'standIn');
+      const lowest = Math.min(...visuals.filter((visual) => visual.name !== 'standIn' && visual.name !== 'rail').map((visual) => visual.position.z ?? 0));
+      if (!standIn) problems.push(`${where}: no stand-in (standIn) on the place of the Power Apps visual ${slot.app}; run npm run powerbi:generate`);
+      else if (standIn.position.x !== slot.x || standIn.position.y !== slot.y || standIn.position.width !== slot.width) problems.push(`${where} › standIn: not at the top of the place of ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} wide)`);
+      else if ((standIn.position.z ?? 0) >= lowest) problems.push(`${where} › standIn: not under every other visual (z ${standIn.position.z}), so the app might not cover it`);
+    }
+    if (FLOW_SLOTS[page.name] && !visuals.some((visual) => visual.name === 'railStandIn' && samePlace(visual.position, FLOW_SLOTS[page.name]!))) {
+      problems.push(`${where}: no stand-in (railStandIn) on the place of the button Refresh now; run npm run powerbi:generate`);
+    }
     for (const visual of visuals) {
       const at = `${where} › ${visual.name}`;
       const type = visual.visual?.visualType ?? '';
@@ -292,10 +311,14 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
         if (x < frame.left || x + width > frame.right || y < frame.top || y + height > page.height - (GRID.height - frame.bottom)) {
           problems.push(`${at}: outside the content frame (x ${frame.left} to ${frame.right}, y ${frame.top} down to ${page.height - (GRID.height - frame.bottom)})`);
         }
-        if (slot && overlap(visual.position, slot)) problems.push(`${at}: over the place of the Power Apps visual ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} × ${slot.height})`);
+        // Build R4 (D359): only a stand-in (a visual named standIn…) may be on the place, inside it and under every other visual.
+        if (slot && STAND_IN.test(visual.name)) {
+          if (!inside(visual.position, slot)) problems.push(`${at}: a stand-in sits inside the place of the Power Apps visual ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} × ${slot.height})`);
+        } else if (slot && overlap(visual.position, slot)) problems.push(`${at}: over the place of the Power Apps visual ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} × ${slot.height})`);
+        else if (STAND_IN.test(visual.name)) problems.push(`${at}: a stand-in on a page with no place for a Power App`);
       }
       const flowSlot = FLOW_SLOTS[page.name];
-      if (flowSlot && visual.name !== 'rail' && overlap(visual.position, flowSlot)) problems.push(`${at}: over the place of the button Refresh now (the Power Automate visual of ${flowSlot.flow}, ${flowSlot.x}, ${flowSlot.y}, ${flowSlot.width} × ${flowSlot.height})`);
+      if (flowSlot && visual.name !== 'rail' && visual.name !== 'railStandIn' && overlap(visual.position, flowSlot)) problems.push(`${at}: over the place of the button Refresh now (the Power Automate visual of ${flowSlot.flow}, ${flowSlot.x}, ${flowSlot.y}, ${flowSlot.width} × ${flowSlot.height})`);
       // 7. Text sizes.
       const formatting = JSON.stringify([visual.visual?.objects ?? {}, visual.visual?.visualContainerObjects ?? {}]);
       const sizes = formatting.matchAll(/"fontSize":\{"expr":\{"Literal":\{"Value":"(\d+(?:\.\d+)?)D"\}\}\}/g);
@@ -377,9 +400,12 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     /** Whether two visuals are never shown together: both on the tabs of one group, and no tab shows both. */
     const apart = (a: string, b: string): boolean => groups.some((group) => group.tabs.every((tab) => tab.targets.includes(a) && tab.targets.includes(b) && !(tab.shown.includes(a) && tab.shown.includes(b))));
     // 4. No two visuals over each other (the parts of the rail sit on its picture, rail.ts places them; tabs, rule 10).
+    // The Power App Carlos adds sits over its stand-ins (build R4, D359): that pair is meant.
     const placed = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name));
+    const underApp = (x: Visual, y: Visual): boolean => STAND_IN.test(x.name) && isAppVisual(y);
     for (let a = 0; a < placed.length; a++) {
       for (let b = a + 1; b < placed.length; b++) {
+        if (underApp(placed[a]!, placed[b]!) || underApp(placed[b]!, placed[a]!)) continue;
         if (overlap(placed[a]!.position, placed[b]!.position) && !apart(placed[a]!.name, placed[b]!.name)) problems.push(`${where}: ${placed[a]!.name} and ${placed[b]!.name} are over each other`);
       }
     }

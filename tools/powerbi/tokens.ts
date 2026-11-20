@@ -64,24 +64,41 @@ export const GRID = {
 
 /**
  * The places of the Power Apps visuals (powerbi/README.md §6): Carlos sets them by hand in the service, so the report
- * files keep these rectangles free. The lint fails when a visual of the file is over one.
+ * files keep these rectangles free. The lint fails when a visual of the file is over one, apart from the stand-in under
+ * it (build R4, D359): `does` and `gets` are its words, what the app does there and the data the visual gives it.
+ * `standInHeight`: the stand-in box is that high at the top of the place (Messages: the email chosen is drawn under it).
  */
-export const APP_SLOTS: Record<string, { app: string; x: number; y: number; width: number; height: number }> = {
-  mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 },
-  // The email studio (build D5, D326): the list, the email as it goes and the fields side by side, so it fills the page.
-  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620 },
-  auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 },
-  auditreview: { app: 'SACM audit', x: 956, y: 84, width: 300, height: 620 },
-  card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 300 },
+export interface AppSlot { app: string; x: number; y: number; width: number; height: number; does: string; gets: string; standInHeight?: number }
+export const APP_SLOTS: Record<string, AppSlot> = {
+  mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
+    does: 'Assign lines, mark them fixed or in progress, hand over your work, add a note, and save.',
+    gets: 'It gets every open line of this page (CaseLines, Queue lines).' },
+  // Build R4 (D361): the list of emails is a table of the page on the left; the app at the right gets the email chosen.
+  messages: { app: 'SACM messages', x: 680, y: 84, width: 576, height: 620, standInHeight: 96,
+    does: 'Send, Test to me, Outlook draft and Teams, for the email chosen in the list.',
+    gets: 'It gets the one email chosen in the list (Drafts, Selected email). Below: the email as Desktop shows it.' },
+  auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
+    does: 'Follow again: select lines of the table, pick Follow again, and save.',
+    gets: 'It gets the lines not followed up (CaseLines, Status Not followed up).' },
+  auditreview: { app: 'SACM audit', x: 956, y: 84, width: 300, height: 620,
+    does: 'Start a new review, mark each CI of the sample same in EPO or not, and change the team\'s settings.',
+    gets: 'It gets the CIs of the reviews (ReviewLines).' },
+  card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 300,
+    does: 'Assign the lines of this card, mark them fixed or in progress, share them out, or add a note.',
+    gets: 'It gets the open lines of this card (CaseLines, For the app).' },
   // Taller since build D5: the app reads the person's replies (the reply reader), where the table of replies was.
-  person: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 568 },
-  case: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620 }
+  person: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 568,
+    does: 'Read the replies of this person, tick the lines they answer, then Mark answered, Waiting until or Add note.',
+    gets: 'It gets the open lines and the replies of this person (CaseLines, For the app).' },
+  case: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
+    does: 'Mark the lines of this CI fixed or in progress, set a stage or a retirement date, stop following, or add a note.',
+    gets: 'It gets the open lines of this CI (CaseLines, For the app).' }
 };
 
 /**
  * The place of the button Refresh now (the Power Automate visual of flow F6, which Carlos adds by hand in the service,
  * D333): on the rail of My day and Reports, above the line at its foot, under the refresh rule (railRefresh). On the rail
- * it counts as part of the rail (pages.ts rule 2); no visual may sit over it (rule 4).
+ * it counts as part of the rail (pages.ts rule 2); no visual may sit over it (rule 4) but its stand-in (build R4).
  */
 export const FLOW_SLOTS: Record<string, { flow: string; x: number; y: number; width: number; height: number }> = {
   myday: { flow: 'SACM refresh now', x: 16, y: 604, width: 156, height: 40 },

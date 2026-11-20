@@ -244,21 +244,28 @@
             "type": {
               "expr": {
                 "Literal": {
-                  "Value": "'PageNavigation'"
-                }
-              }
-            },
-            "navigationSection": {
-              "expr": {
-                "Literal": {
-                  "Value": "'messages'"
+                  "Value": "'Drillthrough'"
                 }
               }
             },
             "tooltip": {
               "expr": {
                 "Literal": {
-                  "Value": "'Open Messages: the email to this person is ready there'"
+                  "Value": "'Open Messages on the email to this person'"
+                }
+              }
+            },
+            "drillthroughSection": {
+              "expr": {
+                "Literal": {
+                  "Value": "'messages'"
+                }
+              }
+            },
+            "disabledTooltip": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Select a line of Open with them first'"
                 }
               }
             }

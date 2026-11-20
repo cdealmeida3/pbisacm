@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { blankRowQueries, boundTexts, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf } from '../../../tools/powerbi/desktop.ts';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { blankRowQueries, boundTexts, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf, realSizeExpressions, withExpression } from '../../../tools/powerbi/desktop.ts';
 import type { Pictures, Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
 
 /*
@@ -77,10 +79,10 @@ test('the line under a title and a text a measure writes are asked too, so an em
   assert.match(problems[0]!, /the text from .* is blank/);
 });
 
-test('the list of the pages: the drill-through pages, Self-check, Data check and the parts of Audit are hidden, every page is 1280 wide (D312)', () => {
+test('the list of the pages: the drill-through pages (but Messages, D362), Self-check, Data check and the parts of Audit are hidden, every page is 1280 wide (D312)', () => {
   const pages = pageList();
   assert.deepEqual(pages.filter((page) => page.hidden).map((page) => page.name).sort(), ['auditexport', 'auditfollow', 'auditrecord', 'auditreview', 'card', 'case', 'datacheck', 'person', 'selfcheck']);
-  assert.deepEqual(pages.filter((page) => page.drillThrough).map((page) => page.name).sort(), ['card', 'case', 'person']);
+  assert.deepEqual(pages.filter((page) => page.drillThrough).map((page) => page.name).sort(), ['card', 'case', 'messages', 'person']);
   assert.deepEqual(pages.find((page) => page.name === 'card')?.tabs, ['SACM fix list', 'To check', 'Export'], 'the picture step presses each tab after the first');
   for (const page of pages) assert.equal(page.width, 1280, page.name);
 });
@@ -163,4 +165,20 @@ test('the values a many side holds on purpose (contract findings, notes about th
   const findings = blankRowQueries().find((query) => query.visual === 'Findings_Inventory')!;
   assert.match(findings.dax, /FILTER \( EXCEPT \( ALLNOBLANKROW \( 'Findings'\[CiKey\] \), ALLNOBLANKROW \( 'Inventory'\[Key\] \) \), NOT LEFT \( 'Findings'\[CiKey\], 9 \) = "contract:" \)/);
   assert.match(blankRowQueries().find((query) => query.visual === 'HistoryNotes_Checks')!.dax, /NOT 'HistoryNotes'\[CheckId\] IN \{ "RELATIONSHIPS", "PARKED", "SOURCE-FIRST", "Routing", "Listing" \}/);
+});
+
+test('the copy at real size (R4 step 0): one expression is replaced and the others stay; packed holds the scaled files, folder reads a folder as SharePoint', () => {
+  const tmdl = readFileSync(join(import.meta.dirname, '..', '..', '..', 'powerbi', 'SACM-Workbench.SemanticModel', 'definition', 'expressions.tmdl'), 'utf8').replace(/\r\n/g, '\n');
+  const swapped = withExpression(tmdl, 'SourceMode', '"SharePoint"');
+  assert.match(swapped, /^expression SourceMode = "SharePoint"\n\tqueryGroup: \w+\n/m);
+  assert.equal(swapped.split('\nexpression ').length, tmdl.split('\nexpression ').length, 'no expression is lost');
+  assert.throws(() => withExpression(tmdl, 'NoSuchExpression', '1'), /no expression NoSuchExpression/);
+
+  const packed = realSizeExpressions(tmdl, 'packed', { copies: 2 });
+  assert.ok(packed.length > tmdl.length, 'the scaled files are inside');
+  assert.match(packed, /^expression SourceMode = "Sample"/m);
+  const folder = realSizeExpressions(tmdl, 'folder', { folder: 'C:\\sacm-real-size', history: 3 });
+  assert.match(folder, /^expression SourceMode = "SharePoint"/m);
+  assert.ok(folder.includes('Folder.Files("C:\\sacm-real-size\\")'), 'the folder of the runner');
+  assert.notEqual(folder.match(/^expression RangeStart = .*$/m)?.[0], tmdl.match(/^expression RangeStart = .*$/m)?.[0], 'RangeStart moves back for the earlier dates');
 });

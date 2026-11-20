@@ -4,5 +4,45 @@
   "displayName": "Messages",
   "displayOption": "FitToPage",
   "height": 720,
-  "width": 1280
+  "width": 1280,
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "drillPerson",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Findings"
+              }
+            },
+            "Property": "ContactName"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "Drillthrough"
+      }
+    ]
+  },
+  "pageBinding": {
+    "name": "messagesDrillthrough",
+    "type": "Drillthrough",
+    "referenceScope": "Default",
+    "parameters": [
+      {
+        "name": "personParameter",
+        "boundFilter": "drillPerson",
+        "fieldExpr": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Findings"
+              }
+            },
+            "Property": "ContactName"
+          }
+        }
+      }
+    ]
+  }
 }
