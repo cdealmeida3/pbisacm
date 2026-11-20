@@ -6047,10 +6047,6 @@ expression RunRows =
 		    Table.ReorderColumns(withDate, {"Part", "ReportDate"} & List.Select(Table.ColumnNames(withDate), (column) => column <> "Part" and column <> "ReportDate"))
 	queryGroup: Tables
 
-/// Table Scope (D343, build R3): the choice above My day and Work queue, whose work they show. "Mine and free" (the first, chosen when the page opens): the lines assigned to the manager who opens the report (Team[Me]) and the lines nobody has; "Everyone": the work of the whole team. No relationship: the measures read the choice (Everyone chosen).
-expression ScopeRows = #table(type table [Choice = text, Order = Int64.Type], {{"Mine and free", 1}, {"Everyone", 2}})
-	queryGroup: Tables
-
 /// Table ServiceNowContracts: the contracts of the newest ServiceNow contract report.
 expression ServiceNowContractsRows = fnNewestRows("contract")
 	queryGroup: Tables
@@ -6123,4 +6119,8 @@ expression TeamRows =
 		    marked = List.Transform(lines, (item) => item & {StateMode = "Sample" and firstActive <> null and item{1} = firstActive{1}})
 		in
 		    #table(type table [Name = text, Email = text, Active = logical, SampleMe = logical], marked)
+	queryGroup: Tables
+
+/// Table WorkScope (D343, build R3): the choice above My day and Work queue, whose work they show. "Mine and free" (the first, chosen when the page opens): the lines assigned to the manager who opens the report (Team[Me]) and the lines nobody has; "Everyone": the work of the whole team. No relationship: the measures read the choice (Everyone chosen).
+expression WorkScopeRows = #table(type table [Choice = text, Order = Int64.Type], {{"Mine and free", 1}, {"Everyone", 2}})
 	queryGroup: Tables

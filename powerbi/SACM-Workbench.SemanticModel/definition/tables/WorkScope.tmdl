@@ -23,4 +23,4 @@ table WorkScope
 
 	partition WorkScope = m
 		mode: import
-		source = ScopeRows
+		source = WorkScopeRows
