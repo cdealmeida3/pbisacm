@@ -90,7 +90,7 @@ table Findings
 		displayFolder: Page notes
 
 	/// Under the title of what is open with a person (Person).
-	measure 'Open with note' = IF ( NOT ISFILTERED ( Findings[ContactName] ), "No person chosen: on My day, People or Overview, select a name, then Open person.", IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers. Select a line, then Prepare email." ) )
+	measure 'Open with note' = IF ( [Person chosen] <> 1, "No person chosen: on My day, People or Overview, select a name, then Open person.", IF ( COUNTROWS ( Findings ) + 0 = 0, "Nothing is open with them.", "Everything one email to them covers. Select a line, then Prepare email." ) )
 		displayFolder: Page notes
 
 	/// The next step with the person in view (My day, Work queue, D2): 1 a reply to read (RepliesToRead, from their address), 2 to escalate, 3 a reminder due, 4 new to ask, 5 asked and not due yet, 6 marked fixed; blank when nothing is open with them. Replies, reminders, escalations and new lines count on the daily cards only (D182), from Today, so right between two refreshes. The order is the one of nextStep in src/app/view/groups.ts. With Mine and free chosen (WorkScope, D343) only the lines assigned to me or to nobody count, and a reply only when the person has such a line.

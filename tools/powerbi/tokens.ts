@@ -75,7 +75,7 @@ export const APP_SLOTS: Record<string, AppSlot> = {
     gets: 'It gets every open line of this page (CaseLines, Queue lines).' },
   // Build R4 (D361): the app still fills the page until build R6 redraws it for one email. In Desktop the stand-in is a
   // strip at the top, and the list of emails (standInList) and the email chosen (standInHead, standInBody) under it.
-  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620, standInHeight: 60,
+  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620, standInHeight: 88,
     does: 'The email studio: Send, Test to me, Outlook draft and Teams, for each email of the list.',
     gets: 'It gets the emails ready to send (Drafts). Below: the list and the email chosen, as Desktop shows them.' },
   auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,

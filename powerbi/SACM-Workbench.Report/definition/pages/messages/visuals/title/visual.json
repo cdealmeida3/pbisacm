@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Every email ready to send. Choose one in the list: the app at the right shows it, with Send.",
+                    "value": "Every email ready to send. In the published report the app SACM messages shows them, with Send.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

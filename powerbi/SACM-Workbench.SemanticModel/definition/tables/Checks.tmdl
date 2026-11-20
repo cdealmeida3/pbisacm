@@ -119,7 +119,7 @@ table Checks
 			RETURN
 			    SWITCH (
 			        TRUE (),
-			        ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), "On All cards, select a card, then Open card. Until then the page shows every card.",
+			        ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), "On All cards, select a card, then Open card.",
 			        cardStatus = "proposed", "Proposed: not sent to anyone until the card is live. " & ownWork & cardHint,
 			        cardStatus <> "live", "Not live: not sent to anyone until the card is live. " & ownWork & cardHint,
 			        ownWork & cardHint
