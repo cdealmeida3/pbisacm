@@ -97,17 +97,11 @@ table History
 	measure 'First seen' = CALCULATE ( MIN ( History[ReportDate] ), ALLEXCEPT ( History, History[Key] ) )
 		formatString: d mmm yyyy
 
-	/// On a line of one finding and one report date: the next report date, when that report contains the CI, tested the part and no longer shows the finding (the export of the Audit page); blank otherwise.
+	/// On a line of one finding and one report date: the next report date, when that report contains the CI, tested the part and no longer shows the finding (the export of the Audit page); blank otherwise. Since build R4 it reads the column VerifiedOn, computed once at the refresh: at real size the table of Audit export ran this three times per line and timed out.
 	measure 'Verified on' =
-			VAR shownOn = SELECTEDVALUE ( History[ReportDate] )
 			VAR findingKey = SELECTEDVALUE ( History[Key] )
-			VAR part = SELECTEDVALUE ( History[CheckId] ) & ":" & SELECTEDVALUE ( History[Field] )
-			VAR ciKey = SELECTEDVALUE ( History[CiKey] )
-			VAR d = CALCULATE ( MIN ( Runs[ReportDate] ), REMOVEFILTERS ( Runs ), Runs[ReportDate] > shownOn )
-			VAR shownNext = CALCULATE ( COUNTROWS ( History ), REMOVEFILTERS ( Runs ), REMOVEFILTERS ( History ), History[Key] = findingKey, Runs[ReportDate] = d )
-			VAR testedRows = CALCULATE ( COUNTROWS ( HistoryChecked ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "part", HistoryChecked[Id] = part )
-			VAR checked = CALCULATE ( COUNTROWS ( HistoryChecked ), REMOVEFILTERS ( Runs ), Runs[ReportDate] = d, HistoryChecked[Kind] = "ci", HistoryChecked[Id] = ciKey )
-			RETURN IF ( NOT ISBLANK ( findingKey ) && NOT ISBLANK ( d ) && ISBLANK ( shownNext ) && testedRows > 0 && checked > 0, d )
+			VAR shownOn = SELECTEDVALUE ( History[ReportDate] )
+			RETURN IF ( NOT ISBLANK ( findingKey ) && NOT ISBLANK ( shownOn ), CALCULATE ( MAX ( History[VerifiedOn] ), REMOVEFILTERS ( Runs ), REMOVEFILTERS ( History ), History[Key] = findingKey, History[ReportDate] = shownOn ) )
 		formatString: d mmm yyyy
 
 	/// The first report date of a finding that a later report verified (the export of the Audit page); blank otherwise.
@@ -514,6 +508,21 @@ table History
 		isDataTypeInferred
 		isNameInferred
 		sourceColumn: [ContactName]
+
+	/// Build R4: the report date that verified the finding of this line, once at the refresh (the measure Verified on reads it): the next CI report date, when that report contains the CI, tested the part (HistoryChecked) and no longer shows the finding; blank otherwise.
+	column VerifiedOn =
+			VAR shownOn = History[ReportDate]
+			VAR findingKey = History[Key]
+			VAR part = History[CheckId] & ":" & History[Field]
+			VAR ciKey = History[CiKey]
+			VAR d = MINX ( FILTER ( ALL ( Runs[ReportDate] ), Runs[ReportDate] > shownOn ), Runs[ReportDate] )
+			VAR shownNext = LOOKUPVALUE ( History[Key], History[Key], findingKey, History[ReportDate], d )
+			VAR partTested = LOOKUPVALUE ( HistoryChecked[Kind], HistoryChecked[ReportDate], d, HistoryChecked[Kind], "part", HistoryChecked[Id], part )
+			VAR ciChecked = LOOKUPVALUE ( HistoryChecked[Kind], HistoryChecked[ReportDate], d, HistoryChecked[Kind], "ci", HistoryChecked[Id], ciKey )
+			RETURN IF ( NOT ISBLANK ( d ) && ISBLANK ( shownNext ) && NOT ISBLANK ( partTested ) && NOT ISBLANK ( ciChecked ), d )
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
 
 	partition History = calculated
 		mode: import

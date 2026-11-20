@@ -10,6 +10,7 @@ What changed in each version, in words for SACM managers. Newest first. The vers
 - ***Prepare email* is a drill-through to Messages** (D362). On *Person*, select a line of *Open with them*, then press *Prepare email*. The table has a new first column *To*. In Desktop the email to that person shows first; the list still shows every email. The app does the same from build R6.
 - **Card, Case and Person show nothing until one is chosen** (D363). Opened from the tabs in Desktop they no longer list every line of the team (on Case also the relationships, the timeline and the replies): the line under each title says "No card chosen", "No CI chosen" or "No person chosen", and the Person tiles say "Choose a person first".
 - **A first-time line on My day** (D364): while *SACM Team* or *SACM Settings* is empty, the line under *Your next steps* starts with "Set-up is not finished: open Data check on the page Reports."
+- **Audit export is fast at real size** (D365): the verified findings are computed once at the refresh. Before, at the size of the real reports, the page took about a minute and its table *Verified* failed.
 - No check, number or email text changed on the samples.
 
 ## 0.55.0 — The Power BI report: who to ask, and the Data check (R3)
