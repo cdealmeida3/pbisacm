@@ -45,7 +45,7 @@ table Drafts
 			VAR ref = SELECTEDVALUE ( Drafts[Ref] )
 			RETURN IF ( HASONEVALUE ( Drafts[DraftId] ), SUBSTITUTE ( subjectText, "%%REF%%", IF ( ref <> "", ref, "reference given at Send" ) ) )
 
-	/// Build R4 (D361, D362): the email the right side of Messages shows, and the one the app SACM messages gets from build R6: the email chosen in the list; with none chosen, the first email to (or about) the person of Prepare email (a drill-through on Findings[ContactName], which Power BI keeps until the next drill); else the first of the list (by name). Its EmailId; blank when no email is ready.
+	/// Build R4 (D361, D362): the email the right side of Messages shows, and the one the app SACM messages gets (build R6, AppEmail[Selected email]): the email chosen in the list; with none chosen, the first email to (or about) the person of Prepare email (a drill-through on Findings[ContactName], which Power BI keeps until the next drill); else the first of the list (by name). Its EmailId; blank when no email is ready.
 	measure 'Chosen email' =
 			VAR emails = CALCULATETABLE ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] ), ALLSELECTED ( Drafts ) )
 			VAR every = CALCULATE ( COUNTROWS ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] ) ), REMOVEFILTERS ( Drafts ) )
@@ -57,12 +57,6 @@ table Drafts
 			VAR shown = FILTER ( emails, NOT onlyTheirs || Drafts[ToName] IN people || Drafts[About] IN people )
 			VAR firstName = MINX ( shown, Drafts[ToName] )
 			RETURN MINX ( FILTER ( shown, Drafts[ToName] = firstName ), Drafts[EmailId] )
-
-	/// Build R4 (D361): 1 on the drafts of the chosen email (all its parts). From build R6 the filter of the Power Apps visual of Messages; now the filter of the email Desktop shows under it.
-	measure 'Selected email' =
-			VAR chosen = [Chosen email]
-			RETURN IF ( NOT ISBLANK ( chosen ) && SELECTEDVALUE ( Drafts[EmailId] ) = chosen, 1 )
-		formatString: 0
 
 	/// The CIs of the email on a line of the list of Messages: every part of it.
 	measure 'Email CIs' =
@@ -76,18 +70,26 @@ table Drafts
 			VAR noAddress = CALCULATE ( COUNTROWS ( Drafts ), REMOVEFILTERS ( Drafts ), TREATAS ( ids, Drafts[EmailId] ), Drafts[To] = "" )
 			RETURN IF ( COUNTROWS ( ids ) > 0, IF ( noAddress > 0, "No address", "Ready" ) )
 
-	/// The line under the title of the list of Messages: how many emails, and which one the right side shows first.
+	/// The line under the title of the list of Messages: how many emails, which one the right side shows first, and (build R6, D373) the settings that would give an address to the emails that have none.
 	measure 'Email list note' =
 			VAR n = CALCULATE ( COUNTROWS ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] ) ), REMOVEFILTERS ( Drafts ) ) + 0
 			VAR who = IF ( ISFILTERED ( Findings[ContactName] ), SELECTEDVALUE ( Findings[ContactName] ) )
 			VAR chosen = [Chosen email]
 			VAR theirs = who <> "" && CALCULATE ( COUNTROWS ( Drafts ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen, Drafts[ToName] = who || Drafts[About] = who ) > 0
+			VAR noAddress = CALCULATE ( COUNTROWS ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] && Drafts[To] = "" ) ), REMOVEFILTERS ( Drafts ) ) + 0
+			VAR titles = CONCATENATEX ( SUMMARIZE ( FILTER ( ALL ( Drafts ), Drafts[DraftId] = Drafts[EmailId] && Drafts[AddressSetting] <> "" ), Drafts[AddressSetting] ), Drafts[AddressSetting], ", ", Drafts[AddressSetting], ASC )
+			VAR addressText =
+			    IF (
+			        noAddress > 0,
+			        " " & noAddress & IF ( noAddress = 1, " has no address", " have no address" )
+			            & IF ( titles <> "", ": add " & titles & " to SACM Settings (Data check lists them).", ": the app says why." )
+			    )
 			RETURN
 				SWITCH (
 					TRUE (),
 					n = 0, "No email is ready to send. After the next report, or when a reminder is due, it is listed here.",
-					theirs, n & IF ( n = 1, " email", " emails" ) & ". At the right: the email to " & who & " (Prepare email), until you choose another.",
-					n & IF ( n = 1, " email", " emails" ) & ". Choose one: it shows on the right as it will arrive."
+					theirs, n & IF ( n = 1, " email", " emails" ) & ". At the right: the email to " & who & " (Prepare email), until you choose another." & addressText,
+					n & IF ( n = 1, " email", " emails" ) & ". Choose one: it shows on the right as it will arrive." & addressText
 				)
 
 	/// A field of the chosen email, for the email Desktop shows under the app (build R4): To with the name, Cc, Subject.
@@ -95,7 +97,8 @@ table Drafts
 			VAR chosen = [Chosen email]
 			VAR toName = CALCULATE ( MAX ( Drafts[ToName] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen )
 			VAR toAddress = CALCULATE ( MAX ( Drafts[To] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen )
-			RETURN IF ( NOT ISBLANK ( chosen ), toName & IF ( toAddress = "", " (no address: type it in the app)", " <" & toAddress & ">" ) )
+			VAR why = CALCULATE ( MAX ( Drafts[AddressWhy] ), REMOVEFILTERS ( Drafts ), Drafts[DraftId] = chosen )
+			RETURN IF ( NOT ISBLANK ( chosen ), IF ( toAddress = "", toName & ". " & why, toName & " <" & toAddress & ">" ) )
 
 	/// The Cc of the chosen email.
 	measure 'Chosen cc' =
@@ -153,6 +156,13 @@ table Drafts
 		isDataTypeInferred
 		isNameInferred
 		sourceColumn: [KindLabel]
+		sortByColumn: KindOrder
+
+	/// Build R6 (D371): the order of the kind buttons of Messages, the order of the work: Email, Reminder, Escalation. From Kind, the source of KindLabel (a sort column may not use the column it sorts).
+	column KindOrder = SWITCH ( Drafts[Kind], "first", 1, "reminder", 2, "escalation", 3, 4 )
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
 
 	/// The address the message goes to; "" for an escalation nobody is known for (the manager types it, D160).
 	column To
@@ -335,6 +345,20 @@ table Drafts
 		isNameInferred
 		sourceColumn: [EmailId]
 
+	/// Build R6 (D373): the Title of SACM Settings that would give this draft its To, when it has none: procurementEmail (the Procurement mailbox), team.<id>.people (a team), epoOwnerEmail (the EPO inventory owner); "" when it has an address or the address is not a setting (a person, an escalation nobody is known for).
+	column AddressSetting
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AddressSetting]
+
+	/// Build R6 (D373): why the draft has no To, and what fixes it, in words; "" when it has an address. The app SACM messages and the email Desktop shows say it in place of To.
+	column AddressWhy
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AddressWhy]
+
 	/// Build R4 (D361): the subject of the email of this draft as the list of Messages shows it: the subject of its first part, with its reference, or the words that say when it gets one. One value per email (the subject names the person, the reference or who did not answer), so the list shows each email on one line.
 	column ListSubject =
 			VAR firstSubject = LOOKUPVALUE ( Drafts[EmailSubject], Drafts[DraftId], Drafts[EmailId] )
@@ -388,5 +412,7 @@ table Drafts
 					"Csv", Run[Drafts.Csv],
 					"Summary", Run[Drafts.Summary],
 					"EmailSubject", Run[Drafts.EmailSubject],
-					"EmailId", Run[Drafts.EmailId]
+					"EmailId", Run[Drafts.EmailId],
+					"AddressSetting", Run[Drafts.AddressSetting],
+					"AddressWhy", Run[Drafts.AddressWhy]
 				)

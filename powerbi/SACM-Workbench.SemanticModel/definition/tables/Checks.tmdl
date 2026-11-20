@@ -225,7 +225,7 @@ table Checks
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// Under the title of What this card asks (Card): its numbers, or how to choose a card.
+	/// The box Lines of this card, under the app on Card (build R6, D374): its numbers, or that no card is chosen.
 	measure 'Card numbers' =
 			IF (
 			    NOT HASONEVALUE ( Checks[CheckId] ),
@@ -233,20 +233,6 @@ table Checks
 			    FORMAT ( [To solve], "#,0" ) & " to solve · " & FORMAT ( [To check], "#,0" ) & " to check · " & FORMAT ( [Waiting], "#,0" ) & " waiting · " & FORMAT ( [Known], "#,0" ) & " known"
 			)
 		displayFolder: Page notes
-
-	/// What this card asks (Card): the short hint of its check file (build R5: the box is short, the app above it grows in R6), else its text, or how to choose a card.
-	measure 'Card about' =
-			VAR cardText = SELECTEDVALUE ( Checks[CardText] )
-			VAR cardHint = SELECTEDVALUE ( Checks[CardHint] )
-			RETURN
-			    SWITCH (
-			        TRUE (),
-			        NOT HASONEVALUE ( Checks[CheckId] ), "On All cards, select a card, then Open card.",
-			        cardHint <> "", cardHint,
-			        cardText <> "", cardText,
-			        "This check has no text yet."
-			    )
-		displayFolder: Card
 
 	column CheckId
 		dataType: string

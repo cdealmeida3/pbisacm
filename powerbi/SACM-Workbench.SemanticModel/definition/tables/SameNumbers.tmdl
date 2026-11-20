@@ -11,7 +11,8 @@ table SameNumbers
 			        2, [Open now],
 			        3, [Waiting now],
 			        4, [Waiting now],
-			        5, [Open now]
+			        5, [Open now],
+			        6, CALCULATE ( COUNTROWS ( FILTER ( Drafts, Drafts[DraftId] = Drafts[EmailId] ) ), REMOVEFILTERS () ) + 0
 			    )
 		formatString: #,0
 
@@ -26,7 +27,8 @@ table SameNumbers
 			        2, SUMX ( CALCULATETABLE ( SUMMARIZE ( CaseLines, Checks[Section], CaseLines[Step] ), REMOVEFILTERS () ), [Heat lines] + 0 ),
 			        3, SUMX ( CALCULATETABLE ( VALUES ( Findings[ContactName] ), REMOVEFILTERS (), Findings[ContactName] <> "" ), [Person lines] + 0 ),
 			        4, CALCULATE ( [Queue open lines], REMOVEFILTERS (), WorkScope[Choice] = "Everyone" ),
-			        5, CALCULATE ( [With a person] + [SACM fixes], REMOVEFILTERS (), Runs[ReportDate] = newestDay )
+			        5, CALCULATE ( [With a person] + [SACM fixes], REMOVEFILTERS (), Runs[ReportDate] = newestDay ),
+			        6, [Emails whole in pieces]
 			    )
 		formatString: #,0
 

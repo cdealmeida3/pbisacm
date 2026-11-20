@@ -1,8 +1,8 @@
-// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of fifteen parts.
+// Table Run (hidden, D284): the checks on the newest CI report, computed ONCE per refresh, as the rows of sixteen parts.
 // Power Query computes a shared query again for every table that reads it, so the tables that show a result of the
 // checks do not read CheckRun: they are DAX calculated tables that split Run (Findings, Tested, Notes, Parked,
 // MappingBacklog, RelationshipLinks, CapabilitySheet, SelfCheck, and from build B5 CaseLines, RepliesToRead and Exceptions, which add
-// the journal of the team, D292; from build B7 Drafts, the messages ready to send, D300; from build R3 PeopleCheck and DataColumns, for the page Data check). Part: the name of the part; every other column of a
+// the journal of the team, D292; from build B7 Drafts, the messages ready to send, D300, and from R6 AppEmail, what the app SACM messages gets, D372; from build R3 PeopleCheck and DataColumns, for the page Data check). Part: the name of the part; every other column of a
 // part is named <Part>.<Column> (Findings.Key), so no two parts share a column. ReportDate: the date of the run, on
 // every row. Run is computed in full at every refresh, so the cases follow the journal; the history of every report
 // date is the table HistoryRun (D290). A new result of the checks is a new part here, never a table that reads CheckRun
@@ -15,6 +15,8 @@ let
     findings = Table.Buffer(fnFindingsPart(run)),
     tested = Table.Buffer(fnTestedPart(run)),
     cases = fnCases(run),
+    // The drafts once: the part Drafts and the part AppEmail (build R6, D372) read them.
+    drafts = Table.Buffer(fnDraftsPart(cases)),
     review = "LIFECYCLE-REVIEW",
     parts = {
         {"Findings", findings}, {"Tested", tested}, {"Notes", fnNotesPart(run)}, {"Parked", fnParkedPart(run)},
@@ -22,7 +24,7 @@ let
         {"CapabilitySheet", fnCapabilitySheetPart(run)},
         {"SelfCheck", fnSelfCheckPart(Table.SelectRows(findings, each [CheckId] <> review), Table.SelectRows(tested, each [CheckId] <> review))},
         {"CaseLines", fnCaseLinesPart(cases)}, {"RepliesToRead", fnRepliesToReadPart(cases)}, {"Exceptions", fnExceptionsPart(run)},
-        {"Drafts", fnDraftsPart(cases)}, {"ReviewLines", fnReviewLinesPart(run, cases)},
+        {"Drafts", drafts}, {"AppEmail", fnAppEmailPart(drafts)}, {"ReviewLines", fnReviewLinesPart(run, cases)},
         {"PeopleCheck", fnPeopleCheckPart(run)}, {"DataColumns", fnDataColumnsPart(run)}
     },
     // Each part with its columns named <Part>.<Column> and a column Part. The type of each column is the data type of the

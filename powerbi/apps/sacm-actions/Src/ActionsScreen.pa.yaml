@@ -1,7 +1,7 @@
 # The one screen of the Power App "SACM actions" (builds B6, D5 and 0.52.0, D294 to D296, D317, D334), written by hand. To use it: in
 # Power Apps Studio, select the screen in the Tree view, then Paste (Ctrl+V) this whole file (powerbi/README.md §6.4).
-# It is drawn for the places of README §6.4 (300 wide, 300 to 620 high) and grows with a wider place. The reply reader
-# needs 480 high (Person, Case, Work queue); on the short place of Card it says to open the person.
+# It is drawn for the places of README §6.4 (300 wide, 476 to 620 high) and grows with a wider place. The reply reader
+# needs 476 high: since build R6 (D374) every place has it, Card too; a smaller place says to open the person.
 # At the top, the header line (D334): the time of the report's data and the changes on these lines saved since then,
 # which the report does not show yet. Only the button Refresh now asks flow F5 (SACMRefresh) for a refresh: at most one
 # in each window of the refresh rule (D333), and the flow says when the window was used. No Save refreshes (D332).
@@ -14,7 +14,8 @@
 #     the lines it is about, with a tick box each. Mark answered (the main button), Waiting until a date, or Add note
 #     add rows to SACM Journal on the ticked lines.
 # Nothing is sent from this app: the app SACM messages sends. The visual gives the app 1,000 lines at most (Microsoft's
-# limit), so Save is off at 1,000: the app may not have them all.
+# limit), so Save is off at 1,000: the app may not have them all. On Work queue the choice Mine and free (D356) keeps
+# the lines the app gets to yours and the free ones (its filter Queue lines is not blank follows the choice, D374).
 Screens:
   ActionsScreen:
     Properties:
@@ -26,7 +27,7 @@ Screens:
             Text: |-
               =If(LineCount = 0, "SACM actions", LineCount & If(LineCount = 1, " line", " lines")) & If(TooManyLines, " · too many", "")
             Tooltip: |-
-              =If(TooManyLines, "The report gives the app 1,000 lines at most. Select or filter fewer lines.", MeName)
+              =If(TooManyLines, "The report gives the app 1,000 lines at most. Choose Mine and free, or select fewer lines.", MeName)
             Font: =AppFont
             FontWeight: =FontWeight.Semibold
             Size: =11
@@ -399,7 +400,7 @@ Screens:
               =If(
                   LineCount = 0, "",
                   IsBlank(ActionPick.Selected.Id), "Pick what to do.",
-                  TooManyLines, "Too many lines: select fewer than 1,000.",
+                  TooManyLines, "Too many lines: choose Mine and free above the table, or select fewer than 1,000.",
                   !IsBlank(SameLabel.Text) && !AnywayCheck.Checked, SameLabel.Text & " Tick Save anyway to save it again.",
                   Switch(
                       ActionPick.Selected.Id,
@@ -526,7 +527,7 @@ Screens:
             Font: =AppFont
             Size: =10
             Color: =ColourMuted
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height < 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height < 476
             X: =16
             Y: =84
             Width: =Parent.Width - 32
@@ -541,7 +542,7 @@ Screens:
             BasePaletteColor: =ColourViolet
             Font: =AppFont
             Size: =10
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             X: =16
             Y: =84
             Width: =Parent.Width - 32
@@ -553,7 +554,7 @@ Screens:
             Font: =AppFont
             Size: =9
             Color: =ColourMuted
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             X: =16
             Y: =120
             Width: =Parent.Width - 32
@@ -575,7 +576,7 @@ Screens:
             PaddingBottom: =8
             VerticalAlign: =VerticalAlign.Top
             Overflow: =Overflow.Scroll
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             X: =16
             Y: =144
             Width: =Parent.Width - 32
@@ -596,7 +597,7 @@ Screens:
             Font: =AppFont
             Size: =9
             Color: =ColourMuted
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             X: =16
             Y: =ReplyBody.Y + ReplyBody.Height + 4
             Width: =Parent.Width - 32
@@ -633,7 +634,7 @@ Screens:
             Items: =Sort(Lines, If(LastRef = ReplyPick.Selected.Title, 0, 1))
             TemplateSize: =44
             TemplatePadding: =0
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             X: =16
             Y: =TickCaption.Y + 24
             Width: =Parent.Width - 32
@@ -691,7 +692,7 @@ Screens:
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             X: =16
             Y: =Parent.Height - 148
             Width: =Parent.Width - 32
@@ -706,7 +707,7 @@ Screens:
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             X: =16
             Y: =Parent.Height - 104
             Width: =(Parent.Width - 40) / 2
@@ -723,7 +724,7 @@ Screens:
             Size: =10
             Tooltip: |-
               ="Fix in progress, with a note of the date they gave: no reminder goes while it stands"
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             DisplayMode: |-
               =If(
                   CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || IsBlank(WaitDate.SelectedDate) || WaitDate.SelectedDate <= Today() || TooManyLines ||
@@ -757,7 +758,7 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: =If(IsBlank(Trim(ReplyNote.Text)), "Type the note first", "Add the note to the ticked lines")
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             DisplayMode: |-
               =If(CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || IsBlank(Trim(ReplyNote.Text)), DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
@@ -783,7 +784,7 @@ Screens:
             Size: =10.5
             FontWeight: =FontWeight.Semibold
             Tooltip: ="Status Answered on the ticked lines, with the note when you typed one"
-            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 480
+            Visible: =LineCount > 0 && Tabs.Selected.Value = "Reply" && !IsEmpty(LineReplies) && Parent.Height >= 476
             DisplayMode: |-
               =If(
                   CountRows(Filter(ReplyGallery.AllItems, LineCheck.Checked)) = 0 || TooManyLines ||

@@ -216,3 +216,32 @@ test('build R5 (D369): a table, chart or slicer shows words, never a column of c
   // The report itself shows no code.
   assert.deepEqual(readPages().pages.flatMap(({ visuals }) => visuals.flatMap(codeColumns)), []);
 });
+
+test('build R6 (D371, D374): Messages keeps the kind buttons and the list at the left of the app; Card keeps its numbers under the app', () => {
+  const pages = readPages();
+  const visualsOf = (name: string) => pages.pages.find((one) => one.page.name === name)!.visuals;
+  const messages = visualsOf('messages');
+  const slot = APP_SLOTS.messages!;
+  for (const name of ['kinds', 'emails']) {
+    const visual = messages.find((one) => one.name === name);
+    assert.ok(visual, `Messages has the visual ${name}`);
+    assert.ok(visual.position.x + visual.position.width <= slot.x, `${name} is left of the app`);
+  }
+  assert.equal(JSON.stringify(messages.find((one) => one.name === 'kinds')!.visual).includes('"KindLabel"'), true);
+  assert.deepEqual([slot.width, slot.height], [580, 620]);
+  const card = APP_SLOTS.card!;
+  assert.equal(card.height, 476);
+  const about = visualsOf('card').find((one) => one.name === 'about')!;
+  assert.ok(about.position.y >= card.y + card.height, 'the numbers sit under the app');
+  assert.equal(JSON.stringify(about.visual).includes('"Card numbers"'), true);
+});
+
+test('build R6 (D372): the app SACM messages gets its email in pieces shorter than the visual cuts, and joins them in order', () => {
+  const part = readFileSync(join(import.meta.dirname, '..', '..', '..', 'powerbi', 'm', 'fnAppEmailPart.pq'), 'utf8');
+  const size = Number(/pieceSize = (\d+)/.exec(part)?.[1]);
+  assert.ok(size > 0 && size <= 30000, `a piece is ${size} characters`);
+  const formulas = readFileSync(join(import.meta.dirname, '..', '..', '..', 'powerbi', 'apps', 'sacm-messages', 'formulas.fx'), 'utf8');
+  assert.match(formulas, /Drafts = Filter\(AppRows, Piece = 0\)/);
+  assert.match(formulas, /Concat\(Sort\(Filter\(Pieces, EmailId = email\.DraftId\), Piece\), Html\)/);
+  assert.match(formulas, /Concat\(Sort\(Filter\(Pieces, EmailId = email\.DraftId\), Piece\), Csv\)/);
+});

@@ -7,6 +7,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve, isAbsolute } from 'node:path';
 import { APP_FOLDERS } from './actions.ts';
+import { APP_SLOTS, FLOW_SLOTS } from './tokens.ts';
 import { TIME_ZONE, gateExpressions, refreshRule, refreshRuleText, windowStarts } from './refresh.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -37,6 +38,12 @@ export function copyPack(): string {
   };
   const place = (page: string, x: number, y: number, width: number, height: number, filter?: string): string =>
     `<div class="place"><div><span>Page</span><b>${esc(page)}</b></div><div><span>X</span><b>${x}</b></div><div><span>Y</span><b>${y}</b></div><div><span>Width</span><b>${width}</b></div><div><span>Height</span><b>${height}</b></div>${filter ? `<div class="wide"><span>Filter on this visual</span><b>${esc(filter)}</b></div>` : ''}</div>`;
+  /** The place of the app of a page (APP_SLOTS) or of the button Refresh now (FLOW_SLOTS), so the pack follows the report. */
+  const slot = (page: string, label: string, filter?: string): string => {
+    const found = APP_SLOTS[page] ?? FLOW_SLOTS[page];
+    if (!found) throw new Error(`copy pack: the page ${page} keeps no place for a visual added by hand`);
+    return place(label, found.x, found.y, found.width, found.height, filter);
+  };
   const fields = (table: string, names: string[]): string =>
     `<p>From the table <b>${esc(table)}</b>, drag these into <b>Power Apps data</b>, in this order, and last the measure <b>About → Report at</b> (new in 0.52.0). On each column: the small arrow → <b>Don't summarize</b>.</p><ol class="fields">${[...names, 'Report at'].map((name) => `<li>${esc(name)}</li>`).join('')}</ol>${row({ label: 'The list (to tick off)', value: [...names, 'Report at (About)'].join(', ') })}`;
   const card = (item: Card): string =>
@@ -171,25 +178,26 @@ export function copyPack(): string {
     {
       id: 'app-actions', tag: 'App', title: 'SACM actions', why: 'Notes, status, assign, stop following, the reply reader, and Refresh now at the top. Made once on Case, then copied.',
       steps: [
-        { title: 'Place the visual', html: 'Report in the service → <b>Edit</b> → page <b>Case</b> → <b>Visualizations → Power Apps</b>. <b>Format → General → Properties → Size and position</b>:', extra: place('Case', 956, 84, 300, 620, 'CaseLines → For the app is 1') },
+        { title: 'Place the visual', html: 'Report in the service → <b>Edit</b> → page <b>Case</b> → <b>Visualizations → Power Apps</b>. <b>Format → General → Properties → Size and position</b>:', extra: slot('case', 'Case', 'CaseLines → For the app is 1') },
         { title: 'Fields', html: '', extra: fields('CaseLines', ['Key', 'CheckId', 'CiName', 'Status', 'AssignedTo', 'Person', 'Actions', 'Stages', 'StageId', 'ExceptionReason', 'RetireOn', 'ContactName', 'ShareTo', 'LastRef', 'Step', 'Card']) },
         { title: 'Filter', html: '<b>Filters on this visual</b>: drag the measure <b>CaseLines → For the app</b>, show items when the value <b>is</b> <b>1</b>, <b>Apply filter</b>.' },
         ...appSteps(actionsFolder, 'ActionsScreen', '<b>SACM Journal</b>, <b>SACM Team</b>, <b>SACM Settings</b>, <b>SACM Replies</b>', '<b>SACMRefresh</b>', 'SACM actions'),
-        { title: 'Copy it to the other pages', html: 'Ctrl+C the visual, Ctrl+V on each page, then its place and filter:', extra: [place('Card', 956, 84, 300, 300, 'For the app is 1'), place('Person', 956, 84, 300, 568, 'For the app is 1'), place('Work queue', 956, 84, 300, 620, 'CaseLines → Queue lines is not blank'), place('Not followed', 956, 84, 300, 620, 'CaseLines → Status is Not followed up')].join(''), rows: [{ label: 'Not followed: filter value', value: 'Not followed up' }] }
+        { title: 'Copy it to the other pages', html: 'Ctrl+C the visual, Ctrl+V on each page, then its place and filter:', extra: [slot('card', 'Card', 'For the app is 1'), slot('person', 'Person', 'For the app is 1'), slot('mywork', 'Work queue', 'CaseLines → Queue lines is not blank'), slot('auditfollow', 'Not followed', 'CaseLines → Status is Not followed up')].join(''), rows: [{ label: 'Not followed: filter value', value: 'Not followed up' }] }
       ]
     },
     {
       id: 'app-messages', tag: 'App', title: 'SACM messages', why: 'The email studio of the page Messages, with Refresh now at the top.',
       steps: [
-        { title: 'Place the visual', html: 'Page <b>Messages</b> → <b>Visualizations → Power Apps</b>:', extra: place('Messages', 224, 84, 1032, 620) },
-        { title: 'Fields', html: '', extra: fields('Drafts', ['DraftId', 'Ref', 'Kind', 'KindLabel', 'To', 'ToName', 'Cc', 'Subject', 'Body', 'Chat', 'Keys', 'NewKeys', 'FreeKeys', 'CiCount', 'About', 'NobodyAbove', 'Mailbox', 'AssignedTo', 'Html', 'Csv', 'Summary', 'EmailSubject', 'EmailId', 'HtmlLength', 'CsvLength']) },
+        { title: 'Place the visual', html: 'Page <b>Messages</b> → <b>Visualizations → Power Apps</b>, at the right of the list of emails (build R6). An app made before R6: the update script moved it here; paste the new formulas and screen below.', extra: slot('messages', 'Messages', 'AppEmail → Selected email is 1') },
+        { title: 'Fields', html: '', extra: fields('AppEmail', ['Row', 'DraftId', 'EmailId', 'Piece', 'Ref', 'Kind', 'KindLabel', 'To', 'ToName', 'Cc', 'Subject', 'Chat', 'Keys', 'NewKeys', 'FreeKeys', 'CiCount', 'About', 'NobodyAbove', 'Mailbox', 'AssignedTo', 'Summary', 'EmailSubject', 'HtmlLength', 'CsvLength', 'AddressWhy', 'Html', 'Csv']) },
+        { title: 'Filter', html: '<b>Filters on this visual</b>: drag the measure <b>AppEmail → Selected email</b>, show items when the value <b>is</b> <b>1</b>, <b>Apply filter</b>. The app then gets only the email chosen in the list. An app made before R6 had the fields of <b>Drafts</b>: remove them all, add these, then <b>… → Edit</b>.' },
         ...appSteps(messagesFolder, 'MessagesScreen', '<b>SACM Journal</b>, <b>SACM Team</b>', '<b>SACMSend</b>, <b>SACMTest</b>, <b>SACMDraft</b>, <b>SACMRefresh</b>', 'SACM messages')
       ]
     },
     {
       id: 'app-audit', tag: 'App', title: 'SACM audit', why: 'The lifecycle review and the settings, on the page Lifecycle review, with Refresh now at the top.',
       steps: [
-        { title: 'Place the visual', html: 'Page <b>Lifecycle review</b> → <b>Visualizations → Power Apps</b>:', extra: place('Lifecycle review', 956, 84, 300, 620) },
+        { title: 'Place the visual', html: 'Page <b>Lifecycle review</b> → <b>Visualizations → Power Apps</b>:', extra: slot('auditreview', 'Lifecycle review') },
         { title: 'Fields', html: '', extra: fields('ReviewLines', ['Review', 'IsNext', 'IsCurrent', 'ReviewDate', 'Report', 'ReportDate', 'Group', 'CiKey', 'CiName', 'ClassLabel', 'ClassName', 'EpoId', 'Status', 'EpoStatus', 'Agrees', 'Result', 'ResultLabel', 'EpoDate', 'Order']) },
         ...appSteps(auditFolder, 'AuditScreen', '<b>SACM Journal</b>, <b>SACM Team</b>, <b>SACM Settings</b>', '<b>SACMRefresh</b>', 'SACM audit')
       ]
@@ -197,7 +205,7 @@ export function copyPack(): string {
     {
       id: 'button', tag: 'Button', title: 'Refresh now', why: 'Flow F6 on the pages My day and Reports, in the place the rail keeps for it.',
       steps: [
-        { title: 'Add it', html: 'Page <b>My day</b> → <b>Visualizations → Power Automate</b>. Add one field (any, for example <b>Runs → ReportDate</b>). <b>… → Edit</b> → pick <b>SACM refresh now</b> → <b>Apply</b>.', extra: place('My day', 16, 604, 156, 40) },
+        { title: 'Add it', html: 'Page <b>My day</b> → <b>Visualizations → Power Automate</b>. Add one field (any, for example <b>Runs → ReportDate</b>). <b>… → Edit</b> → pick <b>SACM refresh now</b> → <b>Apply</b>.', extra: slot('myday', 'My day') },
         { title: 'Its text', html: '<b>Format → Button → Text</b>:', rows: [{ label: 'Button text', value: 'Refresh now' }] },
         { title: 'Copy it', html: '<b>Ctrl+C</b>, page <b>Reports</b>, <b>Ctrl+V</b>, same place. Save the report.' }
       ]
@@ -249,7 +257,7 @@ ${css}</style>
  <h2>3 · Try it</h2>
  <section class="card"><ol class="steps">
   <li class="step"><div class="sn">1</div><div class="sb"><h4>A note</h4><p>Case page of a test CI → Note → a word → Save. <i>Done lately</i> shows it at once with <i>not in the report yet</i>. Press <b>Refresh now</b> at the top of the app. About 2 minutes later press <b>Refresh</b> in the report's top bar: History → What happened shows it.</p></div></li>
-  <li class="step"><div class="sn">2</div><div class="sb"><h4>An email</h4><p>Messages → a test email, To = your own address → <b>Test to me</b> → <b>Outlook draft</b> (answer <i>No</i> in the app) → <b>Send</b>. It stays in the list as <i>Sent</i> until the next refresh.</p></div></li>
+  <li class="step"><div class="sn">2</div><div class="sb"><h4>An email</h4><p>Messages → choose a test email in the list at the left. In the app at the right, To = your own address → <b>Test to me</b> → <b>Outlook draft</b> (answer <i>No</i> in the app) → <b>Send</b>. The app shows it <i>Sent</i>; the list keeps it until the next refresh.</p></div></li>
   <li class="step"><div class="sn">3</div><div class="sb"><h4>The review</h4><p>Lifecycle review → <b>New review</b>: the review of today shows at once. Tick a CI → <i>Same in EPO</i> → Save the mark.</p></div></li>
  </ol></section>
 </div>
