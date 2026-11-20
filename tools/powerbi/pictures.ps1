@@ -360,6 +360,19 @@ foreach ($page in $list) {
   Open-Tab $tab
   Pointer-Away
   Start-Sleep -Milliseconds 300
+  # A click can be lost (build R6: the tooltip of the tab before still showed, and History stayed on Contract
+  # changes). The status bar says which page is open: when it is not this one, find the tab again and click again.
+  $want = "Page $($n - 1) of $(@($list).Count)"
+  for ($try = 1; $try -le 2; $try++) {
+    $open = @((Words (Window)) | Where-Object { $_ -match '^Page \d+ of \d+$' }) | Select-Object -First 1
+    if (-not $open -or $open -eq $want) { break }
+    Say "$($page.displayName): the status bar says $open, not $want; clicking the tab again"
+    Start-Sleep -Milliseconds 800
+    $again = Find-Tab (Window) $page.displayName
+    if ($again) { $clock.Restart(); Open-Tab $again }
+    Pointer-Away
+    Start-Sleep -Milliseconds 300
+  }
   $seconds = Wait-Drawn $clock
   $saved = Save-Picture $slug -Look -Words @($page.words)
   $file = $saved[0]
