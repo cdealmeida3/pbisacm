@@ -64,6 +64,10 @@ ref table JournalKeys
 ref table Replies
 ref table Settings
 ref table Team
+ref table WorkScope
+ref table PeopleCheck
+ref table DataColumns
+ref table SettingsCheck
 ref table ReviewLines
 ref table Activity
 ref table HistoryExpected

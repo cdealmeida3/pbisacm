@@ -38,6 +38,18 @@ table ReportTypes
 			RETURN IF ( NOT ISBLANK ( file ), LOOKUPVALUE ( ReportFiles[Rows], ReportFiles[FileName], file ) )
 		formatString: #,0
 
+	/// The Data check (build R3): what the checks get from the newest file of the type. A CI report: how many of the columns the checks read it has (DataColumns); any other type has every column it must have, or it is not read as that type.
+	measure 'Data columns' =
+			VAR kind = SELECTEDVALUE ( ReportTypes[Kind] )
+			VAR file = SELECTEDVALUE ( ReportTypes[NewestFile] )
+			VAR total = COUNTROWS ( ALL ( DataColumns ) ) + 0
+			VAR found = CALCULATE ( COUNTROWS ( DataColumns ), REMOVEFILTERS ( DataColumns ), DataColumns[State] = "Found" ) + 0
+			RETURN
+			    IF (
+			        HASONEVALUE ( ReportTypes[Kind] ),
+			        IF ( ISBLANK ( file ), "No file: its cards are grey", IF ( kind = "ci", found & " of " & total & " columns the checks read", "Every column it must have" ) )
+			    )
+
 	/// The text colour of the state (LOOK.md: red a problem, amber a warning, green OK).
 	measure 'Report state colour' = SWITCH ( [Report state], "Missing", "#b42318", "Old", "#7d5700", "Up to date", "#067647" )
 

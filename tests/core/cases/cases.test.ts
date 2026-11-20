@@ -9,15 +9,15 @@ import { addBusinessDays, isoDate } from '../../../src/core/shared/dates.ts';
 import { decodeBase64Text } from '../../../src/core/shared/text.ts';
 import { buildCases, buildRun, caseState, EPO_OWNER, groupCases, moduleScores, plannedRetirement } from '../../../src/core/cases/cases.ts';
 import type { CaseEvent, Reply, Run } from '../../../src/core/cases/cases.ts';
-import { resolveContact } from '../../../src/core/cases/contact.ts';
+import { nobodyWhy, resolveContact } from '../../../src/core/cases/contact.ts';
 import { REQUESTS, buildDrafts, recipientOf, requestName } from '../../../src/core/messages/messages.ts';
 import { htmlToText, parseReply } from '../../../src/core/cases/replies.ts';
 import { loadPacks, loadReferences } from '../../../src/hosts/cli.ts';
-import { editSample, withoutTeams } from '../../helpers.ts';
+import { asLive, editSample, withoutTeams } from '../../helpers.ts';
 import type { Ci, PersonRef } from '../../../src/core/model/model.ts';
 
 const sample = readFileSync(join(import.meta.dirname, '../../..', 'samples', 'cmdb_ci-sample.csv'), 'utf8');
-const packs = loadPacks();
+const packs = asLive(loadPacks());
 // The generic tests ask the people of a CI, also on the Business Processes of the sample; the team of reference/record-teams
 // (Process Management, D195) has its own tests.
 const allReferences = loadReferences();
@@ -545,4 +545,50 @@ test('message wording: "the CI below" for one CI, "the CIs below" for more (F40)
   const many = buildDrafts(cases, packs, settings, () => 'SACM-MANY').drafts[0]!;
   assert.match(many.plain, /ServiceNow names you as Owned by of the CIs below\./);
   assert.ok(!/You are Owned by on/.test(one.plain + many.plain));
+});
+
+test('only a live check asks people: the lines of a proposed check are listed, with nobody to ask and why (D346)', () => {
+  const real = loadPacks();
+  const report = readCiReport(parseCsv(sample));
+  const facts = buildRun(report.cis, runChecks(report.cis, report.columns, real, references, { date: '2026-11-12' }), real, '2026-11-12', 'r.csv', references).facts;
+  const status = new Map(real.map((pack) => [pack.id, pack.status]));
+  const proposed = facts.filter((fact) => status.get(fact.checkId) === 'proposed');
+  assert.ok(proposed.length > 0, 'the sample has findings of proposed checks');
+  for (const fact of proposed) {
+    assert.deepEqual([fact.contactName, fact.contactEmail, fact.contactId, fact.cc.length], ['', '', '', 0], fact.key);
+    assert.equal(fact.nobodyWhy, 'Proposed: not sent to anyone until the card is live', fact.key);
+  }
+  // A live check still asks, and a fact with somebody to ask has no reason.
+  const asked = facts.filter((fact) => status.get(fact.checkId) === 'live' && fact.contactName);
+  assert.ok(asked.length > 0);
+  assert.ok(asked.every((fact) => fact.nobodyWhy === undefined));
+  // A live card SACM fixes or checks itself says so.
+  const sacm = facts.filter((fact) => status.get(fact.checkId) === 'live' && real.find((pack) => pack.id === fact.checkId)!.playbook.audience.includes('sacm'));
+  assert.ok(sacm.length > 0);
+  for (const fact of sacm) assert.equal(fact.nobodyWhy, real.find((pack) => pack.id === fact.checkId)!.reviewOnly ? 'SACM checks it' : 'SACM fixes it', fact.key);
+  // No email is drafted for a proposed check.
+  const cases = buildCases([{ date: '2026-11-12', report: 'r.csv', cis: report.cis.length, facts, tested: [], notes: [] }], [], [], '2026-11-12', rules);
+  const { drafts } = buildDrafts(cases.filter((item) => item.state === 'open'), real, settings, () => 'SACM-LIVE');
+  const drafted = new Set(drafts.flatMap((draft) => draft.keys));
+  assert.ok(drafted.size > 0);
+  assert.ok(proposed.every((fact) => !drafted.has(fact.key)));
+});
+
+test('why nobody is asked: one reason per entry of the audience, in its order, the role of the problem skipped (rule 10)', () => {
+  const person = (values: Partial<PersonRef>): PersonRef => ({
+    name: '', email: '', userId: '', active: null, manager: '', managerEmail: '', managerUserId: '', managerActive: null,
+    departmentHead: '', departmentHeadEmail: '', departmentHeadUserId: '', ...values
+  });
+  const ci = (roles: Ci['roles']): Ci => ({ ...readCiReport(parseCsv(sample)).cis[0]!, roles });
+  const audience = ['owned_by', 'managed_by', 'managerOf(owned_by)'];
+  assert.equal(nobodyWhy(ci({ owned_by: person({ name: 'Ada' }) }), 'owned_by', audience),
+    'The CI report has no column Managed by; Owned by has no manager in the CI report');
+  assert.equal(nobodyWhy(ci({ owned_by: person({ name: 'Ada', email: 'ada@example.com', active: false, manager: 'Max' }), managed_by: person({}) }), 'description', audience),
+    'Owned by is inactive; Managed by is empty; the manager of Owned by has no email in the CI report');
+  assert.equal(nobodyWhy(ci({ managed_by: person({ name: 'Mo' }) }), 'owned_by', ['managed_by', 'managerOf(field)', 'departmentHeadOf(field)']),
+    'Managed by has no email in the CI report; the CI report has no column Owned by');
+  assert.equal(nobodyWhy(ci({ owned_by: person({}) }), 'owned_by', ['managerOf(field)', 'otherRoles']), 'Owned by is empty, so nobody above it is known; no other role has an active person with an email');
+  assert.equal(nobodyWhy(ci({}), 'owned_by', ['sacm']), '');
+  // Only the role of the problem itself: no reason here, so buildRun says "Nobody to ask: the card names nobody else to ask".
+  assert.equal(nobodyWhy(ci({ owned_by: person({}) }), 'owned_by', ['owned_by']), '');
 });

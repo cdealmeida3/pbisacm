@@ -1,0 +1,60 @@
+/// The page Data check (build R3): the settings of the list SACM Settings that the emails need, whether each is set, and what an email lacks while it is missing.
+table SettingsCheck
+
+	/// Under the title of the box: how many settings are missing.
+	measure 'Settings check note' =
+			VAR missing = CALCULATE ( COUNTROWS ( SettingsCheck ), SettingsCheck[State] = "Missing" ) + 0
+			RETURN IF ( missing = 0, "Every setting the emails need is in SACM Settings.", missing & " missing: add a row to the list SACM Settings, with the Setting as Title and the value as Value." )
+		displayFolder: Page notes
+
+	/// The line under the title of Data check: who opens the report, and whether they are on the list SACM Team.
+	measure 'You line' =
+			VAR login = LOWER ( USERPRINCIPALNAME () )
+			VAR teamName = CALCULATE ( MAX ( Team[Name] ), REMOVEFILTERS ( Team ), Team[Email] = login )
+			VAR counted = [Me]
+			RETURN
+			    IF (
+			        NOT ISBLANK ( teamName ),
+			        "You are " & teamName & " (" & login & "), member of SACM Team: yes.",
+			        "You are " & login & ", member of SACM Team: no. Add your address to the list SACM Team."
+			            & IF ( ISBLANK ( counted ), "", " The samples count you as " & counted & "." )
+			    )
+		displayFolder: Page notes
+
+	/// The lists of the team site the report read at the last refresh, with their rows.
+	measure 'Lists line' =
+			"Lists read: SACM Journal " & FORMAT ( COUNTROWS ( DISTINCT ( ALL ( Journal[Id] ) ) ) + 0, "#,0" )
+			    & " entries, SACM Team " & FORMAT ( COUNTROWS ( ALL ( Team ) ) + 0, "#,0" )
+			    & " people, SACM Settings " & FORMAT ( COUNTROWS ( ALL ( Settings ) ) + 0, "#,0" )
+			    & " settings, SACM Replies " & FORMAT ( COUNTROWS ( ALL ( Replies ) ) + 0, "#,0" ) & " replies. A list at 0 is missing or empty."
+		displayFolder: Page notes
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	column Setting
+		dataType: string
+		sourceColumn: Setting
+
+	column Label
+		dataType: string
+		sortByColumn: Order
+		sourceColumn: Label
+
+	column Value
+		dataType: string
+		sourceColumn: Value
+
+	column State
+		dataType: string
+		sourceColumn: State
+
+	column Why
+		dataType: string
+		sourceColumn: Why
+
+	partition SettingsCheck = m
+		mode: import
+		source = SettingsCheckRows

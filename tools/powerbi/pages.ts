@@ -253,17 +253,19 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     const fit = page.height === GRID.height ? 'FitToPage' : 'FitToWidth';
     if (page.displayOption !== fit) problems.push(`${where}: the page shows as ${page.displayOption ?? 'its default'}; a page of this height shows as ${fit}`);
     // 9. Hidden pages.
-    if ((page.pageBinding?.type === 'Drillthrough' || page.name === 'selfcheck') && page.visibility !== 'HiddenInViewMode') {
-      problems.push(`${where}: a drill-through page and Self-check are hidden from the team's tabs (visibility HiddenInViewMode)`);
+    if ((page.pageBinding?.type === 'Drillthrough' || page.name === 'selfcheck' || page.name === 'datacheck') && page.visibility !== 'HiddenInViewMode') {
+      problems.push(`${where}: a drill-through page, Self-check and Data check are hidden from the team's tabs (visibility HiddenInViewMode)`);
     }
     if (index === 0 && page.visibility === 'HiddenInViewMode') problems.push(`${where}: the first page is hidden`);
     // 2. How many.
-    // The navy rail and what is on it (its picture, buttons, counts and foot line, tools/powerbi/rail.ts) count as one.
+    // The navy rail and what is on it (its picture, buttons, counts and foot line, tools/powerbi/rail.ts) count as one,
+    // with the reports chip at the top right, which rail.ts writes on every page too (the frame of the page, build R3).
     // The Power App of the page's slot counts too: Carlos places it by hand, so it is not in the files (build D3).
     const apps = visuals.filter(isAppVisual);
     const handPlaced = APP_SLOTS[page.name] && !apps.length ? 1 : 0;
     // The button Refresh now sits on the rail and counts as part of it (FLOW_SLOTS).
-    const counted = visuals.filter((visual) => !RAIL_VISUAL.test(visual.name) && !(FLOW_SLOTS[page.name] && isAppVisual(visual))).length + (visuals.some((visual) => RAIL_VISUAL.test(visual.name)) ? 1 : 0) + handPlaced;
+    const frame = (visual: { name: string }): boolean => RAIL_VISUAL.test(visual.name) || visual.name === 'reportsChip';
+    const counted = visuals.filter((visual) => !frame(visual) && !(FLOW_SLOTS[page.name] && isAppVisual(visual))).length + (visuals.some(frame) ? 1 : 0) + handPlaced;
     if (counted > GRID.maxVisuals) problems.push(`${where}: ${counted} visuals${handPlaced ? ' with the Power App placed by hand' : ''}, more than ${GRID.maxVisuals} (design pass §8.1)`);
     if (apps.length > 1) problems.push(`${where}: ${apps.length} visuals added by hand (Power Apps, Power Automate); at most one on a page`);
     if (apps.some((visual) => /powerapps/i.test(visual.visual?.visualType ?? '')) && index === 0) problems.push(`${where}: a Power Apps visual on the first page; it opens slowly`);

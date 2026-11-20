@@ -1,8 +1,12 @@
-import { resolveContact } from './contact.ts';
+import { nobodyWhy, resolveContact } from './contact.ts';
 import type { EscalationVia } from './contact.ts';
 import { addBusinessDays } from '../shared/dates.ts';
 import { MODULES, PROCUREMENT, PROCUREMENT_VIA, isContractKey } from '../model/model.ts';
 import { chipsOf, listing, listingNotes } from '../checks/finding-states.ts';
+import { asksPeople, notLiveWhy } from '../checks/engine.ts';
+
+/** Why nobody is asked when the card names only the field of the problem itself (rule 10: never "Nobody to ask" alone). */
+const NO_OTHER_ROLE = 'the card names nobody else to ask';
 import { inventoryOf } from './inventory.ts';
 import { fixPlaceNotes, fixedInEpo } from './fix-place.ts';
 import { TEAM_PREFIX, teamFor, teamVia } from './record-teams.ts';
@@ -62,6 +66,12 @@ export interface Fact extends Finding {
   escalateVia?: EscalationVia;
   /** The CI as the message table shows it. Missing in runs saved before version 0.8. */
   ci?: CiContext;
+  /**
+   * Why nobody is asked, when `contactName` is '' (rule 10 of the real-data plan, version 0.55): "SACM fixes it", "SACM checks
+   * it", "Proposed: not sent to anyone until the card is live" (D346), or "Nobody to ask: " and the reasons ("Managed by is
+   * empty; Owned by has no manager in the CI report"). Missing when someone is asked, and in runs saved before version 0.55.
+   */
+  nobodyWhy?: string;
   /** How the finding is listed (see FindingState). Missing in runs saved before version 0.9: read as 'open' (stateOf). */
   state?: FindingState;
   /** Why it is not open, in words: "Status Ready: not live yet", "Tagged BIA is pending". */
@@ -286,6 +296,10 @@ export function buildRun(cis: Ci[], result: RunResult, packs: CheckPack[], date:
       module: moduleOf(pack), route, ci: contextOf(ci, references, finding.chips), state: listed.state, ...(listed.why ? { stateWhy: listed.why } : {})
     };
     const audience = pack ? pack.playbook.audience : [];
+    // A card SACM fixes or checks itself says so, live or not (D355).
+    const sacmWhy = audience.indexOf('sacm') >= 0 ? (pack?.reviewOnly ? 'SACM checks it' : 'SACM fixes it') : '';
+    // Only a live check asks people (D346): the lines of a proposed one are listed, and nobody is asked about them.
+    if (pack && !asksPeople(pack)) return { ...base, contactName: '', contactEmail: '', contactId: '', contactVia: '', cc: [], escalateName: '', escalateEmail: '', nobodyWhy: sacmWhy || notLiveWhy(pack) };
     // Problems in Solusi itself go to the Procurement mailbox of the team settings; the people of the contract are never copied.
     if (audience.indexOf('procurement') >= 0) return { ...base, contactName: 'Procurement', contactEmail: '', contactId: PROCUREMENT, contactVia: PROCUREMENT_VIA, cc: [] };
     // A problem on the record of a class a team is responsible for (a Business Process: Process Management) goes to the team,
@@ -300,8 +314,10 @@ export function buildRun(cis: Ci[], result: RunResult, packs: CheckPack[], date:
       : resolveContact(ci, finding.field, audience);
     // From EPO and nobody to ask: the EPO inventory owner of the team settings is the fallback.
     if (route && !contact.to) return { ...base, contactName: 'EPO inventory owner', contactEmail: '', contactId: EPO_OWNER, contactVia: 'inventory owner of EPO', cc: [] };
+    // Nobody: the reason, so a line never says only "Nobody to ask" (rule 10).
+    const why = contact.to ? '' : sacmWhy || `Nobody to ask: ${nobodyWhy(ci, finding.field, audience) || NO_OTHER_ROLE}`;
     return {
-      ...base,
+      ...base, ...(why ? { nobodyWhy: why } : {}),
       contactName: contact.to ? contact.to.name : '', contactEmail: contact.to ? contact.to.email : '', contactId: contact.to ? contact.to.id : '',
       contactVia: contact.to ? contact.to.via : '', cc: contact.cc.map((person) => person.email),
       escalateName: contact.to?.above?.name ?? '', escalateEmail: contact.to?.above?.email ?? '', ...(contact.to?.above ? { escalateVia: contact.to.above.via } : {})

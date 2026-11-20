@@ -1101,18 +1101,7 @@
           "active": true
         }
       ],
-      "contacts": [
-        {
-          "name": "Ada Example",
-          "email": "ada@example.com",
-          "via": "owned by"
-        },
-        {
-          "name": "Cy Keeper",
-          "email": "cy@example.com",
-          "via": "managed by"
-        }
-      ],
+      "contacts": [],
       "memory": {
         "emails": 0,
         "reminders": 0,
@@ -1129,39 +1118,20 @@
       "verifiedOn": ""
     },
     {
-      "key": "team:team:process-management",
+      "key": "owner:bo01",
       "owner": {
-        "id": "team:process-management",
-        "name": "Process Management",
-        "email": "",
-        "active": null
+        "id": "bo01",
+        "name": "Bo Leaver",
+        "email": "bo@example.com",
+        "active": false
       },
-      "team": true,
       "cases": [
-        "case DESC-QUALITY:reconcile index:description",
-        "case DESC-QUALITY:close the month:description"
+        "case DESC-QUALITY:reconcile index:description"
       ],
       "open": [
-        "case DESC-QUALITY:reconcile index:description",
-        "case DESC-QUALITY:close the month:description"
+        "case DESC-QUALITY:reconcile index:description"
       ],
       "rows": [
-        {
-          "ciKey": "close the month",
-          "name": "Close the Month",
-          "classLabel": "Business Process",
-          "people": {
-            "owned_by": {
-              "id": "dee01",
-              "name": "Dee Owner",
-              "email": "dee@example.com",
-              "active": true
-            }
-          },
-          "cases": [
-            "case DESC-QUALITY:close the month:description"
-          ]
-        },
         {
           "ciKey": "reconcile index",
           "name": "Reconcile Index",
@@ -1187,19 +1157,75 @@
       ],
       "people": [
         {
-          "id": "team:process-management",
-          "name": "Process Management",
-          "email": "",
-          "active": null
-        }
-      ],
-      "contacts": [
+          "id": "bo01",
+          "name": "Bo Leaver",
+          "email": "bo@example.com",
+          "active": false
+        },
         {
-          "name": "Process Management",
-          "email": "",
-          "via": "Process Management team"
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
         }
       ],
+      "contacts": [],
+      "memory": {
+        "emails": 0,
+        "reminders": 0,
+        "teams": 0,
+        "lastContact": "",
+        "replies": 0,
+        "reminderDue": false,
+        "overLimit": false,
+        "assignedTo": "",
+        "notes": 0,
+        "lastNote": null
+      },
+      "state": "open",
+      "verifiedOn": ""
+    },
+    {
+      "key": "owner:dee01",
+      "owner": {
+        "id": "dee01",
+        "name": "Dee Owner",
+        "email": "dee@example.com",
+        "active": true
+      },
+      "cases": [
+        "case DESC-QUALITY:close the month:description"
+      ],
+      "open": [
+        "case DESC-QUALITY:close the month:description"
+      ],
+      "rows": [
+        {
+          "ciKey": "close the month",
+          "name": "Close the Month",
+          "classLabel": "Business Process",
+          "people": {
+            "owned_by": {
+              "id": "dee01",
+              "name": "Dee Owner",
+              "email": "dee@example.com",
+              "active": true
+            }
+          },
+          "cases": [
+            "case DESC-QUALITY:close the month:description"
+          ]
+        }
+      ],
+      "people": [
+        {
+          "id": "dee01",
+          "name": "Dee Owner",
+          "email": "dee@example.com",
+          "active": true
+        }
+      ],
+      "contacts": [],
       "memory": {
         "emails": 0,
         "reminders": 0,
@@ -1543,13 +1569,7 @@
           "active": true
         }
       ],
-      "contacts": [
-        {
-          "name": "Dee Owner",
-          "email": "dee@example.com",
-          "via": "owned by"
-        }
-      ],
+      "contacts": [],
       "memory": {
         "emails": 0,
         "reminders": 0,
@@ -1740,13 +1760,7 @@
           "active": true
         }
       ],
-      "contacts": [
-        {
-          "name": "Ada Example",
-          "email": "ada@example.com",
-          "via": "owned by"
-        }
-      ],
+      "contacts": [],
       "memory": {
         "emails": 0,
         "reminders": 0,
@@ -2340,14 +2354,13 @@
   ],
   "RESP-SAME-PERSON": [
     {
-      "key": "team:team:process-management",
+      "key": "owner:ada01",
       "owner": {
-        "id": "team:process-management",
-        "name": "Process Management",
-        "email": "",
-        "active": null
+        "id": "ada01",
+        "name": "Ada Example",
+        "email": "ada@example.com",
+        "active": true
       },
-      "team": true,
       "cases": [
         "case RESP-SAME-PERSON:register a new member:owned_by"
       ],
@@ -2380,19 +2393,13 @@
       ],
       "people": [
         {
-          "id": "team:process-management",
-          "name": "Process Management",
-          "email": "",
-          "active": null
+          "id": "ada01",
+          "name": "Ada Example",
+          "email": "ada@example.com",
+          "active": true
         }
       ],
-      "contacts": [
-        {
-          "name": "Process Management",
-          "email": "",
-          "via": "Process Management team"
-        }
-      ],
+      "contacts": [],
       "memory": {
         "emails": 0,
         "reminders": 0,
@@ -2841,14 +2848,13 @@
   ],
   "TAG-MISSING": [
     {
-      "key": "team:team:process-management",
+      "key": "owner:bo01",
       "owner": {
-        "id": "team:process-management",
-        "name": "Process Management",
-        "email": "",
-        "active": null
+        "id": "bo01",
+        "name": "Bo Leaver",
+        "email": "bo@example.com",
+        "active": false
       },
-      "team": true,
       "cases": [
         "case TAG-MISSING:reconcile index:tags"
       ],
@@ -2881,19 +2887,19 @@
       ],
       "people": [
         {
-          "id": "team:process-management",
-          "name": "Process Management",
-          "email": "",
-          "active": null
-        }
-      ],
-      "contacts": [
+          "id": "bo01",
+          "name": "Bo Leaver",
+          "email": "bo@example.com",
+          "active": false
+        },
         {
-          "name": "Process Management",
-          "email": "",
-          "via": "Process Management team"
+          "id": "cy01",
+          "name": "Cy Keeper",
+          "email": "cy@example.com",
+          "active": true
         }
       ],
+      "contacts": [],
       "memory": {
         "emails": 0,
         "reminders": 0,
@@ -2969,13 +2975,7 @@
           "active": true
         }
       ],
-      "contacts": [
-        {
-          "name": "Dee Owner",
-          "email": "dee@example.com",
-          "via": "owned by"
-        }
-      ],
+      "contacts": [],
       "memory": {
         "emails": 0,
         "reminders": 0,

@@ -5,10 +5,11 @@ import { readCiReport } from '../../../../src/core/sources/ci/ci-report.ts';
 import { readRelationshipReport } from '../../../../src/core/sources/relationships/relationship-report.ts';
 import { buildCases, buildRun } from '../../../../src/core/cases/cases.ts';
 import { loadPacks, loadReferences } from '../../../../src/hosts/cli.ts';
+import { asLive } from '../../../helpers.ts';
 
 /* Invented data only. The mapping backlog (D200): one case per CI to map, with every reason. */
 
-const packs = loadPacks();
+const packs = asLive(loadPacks());
 const references = loadReferences();
 const DATE = '2026-11-20';
 const HEAD = ['name', 'sys_class_name', 'operational_status', 'owned_by', 'owned_by.user_name', 'owned_by.email', 'sys_tags'];

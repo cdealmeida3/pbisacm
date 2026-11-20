@@ -1,0 +1,367 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "people",
+  "position": {
+    "x": 224,
+    "y": 412,
+    "z": 5000,
+    "height": 140,
+    "width": 1032,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "Label"
+                }
+              },
+              "queryRef": "PeopleCheck.Label",
+              "nativeQueryRef": "Label",
+              "displayName": "Role"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "InReport"
+                }
+              },
+              "queryRef": "PeopleCheck.InReport",
+              "nativeQueryRef": "InReport",
+              "displayName": "Column"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "CIs"
+                }
+              },
+              "queryRef": "PeopleCheck.CIs",
+              "nativeQueryRef": "CIs",
+              "displayName": "CIs"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "WithName"
+                }
+              },
+              "queryRef": "PeopleCheck.WithName",
+              "nativeQueryRef": "WithName",
+              "displayName": "With a name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "WithEmail"
+                }
+              },
+              "queryRef": "PeopleCheck.WithEmail",
+              "nativeQueryRef": "WithEmail",
+              "displayName": "With an email"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "WithUserId"
+                }
+              },
+              "queryRef": "PeopleCheck.WithUserId",
+              "nativeQueryRef": "WithUserId",
+              "displayName": "With a user ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "Active"
+                }
+              },
+              "queryRef": "PeopleCheck.Active",
+              "nativeQueryRef": "Active",
+              "displayName": "Active"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "Inactive"
+                }
+              },
+              "queryRef": "PeopleCheck.Inactive",
+              "nativeQueryRef": "Inactive",
+              "displayName": "Inactive"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "NotSaid"
+                }
+              },
+              "queryRef": "PeopleCheck.NotSaid",
+              "nativeQueryRef": "NotSaid",
+              "displayName": "Active not said"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "PeopleCheck"
+                  }
+                },
+                "Property": "Label"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "160D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.Label"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.InReport"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "64D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.CIs"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "96D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.WithName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "108D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.WithEmail"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "112D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.WithUserId"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "64D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.Active"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "72D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.Inactive"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "120D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PeopleCheck.NotSaid"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Who the CI report names'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'How many CIs name a person of each role, and how fully'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PeopleCheck"
+                    }
+                  },
+                  "Property": "People check note"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

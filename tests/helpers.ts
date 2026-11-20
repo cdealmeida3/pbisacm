@@ -15,3 +15,9 @@ export function withoutTeams<T extends Record<string, unknown>>(references: T): 
   delete copy['reference/record-teams'];
   return copy;
 }
+
+/**
+ * The check packs as if every one were live (D346: only a live check asks people). For the tests of who is asked and of
+ * the messages, which use proposed checks (Description, Mapping backlog) as examples of every route.
+ */
+export const asLive = <T extends { status: string }>(packs: T[]): T[] => packs.map((pack) => (pack.status === 'off' ? pack : { ...pack, status: 'live' }));

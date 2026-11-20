@@ -1,6 +1,6 @@
 // The part Findings of the table Run (D284), which the DAX table Findings shows: one row per finding of the newest CI
 // report (fnCheckRun), with who is asked, how it is listed, where it is fixed and the CI as the message table shows it
-// (DATA-MODEL §3, a fact). Key never changes: <check>:<CI key>:<field>. Group: the findings of one check that go to the
+// (DATA-MODEL §3, a fact). AskWho: "Name (via)", or why nobody is asked (fnFacts, NobodyWhy). Key never changes: <check>:<CI key>:<field>. Group: the findings of one check that go to the
 // same person by the same route, in the same state (one piece of work). Mapping: the reasons of a case of the mapping
 // backlog, by id. EpoCorrection: what EPO already says (fnEpoCorrections). Problem: the kind of problem a line is listed
 // under (a problem of the contract data, a field of the upload check; D146), "" for most checks. `run` is CheckRun (null
@@ -20,7 +20,7 @@
                     run[Date], fact[Key], fact[CheckId], fact[CiKey], fact[CiName], fact[Class], fact[ClassLabel], fact[Field], fact[Severity], fact[Detail],
                     fact[Module], fact[Route], fact[State], Record.Field(words, fact[State]), fact[StateWhy], fact[Source], fact[Wait], fact[Review],
                     fact[ContactId], fact[ContactName], fact[ContactEmail], fact[ContactVia],
-                    if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else "Nobody to ask",
+                    if fact[ContactName] <> "" then fact[ContactName] & " (" & fact[ContactVia] & ")" else fact[NobodyWhy],
                     Text.Combine(fact[Cc], "; "), fact[EscalateName], fact[EscalateEmail], fact[EscalateVia],
                     fix(fact, "Change"), fix(fact, "Current"), fix(fact, "Set"), fix(fact, "Value"), fix(fact, "RelatedTo"), fix(fact, "Note"),
                     fact[CheckId] & "|" & fact[Route] & "|" & person & (if fact[State] = "open" then "" else "|" & fact[State]),

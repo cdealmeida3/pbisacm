@@ -75,3 +75,45 @@ export function resolveContact(ci: Ci, field: string, audience: string[]): { to:
   const cc = others.map(asContact).filter((contact) => contact.email.toLowerCase() !== toEmail);
   return { to, cc };
 }
+
+/** The words of a role in a sentence: "Owned by", "Managed by". */
+const roleLabel = (role: string): string => { const words = role.replace(/_/g, ' '); return words.charAt(0).toUpperCase() + words.slice(1); };
+
+/** Why a person of a role cannot be asked, or '' when they can. */
+function personWhy(person: PersonRef | undefined, label: string): string {
+  if (!person) return `the CI report has no column ${label}`;
+  if (!person.name && !person.email) return `${label} is empty`;
+  if (!person.email) return `${label} has no email in the CI report`;
+  if (person.active === false) return `${label} is inactive`;
+  return '';
+}
+
+/**
+ * Why `resolveContact` found nobody (rule 10 of the real-data plan: a missing person always says why), one reason per entry
+ * of the audience, in its order, without repeats: "Managed by has no email in the CI report; Owned by has no manager in
+ * the CI report". The role the finding is about is skipped (it is the problem itself). '' when the audience names nobody.
+ */
+export function nobodyWhy(ci: Ci, field: string, audience: string[]): string {
+  const reasons: string[] = [];
+  const add = (reason: string): void => { if (reason && reasons.indexOf(reason) < 0) reasons.push(reason); };
+  for (const entry of audience) {
+    const above = /^(managerOf|departmentHeadOf)\((.+)\)$/.exec(entry);
+    if (above) {
+      const role = above[2] === 'field' ? field : above[2]!;
+      const person = ci.roles[role as Role];
+      const label = roleLabel(role);
+      if (!person) add(`the CI report has no column ${label}`);
+      else if (!person.name && !person.email) add(`${label} is empty, so nobody above it is known`);
+      else if (above[1] === 'managerOf') {
+        if (!person.managerEmail) add(person.manager ? `the manager of ${label} has no email in the CI report` : `${label} has no manager in the CI report`);
+        else if (person.managerActive === false) add(`the manager of ${label} is inactive`);
+      } else if (!person.departmentHeadEmail) add(`${label} has no department head in the CI report`);
+    } else if (entry === 'otherRoles') {
+      if (!ROLES.some((role) => role !== field && reachable(ci.roles[role]))) add('no other role has an active person with an email');
+    } else if ((ROLES as readonly string[]).indexOf(entry) >= 0 && entry !== field) {
+      add(personWhy(ci.roles[entry as Role], roleLabel(entry)));
+    }
+  }
+  const text = reasons.join('; ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

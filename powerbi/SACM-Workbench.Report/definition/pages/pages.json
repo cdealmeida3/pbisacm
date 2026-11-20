@@ -19,7 +19,8 @@
     "card",
     "case",
     "person",
-    "selfcheck"
+    "selfcheck",
+    "datacheck"
   ],
   "activePageName": "myday"
 }

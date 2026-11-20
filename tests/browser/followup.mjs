@@ -84,8 +84,8 @@ export async function followup() {
   check('My day lists the escalation in To escalate, with its button', /To escalate\s*[1-9]/.test(await text(box)) && await box.getByRole('button', { name: /^Escalate to / }).first().isEnabled(), await text(box));
 
   console.log('== The outbox ==');
-  await openCard(p, 'Description');
-  // The descriptions of the Business Processes are one group: the Process Management team, written to as one message (D195, D196).
+  await openCard(p, 'Owner or manager missing');
+  // The owners missing on the Business Processes are one group: the Process Management team, written to as one message (D195, D196). A live card: a proposed card asks nobody (D346).
   const dee = named('Process Management');
   await dee.getByRole('button', { name: 'Email', exact: true }).click();
   await p.waitForTimeout(500);
@@ -98,7 +98,7 @@ export async function followup() {
   await p.waitForTimeout(400);
   await back(p);
   check('Send from the shared mailbox: "1 in outbox" on My day', /1 in outbox/.test(await strip()), await strip());
-  await openCard(p, 'Description');
+  await openCard(p, 'Owner or manager missing');
   check('just handed over: the group waits for an answer', /Waiting for an answer/.test(await text(dee)));
   await later(2 * 3600 * 1000);
   let d = await text(dee);
@@ -111,7 +111,7 @@ export async function followup() {
   await p.screenshot({ path: join(outDir, 'followup-outbox.png') });
   await p.keyboard.press('Escape');
   await p.waitForTimeout(300);
-  await openCard(p, 'Description');
+  await openCard(p, 'Owner or manager missing');
   // The manager is not stuck: "Write again" opens the dialog, which says that nothing was sent from the shared mailbox yet.
   await dee.getByRole('button', { name: 'Write again' }).first().click();
   await p.waitForTimeout(500);
@@ -124,7 +124,7 @@ export async function followup() {
   check('the app left the message in the outbox', waiting.length === 1 && !files.some((file) => file.startsWith('sent/')), waiting.join(' '));
   await p.evaluate(async (file) => { await window.__fs.putText(file.replace('outbox/', 'sent/'), await window.__fs.get(file)); await window.__fs.del(file); }, waiting[0]);
   await refresh();
-  await openCard(p, 'Description');
+  await openCard(p, 'Owner or manager missing');
   d = await text(dee);
   await back(p);
   check('once the file is in sent/: waiting for an answer, and the chip is gone', /Waiting for an answer\. A reminder is due from/.test(d) && !/in outbox/.test(await strip()), d.slice(-200));

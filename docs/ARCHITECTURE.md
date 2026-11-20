@@ -392,7 +392,7 @@ powerbi/
 │   └── tables/<Table>.tmdl                one file per table: its columns, its DAX measures, one query <Table>Rows, or a calculated
 │                                          table that splits Run or HistoryRun (D284, D290); Run.tmdl and HistoryRun.tmdl are GENERATED
 ├── SACM-Workbench.Report/
-│   ├── definition/                        the pages (My day, Work queue, People, Messages, Cards, Card, Case, Person, Mapping backlog, Contract changes, History, Overview, Audit and its parts, Reports, Self-check), their visuals and the bookmarks of their tabs (bookmarks/, D323), in PBIR
+│   ├── definition/                        the pages (My day, Work queue, People, Messages, Cards, Card, Case, Person, Mapping backlog, Contract changes, History, Overview, Audit and its parts, Reports, Data check, Self-check), their visuals and the bookmarks of their tabs (bookmarks/, D323), in PBIR
 │   └── StaticResources/RegisteredResources/sacm-theme.json   GENERATED from the colours of LOOK.md
 ├── m/<Query>.pq                           the Power Query queries, one per file (hand-written)
 ├── apps/                                  stage 2 (B6, B7, D294 to D304): actions.json (the catalogue), flows.json (F1 to F6)
@@ -422,10 +422,11 @@ Then `fnSourceFirst` (D190, on the pairs of `fnEpoCompare`), the parked filter, 
 files ─▶ ReadFiles ─▶ CheckRun ─▶ Run (hidden, RunRows) ─▶ Findings, Tested, Notes, Parked, MappingBacklog,
                                                            RelationshipLinks, CapabilitySheet, SelfCheck (DAX)
           │                              (+ CaseLines, RepliesToRead, Exceptions: the cases of the newest report, D292)
+          │                              (+ PeopleCheck, DataColumns: the page Data check, build R3, D357)
           ├────▶ HistoryRun (hidden, incremental, fnHistoryRun) ─▶ History, HistoryTested, HistoryNotes,
           │                                                         HistoryChecked, Runs (DAX)
           └────▶ ContractChanges (ContractChangesRows: the two newest Solusi files, no CI report)
-lists ─▶ fnStateList ─▶ Journal, JournalKeys, Replies, Settings, Team, Activity (the reviews: ReviewLines, a part of Run)
+lists ─▶ fnStateList ─▶ Journal, JournalKeys, Replies, Settings, SettingsCheck, Team, Activity (the reviews: ReviewLines, a part of Run)
 ```
 
 **The actions (B6, D294 to D296).** The Power App *SACM actions* holds no SACM rule. `fnCases` gives each case its actions with `fnCaseActions` (the port of the conditions of the case panel, `src/app/screens/case/CasePanel.tsx`; the playbook words come from `CheckPlaybooks`, the stages from `fnStages`): the columns `Actions` (`id=Label|…`), `ActionWords`, `Stages`, `StageId` and `Person` of `CaseLines`. The answer key is `caseActions` in `tools/powerbi/actions.ts`, compared by `parity.ts` like every other column. The Power Apps visual gives these columns to the app (`PowerBIIntegration.Data`); the measure `CaseLines[For the app]` keeps the lines of the page. The app's named formulas are generated from `powerbi/apps/actions.json` and `formulas.fx` (`appFormulas`), so the catalogue has one source. Save adds one row to *SACM Journal*; since 0.52.0 it does not refresh (D332): only the button **Refresh now** runs the flow *SACMRefresh*. The flows are described in `flows.json`.

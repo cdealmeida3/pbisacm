@@ -10,12 +10,13 @@ import { cardSummaries, cardTotals } from '../../../../src/app/view/cards.ts';
 import { exportFixCsv } from '../../../../src/app/view/exports.ts';
 import { askable, fixRows, handedToOwner, isFixList } from '../../../../src/app/view/fix-list.ts';
 import { loadPacks, loadReferences } from '../../../../src/hosts/cli.ts';
+import { asLive } from '../../../helpers.ts';
 import type { CaseEvent } from '../../../../src/core/cases/cases.ts';
 import type { RelationshipModel } from '../../../../src/core/checks/detectors/relationship-detectors.ts';
 
 /* Invented data only. Each CI row: name, class, status, owner, manager, tags, platform, environment, parent field. */
 
-const packs = loadPacks();
+const packs = asLive(loadPacks());
 const references = loadReferences();
 const model = references['reference/relationship-model'] as RelationshipModel;
 const rules = { reminderDays: 3, maxReminders: 2 };

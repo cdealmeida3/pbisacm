@@ -5,10 +5,11 @@ import { readCiReport } from '../../../../src/core/sources/ci/ci-report.ts';
 import { readRelationshipReport } from '../../../../src/core/sources/relationships/relationship-report.ts';
 import { buildCases, buildRun } from '../../../../src/core/cases/cases.ts';
 import { loadPacks, loadReferences } from '../../../../src/hosts/cli.ts';
+import { asLive } from '../../../helpers.ts';
 
 /* Invented data only. The stages of a Business Process in Ready (D197). */
 
-const packs = loadPacks();
+const packs = asLive(loadPacks());
 const references = loadReferences();
 const DATE = '2026-11-20';
 const LEVELS = ['confidentiality', 'integrity', 'availability', 'authenticity'];
