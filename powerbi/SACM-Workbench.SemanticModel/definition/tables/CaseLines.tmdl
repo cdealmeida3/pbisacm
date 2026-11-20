@@ -185,9 +185,9 @@ table CaseLines
 			    )
 		displayFolder: Page notes
 
-	/// A cell of Where the work sits (Overview): the open lines of the newest report of the section (row) at the step (column, Step); blank leaves the cell empty. The column Open is the total of the row.
+	/// A cell of Where the work sits (Overview): the open lines of the newest report on the live cards (a proposed card asks nobody, D346) of the section (row) at the step (column, Step); blank leaves the cell empty. The column Open is the total of the row.
 	measure 'Heat lines' =
-			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Status] = "live" ) )
 			RETURN IF ( n > 0, n )
 		formatString: #,0
 		displayFolder: Overview
@@ -219,8 +219,8 @@ table CaseLines
 
 	/// Under the title of Where the work sits (Overview).
 	measure 'Heat note' =
-			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
-			RETURN IF ( n = 0, "Nothing open: the newest report finds nothing to solve.", FORMAT ( n, "#,0" ) & " open lines by section and next step · darker is more" )
+			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[InLatest] = TRUE (), CaseLines[State] = "open", NOT CaseLines[Status] IN { "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
+			RETURN IF ( n = 0, "Nothing open on the live cards: the newest report finds nothing to solve.", FORMAT ( n, "#,0" ) & " open lines of the live cards by section and next step · darker is more" )
 		displayFolder: Page notes
 
 	column Key

@@ -133,7 +133,7 @@
               },
               "queryRef": "Checks.Card time",
               "nativeQueryRef": "Card time",
-              "displayName": "When"
+              "displayName": "Status"
             },
             {
               "field": {

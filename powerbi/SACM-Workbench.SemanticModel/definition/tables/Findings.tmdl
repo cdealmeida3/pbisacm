@@ -25,6 +25,24 @@ table Findings
 	measure 'Finding colour' = SWITCH ( SELECTEDVALUE ( Findings[State] ), "open", "#b42318", "review", "#175cd3", "#475467" )
 
 	/// Under the title of the lines of a card (Card): the order, or why the box is empty. Opened from its tab, the page says how to choose a card.
+	/// Under the title of To solve with a person (Card): on a card SACM fixes or checks itself, that nobody is asked and where its lines are (the table shows none, Ask mark); else as Lines note.
+	measure 'Ask lines note' =
+			VAR asks = SELECTEDVALUE ( Checks[Asks] )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        HASONEVALUE ( Checks[CheckId] ) && asks = "SACM" && SELECTEDVALUE ( Checks[Kind] ) = "fix", "SACM fixes this card itself: open the tab SACM fix list.",
+			        HASONEVALUE ( Checks[CheckId] ) && asks = "SACM", "SACM checks this card itself: open the tab To check.",
+			        [Lines note]
+			    )
+		displayFolder: Page notes
+
+	/// 1 on a line of a card that asks a person or the Procurement mailbox, blank on a card SACM fixes or checks itself: the visual filter of To solve with a person (Card), so that table never lists "SACM fixes it" line by line.
+	measure 'Ask mark' =
+			VAR asks = CALCULATE ( MAX ( Checks[Asks] ), TREATAS ( VALUES ( Findings[CheckId] ), Checks[CheckId] ) )
+			RETURN IF ( asks <> "SACM", 1 )
+		formatString: 0
+
 	measure 'Lines note' = SWITCH ( TRUE (), NOT HASONEVALUE ( Checks[CheckId] ), "No card chosen: on All cards, select a card, then Open card.", COUNTROWS ( Findings ) + 0 = 0, "No line: the newest report finds nothing on this card.", "Who is asked about which CI. Owned by, Managed by and Tags are in the export." )
 		displayFolder: Page notes
 
@@ -168,10 +186,10 @@ table Findings
 			    )
 		displayFolder: My day
 
-	/// Open lines of the daily cards that SACM fixes itself in ServiceNow: nobody to ask, a change on the SACM fix list, not marked fixed yet.
+	/// Open lines of the daily live cards that SACM fixes itself in ServiceNow: nobody to ask, a change on the SACM fix list, not marked fixed yet. A card that is not live is no step of the day (D346).
 	measure 'SACM fix lines' =
 			VAR keys = CALCULATETABLE ( VALUES ( Findings[Key] ), Findings[ContactName] = "", Findings[FixChange] <> "", Findings[State] = "open" )
-			RETURN CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), NOT CaseLines[Status] IN { "Fix in progress", "Fixed", "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Priority] <> "later" ) ) + 0
+			RETURN CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( keys, CaseLines[Key] ), NOT CaseLines[Status] IN { "Fix in progress", "Fixed", "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Priority] <> "later" ), KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
 		formatString: #,0
 		displayFolder: My day
 
@@ -462,7 +480,7 @@ table Findings
 
 	/// Under the title of Who holds the most (Overview): the lines that wait for nobody.
 	measure 'Holders line' =
-			VAR sacm = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[ContactName] = "", CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), NOT CaseLines[Status] IN { "Verified", "Not followed up" } ) + 0
+			VAR sacm = CALCULATE ( COUNTROWS ( CaseLines ), CaseLines[ContactName] = "", CaseLines[State] = "open", CaseLines[InLatest] = TRUE (), NOT CaseLines[Status] IN { "Verified", "Not followed up" }, KEEPFILTERS ( Checks[Status] = "live" ) ) + 0
 			RETURN IF ( sacm = 0, "The most open lines first. Every open line waits for a person.", "The most open lines first. " & sacm & IF ( sacm = 1, " line has", " lines have" ) & " no person: SACM fixes them, on the fix list of each card." )
 		displayFolder: Page notes
 

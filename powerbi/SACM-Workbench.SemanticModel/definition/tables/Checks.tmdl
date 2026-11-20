@@ -79,8 +79,12 @@ table Checks
 	measure 'Card rank' = SWITCH ( [Card state], "To solve", 1, "All marked as fixed", 1, "To check", 2, "OK", 3, 4 )
 		formatString: 0
 
-	/// "When there is time" on a card that is not daily work (priority later, D182): it is never in the count to solve.
-	measure 'Card time' = IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", "When there is time" )
+	/// The column Status of All cards: "Proposed" on a card that is not live yet, so it asks nobody (D346, D114), and "When there is time" on a card that is not daily work (priority later, D182: never in the count to solve); both with " · ".
+	measure 'Card time' =
+			VAR cardStatus = SELECTEDVALUE ( Checks[Status] )
+			VAR notLive = IF ( NOT ISBLANK ( cardStatus ) && cardStatus <> "live", IF ( cardStatus = "proposed", "Proposed", UPPER ( LEFT ( cardStatus, 1 ) ) & MID ( cardStatus, 2, 20 ) ) )
+			VAR later = IF ( SELECTEDVALUE ( Checks[Priority] ) = "later", "When there is time" )
+			RETURN IF ( notLive <> "" || later <> "", notLive & IF ( notLive <> "" && later <> "", " · " ) & later )
 
 	/// The order of the cards (D172, src/app/view/cards.ts orderCards): by section, daily work before the cards for when there is time, then To solve, To check, OK, Not tested, the biggest first, then the order of the check files.
 	measure 'Card order' =
@@ -103,8 +107,18 @@ table Checks
 	measure 'Checks in use' = COUNTROWS ( DISTINCT ( Checks[CheckId] ) ) + 0
 		formatString: 0
 
-	/// What the card page says to do: the hint of the check file.
-	measure 'Card hint' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardHint] ), "On All cards, select a card, then Open card. Until then the page shows every card." )
+	/// What the card page says to do: the hint of the check file; on a card that is not live, first that nobody is asked (D346).
+	measure 'Card hint' =
+			VAR cardStatus = SELECTEDVALUE ( Checks[Status] )
+			VAR cardHint = SELECTEDVALUE ( Checks[CardHint] )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), "On All cards, select a card, then Open card. Until then the page shows every card.",
+			        cardStatus = "proposed", "Proposed: not sent to anyone until the card is live. " & cardHint,
+			        cardStatus <> "live", "Not live: not sent to anyone until the card is live. " & cardHint,
+			        cardHint
+			    )
 
 	/// The name of the check on its card page.
 	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen" )
@@ -331,6 +345,11 @@ table Checks
 	column Kind
 		dataType: string
 		sourceColumn: Kind
+
+	/// Who the card asks (ChecksRows): SACM (SACM fixes or checks it itself), Procurement (the mailbox) or People (the people of the CIs).
+	column Asks
+		dataType: string
+		sourceColumn: Asks
 
 	/// The state of the card for the filter of All cards (build D3): the measure Card state at the refresh, with All marked as fixed counted as To solve. The buttons sort it from the last word down: To solve, To check, OK, Not tested.
 	column CardState = VAR state = [Card state] RETURN IF ( state = "All marked as fixed", "To solve", state )

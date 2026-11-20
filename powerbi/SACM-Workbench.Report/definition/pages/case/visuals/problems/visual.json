@@ -83,12 +83,12 @@
                       "Entity": "Findings"
                     }
                   },
-                  "Property": "ContactName"
+                  "Property": "AskWho"
                 }
               },
-              "queryRef": "Findings.ContactName",
-              "nativeQueryRef": "ContactName",
-              "displayName": "Asked"
+              "queryRef": "Findings.AskWho",
+              "nativeQueryRef": "AskWho",
+              "displayName": "Who to ask"
             },
             {
               "field": {
@@ -195,7 +195,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "160D"
+                  "Value": "130D"
                 }
               }
             }
@@ -223,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "100D"
+                  "Value": "98D"
                 }
               }
             }
@@ -237,13 +237,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "88D"
+                  "Value": "120D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Findings.ContactName"
+            "metadata": "Findings.AskWho"
           }
         },
         {
