@@ -5,7 +5,7 @@ import { loadPackFiles } from '../../../src/hosts/cli.ts';
 import { mText, queries, readingRules, staleQueries, theme, THEME_FILE } from '../../../tools/powerbi/generate.ts';
 import { lightColours } from '../../../tools/powerbi/tokens.ts';
 import { queryColumns, readExpressions, readTables } from '../../../tools/powerbi/tmdl.ts';
-import { evaluatedNames, PARITY_QUERIES } from '../../../tools/powerbi/connector.ts';
+import { evaluatedNames, PARITY_QUERIES, realShapeMembers } from '../../../tools/powerbi/connector.ts';
 import { UNIT_PAGE_SIZE, unitCases, unitQuery, unitQueryNames } from '../../../tools/powerbi/units.ts';
 
 /*
@@ -57,8 +57,11 @@ test('every table reads from its own query <Table>Rows or is a part of Run, and 
     assert.ok(table.columns.length > 0, `${table.name} has no column`);
   }
   assert.deepEqual(evaluatedNames(), [...tables.map((table) => table.name), ...unitQueryNames(), ...PARITY_QUERIES]);
-  // The queries of the answer key are queries of the model that no table reads (build B7).
-  for (const name of PARITY_QUERIES) assert.ok(names.has(name), `${name} is not in expressions.tmdl`);
+  // The queries of the answer key are queries of the model that no table reads (build B7), or members of the test
+  // connector only: the real-shape samples are never packed into the model (D353).
+  const connectorOnly = new Set(realShapeMembers().map((member) => member.name));
+  for (const name of PARITY_QUERIES) assert.ok(names.has(name) || connectorOnly.has(name), `${name} is not in expressions.tmdl nor a member of the test connector`);
+  assert.ok(!names.has('RealShapeFiles'), 'the model must not carry the real-shape samples');
 });
 
 test('each unit query has at most 1,000 rows (PQTest returns no more), and the pages hold every case once', () => {

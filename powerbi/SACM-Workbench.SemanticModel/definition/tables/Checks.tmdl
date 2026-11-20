@@ -100,7 +100,7 @@ table Checks
 		formatString: 0
 
 	/// Checks that are not off.
-	measure 'Checks in use' = COUNTROWS ( Checks ) + 0
+	measure 'Checks in use' = COUNTROWS ( DISTINCT ( Checks[CheckId] ) ) + 0
 		formatString: 0
 
 	/// What the card page says to do: the hint of the check file.
@@ -158,7 +158,7 @@ table Checks
 			RETURN "Compliance: " & IF ( words = "", "All OK", words )
 
 	/// Under the title of the table of cards (All cards).
-	measure 'Cards note' = IF ( COUNTROWS ( Checks ) + 0 = 0, "No card is about this: choose another subject.", "Red: to solve. Blue: to check. Green: OK. Grey: not tested. Select a card, then Open card." )
+	measure 'Cards note' = IF ( COUNTROWS ( DISTINCT ( Checks[CheckId] ) ) + 0 = 0, "No card is about this: choose another subject.", "Red: to solve. Blue: to check. Green: OK. Grey: not tested. Select a card, then Open card." )
 		displayFolder: Page notes
 
 	/// The number of a card in a pill of the colour of its state (All cards): the CIs, lines or contracts to solve or to check, a tick when it is OK, a dash when it was not tested. The place of the card in the order of the app comes first in the picture, so a table sorted on it keeps that order. 56 × 32: a table gives all its pictures one size.

@@ -109,8 +109,11 @@ parts: *Record* (the verification record of a report date), *Export* (the tables
 
 ![Reports](guide/reports.png)
 
-The newest file of each kind of report, its date and whether it is up to date; the files each CI report date was checked
-with; the files that could not be read; and how many CIs each class has.
+First, **What to fix in the folder**: a kind of report with no file, the columns the CI report lacks (one line to copy
+into the ServiceNow report), a file the report did not use and why (for example a copy of the same day: move it into the
+sub-folder *Archive*), then the files the report knows but does not use yet. Below: the newest file of each kind of
+report, its date and whether it is up to date; the files each CI report date was checked with; and how many CIs each
+class has.
 
 ### Mapping and Contracts
 
@@ -122,6 +125,7 @@ them.
 
 - **The chip is amber.** A report is old or missing. Open *Reports*: it says which one. The numbers still show, from the
   reports that are there.
+- **A card is grey or a number looks wrong after new files.** Open *Reports* and read *What to fix in the folder* first.
 - **A box says why it is empty.** Read the grey line under its title: it is often fine ("No reply to read").
 - **The numbers look old.** Look at the foot of the rail: it says how old the data is. Press **Refresh** in the
   report's top bar first. Then press **Refresh now** (part 2A); outside 08:00 to 18:00 the next refresh is at 07:00.

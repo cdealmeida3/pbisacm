@@ -48,3 +48,46 @@ export function reportCandidates(files: ReportFile[], offsetMinutes: number): Da
 /** The file name of a saved run: one per report date and report name, so the same report is never saved twice. */
 export const safeName = (value: string): string => value.toLowerCase().replace(/[^a-z0-9._-]+/g, '_');
 export const runFileName = (date: string, report: string): string => `${date}_${safeName(report)}.json`;
+
+/* ------------------------------------------------------------------ one report per type and day (D348) */
+
+/** A report file of a known type, for the choice of its day: what makes one file fuller than another of the same day. */
+export interface ChoiceFile {
+  name: string;
+  kind: string;
+  /** The report date, yyyy-mm-dd. */
+  date: string;
+  /** The columns that count for its type (neededColumns of src/core/sources/report-types.ts). */
+  columns: number;
+  /** Its rows under the header. */
+  rows: number;
+  /** Last change, in milliseconds; 0 when it is not known. */
+  modified: number;
+}
+
+export interface Choice { name: string; used: boolean; whyNotUsed: string }
+
+
+const fuller = (a: ChoiceFile, b: ChoiceFile): number =>
+  b.columns - a.columns || b.rows - a.rows || b.modified - a.modified || (a.name < b.name ? 1 : a.name > b.name ? -1 : 0);
+
+/**
+ * Which file of each type and report date is the report of that day (D348): the one with the most of the needed columns
+ * (for a CI report, the columns the checks read), then the most rows, then the one changed last, then the last file name. A file name never decides alone. The others are not
+ * used, with the reason, in plain words. The answer is in the order of `files`.
+ */
+export function chooseReports(files: ChoiceFile[]): Choice[] {
+  const keyOf = (file: ChoiceFile): string => `${file.kind}|${file.date}`;
+  const groups = new Map<string, ChoiceFile[]>();
+  for (const file of files) groups.set(keyOf(file), [...(groups.get(keyOf(file)) ?? []), file]);
+  return files.map((file): Choice => {
+    const best = [...groups.get(keyOf(file))!].sort(fuller)[0]!;
+    if (best === file) return { name: file.name, used: true, whyNotUsed: '' };
+    const why = best.columns !== file.columns
+      ? `${best.name} of the same day has more of the needed columns (${best.columns} against ${file.columns}), so it is used.`
+      : best.rows !== file.rows
+        ? `${best.name} of the same day has more rows (${best.rows} against ${file.rows}), so it is used.`
+        : `${best.name} of the same day has the same columns and rows and is used (${best.modified !== file.modified ? 'it was saved later' : 'the last file name'}). Move this copy into the sub-folder Archive.`;
+    return { name: file.name, used: false, whyNotUsed: `Not used: ${why}` };
+  });
+}

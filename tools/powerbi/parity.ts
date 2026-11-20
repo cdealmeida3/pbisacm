@@ -12,8 +12,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { inflateRawSync } from 'node:zlib';
 import { readTable } from '../../src/core/reading/table.ts';
-import { recogniseReport } from '../../src/core/sources/report-types.ts';
-import { PERSON_PARTS, readCiReport } from '../../src/core/sources/ci/ci-report.ts';
+import { fileKind, folderFixes, neededColumns, recogniseReport, REPORT_TYPES } from '../../src/core/sources/report-types.ts';
+import type { FolderFix } from '../../src/core/sources/report-types.ts';
+import { chooseReports } from '../../src/core/memory/finder.ts';
+import { csvRealShapeFiles, readRealShape } from '../../tests/real-shape.ts';
+import { missingWanted, PERSON_PARTS, readCiReport } from '../../src/core/sources/ci/ci-report.ts';
 import { readRelationshipReport } from '../../src/core/sources/relationships/relationship-report.ts';
 import { epoConfig, readEpoReport } from '../../src/core/sources/epo/epo-report.ts';
 import { contractConfig, readContractReport, readSolusiFile } from '../../src/core/sources/contracts/contract-reports.ts';
@@ -108,6 +111,11 @@ export function contractChangeRows(previous: { contracts: SolusiContract[]; date
   return rows;
 }
 
+/** The rows of the table FolderFixes that src/core's folderFixes gives (FolderFixesRows.pq, fnFolderFixes). */
+function fixRows(fixes: FolderFix[]): Row[] {
+  return fixes.map((fix, at) => ({ Order: `${at + 1}`, FileName: fix.name, ReportDate: fix.date, ReadAs: fix.readAs, What: fix.what, Level: fix.level }));
+}
+
 export async function parityProblems(folder: string): Promise<string[]> {
   const problems: string[] = [];
   const outputs = new Map<string, Row[]>();
@@ -144,10 +152,13 @@ export async function parityProblems(folder: string): Promise<string[]> {
   ];
   const expectedFiles: Row[] = [];
   const read: Record<string, Awaited<ReturnType<typeof tableOf>>> = {};
+  const sampleFolder: Array<{ name: string; date: string; kind: string; message: string; columns: number; rows: number }> = [];
   for (const { file, date } of files) {
     const table = await tableOf(file.path);
     read[file.name] = table;
-    const kind = recogniseReport(table.rows[0] ?? []).type?.kind ?? '';
+    // A file of no report type is "unknown" (R2): the table ReportTypes has a row for it, so no blank row (D349).
+    const kind = fileKind(table.rows[0] ?? []);
+    sampleFolder.push({ name: `${date}_${file.name}`, date, kind, message: recogniseReport(table.rows[0] ?? []).message, columns: neededColumns(kind, table.rows[0] ?? []), rows: Math.max(0, table.rows.length - 1) });
     const count = kind === 'ci' ? readCiReport(table.rows).cis.length
       : kind === 'relationship' ? readRelationshipReport(table.rows).relationships.length
       : kind === 'epo' ? readEpoReport(table.rows, epoConfig(references)!).systems.length
@@ -155,7 +166,22 @@ export async function parityProblems(folder: string): Promise<string[]> {
       : kind === 'contract' ? readContractReport(table.rows, contracts).contracts.length : table.rows.length - 1;
     expectedFiles.push({ FileName: `${date}_${file.name}`, ReportDate: date, Kind: kind, Rows: count, Format: table.format, Columns: (table.rows[0] ?? []).length });
   }
-  problems.push(...compare('ReportFiles', rows('ReportFiles'), expectedFiles, 'FileName', ['ReportDate', 'Kind', 'Rows', 'Format', 'Columns']));
+  // The choice of the day (D348): the samples have one file per type and day, so each is used.
+  const reportKinds = new Set(REPORT_TYPES.map((type) => type.kind as string));
+  const choices = new Map(chooseReports(sampleFolder.filter((file) => reportKinds.has(file.kind)).map((file) => ({ ...file, modified: 0 }))).map((choice) => [choice.name, choice]));
+  for (const row of expectedFiles) Object.assign(row, { Used: choices.get(norm(row.FileName))?.used ?? false, WhyNotUsed: choices.get(norm(row.FileName))?.whyNotUsed ?? '' });
+  problems.push(...compare('ReportFiles', rows('ReportFiles'), expectedFiles, 'FileName', ['ReportDate', 'Kind', 'Rows', 'Format', 'Columns', 'Used', 'WhyNotUsed']));
+  // What to fix in the sampleFolder (D352): on the samples, the CI columns the sample CI report lacks.
+  const newestCi = sampleFolder.filter((file) => file.kind === 'ci').sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).at(-1)!;
+  const sampleFixes = folderFixes(sampleFolder.map((file) => ({ ...file, used: choices.get(file.name)?.used ?? false, whyNotUsed: choices.get(file.name)?.whyNotUsed ?? '' })),
+    { name: newestCi.name, date: newestCi.date, missing: missingWanted(readCiReport(read[SAMPLE_FILES.ci.name]!.rows).columns) });
+  problems.push(...compare('FolderFixes', rows('FolderFixes'), fixRows(sampleFixes), 'Order', ['FileName', 'ReportDate', 'ReadAs', 'What', 'Level']));
+  // 3b. The real-shape samples (D353): the M reads Carlos's shapes as src/core does (tests/recorded/real-shape.json).
+  // PQTest opens no .xlsx, so the M reads the CSV files of the folder; the Solusi workbook is tested in src/core only.
+  const realShape = await readRealShape(csvRealShapeFiles());
+  problems.push(...compare('RealShape', rows('RealShape'), realShape.files.map((file) => ({ FileName: file.name, Kind: file.kind, Used: file.used, WhyNotUsed: file.whyNotUsed, Rows: file.rows, Fact: file.fact })),
+    'FileName', ['Kind', 'Used', 'WhyNotUsed', 'Rows', 'Fact']));
+  problems.push(...compare('RealShapeFixes', rows('RealShapeFixes'), fixRows(realShape.fixes), 'Order', ['FileName', 'ReportDate', 'ReadAs', 'What', 'Level']));
 
   // 4. Inventory: every CI with the canonical columns of src/core/sources/ci/ci-report.ts.
   const cis = readCiReport(read[SAMPLE_FILES.ci.name]!.rows).cis;

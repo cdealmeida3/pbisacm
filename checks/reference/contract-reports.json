@@ -109,10 +109,10 @@
         "sys_tags"
       ],
       "criticality": [
-        "u_inherited_confidentiality",
-        "u_inherited_integrity",
-        "u_inherited_availability",
-        "u_inherited_authenticity"
+        "inherited_confidentiality",
+        "inherited_integrity",
+        "inherited_availability",
+        "inherited_authenticity"
       ]
     }
   },

@@ -2,6 +2,18 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.54.0 — The Power BI report reads the real reports correctly (R2)
+
+- **One report per kind and day, chosen by what is in it** (D348). When the folder has two CI reports of the same day (a copy such as `…_1cmdb_logical_automation.csv`), the report uses the one with the most of the columns the checks read, then the most rows, then the one saved last. The other is *not used*, with the reason. The history makes the same choice for every date.
+- **A CMDB Health result is never the CI report** (D341), and the contract–CI links file is known (D342). Both are listed as "known, not used yet".
+- **The Solusi workbook is read** (D350): its XML names every element with a prefix, which gave 0 contracts. A date in the year 10000 (*Next reminder date*) is an empty cell, not an error.
+- **Columns with the instance's own prefix are found** (D351): *Excluded for calculation* of the Relationship report and the inherited criticality of the ServiceNow contract report.
+- **Reports page: What to fix in the folder** (D352), the first box. It lists a kind of report with no file, the columns the CI report lacks, in a line *Columns to add* to copy into the ServiceNow report (right-click, Copy, Copy value; D347), each file not used and why, and the known files. *Report types* shows its five rows without scrolling.
+- **No empty line and no count one too high** (D349): a file of no kind has the kind *unknown*, and the counts of CIs, cases, checks, events and report dates leave out the blank row Power BI adds for a value with no row. The Desktop check now asks every relationship.
+- **Real-shape samples** (D353): small invented files with the shapes of the real folder, tested with the logic and with the Power BI queries.
+- **After you publish this version, the first refresh computes the history again** with the new choice of the day. It takes longer than a normal refresh. Move copies and old reports into the sub-folder *Archive* first.
+- No check, number or email text changed on the samples. Until build R3: do not press Send to real people; *Test to me* is safe.
+
 ## 0.53.0 — The Power BI report: updates that never mix two versions (R1)
 
 - **Each zip unpacks into its own folder** (D339), `SACM-Workbench-0.53.0`, not into `powerbi`. Unzipping over an old folder kept the panels of build B2 on top of the new pages (the "crazy" Case and Card pages of 19 November).

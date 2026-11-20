@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "notRead",
+  "name": "folderFixes",
   "position": {
     "x": 224,
-    "y": 520,
-    "z": 6000,
-    "height": 184,
-    "width": 720,
-    "tabOrder": 6000
+    "y": 84,
+    "z": 3000,
+    "height": 168,
+    "width": 1032,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "tableEx",
@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "NotRead"
+                      "Entity": "FolderFixes"
                     }
                   },
                   "Property": "FileName"
                 }
               },
-              "queryRef": "NotRead.FileName",
+              "queryRef": "FolderFixes.FileName",
               "nativeQueryRef": "FileName",
               "displayName": "File"
             },
@@ -35,30 +35,30 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "NotRead"
+                      "Entity": "FolderFixes"
                     }
                   },
-                  "Property": "ReportDate"
+                  "Property": "ReadAs"
                 }
               },
-              "queryRef": "NotRead.ReportDate",
-              "nativeQueryRef": "ReportDate",
-              "displayName": "Date"
+              "queryRef": "FolderFixes.ReadAs",
+              "nativeQueryRef": "ReadAs",
+              "displayName": "Read as"
             },
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "NotRead"
+                      "Entity": "FolderFixes"
                     }
                   },
-                  "Property": "Message"
+                  "Property": "What"
                 }
               },
-              "queryRef": "NotRead.Message",
-              "nativeQueryRef": "Message",
-              "displayName": "Why it was not read"
+              "queryRef": "FolderFixes.What",
+              "nativeQueryRef": "What",
+              "displayName": "What to do"
             }
           ]
         }
@@ -70,7 +70,7 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "NotRead"
+                    "Entity": "FolderFixes"
                   }
                 },
                 "Property": "FileName"
@@ -96,7 +96,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Files not read'"
+                  "Value": "'What to fix in the folder'"
                 }
               }
             }
@@ -109,7 +109,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Files not read'"
+                  "Value": "'What to fix in the folder'"
                 }
               }
             }
@@ -131,10 +131,10 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "NotRead"
+                      "Entity": "FolderFixes"
                     }
                   },
-                  "Property": "Not read note"
+                  "Property": "Folder fixes note"
                 }
               }
             }
@@ -144,19 +144,51 @@
     },
     "drillFilterOtherVisuals": true,
     "objects": {
+      "values": [
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "FolderFixes"
+                        }
+                      },
+                      "Property": "Folder fix colour"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "FolderFixes.What"
+          }
+        }
+      ],
       "columnWidth": [
         {
           "properties": {
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "193D"
+                  "Value": "300D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "NotRead.FileName"
+            "metadata": "FolderFixes.FileName"
           }
         },
         {
@@ -164,13 +196,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "118D"
+                  "Value": "156D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "NotRead.ReportDate"
+            "metadata": "FolderFixes.ReadAs"
           }
         },
         {
@@ -178,13 +210,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "368D"
+                  "Value": "532D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "NotRead.Message"
+            "metadata": "FolderFixes.What"
           }
         }
       ]

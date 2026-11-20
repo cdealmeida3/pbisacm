@@ -2,11 +2,11 @@
 table Inventory
 
 	/// CIs in the newest CI report.
-	measure CIs = COUNTROWS ( Inventory ) + 0
+	measure CIs = COUNTROWS ( DISTINCT ( Inventory[Key] ) ) + 0
 		formatString: #,0
 
 	/// Under the title of the CIs by class (Reports).
-	measure 'Classes note' = IF ( COUNTROWS ( Inventory ) + 0 = 0, "No CI report is loaded yet.", "The newest CI report; the nine classes of the checks." )
+	measure 'Classes note' = IF ( COUNTROWS ( DISTINCT ( Inventory[Key] ) ) + 0 = 0, "No CI report is loaded yet.", "The newest CI report; the nine classes of the checks." )
 		displayFolder: Page notes
 
 	column ReportDate

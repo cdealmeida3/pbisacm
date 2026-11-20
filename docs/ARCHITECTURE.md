@@ -127,8 +127,8 @@ Every module of `src/`, by folder. Tests use the same folders under `tests/` (`t
 | Module | Holds |
 |---|---|
 | `csv.ts` | The CSV reader (quoting; comma, semicolon or tab found from the header line) |
-| `xlsx.ts` | The `.xlsx` reader, no library: the zip directory and the sheet XML; the host passes the one unzip step |
-| `headers.ts` | How a column header is compared (lower case, `_`, no `ci.` prefix) |
+| `xlsx.ts` | The `.xlsx` reader, no library: the zip directory and the sheet XML (element prefixes such as `<x:row>` dropped, D350); the host passes the one unzip step |
+| `headers.ts` | How a column header is compared (lower case, `_`; the `ci.` prefix of a CMDB Health result is kept, D341) |
 | `table.ts` | A file as a table; `ReportType`; knowing the type of a report from its columns (`recogniseAmong`) |
 
 ### `src/core/sources/`
@@ -137,7 +137,7 @@ One folder per report type: its definition (a `ReportType`), its reader and its 
 
 | Module | Holds |
 |---|---|
-| `report-types.ts` | `REPORT_TYPES`, the one list of report types (the order of the tiles); `recogniseReport`; `unhandledKind`, the last branch of every "one branch per type" in the hosts |
+| `report-types.ts` | `REPORT_TYPES`, the one list of report types (the order of the tiles); `KNOWN_FILES`, the files known but not used (D341, D342); `recogniseReport`, `fileKind`; `folderFixes`, the box *What to fix in the folder* of the Power BI report (D352); `unhandledKind`, the last branch of every "one branch per type" in the hosts |
 | `ci/ci-report.ts` | The CI report (`cmdb_ci` export or CMDB Health result) read into CIs |
 | `relationships/relationship-report.ts` | The Relationship report (`cmdb_rel_ci`), and matching its ends to CIs |
 | `epo/epo-report.ts` | The EPO systems report, and its comparison with the Service Instances |
@@ -190,7 +190,7 @@ One folder per report type: its definition (a `ReportType`), its reader and its 
 | `team/team.ts` | The team list, sharing out a card, My work, Since your last visit, the double-contact warning |
 | `team/conflict-copies.ts` | Tidying the copies OneDrive makes when two computers write the same file |
 | `memory/memory.ts` | Keeping the shared memory small: what is active, what is archived, `state.json` |
-| `memory/finder.ts` | The newest report of each type among the files of the folder; run file names |
+| `memory/finder.ts` | The newest report of each type among the files of the folder; `chooseReports`, the file of one type and day chosen by its content (D348); run file names |
 | `audit/audit.ts` | The verification record of a load, the audit export of a period, *Not followed up* |
 | `audit/lifecycle-review.ts` | The lifecycle review: drawing the sample, the answers, the cases it opens |
 

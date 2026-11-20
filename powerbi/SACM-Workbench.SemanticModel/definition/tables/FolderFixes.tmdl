@@ -1,0 +1,50 @@
+/// What to fix in the reports folder, the first box of the Reports page (D352): a report type with no file, the columns the newest CI report lacks, the files not used and why.
+table FolderFixes
+
+	/// Under the title of the box: what it lists, or that the folder needs nothing.
+	measure 'Folder fixes note' =
+			VAR toFix = CALCULATE ( COUNTROWS ( FolderFixes ), FolderFixes[Level] = "fix" ) + 0
+			VAR known = CALCULATE ( COUNTROWS ( FolderFixes ), FolderFixes[Level] = "known" ) + 0
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        toFix + known = 0, "Nothing to fix: every file in the folder is used.",
+			        toFix = 0, "Nothing to fix. The report knows these files but does not use them.",
+			        "The report still works: it chose the file of each type and day by its content. Fix these in the folder or in ServiceNow."
+			    )
+		displayFolder: Page notes
+
+	/// The text colour of a line: amber for a line to act on, muted for a file the report knows but does not use (LOOK.md).
+	measure 'Folder fix colour' = IF ( SELECTEDVALUE ( FolderFixes[Level] ) = "fix", "#7d5700", "#655a52" )
+
+	column Order
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: Order
+
+	column FileName
+		dataType: string
+		sortByColumn: Order
+		sourceColumn: FileName
+
+	column ReportDate
+		dataType: dateTime
+		formatString: d mmm yyyy
+		summarizeBy: none
+		sourceColumn: ReportDate
+
+	column ReadAs
+		dataType: string
+		sourceColumn: ReadAs
+
+	column What
+		dataType: string
+		sourceColumn: What
+
+	column Level
+		dataType: string
+		sourceColumn: Level
+
+	partition FolderFixes = m
+		mode: import
+		source = FolderFixesRows

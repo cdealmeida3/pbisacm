@@ -19,7 +19,7 @@ test('csv: quotes, embedded commas and line breaks, semicolon delimiter', () => 
   assert.deepEqual(parseCsv('a;b\n1;"say ""hi"""\n'), [['a', 'b'], ['1', 'say "hi"']]);
 });
 
-test('report: labels, table names, ci. prefix and numeric choices are understood', () => {
+test('report: labels, table names and numeric choices are understood; the ci. prefix of a Health result is kept (D341)', () => {
   assert.equal(canonicalClass('cmdb_ci_service_auto'), 'service_instance');
   assert.equal(canonicalClass('Business Application'), 'business_application');
   assert.equal(canonicalClass('Technology Management Service'), 'technology_management_service');
@@ -27,9 +27,10 @@ test('report: labels, table names, ci. prefix and numeric choices are understood
   assert.equal(canonicalClass('API'), 'api');
   assert.equal(level('Mission/Business critical'), 4);
   assert.equal(level('None'), undefined);
+  // A CMDB Health result keeps its "ci." prefix, so it never gives the CI report its Class or its people.
   const health = readCiReport(parseCsv('ci,ci.sys_class_name,ci.Owned by,ci.owned_by.email\nX,Business Service,,\n'));
-  assert.equal(health.cis[0]!.className, 'business_service');
-  assert.ok(health.columns.has('owned_by'));
+  assert.equal(health.cis[0]!.className, '');
+  assert.ok(!health.columns.has('owned_by'));
   assert.equal(report.cis.find((ci) => ci.name === 'Old Receipt Printer')!.operationalStatus, 'Retired');
   assert.deepEqual(report.unknownHeaders, []);
   const owner = report.cis.find((ci) => ci.name === 'Reconcile Index')!.roles.owned_by!;

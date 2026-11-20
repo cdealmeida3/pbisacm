@@ -7,7 +7,7 @@
 let
     config = fnReference("reference/contract-reports"),
     words = ContractWords,
-    files = Table.Buffer(Table.Sort(Table.SelectRows(ReadFiles, each [Kind] = "solusi" and [ReportDate] <> null), {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})),
+    files = Table.Buffer(Table.Sort(Table.SelectRows(ReadFiles, each [Kind] = "solusi" and [Used] and [ReportDate] <> null), {{"ReportDate", Order.Ascending}, {"FileName", Order.Ascending}})),
     count = Table.RowCount(files),
     fileAt = (at as number) as record => let row = files{at} in [Date = row[ReportDate], Contracts = List.Buffer(Table.ToRecords(fnReadKind("solusi", row[Read])))],
     current = if count = 0 then null else fileAt(count - 1),

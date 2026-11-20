@@ -37,6 +37,7 @@ import { reportTiles } from '../src/app/view/tiles.ts';
 import type { AppRun } from '../src/app/view/people.ts';
 import { loadPacks, loadReferences } from '../src/hosts/cli.ts';
 import { emailsOf } from '../tools/powerbi/email.ts';
+import { realShapeRecord } from './real-shape.ts';
 import type { Draft } from '../src/core/messages/messages.ts';
 
 /** The day the reports are loaded. Fixed, so the record never depends on the day the tests run. */
@@ -93,7 +94,8 @@ function json(value: unknown, casesAsKeys = true): string {
 const caseKeys = (cases: Case[]): string[] => cases.map((item) => item.key);
 
 /** File name (under tests/recorded/) → its content, for the invented samples. */
-export const recordSamples = (): Promise<Record<string, string>> => recordReports(SAMPLE_FILES);
+/** The recorded result of the samples, with that of the real-shape samples (tests/real-shape.ts, D353). */
+export const recordSamples = async (): Promise<Record<string, string>> => ({ ...await recordReports(SAMPLE_FILES), 'real-shape.json': await realShapeRecord() });
 
 /** The same for any set of report files (tools/fingerprint.ts uses it on real files, which are never recorded). */
 export async function recordReports(files: RecordFiles): Promise<Record<string, string>> {

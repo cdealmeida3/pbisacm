@@ -5,7 +5,9 @@
         columns = ReferenceFiles[#"contract-reports"][servicenow][columns],
         names = List.Select(Record.FieldNames(columns), (name) => name <> "criticality"),
         specs = List.Transform(names, (name) => [column = name, any = Record.Field(columns, name)]),
-        critical = List.Select(List.Transform(columns[criticality], (name) => List.PositionOf(read[Headers], name)), (position) => position >= 0),
+        // The criticality columns by the end of their name, whatever the prefix (u_, or the instance's scoped-app prefix, D351).
+        isCritical = (header as text) as logical => List.AnyTrue(List.Transform(columns[criticality], (end) => header = end or Text.EndsWith(header, "_" & end))),
+        critical = List.Select(List.Positions(read[Headers]), (position) => isCritical(read[Headers]{position})),
         picked = fnPickColumns(read, specs)[Table],
         criticalRows = List.Transform(Table.ToRows(read[Rows]), (row) =>
             List.AnyTrue(List.Transform(critical, (position) => position < List.Count(row) and Text.Trim(row{position}) <> ""))),
