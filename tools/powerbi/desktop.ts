@@ -177,6 +177,24 @@ export function columnWidths(visual: VisualFile, projections: Projection[]): Rec
 }
 
 /**
+ * Tables where a word may break (D370): the tab Export of Card has the nine columns of the SACM template (FEATURES, Get a
+ * list for Excel) in 680 px, for *Export data*; they cannot all fit their longest word.
+ */
+export const BREAKS_ALLOWED = new Set(['card/export']);
+
+/**
+ * The words of a text as Power BI wraps it: at spaces and after a hyphen that follows a letter, the brackets and the
+ * punctuation around a word left out. An address, a file name, a relationship type or a setting (a word with @, _, /,
+ * :: or a dot inside) is not a word of the language: Power BI breaks it at its punctuation, so it is left out (D370).
+ */
+export function wrappedWords(text: string): string[] {
+  return text.split(/\s+/)
+    .map((word) => word.replace(/^[(\["']+/, '').replace(/[)\]"',;:.!?]+$/, ''))
+    .filter((word) => word && !/[@_/]|::|\.\S/.test(word))
+    .flatMap((word) => word.split(/(?<=[A-Za-z]-)/));
+}
+
+/**
  * The words of a table that do not fit their column (build R5, LOOK rule 3, D370: no word broken over two lines): Power BI
  * wraps a text at its spaces, and breaks a word longer than the column ("Descriptio n", "NAME-DUPLICA TE"). The width of
  * a word is the estimate of the lint (tokens.ts); a picture, a link, a date and a number are left out.
@@ -191,7 +209,7 @@ export function brokenWords(query: VisualQuery, rows: Array<Array<string | null>
     for (const row of rows) {
       const value = row[at];
       if (typeof value !== 'string' || /^(data:|https?:)/.test(value) || /^\d{4}-\d{2}-\d{2}/.test(value) || /^-?[\d.,]+$/.test(value)) continue;
-      for (const word of value.split(/\s+/)) if (word.length > longest.length) longest = word;
+      for (const word of wrappedWords(value)) if (word.length > longest.length) longest = word;
     }
     const need = textWidth(longest, TEXT.table) + CELL_PADDING;
     if (longest && need > width) problems.push(`${where(query)}: the column "${name}" is ${width} px and "${longest}" needs ${need}: Power BI breaks the word over two lines (LOOK rule 3)`);
@@ -363,6 +381,7 @@ const where = (query: VisualQuery): string => `${query.page} › ${query.visual}
 export function judge(results: Results, pictures?: Pictures): { problems: string[]; notes: string[] } {
   const problems: string[] = [];
   const notes: string[] = [];
+  const brokenSeen = new Set<string>();
   if (pictures) problems.push(...judgePictures(pictures, notes), ...judgeLook(pictures, notes));
   if (!results.opened) { problems.push(`Desktop did not open the project: ${results.openError ?? 'no reason given'}`); return { problems, notes }; }
   if (results.refreshError) problems.push(`The refresh failed: ${results.refreshError}`);
@@ -397,7 +416,13 @@ export function judge(results: Results, pictures?: Pictures): { problems: string
       // One word, one number (D366): every pair of numbers of two pages agrees, on the samples as on any data.
       for (const line of lines) if (line.at(-1) !== 'Yes') problems.push(`${where(query)}: "${line[0]}" do not agree (${line[1]} and ${line[2]}): two pages give two numbers for one word`);
     }
-    if (query.type === 'tableEx') problems.push(...brokenWords(query, lines));
+    if (query.type === 'tableEx' && !BREAKS_ALLOWED.has(`${query.pageName}/${query.visual}`)) {
+      // One problem per visual and column, not one per drill value: the same column breaks for every CI.
+      for (const problem of brokenWords(query, lines)) {
+        const once = problem.replace(/ \(drilled to [^)]*\)/, '').replace(/ and "[^"]*" needs \d+/, '');
+        if (!brokenSeen.has(once)) { brokenSeen.add(once); problems.push(problem); }
+      }
+    }
     if (groups === 0) continue;
     const blankRows = lines.filter((line) => line.slice(0, groups).every(blank)).length;
     if (blankRows) problems.push(`${where(query)}: ${blankRows === 1 ? 'a line' : `${blankRows} lines`} with every column blank (${query.groups.join(', ')})`);

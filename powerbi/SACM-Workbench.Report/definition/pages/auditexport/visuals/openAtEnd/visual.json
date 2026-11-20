@@ -89,7 +89,7 @@
               },
               "queryRef": "History.Open age",
               "nativeQueryRef": "Open age",
-              "displayName": "Age in days"
+              "displayName": "Days open"
             },
             {
               "field": {
@@ -104,7 +104,7 @@
               },
               "queryRef": "History.ContactName",
               "nativeQueryRef": "ContactName",
-              "displayName": "Person asked"
+              "displayName": "Asked"
             },
             {
               "field": {
@@ -212,7 +212,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "92D"
+                  "Value": "93D"
                 }
               }
             }
@@ -226,7 +226,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "84D"
+                  "Value": "87D"
                 }
               }
             }
@@ -240,7 +240,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "106D"
                 }
               }
             }
@@ -254,7 +254,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "84D"
+                  "Value": "112D"
                 }
               }
             }
@@ -268,7 +268,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "92D"
+                  "Value": "78D"
                 }
               }
             }
@@ -282,7 +282,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "98D"
+                  "Value": "90D"
                 }
               }
             }

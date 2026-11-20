@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { blankRowQueries, boundTexts, brokenWords, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf, realSizeExpressions, withExpression } from '../../../tools/powerbi/desktop.ts';
+import { blankRowQueries, boundTexts, brokenWords, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf, realSizeExpressions, withExpression, wrappedWords } from '../../../tools/powerbi/desktop.ts';
 import type { Pictures, Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
 
 /*
@@ -190,6 +190,11 @@ test('build R5: a word longer than its column is broken over two lines; links, p
   const cut = brokenWords({ ...query, widths: { CI: 60, Part: 40, Link: 40 } }, [['Index Tool', 'Description', '']]);
   assert.equal(cut.length, 1);
   assert.match(cut[0]!, /the column "Part" is 40 px and "Description" needs/);
+});
+
+test('build R5 (D370): the words Power BI wraps leave out brackets, addresses, file names and relationship types, and break after a hyphen', () => {
+  assert.deepEqual(wrappedWords('Owner (inactive), Customer-facing AST-0004'), ['Owner', 'inactive', 'Customer-', 'facing', 'AST-', '0004']);
+  assert.deepEqual(wrappedWords('someone@example.com 2026-11-11_cmdb_ci-sample.csv Provides::Provided request.modify.link end.'), ['end']);
 });
 
 test('build R5 (D366): a pair of numbers of Self-check that does not agree fails the Desktop check', () => {
