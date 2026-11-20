@@ -6,7 +6,7 @@
     "y": 84,
     "z": 3100,
     "height": 40,
-    "width": 1032,
+    "width": 432,
     "tabOrder": 3100
   },
   "visual": {
@@ -20,18 +20,36 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "MappingBacklog"
+                      "Entity": "BacklogStates"
                     }
                   },
-                  "Property": "StateLabel"
+                  "Property": "Label"
                 }
               },
-              "queryRef": "MappingBacklog.StateLabel",
-              "nativeQueryRef": "StateLabel",
+              "queryRef": "BacklogStates.Label",
+              "nativeQueryRef": "Label",
               "active": true
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "BacklogStates"
+                  }
+                },
+                "Property": "Label"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -48,7 +66,7 @@
             "columnCount": {
               "expr": {
                 "Literal": {
-                  "Value": "6L"
+                  "Value": "4L"
                 }
               }
             }
@@ -264,6 +282,35 @@
           "selector": {
             "id": "selection:selected"
           }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "BacklogStates"
+                        }
+                      },
+                      "Property": "Backlog state ink"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ]
+          }
         }
       ],
       "label": [
@@ -410,10 +457,10 @@
           "Column": {
             "Expression": {
               "SourceRef": {
-                "Entity": "MappingBacklog"
+                "Entity": "BacklogStates"
               }
             },
-            "Property": "StateLabel"
+            "Property": "Label"
           }
         },
         "type": "Categorical",
@@ -422,7 +469,7 @@
           "From": [
             {
               "Name": "f",
-              "Entity": "MappingBacklog",
+              "Entity": "BacklogStates",
               "Type": 0
             }
           ],
@@ -440,7 +487,7 @@
                                 "Source": "f"
                               }
                             },
-                            "Property": "StateLabel"
+                            "Property": "Label"
                           }
                         }
                       ],

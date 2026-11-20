@@ -53,11 +53,12 @@
                       "Entity": "Journal"
                     }
                   },
-                  "Property": "Type"
+                  "Property": "Action"
                 }
               },
-              "queryRef": "Journal.Type",
-              "nativeQueryRef": "Type",
+              "queryRef": "Journal.Action",
+              "nativeQueryRef": "Action",
+              "active": true,
               "displayName": "Action"
             },
             {
@@ -208,13 +209,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "93D"
+                  "Value": "100D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Journal.Type"
+            "metadata": "Journal.Action"
           }
         },
         {
@@ -222,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "89D"
+                  "Value": "82D"
                 }
               }
             }

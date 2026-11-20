@@ -9,7 +9,7 @@ table SelfCheck
 			    IF (
 			        SELECTEDVALUE ( About[SourceMode] ) = "Sample",
 			        matching & " of " & total & " checks give the recorded result",
-			        "The self-check runs on the sample data only (SourceMode = Sample)"
+			        "The self-check compares the invented samples only: switch SourceMode to Sample to run it"
 			    )
 
 	column CheckId

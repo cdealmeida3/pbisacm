@@ -38,21 +38,6 @@
                       "Entity": "ReviewLines"
                     }
                   },
-                  "Property": "ReviewLabel"
-                }
-              },
-              "queryRef": "ReviewLines.ReviewLabel",
-              "nativeQueryRef": "ReviewLabel",
-              "displayName": "Review"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "ReviewLines"
-                    }
-                  },
                   "Property": "CiName"
                 }
               },
@@ -113,11 +98,11 @@
                       "Entity": "ReviewLines"
                     }
                   },
-                  "Property": "CaseStatus"
+                  "Property": "CaseStatusLabel"
                 }
               },
-              "queryRef": "ReviewLines.CaseStatus",
-              "nativeQueryRef": "CaseStatus",
+              "queryRef": "ReviewLines.CaseStatusLabel",
+              "nativeQueryRef": "CaseStatusLabel",
               "displayName": "Case"
             },
             {
@@ -269,21 +254,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "57D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "ReviewLines.ReviewLabel"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "96D"
+                  "Value": "118D"
                 }
               }
             }
@@ -297,7 +268,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "46D"
+                  "Value": "70D"
                 }
               }
             }
@@ -339,13 +310,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "44D"
+                  "Value": "60D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "ReviewLines.CaseStatus"
+            "metadata": "ReviewLines.CaseStatusLabel"
           }
         },
         {
@@ -353,7 +324,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "71D"
+                  "Value": "72D"
                 }
               }
             }

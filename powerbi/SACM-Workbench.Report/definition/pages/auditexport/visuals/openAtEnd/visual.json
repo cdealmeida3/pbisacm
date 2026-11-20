@@ -68,27 +68,13 @@
                       "Entity": "History"
                     }
                   },
-                  "Property": "Field"
+                  "Property": "Part"
                 }
               },
-              "queryRef": "History.Field",
-              "nativeQueryRef": "Field",
-              "displayName": "Field"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "History"
-                    }
-                  },
-                  "Property": "Open first seen"
-                }
-              },
-              "queryRef": "History.Open first seen",
-              "nativeQueryRef": "Open first seen",
-              "displayName": "First seen"
+              "queryRef": "History.Part",
+              "nativeQueryRef": "Part",
+              "active": true,
+              "displayName": "Part"
             },
             {
               "field": {
@@ -128,11 +114,12 @@
                       "Entity": "History"
                     }
                   },
-                  "Property": "State"
+                  "Property": "StateLabel"
                 }
               },
-              "queryRef": "History.State",
-              "nativeQueryRef": "State",
+              "queryRef": "History.StateLabel",
+              "nativeQueryRef": "StateLabel",
+              "active": true,
               "displayName": "Listed as"
             }
           ]
@@ -225,7 +212,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "98D"
+                  "Value": "92D"
                 }
               }
             }
@@ -239,7 +226,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "88D"
+                  "Value": "84D"
                 }
               }
             }
@@ -253,7 +240,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "51D"
+                  "Value": "116D"
                 }
               }
             }
@@ -267,27 +254,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "50D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "History.Field"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
                   "Value": "84D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "History.Open first seen"
+            "metadata": "History.Part"
           }
         },
         {
@@ -295,7 +268,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "91D"
+                  "Value": "92D"
                 }
               }
             }
@@ -309,7 +282,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "99D"
+                  "Value": "98D"
                 }
               }
             }
@@ -329,7 +302,7 @@
             }
           },
           "selector": {
-            "metadata": "History.State"
+            "metadata": "History.StateLabel"
           }
         }
       ]

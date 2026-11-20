@@ -1,6 +1,6 @@
 // The part CapabilitySheet of the table Run (D284), which the DAX table CapabilitySheet shows (src/core/mapping/capability-sheet.ts, D205): every Business Capability of the newest CI report
 // with its status, the capabilities above and below it, the Business Processes below, its description, tags, people and
-// hidden characters, sorted by name. For the talks with Enterprise Architecture and Process Management: the table's
+// hidden characters, sorted by name, and its asset tag (build R5: the page names two capabilities of one name apart). For the talks with Enterprise Architecture and Process Management: the table's
 // Export data gives the file. Empty without a Relationship report (the page says so).
 // `run` is CheckRun (null when no CI report is loaded).
 (run as nullable record) as table =>
@@ -23,10 +23,10 @@
             {
                 ci[Name], ci[Status], namesOf(linked(ci, "up", "business_capability")), namesOf(linked(ci, "down", "business_capability")),
                 namesOf(linked(ci, "down", "business_process")), ci[Description], Text.Combine(ci[TagList], ", "), personOf(ci, "owned_by"), personOf(ci, "managed_by"),
-                Text.Combine(ci[HiddenCharacters], ", "), position + 1
+                Text.Combine(ci[HiddenCharacters], ", "), position + 1, ci[AssetTag]
             }
     in
         #table(
             type table [Name = text, Status = text, CapabilitiesAbove = text, CapabilitiesBelow = text, ProcessesBelow = text, Description = text, Tags = text,
-                OwnedBy = text, ManagedBy = text, HiddenCharacters = text, Order = Int64.Type],
+                OwnedBy = text, ManagedBy = text, HiddenCharacters = text, Order = Int64.Type, AssetTag = text],
             List.Transform(List.Positions(sorted), row))

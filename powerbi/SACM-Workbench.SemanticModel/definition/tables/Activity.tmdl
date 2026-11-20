@@ -88,11 +88,18 @@ table Activity
 	column Kind
 		dataType: string
 		sourceColumn: Kind
+		sortByColumn: KindOrder
 
 	/// The words the search box of History looks in: what happened, the cards, the text and who (build D3).
 	column Find
 		dataType: string
 		sourceColumn: Find
+
+	/// Build R5 (D368): the order of the kind buttons of History, the order of the day's work: reports, replies, emails, reminders, status, assigned, notes, not followed, reviews, other. From Icon, the source of Kind (a sort column may not use the column it sorts).
+	column KindOrder = SWITCH ( Activity[Icon], "load", 1, "reply", 2, "mail", 3, "teams", 3, "remind", 4, "ok", 5, "assign", 6, "handover", 6, "note", 7, "stop", 8, "review", 9, "eye", 9, 10 )
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
 
 	partition Activity = m
 		mode: import

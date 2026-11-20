@@ -35,14 +35,15 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "CaseLines"
+                      "Entity": "Checks"
                     }
                   },
-                  "Property": "CheckId"
+                  "Property": "CardLabel"
                 }
               },
-              "queryRef": "CaseLines.CheckId",
-              "nativeQueryRef": "CheckId",
+              "queryRef": "Checks.CardLabel",
+              "nativeQueryRef": "CardLabel",
+              "active": true,
               "displayName": "Check"
             },
             {
@@ -180,7 +181,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "184D"
+                  "Value": "160D"
                 }
               }
             }
@@ -194,13 +195,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "94D"
+                  "Value": "150D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "CaseLines.CheckId"
+            "metadata": "Checks.CardLabel"
           }
         },
         {
@@ -208,7 +209,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "145D"
+                  "Value": "140D"
                 }
               }
             }
@@ -222,7 +223,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "122D"
+                  "Value": "100D"
                 }
               }
             }
@@ -236,7 +237,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "135D"
+                  "Value": "130D"
                 }
               }
             }

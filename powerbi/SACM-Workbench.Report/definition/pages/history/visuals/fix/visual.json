@@ -23,11 +23,11 @@
                       "Entity": "Runs"
                     }
                   },
-                  "Property": "ReportDate"
+                  "Property": "Day"
                 }
               },
-              "queryRef": "Runs.ReportDate",
-              "nativeQueryRef": "ReportDate",
+              "queryRef": "Runs.Day",
+              "nativeQueryRef": "Day",
               "displayName": "Report date",
               "active": true
             }
@@ -63,7 +63,7 @@
                     "Entity": "Runs"
                   }
                 },
-                "Property": "ReportDate"
+                "Property": "Day"
               }
             },
             "direction": "Ascending"

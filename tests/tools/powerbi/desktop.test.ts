@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { blankRowQueries, boundTexts, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf, realSizeExpressions, withExpression } from '../../../tools/powerbi/desktop.ts';
+import { blankRowQueries, boundTexts, brokenWords, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf, realSizeExpressions, withExpression } from '../../../tools/powerbi/desktop.ts';
 import type { Pictures, Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
 
 /*
@@ -181,4 +181,20 @@ test('the copy at real size (R4 step 0): one expression is replaced and the othe
   assert.match(folder, /^expression SourceMode = "SharePoint"/m);
   assert.ok(folder.includes('Folder.Files("C:\\sacm-real-size\\")'), 'the folder of the runner');
   assert.notEqual(folder.match(/^expression RangeStart = .*$/m)?.[0], tmdl.match(/^expression RangeStart = .*$/m)?.[0], 'RangeStart moves back for the earlier dates');
+});
+
+test('build R5: a word longer than its column is broken over two lines; links, pictures, dates and numbers are left out', () => {
+  const query: VisualQuery = { page: 'Audit export', pageName: 'auditexport', visual: 'openAtEnd', type: 'tableEx', title: 'openAtEnd', groups: ['CI', 'Part'], values: ['Link'], dax: '', widths: { CI: 60, Part: 200, Link: 40 } };
+  const problems = brokenWords(query, [['Index Tool', 'Description', 'https://example.com/a/very/long/link'], ['Member', 'Owned by', 'data:image/svg+xml;utf8,<svg/>'], ['2026-11-04T00:00:00', '12345678901234', null]]);
+  assert.equal(problems.length, 0, problems.join('\n'));
+  const cut = brokenWords({ ...query, widths: { CI: 60, Part: 40, Link: 40 } }, [['Index Tool', 'Description', '']]);
+  assert.equal(cut.length, 1);
+  assert.match(cut[0]!, /the column "Part" is 40 px and "Description" needs/);
+});
+
+test('build R5 (D366): a pair of numbers of Self-check that does not agree fails the Desktop check', () => {
+  const query: VisualQuery = { page: 'Self-check', pageName: 'selfcheck', visual: 'same', type: 'tableEx', title: 'same', groups: ['Pair of numbers'], values: ['One', 'Other', 'Same'], dax: '' };
+  const results: Results = { opened: true, modelErrors: [], results: [{ query, rows: [['A = B', '3', '3', 'Yes'], ['C = D', '44', '21', 'No']] }] };
+  const { problems } = judge(results);
+  assert.deepEqual(problems.filter((line) => line.includes('do not agree')), ['Self-check › same: "C = D" do not agree (44 and 21): two pages give two numbers for one word']);
 });

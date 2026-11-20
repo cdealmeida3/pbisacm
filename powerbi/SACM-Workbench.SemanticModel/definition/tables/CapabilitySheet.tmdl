@@ -71,6 +71,21 @@ table CapabilitySheet
 		isNameInferred
 		sourceColumn: [Order]
 
+	/// The asset tag (EPO ID) of the capability (build R5).
+	column AssetTag
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AssetTag]
+
+	/// The name as the page shows it (build R5, D367): with the asset tag in brackets when another capability has the same name, so two lines of one name do not look like one line twice.
+	column NameShown =
+			VAR named = CapabilitySheet[Name]
+			VAR same = CALCULATE ( COUNTROWS ( CapabilitySheet ), ALL ( CapabilitySheet ), CapabilitySheet[Name] = named )
+			RETURN IF ( same > 1 && CapabilitySheet[AssetTag] <> "", named & " (" & CapabilitySheet[AssetTag] & ")", named )
+		dataType: string
+		summarizeBy: none
+
 	partition CapabilitySheet = calculated
 		mode: import
 		source =
@@ -86,5 +101,6 @@ table CapabilitySheet
 					"OwnedBy", Run[CapabilitySheet.OwnedBy],
 					"ManagedBy", Run[CapabilitySheet.ManagedBy],
 					"HiddenCharacters", Run[CapabilitySheet.HiddenCharacters],
-					"Order", Run[CapabilitySheet.Order]
+					"Order", Run[CapabilitySheet.Order],
+					"AssetTag", Run[CapabilitySheet.AssetTag]
 				)

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { folderProblems, LONG_BUTTONS, pageProblems, readCatalogue, readPages, themeProblems, wordProblems } from '../../../tools/powerbi/pages.ts';
+import { codeColumns, folderProblems, LONG_BUTTONS, pageProblems, readCatalogue, readPages, themeProblems, wordProblems } from '../../../tools/powerbi/pages.ts';
 import { APP_SLOTS } from '../../../tools/powerbi/tokens.ts';
 import type { ReportPages, Visual } from '../../../tools/powerbi/pages.ts';
 import { theme } from '../../../tools/powerbi/generate.ts';
@@ -200,4 +200,19 @@ test('build R4 (D359): a page with an app has its app box under it, a page with 
   } finally {
     rmSync(at, { recursive: true, force: true });
   }
+});
+
+test('build R5 (D369): a table, chart or slicer shows words, never a column of codes; the Data check may name the report columns', () => {
+  const visual = (entity: string, property: string): Visual => ({
+    name: 'x', position: { x: 224, y: 84, width: 400, height: 200 },
+    visual: { visualType: 'tableEx', query: { queryState: { Values: { projections: [{ queryRef: `${entity}.${property}`, field: { Column: { Expression: { SourceRef: { Entity: entity } }, Property: property } } as never }] } } } }
+  });
+  assert.deepEqual(codeColumns(visual('Checks', 'CheckId')), ['Checks.CheckId']);
+  assert.deepEqual(codeColumns(visual('History', 'Field')), ['History.Field']);
+  assert.deepEqual(codeColumns(visual('Journal', 'Type')), ['Journal.Type']);
+  assert.deepEqual(codeColumns(visual('Checks', 'CardLabel')), []);
+  assert.deepEqual(codeColumns(visual('History', 'Part')), []);
+  assert.deepEqual(codeColumns(visual('DataColumns', 'Field')), []);
+  // The report itself shows no code.
+  assert.deepEqual(readPages().pages.flatMap(({ visuals }) => visuals.flatMap(codeColumns)), []);
 });

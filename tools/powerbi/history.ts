@@ -16,7 +16,7 @@ import type { Table } from '../../src/core/reading/table.ts';
 import { parseCsv } from '../../src/core/reading/csv.ts';
 import { buildCases, buildRun, checkedIn, isClosedStatus, isDaily, stateOf } from '../../src/core/cases/cases.ts';
 import type { Case, CaseEvent, EventType, Reply, Rules, Run } from '../../src/core/cases/cases.ts';
-import { runChecks } from '../../src/core/checks/engine.ts';
+import { asksPeople, runChecks } from '../../src/core/checks/engine.ts';
 import { withTeamDays } from '../../src/core/checks/detectors/ci-detectors.ts';
 import { contractConfig, readSolusiFile } from '../../src/core/sources/contracts/contract-reports.ts';
 import { hiddenNames, readRelationshipReport } from '../../src/core/sources/relationships/relationship-report.ts';
@@ -299,6 +299,14 @@ export function activityRows(packs = loadPacks()): Array<Record<string, string |
   return [...journal, ...replies].map((row) => ({ ...row, Find: find(row) }));
 }
 
+/**
+ * An open line (D366, the column IsOpen of CaseLines): a case of the newest report that is to solve (not to check,
+ * waiting or known), not closed (not verified, not set aside) and of a live card. Every page counts these.
+ */
+export function isOpenLine(item: Case, newest: ReadonlySet<string>): boolean {
+  return newest.has(item.fact.key) && item.state === 'open' && !isClosedStatus(item.status) && asksPeople(packOf(item.fact.checkId));
+}
+
 /** The rows of the part History of HistoryRun: every finding of every report date. */
 export function historyRows(key: HistoryKey): Array<Record<string, string>> {
   return key.runs.flatMap((run) => run.facts.map((fact) => ({
@@ -324,9 +332,10 @@ export async function expectedHistory(): Promise<Array<{ metric: string; expecte
   const days = solved.map((fact) => daysBetween(firstSeen.get(fact.key)!, newest.date));
   const team = stateRows('team').filter((row) => !/^(no|false|0)$/i.test(row.Active!.trim()));
   const me = team[0]?.Title ?? '';
-  const open = key.cases.filter((item) => !isClosedStatus(item.status));
+  // An open line (D366): of the newest report, to solve, not closed, of a live card. The column IsOpen of CaseLines.
+  const open = key.cases.filter((item) => isOpenLine(item, now));
   // My day counts the daily cards only (D182).
-  const daily = key.cases.filter((item) => isDaily(packOf(item.fact.checkId)));
+  const daily = open.filter((item) => isDaily(packOf(item.fact.checkId)));
   return [
     { metric: 'Report dates', expected: key.runs.length },
     { metric: 'Findings in the newest report', expected: newest.facts.length },
