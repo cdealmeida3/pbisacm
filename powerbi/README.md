@@ -44,13 +44,13 @@ The report opens on the **My day** page. Look at:
 | **Lifecycle review** | The lifecycle reviews: the review of 11 November with its 7 CIs and their marks, and the next draw. The marks, then the evidence (who checked, the case, when it was asked); the app *SACM audit* sits at the right (section 6.8). |
 | **Reports** | One line per kind of report (CI report, Relationship report, EPO systems report, Solusi contract file, ServiceNow contract report), the newest file of each, its date and age, and "Up to date", "Old" or "Missing" in colour. First, the box **What to fix in the folder**: a kind with no file, the columns the CI report lacks (one line to copy; the samples lack 3), a file not used and why, then the files the report knows but does not use. Below: the runs and the classes. |
 | **Cards** | Two tabs. **Sections**: the three sections side by side, each card with a badge (the number to solve, a tick when OK) and a small line of its report dates. **List**: one row per check, as before. Select a card, then **Open card**. On the list: the three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. The row of states (*To solve*, *To check*, *OK*, *Not tested*) and **Topic** filter the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
-| **Card** (drill through) | On All cards select a card and press **Open card**. **Back**, the card and what it finds, then the tabs **To solve with a person** (the lines by the person to ask, then the kind of problem, with why a line waits), **SACM fix list** (with **Open in ServiceNow**), **To check** (the lines to check first) and **Export** (the columns of the SACM template: **More options (...)**, **Export data** gives the Excel file). At the right the app, *About this card* with the numbers, and **Open CI** for the line selected. A contract shows as `CT…: name`. |
+| **Card** (drill through) | On All cards select a card and press **Open card**. **Back**, the card and what it finds, then the tabs **To solve with a person** (the lines by the person to ask, then the kind of problem, with why a line waits), **SACM fix list** (with **Open in ServiceNow**), **To check** (the lines to check first) and **Export** (the columns of the SACM template: **More options (...)**, **Export data** gives the Excel file). At the right the app, *Lines of this card* with the numbers, and **Open CI** for the line selected. A contract shows as `CT…: name`. |
 | **Case** (drill through) | On a card or a person select a line and press **Open CI**. **Back**, the CI and its fields, then the tabs **Problems** (each problem, its state, why it waits, who is asked, the follow-up, **Open in ServiceNow**), **People** (who is asked, copied, who gets an escalation), **Relationships** (every CI above and below it, and whether the line counts), **Timeline** and **Replies**. The app *SACM actions* at the right (section 6.4). |
 | **Person** (drill through) | On My day, People or Overview select a person and press **Open person**: the next step, the open lines, the kinds of problem, the last contact, everything open with them, **Prepare email** (select a line of *Open with them* first: it opens Messages on this person) and **Open CI**. With nobody chosen it shows no line and the tiles say "Choose a person first". *Card* and *Case* show no line until a card or a CI is chosen. Their replies are in the app *SACM actions* at the right (tab **Reply**, section 6.4). |
 | **Mapping backlog** | One line per CI to map with its owner: why it is on the list, the stage of its class, the steps, its criticality and the next step ("Invite the owner to a mapping session", or why it waits). **Lines** filters To solve, To check, Waiting and Planned. Below: the **capability sheet** for Enterprise Architecture (its line says how many, or why it is empty: it needs the Relationship report), every Business Capability with what is above and below it (**Export data** gives the Excel file). For the samples: 4 CIs to map. The backlog has no drill through to the Case page: right-click the CI on the *Mapping backlog* card instead. The stage is the last one the journal sets for the CI (the Power App's *Mapping stage*), else the first stage of the class: in the samples one CI is at *Session held*. |
 | **Contract changes** | The newest Solusi contract file against the one before it: new contracts, contracts no longer in the file, status changes and changed fields. Then the Concluded contracts that end in the next 30 and in the next 90 days (counted from today), and the running contracts without a daily responsible. For information only: nobody is asked. The samples have two Solusi files, an earlier one and the newest, so the page compares them; 2 Concluded contracts end in the next 90 days (none in 30) and 1 has no daily responsible. |
 | **Data check** (hidden page) | Opened with **Data check ›** at the top of Reports. Who you are and whether you are on *SACM Team* (in Desktop with the samples: not on it, counted as the sample member); the rows read from the four lists; each report with what the checks get (the CI report: 26 of the 29 columns the checks read on the samples); the columns found and missing; how many CIs name Owned by, Managed by, Supported by and the manager of Owned by with a name, an email, a user ID and *active*; and the settings the emails need (on the samples the Procurement lead and the request links are missing). |
-| **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples: **39 of 39**. Below: the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up), each with the app's number and *OK*, and **Numbers that must agree**: five pairs of numbers from two pages that must be the same, on the samples and on your real reports. In Desktop you see hidden pages in the page list; in the published report they are hidden. |
+| **Self-check** (hidden page) | How many checks give the result the HTML app records for the same samples: **39 of 39**. Below: the numbers of the history (report dates, findings per date, new, solved, days to fix, open cases, reminders due, to escalate, replies to read, mine, not followed up), each with the app's number and *OK*, and **Numbers that must agree**: six pairs of numbers that must be the same, on the samples and on your real reports (the sixth: every email ready to send reaches the app *SACM messages* whole, D372). In Desktop you see hidden pages in the page list; in the published report they are hidden. |
 
 Every page has the navy rail at the left: one item per page (a press opens it), the page in view lighter with a coral
 line, the number of next steps beside *My day* and of open lines beside *Work queue*; at its foot the version, "invented
@@ -90,6 +90,9 @@ of the new pages.
    - the **Power Apps** and the **Refresh now** buttons you added (section 6), each to the same page, at the place this
      version keeps for it. They are in your folder only after step 13 of section 6.4.
    It copies nothing else, deletes nothing and never changes the previous folder.
+   **From 0.57.0 or older to 0.58.0:** the script moves the app of *Messages* to the right side and the app of *Card*
+   to its taller place. After you publish, the app of *Messages* needs its new fields, filter, formulas and screen:
+   section 6.6, *An app made before build R6*.
 6. Press a key to close the window. **Open `SACM-Workbench.pbip` in the new folder** and press **Refresh**.
 7. When the new version works, publish it (section 4) and delete the previous folder.
 
@@ -319,6 +322,28 @@ What the app offers (the words are those of the HTML app; a check file can give 
 | **Hand over my work** | your open lines among the selected ones, to another member | when you have open lines there |
 | **Note about the person** | a note about the person asked | when every line is about one person |
 | **Share out** | one *assign* per member: the free groups of the card, the biggest first, each to the active member with the fewest CIs so far (D24, D303) | when a line belongs to a free group and the team has two active members or more |
+
+### The set-up on one page (build R6)
+
+Do it in this order. After each step, open the page **Data check** (the button **Data check ›** at the top of
+*Reports*) in the published report: the last column says what it shows when the step is done. The copy pack has every
+value and text to paste, in the same order.
+
+| # | Step | Where | Data check shows when it is done |
+|---|---|---|---|
+| 1 | Open the report with the samples, press Refresh | Section 1 | *Reports*: the invented reports, each with its newest file; *Lists read*: the invented lists |
+| 2 | The reports folder: the five parameters, then Refresh | Sections 3 and 4A step 2 | *Reports*: each report with its newest file; *Columns the checks read*: the columns the CI report lacks, if any; *Who the CI report names*: the CIs with an owner, an email, a user ID |
+| 3 | Publish to My workspace, credentials, the first refresh, the schedule at 07:00, share | Section 4A | The same, in the service. The rail says "refreshed … ago" |
+| 4 | The five lists, with their exact columns | Section 5 | *Lists read*: SACM Journal, SACM Team, SACM Settings and SACM Replies, each with a number (0 is fine for an empty list; a list that is missing also gives 0) |
+| 5 | Put yourself and the managers in *SACM Team*, then refresh | Section 5 | *You*: "You are <your name> (…), member of SACM Team: yes"; *Lists read*: SACM Team with the number of managers |
+| 6 | The settings of the emails in *SACM Settings*, then refresh | Section 6.7 | *Settings the emails need*: each row *Set* (the signature may stay *Default*); a row *Missing* says what an email lacks without it. The line under the list of *Messages* names the settings that would give an email its address |
+| 7 | The lists' permissions | Section 6.2 | (nothing new: the managers can open the lists) |
+| 8 | The flows F1 to F7 | Section 6.3 | After F3 and a reply: *Lists read* counts SACM Replies. F5 and F6 give no line here: their answer is in the app and on the rail |
+| 9 | The app SACM actions on Case, then copied to Card, Person, Work queue and Not followed | Section 6.4 | (in the app) the top line "Report data from …"; a note you save appears under *Done lately*, and after a refresh *Lists read* counts one more SACM Journal entry |
+| 10 | The app SACM messages on Messages (fields of AppEmail, filter Selected email is 1) | Section 6.6 | (in the app) the email chosen in the list, whole. *Self-check*, *Numbers that must agree*: "Emails ready = emails the app gets whole" agrees |
+| 11 | The app SACM audit on Lifecycle review, and the button Refresh now on My day and Reports | Sections 6.8 and 6.3 (F6) | A change of a setting in the app's Settings screen shows in *Settings the emails need* after a refresh |
+| 12 | Keep the apps in your folder for the next update | Section 6.4 step 13 | (nothing: the next update carries them) |
+| 13 | Try it: a note, a test email to yourself, a review | Sections 6.4 and 6.6 | After a refresh, *Lists read* counts the new SACM Journal entries |
 
 ### 6.1 Check first (question Q4)
 
@@ -552,12 +577,14 @@ top line says everything is in the report.
   <name>): <your note>". The reply counts as read.
 - **Add note**: only a note. The reply stays to read.
 
-On the page *Card* (300 high) the tab says to open the person: the reply reader needs the height of *Person* or *Case*.
+Since build R6 the reply reader works on every page of the app, *Card* too (476 high, D374). A smaller place says to
+open the person.
 
 What to know:
 
 - The visual gives the app **1,000 lines at most** (Microsoft's limit). At 1,000 lines the app cannot tell whether there
-  are more, so **Save is off**: select fewer lines, or filter the page.
+  are more, so **Save is off**: on *Work queue* choose **Mine and free** (the app then gets only your lines and the
+  free ones, D374), or select fewer lines.
 - **If you change the fields** of the visual, edit the app from the visual (**... → Edit**), or the app does not see the
   change.
 - The visual works in **Edge** and **Chrome**, not in Firefox.
@@ -582,11 +609,11 @@ them in **Format → General → Properties → Size and position**:
 | Page | App | X | Y | Width | Height |
 |---|---|---|---|---|---|
 | Case | SACM actions | 956 | 84 | 300 | 620 |
-| Card | SACM actions | 956 | 84 | 300 | 300 |
+| Card | SACM actions | 956 | 84 | 300 | 476 |
 | Person | SACM actions | 956 | 84 | 300 | 568 |
 | Work queue | SACM actions | 956 | 84 | 300 | 620 |
 | Not followed | SACM actions (Follow again) | 956 | 84 | 300 | 620 |
-| Messages | SACM messages (the email studio) | 224 | 84 | 1032 | 620 |
+| Messages | SACM messages (the email studio) | 676 | 84 | 580 | 620 |
 | Lifecycle review | SACM audit | 956 | 84 | 300 | 620 |
 | My day, Reports | the button **Refresh now** (F6, a Power Automate visual, section 6.3) | 16 | 604 | 156 | 40 |
 
@@ -600,10 +627,14 @@ app reads them).
 **Build R4 (0.56.0): a grey box under each place.** In Desktop each place above shows a grey box: the name of the app,
 what it does there and the data it gets ("appears here in the published report"); on My day and Reports the place of
 **Refresh now** shows one too. In the service the app covers its box. The lint allows only that box under an app
-(D359). **Messages in Desktop** (D361): under the app's place the page has the list of the emails at the left and the email
-chosen at the right (To, Cc, Subject and its first lines). In the service the app covers them, as before. Build R6
-redraws the app for one email: then the list stays on the page, the app moves to the right side, and the update script
-moves it for you.
+(D359). **Messages in Desktop** (D361): under the app's place the page shows the email chosen (To, Cc, Subject and its
+first lines). In the service the app covers it.
+
+**Build R6 (0.58.0) moved two apps, and the update script moves them for you** (section 1, *Update to a new version*):
+on *Messages* the app is on the right side (X `676`, Y `84`, width `580`, height `620`), next to the list of the emails,
+and gets one email (section 6.6, D371); on *Card* it is taller (height `476`, D374), so its form no longer scrolls and
+the reply reader fits. The app of *Messages* also needs new fields, a filter and its new formulas and screen: follow
+*An app made before build R6* in section 6.6.
 
 ### 6.5 How many refreshes (the refresh rule, D332 and D333)
 
@@ -636,26 +667,32 @@ What **Refresh now** in an app answers (the flow F5):
 The button on *My day* and *Reports* (F6) cannot show an answer: when a press changes nothing, the line above it says
 why. Do **not** test the limit by pressing Refresh now many times: in My workspace that uses the day's 8.
 
-### 6.6 The app SACM messages: the email studio (builds B7 and D5)
+### 6.6 The app SACM messages: the email studio (builds B7, D5 and R6)
 
-The page **Messages** holds the app **SACM messages**, the email studio (D326). It fills the page under the title (X 224,
-Y 84, 1032 × 620) (section 6.4). Under it, since build R4, Desktop shows the list of the emails at the left (who, kind, CIs, subject, state) and
-the email chosen at the right (after *Prepare email*, the email to that person): To, Cc, Subject and its first
-lines (D361). In the service the app covers them. It lists every email ready to send: first messages, reminders that are due and escalations, one per
-person and kind (D300, D314). The words are those of the HTML app, and the check of every pull request compares them
-with it.
+The page **Messages** has, from build R6 (D371), the **list of the emails** at the left and the app **SACM messages**,
+the email studio, at the right (X 676, Y 84, 580 × 620, section 6.4). The list has every email ready to send: first
+messages, reminders that are due and escalations, one per person and kind (D300, D314), with who gets it, the kind,
+the CIs, the subject and *Ready* or *No address*. The buttons above it (*Email*, *Reminder*, *Escalation*) show one
+kind. The words are those of the HTML app, and the check of every pull request compares them with it.
 
-- **On the left, the list.** One line per email: who gets it, the kind (*First*, *Reminder*, *Escalate*, or *Sent*), the
-  CIs and the parts. The tabs above it (*All*, *First*, *Reminder*, *Escalate*) filter it. Press a line to open it.
-- **In the middle, the email as it will arrive**, with its reference and your name. A long email shows each table's first
-  lines (the setting `rowsInEmail`, default 10) and carries the full list as a CSV file (the chip above it says so).
-- **On the right, the fields.** From is the shared SACM mailbox. **To**, **Cc** and **Subject** can be changed. The box
-  under them says whether a colleague wrote to this person, or about these cases, in the last 24 hours (D302): then
-  the buttons wait until you tick **Send anyway**.
+**Choose an email in the list: the app shows that one.** With none chosen it shows the email of *Prepare email* (the
+person you came from), else the first of the list. In Desktop the place of the app shows the email chosen as text
+(D361). The app gets only that email (the table *AppEmail*, its filter *Selected email is 1*), so it never reaches the
+1,000 rows of the visual, and a long email comes whole: the report cuts its text into pieces of 20,000 characters and
+the app joins them (D372).
+
+- **At the top**, the kind and who gets it, the time of the report's data, and **Refresh now**.
+- **The fields.** From is the shared SACM mailbox. **To**, **Cc** and **Subject** can be changed. A new email shows
+  *new reference* in the subject: it gets its reference at your first *Test to me*, *Send*, *Outlook draft* or
+  *Teams*, and keeps it while it stays chosen. A reminder keeps the reference of the first message (D5).
+- **One line on what happens**: sent, or a colleague wrote to this person or about these cases in the last 24 hours
+  (D302): then the buttons wait until you tick **Send anyway**. The tick counts for this email only.
+- **The email as it will arrive**, with your name. A long email shows each table's first lines (the setting
+  `rowsInEmail`, default 10) and carries the full list as a CSV file (the line above it says so).
 - **Send** (the main button): the flow *SACMSend* sends the email from the shared mailbox, with its file. Then the app
-  records it on the cases of every part (and gives you the cases nobody had). It does not refresh the report: the email
-  stays in the list, marked **Sent** for every manager, and leaves it after the next refresh. **Next email** opens the
-  next one not sent.
+  records it on the cases of every part (and gives you the cases nobody had). It does not refresh the report: the app
+  shows it **Sent** for every manager, and the email leaves the list after the next refresh. **Choose the next email in
+  the list**: the app cannot move the list's choice.
 - **Test to me**: the flow *SACMTest* sends it, with its file, to you only. The cases are not changed.
 - **Outlook draft**: the flow *SACMDraft* puts the email, with its file, into **your** Drafts in Outlook, with From set
   to the SACM mailbox (D315), and opens it. Change it there and press Send in Outlook. Then answer **Sent from
@@ -663,48 +700,57 @@ with it.
 - **Teams**: opens a Teams chat with the person and the first message. Then **Did you start the chat?**: *Yes* records
   it. Teams is off for an email to a mailbox, for a long list (a file or several parts) and for more than 15 people:
   the button says why.
-- A grey button always says why under it (for example *Fill in To first.*).
+- **No address** (D373): when the report knows nobody to send it to, the line above the buttons says why and what fixes
+  it: "No address: add procurementEmail to SACM Settings, or type it in To" (the Procurement mailbox),
+  `team.<id>.people` (a team), `epoOwnerEmail` (the EPO inventory owner), or that the person has no email in the CI
+  report. The line under the title of the list names the settings to add, and the page *Data check* lists them.
+- A grey button always says why above it (for example *Fill in To first.*).
 
 Make it once, as the app of section 6.4:
 
-1. In the report (the service, **Edit**), page **Messages**: **Visualizations → Power Apps**, at X 224, Y 84, 1032 × 620.
-   Add these fields of **Drafts**, each **Don't summarize**: *DraftId*, *Ref*, *Kind*, *KindLabel*, *To*, *ToName*,
-   *Cc*, *Subject*, *Body*, *Chat*, *Keys*, *NewKeys*, *FreeKeys*, *CiCount*, *About*, *NobodyAbove*, *Mailbox*,
-   *AssignedTo*, and from build D5 *Html*, *Csv*, *Summary*, *EmailSubject*, *EmailId*, *HtmlLength*, *CsvLength*, and
-   from build 0.52.0 the measure **About → Report at**.
-2. **Create new**. In Studio: **Settings → Updates → New**: turn on **Modern controls and themes**. **Data → Add data →
+1. In the report (the service, **Edit**), page **Messages**: **Visualizations → Power Apps**, at X 676, Y 84, 580 × 620.
+   Add these fields of **AppEmail**, in this order, each **Don't summarize**: *Row*, *DraftId*, *EmailId*, *Piece*,
+   *Ref*, *Kind*, *KindLabel*, *To*, *ToName*, *Cc*, *Subject*, *Chat*, *Keys*, *NewKeys*, *FreeKeys*, *CiCount*,
+   *About*, *NobodyAbove*, *Mailbox*, *AssignedTo*, *Summary*, *EmailSubject*, *HtmlLength*, *CsvLength*, *AddressWhy*,
+   *Html*, *Csv*, and last the measure **About → Report at**.
+2. **Filters on this visual**: drag the measure **AppEmail → Selected email**, *Show items when the value* **is** `1`,
+   **Apply filter**. The app then gets only the email chosen in the list.
+3. **Create new**. In Studio: **Settings → Updates → New**: turn on **Modern controls and themes**. **Data → Add data →
    SharePoint** → **SACM Journal** and **SACM Team**. **Power Automate → Add flow** → **SACMSend**, **SACMTest**,
    **SACMDraft** and **SACMRefresh** (for the button **Refresh now** at the top).
-3. **App → Formulas**: paste `apps/sacm-messages/App-Formulas.fx`. Paste `apps/sacm-messages/Src/MessagesScreen.pa.yaml`
+4. **App → Formulas**: paste `apps/sacm-messages/App-Formulas.fx`. Paste `apps/sacm-messages/Src/MessagesScreen.pa.yaml`
    on *Screen1* (Ctrl+V), delete *Screen1*, **App → StartScreen** `MessagesScreen`.
-4. **Settings → General → Data row limit** `2000`. **Save as** `SACM messages`, **Publish**, **Share** with `SACM
+5. **Settings → General → Data row limit** `2000`. **Save as** `SACM messages`, **Publish**, **Share** with `SACM
    managers`. Save the report.
 
-**An app made in build B7**: in the report, move and resize the visual to X 224, Y 84, 1032 × 620 (the table and the
-kind buttons are gone from the page). Add the new fields of step 1, then **... → Edit**. In Studio: turn on the modern
-controls (step 2), add the flow **SACMDraft**, refresh the flows **SACMSend** and **SACMTest** (they have new inputs:
-**Power Automate → ... → Refresh**), paste the new `App-Formulas.fx`, delete *MessagesScreen*, and paste the new
-`MessagesScreen.pa.yaml`. Save and publish.
+**An app made before build R6** (it had the fields of *Drafts* and filled the page): the update script moved the visual
+to the right side. In the report (**Edit**), select it: remove every field of *Drafts* from **Power Apps data**, add the
+fields of **AppEmail** of step 1 and **About → Report at**, and add the filter of step 2. Then **... → Edit**. In
+Studio, paste the new `App-Formulas.fx`, delete *MessagesScreen*, paste the new `MessagesScreen.pa.yaml`, and set
+**App → StartScreen** again. The app check (the warning triangle) should show no error; an error on a field means the
+visual lacks it (step 1). Save and publish.
 
-How to try it: in *SACM Team* put yourself as a member. On a test email, change **To** to your own address, press
-**Test to me**: the email comes to you, with its file when the list is long. Press **Outlook draft**: the draft opens in
-Outlook, From the SACM mailbox; answer *No* in the app. Then **Send**: it comes again, and the list shows it *Sent* at
-once. After the next refresh (**Refresh now** at the top, then **Refresh** in the report's top bar) the tab *What
-happened* of **History** shows the message, and the email leaves the list.
+How to try it: in *SACM Team* put yourself as a member. Choose a test email in the list, change **To** to your own
+address, press **Test to me**: the email comes to you, with its file when the list is long. Press **Outlook draft**: the
+draft opens in Outlook, From the SACM mailbox; answer *No* in the app. Then **Send**: it comes again, and the app shows
+it *Sent* at once. After the next refresh (**Refresh now** at the top, then **Refresh** in the report's top bar) the
+tab *What happened* of **History** shows the message, and the email leaves the list.
 
 What to know:
 
-- The visual gives the app 1,000 drafts at most.
-- A reminder keeps the reference of the first message, so the reply finds the case (D5). A new email gets its
-  reference when you open it in the list.
-- Until the refresh, an email that anyone sent since the report's data stays in the list, marked *Sent* with who sent it
-  and when, and its buttons off (the app reads the journal, D334). The top line counts the journal rows since then.
+- Until the refresh, an email that anyone sent since the report's data stays in the list. The app shows it *Sent*, with
+  who sent it and when, and its buttons off (the app reads the journal, D334). The top line counts the journal rows
+  since then.
 - **A long email** (D313, D314): its parts are one email on its first part (*EmailId* points to it), each table shows its
   first `rowsInEmail` lines, and the file `<reference>.csv` has every line (it opens in Excel).
-- **A cut email.** The Power Apps visual may pass a very long text cut: about 32,000 characters is the limit people
-  report for the visuals of Power BI. The app compares what it got with *HtmlLength* and *CsvLength*: when the email or
-  its file is shorter than the report says, Send, Test to me and Outlook draft stay off and say so. Tell the project
-  thread when you see it; a lower `rowsInEmail` makes the email shorter (the file stays whole in the report).
+- **Long texts come in pieces** (D372). The Power Apps visual is reported to cut a text of about 32,000 characters. An
+  email at the real size of the reports passes it: in the invented samples made as big as the real reports, the longest
+  email has about 66,000 characters and its file about 290,000. So *AppEmail* cuts the email and its file into pieces of
+  20,000 characters (*Piece* 1, 2, …), and the app joins them in order. It still compares what it got with *HtmlLength*
+  and *CsvLength*: if the email or its file is shorter, Send, Test to me and Outlook draft stay off and say so. The
+  Self-check page checks that the pieces of every email join to the whole email.
+- **More than one email**: the visual lacks the filter *Selected email is 1* (step 2). The app then sends nothing and
+  says so.
 - There is no **Copy** and no `mailto:` link any more (D316): both lose the tables and the file.
 
 ### 6.7 The settings the messages read

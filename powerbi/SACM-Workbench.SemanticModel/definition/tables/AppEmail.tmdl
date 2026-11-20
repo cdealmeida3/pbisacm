@@ -1,0 +1,255 @@
+/// Build R6 (D372): the rows the app SACM messages gets, for the one email chosen on Messages (its visual filter: Selected email is 1). Built by Power Query (fnAppEmailPart): one row per part of each email (Piece 0, the fields of Drafts the app reads), and the email's Html and Csv cut into pieces of 20,000 characters (Piece 1, 2, …), because the Power Apps visual is reported to cut a text of about 32,000 characters: the app joins the pieces in order and checks their length against HtmlLength and CsvLength. No relationship: Selected email reads the choice of the list (Drafts) itself.
+table AppEmail
+
+	/// Build R6 (D371, D372): 1 on the rows of the email chosen on Messages (Drafts[Chosen email]: the email chosen in the list; else the email to the person of Prepare email; else the first of the list). The filter of the Power Apps visual of Messages, so the app gets one email.
+	measure 'Selected email' =
+			VAR chosen = [Chosen email]
+			RETURN IF ( NOT ISBLANK ( chosen ) && SELECTEDVALUE ( AppEmail[EmailId] ) = chosen, 1 )
+		formatString: 0
+
+	/// Self-check (D372): the emails whose pieces, joined in order, are their whole Html and Csv. SameNumbers compares it with the number of emails.
+	measure 'Emails whole in pieces' =
+			VAR emails = FILTER ( ALL ( Drafts ), Drafts[DraftId] = Drafts[EmailId] )
+			RETURN
+			    SUMX (
+			        emails,
+			        VAR id = Drafts[DraftId]
+			        VAR pieces = FILTER ( ALL ( AppEmail ), AppEmail[EmailId] = id && AppEmail[Piece] > 0 )
+			        VAR joinedHtml = CONCATENATEX ( pieces, AppEmail[Html], "", AppEmail[Piece], ASC )
+			        VAR joinedCsv = CONCATENATEX ( pieces, AppEmail[Csv], "", AppEmail[Piece], ASC )
+			        RETURN IF ( EXACT ( joinedHtml, Drafts[Html] ) && EXACT ( joinedCsv, Drafts[Csv] ), 1, 0 )
+			    ) + 0
+		formatString: #,0
+
+	/// The row: the DraftId of a part, or the DraftId of the email and the piece ("D0001-2"). Unique, so the Power Apps visual never joins two rows into one.
+	column Row
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Row]
+
+	/// The draft (Drafts[DraftId]); on a piece row, the email's first part.
+	column DraftId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [DraftId]
+
+	/// The email the row belongs to: the DraftId of its first part (Drafts[EmailId]).
+	column EmailId
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EmailId]
+
+	/// 0 on a part (one per draft); 1, 2, … on the pieces of the email's texts, in their order.
+	column Piece
+		dataType: int64
+		isDataTypeInferred
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Piece]
+
+	/// On a part: Drafts[Ref].
+	column Ref
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Ref]
+
+	/// On a part: first, reminder or escalation.
+	column Kind
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Kind]
+
+	/// On a part: Email, Reminder or Escalation.
+	column KindLabel
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [KindLabel]
+
+	/// On a part: the address the message goes to.
+	column To
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [To]
+
+	/// On a part: the name of the person or mailbox.
+	column ToName
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [ToName]
+
+	/// On a part: the addresses copied.
+	column Cc
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Cc]
+
+	/// On a part: the subject of the part.
+	column Subject
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Subject]
+
+	/// On a part: the first message of a Teams chat.
+	column Chat
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Chat]
+
+	/// On a part: its keys, one per line.
+	column Keys
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Keys]
+
+	/// On a part: the keys new since the first message, one per line.
+	column NewKeys
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [NewKeys]
+
+	/// On a part: the keys nobody has, one per line.
+	column FreeKeys
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [FreeKeys]
+
+	/// On a part: its CIs.
+	column CiCount
+		dataType: int64
+		isDataTypeInferred
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CiCount]
+
+	/// On a part: for an escalation, who did not answer.
+	column About
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [About]
+
+	/// On a part: an escalation nobody is known for (D160).
+	column NobodyAbove
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [NobodyAbove]
+
+	/// On a part: to the Procurement mailbox.
+	column Mailbox
+		dataType: boolean
+		isDataTypeInferred
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Mailbox]
+
+	/// On a part: who has the cases.
+	column AssignedTo
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AssignedTo]
+
+	/// On a part: the parts of "In this email", one per line (first part only).
+	column Summary
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Summary]
+
+	/// On a part: the subject of the whole email (first part only).
+	column EmailSubject
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [EmailSubject]
+
+	/// On a part: the length of the email's Html (first part only), so the app knows it got all of it.
+	column HtmlLength
+		dataType: int64
+		isDataTypeInferred
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [HtmlLength]
+
+	/// On a part: the length of the email's file (first part only).
+	column CsvLength
+		dataType: int64
+		isDataTypeInferred
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [CsvLength]
+
+	/// On a part: why it has no To and what fixes it (Drafts[AddressWhy]).
+	column AddressWhy
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [AddressWhy]
+
+	/// On a piece: the next 20,000 characters of the email (Drafts[Html]).
+	column Html
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Html]
+
+	/// On a piece: the next 20,000 characters of the email's file (Drafts[Csv]).
+	column Csv
+		dataType: string
+		isDataTypeInferred
+		isNameInferred
+		sourceColumn: [Csv]
+
+	partition AppEmail = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS (
+					FILTER ( Run, Run[Part] = "AppEmail" ),
+					"Row", Run[AppEmail.Row],
+					"DraftId", Run[AppEmail.DraftId],
+					"EmailId", Run[AppEmail.EmailId],
+					"Piece", Run[AppEmail.Piece],
+					"Ref", Run[AppEmail.Ref],
+					"Kind", Run[AppEmail.Kind],
+					"KindLabel", Run[AppEmail.KindLabel],
+					"To", Run[AppEmail.To],
+					"ToName", Run[AppEmail.ToName],
+					"Cc", Run[AppEmail.Cc],
+					"Subject", Run[AppEmail.Subject],
+					"Chat", Run[AppEmail.Chat],
+					"Keys", Run[AppEmail.Keys],
+					"NewKeys", Run[AppEmail.NewKeys],
+					"FreeKeys", Run[AppEmail.FreeKeys],
+					"CiCount", Run[AppEmail.CiCount],
+					"About", Run[AppEmail.About],
+					"NobodyAbove", Run[AppEmail.NobodyAbove],
+					"Mailbox", Run[AppEmail.Mailbox],
+					"AssignedTo", Run[AppEmail.AssignedTo],
+					"Summary", Run[AppEmail.Summary],
+					"EmailSubject", Run[AppEmail.EmailSubject],
+					"HtmlLength", Run[AppEmail.HtmlLength],
+					"CsvLength", Run[AppEmail.CsvLength],
+					"AddressWhy", Run[AppEmail.AddressWhy],
+					"Html", Run[AppEmail.Html],
+					"Csv", Run[AppEmail.Csv]
+				)

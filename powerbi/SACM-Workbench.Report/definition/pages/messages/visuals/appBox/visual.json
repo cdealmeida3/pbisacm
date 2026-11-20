@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "appBox",
   "position": {
-    "x": 224,
+    "x": 676,
     "y": 84,
     "z": 1,
     "height": 88,
-    "width": 1032,
+    "width": 580,
     "tabOrder": 9000
   },
   "visual": {
@@ -43,7 +43,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The email studio: Send, Test to me, Outlook draft and Teams, for each email of the list.",
+                    "value": "Send, Test to me, Outlook draft and Teams, for the email chosen in the list at the left.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",
@@ -55,7 +55,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "It gets the emails ready to send (Drafts). Below: the list and the email chosen, as Desktop shows them.",
+                    "value": "It gets that one email (AppEmail, Selected email is 1). Below: the email chosen, as Desktop shows it.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

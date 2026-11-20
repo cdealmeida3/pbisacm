@@ -2,6 +2,16 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.58.0 — The Power BI report: the apps, for good (R6)
+
+- **Messages: the list on the page, the app for one email** (D371). In the service too, the page now shows at the left the buttons *First*, *Reminder* and *Escalation* and the list of the emails; the app *SACM messages* sits at the right and shows the one email chosen in the list. Choose the next email in the list after you send. A new email gets its reference when you first press a button; until then the subject says "new reference". **Your app needs a change once**: README §6.6, *An app made before build R6*.
+- **A long email arrives whole** (D372). On reports as big as the real ones an email reaches about 66,000 characters and its CSV file about 290,000, more than the Power Apps visual passes in one text. The app now gets the email in pieces and joins them. If a piece is missing it sends nothing and says so. *Self-check*, *Numbers that must agree*, has a sixth pair that checks every email arrives whole.
+- **"No address" says what to add** (D373): for example "No address: add procurementEmail to SACM Settings, or type it in To." The line under the list names the settings that would give the emails their address; *Data check* lists them.
+- **Card: the app is 476 high** (D374), and under it *Lines of this card* gives the numbers to solve, to check, waiting and known. The app's reply reader works at this height.
+- **Work queue:** when more than 1,000 lines are selected, the app says to choose *Mine and free* above the table, or select fewer lines.
+- **The set-up on one page** (README §6): every step in the order of the work, and what *Data check* shows when it is done. The copy pack takes the places of the apps from the report itself.
+- The update script moves the apps of *Messages* and *Card* to their new places. No check and no email text changed on the samples.
+
 ## 0.57.0 — The Power BI report: words, numbers and tables (R5)
 
 - **One word, one number** (D366). An *open line* is a line of the newest CI report that is still to solve, not verified, not set aside, of a live card. Overview, My day, Work queue, People, Person, the rail and the reminders all count these. Before, on the real reports, Overview and the Work queue gave two numbers far apart: Overview also counted proposed cards and the lines SACM fixes, the Work queue also lines to check or waiting. The line under *Where the work sits* now says "N open lines: X with a person, Y SACM fixes", the line under the Work queue says the lines SACM fixes are on Cards, and the newest point of each small line is the number of its tile. On the samples *Open cases* is 42 (was 65), *To escalate* 1 (was 3) and *Mine* 0 (was 2): the other lines are of proposed cards, to check or waiting.

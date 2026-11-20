@@ -65,21 +65,25 @@ App:
       RefreshClosedText = "Refresh now works from 08:00 to 18:00. The report refreshes at 07:00.";
       RefreshErrorText = "The refresh could not be asked. Your work is saved. Tell the owner of the report if it happens again.";
 
-      // The named formulas of the Power App "SACM messages", the email studio (builds B7, D5 and 0.52.0, D301, D313 to D317, D334), written
+      // The named formulas of the Power App "SACM messages", the email studio (builds B7, D5, 0.52.0 and R6, D301, D313 to D317, D334, D371 to D373), written
       // by hand. npm run powerbi:generate puts the look of the report before them in App-Formulas.fx (to paste into App →
       // Formulas) and Src/App.pa.yaml. Words of the app: plain English, as in the report.
       //
-      // Drafts: the rows the Power Apps visual of the page Messages gives (the fields of the table Drafts, README §6.6): the
-      // messages ready to send. A long message is split into parts (D36), and the template joins them into ONE email on its
-      // first part (D314): that part holds the email (Html, its file Csv, EmailSubject); the other parts point to it in
-      // EmailId. The app lists the emails, and records every part of an email under its one reference. The texts hold %%REF%%
-      // where the reference goes and %%SENDER%% where the manager's name goes: the app fills both when the manager sends
-      // (D301). Nothing is sent until a manager presses Send, Test to me, Outlook draft or Teams (D2).
+      // The rows the Power Apps visual of the page Messages gives (the fields of the table AppEmail, README §6.6). From build R6
+      // (D371, D372) the visual has the filter Selected email is 1, so the app gets ONE email: the email chosen in the list at
+      // the left of the page (else the email of Prepare email, else the first of the list). Its rows:
+      //   - Piece 0, one per part (the drafts): a long message is split into parts (D36), and the template joins them into ONE
+      //     email on its first part (D314): the other parts point to it in EmailId. The app records every part of the email
+      //     under its one reference.
+      //   - Piece 1, 2, …: the email's Html and its file Csv in pieces of 20,000 characters, which the app joins in order (the
+      //     visual is reported to cut a text of about 32,000 characters; an email at real size has 66,000).
+      // The texts hold %%REF%% where the reference goes and %%SENDER%% where the manager's name goes: the app fills both when
+      // the manager sends (D301). Nothing is sent until a manager presses Send, Test to me, Outlook draft or Teams (D2).
 
-      Drafts = PowerBIIntegration.Data;
+      AppRows = PowerBIIntegration.Data;
+      Drafts = Filter(AppRows, Piece = 0);
+      Pieces = Filter(AppRows, Piece > 0);
       DraftCount = CountRows(Drafts);
-      // The Power Apps visual gives the app 1,000 rows at most (Microsoft's limit).
-      TooManyDrafts = DraftCount >= 1000;
       Me = LookUp('SACM Team', Lower(Email) = Lower(User().Email));
       MeName = Coalesce(Me.Title, User().FullName);
       MeEmail = Lower(User().Email);
@@ -112,13 +116,18 @@ App:
       PendingWhere = "";
       ReportUnknownText = "No email from the report now.";
 
-      // The emails, in the order of the HTML app (D0001 first): one per message, on its first part, with the cases of all its
-      // parts. Keys, NewKeys and FreeKeys are lists of keys, one per line (Char(10)). An email of an older report (no
-      // EmailId) is its draft alone.
+      // The emails the app got, one per message, on its first part, with the cases of all its parts. Keys, NewKeys and
+      // FreeKeys are lists of keys, one per line (Char(10)). With the filter Selected email is 1 there is one: ThisEmail. More
+      // than one means the visual lacks that filter, and the app sends none (SendWhy).
       Emails = ForAll(
           Sort(Filter(Drafts, IsBlank(EmailId) || EmailId = DraftId), DraftId) As email,
           With(
-              { parts: If(IsBlank(email.EmailId), Filter(Drafts, DraftId = email.DraftId), Filter(Drafts, EmailId = email.DraftId)) },
+              {
+                  parts: If(IsBlank(email.EmailId), Filter(Drafts, DraftId = email.DraftId), Filter(Drafts, EmailId = email.DraftId)),
+                  // The email and its file, joined from their pieces in order.
+                  html: Concat(Sort(Filter(Pieces, EmailId = email.DraftId), Piece), Html),
+                  csv: Concat(Sort(Filter(Pieces, EmailId = email.DraftId), Piece), Csv)
+              },
               With(
                   { keys: Concat(Filter(parts, !IsBlank(Keys)), Keys, Char(10)) },
                   With(
@@ -129,19 +138,19 @@ App:
                           To: email.To, ToName: email.ToName, Cc: email.Cc, About: email.About, NobodyAbove: email.NobodyAbove,
                           Mailbox: email.Mailbox, AssignedTo: email.AssignedTo, Chat: email.Chat,
                           Subject: Coalesce(email.EmailSubject, email.Subject),
-                          Html: Coalesce(email.Html, email.Body),
-                          Csv: email.Csv,
+                          // Why the email has no To, and what fixes it (D373): the setting to add, or that the CI report has no email.
+                          AddressWhy: email.AddressWhy,
+                          Html: html,
+                          Csv: csv,
                           Summary: email.Summary,
-                          // The Power Apps visual may pass a long text cut (a limit of about 32,000 characters is reported for the visuals
-                          // of Power BI): "cut" when the email or its file is shorter than the report says (Drafts[HtmlLength],
-                          // [CsvLength]), "unknown" when the visual has not these two fields. The app sends neither (README §6.6).
+                          // "cut" when the joined email or file is shorter than the report says (AppEmail[HtmlLength], [CsvLength]),
+                          // "unknown" when the visual has not these two fields. The app sends neither (README §6.6).
                           Whole: If(
-                              IsBlank(email.Html), "yes",
                               IsBlank(email.HtmlLength) || IsBlank(email.CsvLength), "unknown",
-                              Len(email.Html) = email.HtmlLength && Len(email.Csv) = email.CsvLength, "yes",
+                              Len(html) = email.HtmlLength && Len(csv) = email.CsvLength, "yes",
                               "cut"),
-                          // What the app remembers of an email it recorded, until the refresh takes it off the list: its first key
-                          // between two line breaks (a refresh may number the drafts again, the keys stay).
+                          // What the app remembers of an email: its first key between two line breaks (a refresh may number the
+                          // drafts again, the keys stay). The reference made for a new email and the email sent are kept under it.
                           SentKey: Char(10) & First(Split(keys, Char(10))).Value & Char(10),
                           PartCount: CountRows(parts),
                           CiCount: Sum(parts, CiCount),
@@ -152,7 +161,7 @@ App:
                           SentAt: sent.At,
                           NewKeys: Concat(Filter(parts, !IsBlank(NewKeys)), NewKeys, Char(10)),
                           FreeKeys: Concat(Filter(parts, !IsBlank(FreeKeys)), FreeKeys, Char(10)),
-                          // The parts of "In this email" (one line each in Summary), for the line of the list.
+                          // The parts of "In this email" (one line each in Summary).
                           Topics: If(IsBlank(email.Summary), 1, CountRows(Split(email.Summary, Char(10))))
                       }
                   )
@@ -160,12 +169,12 @@ App:
           )
       );
       EmailCount = CountRows(Emails);
+      ThisEmail = First(Emails);
+      // The words in the subject in place of the reference of a new email, until Test to me, Send, Outlook draft or Teams
+      // gives it one (D371): the field To and Subject never change under the manager's hands.
+      NewRefWords = "new reference";
 
-      // The filter of the list (the tabs above it): every email, or one kind.
-      KindTabs = ["All", "First", "Reminder", "Escalate"];
-      KindOf = Table({ Tab: "First", Kind: "first" }, { Tab: "Reminder", Kind: "reminder" }, { Tab: "Escalate", Kind: "escalation" });
-
-      // The chip of a kind: its colour and its soft background (one meaning per colour, with the word, LOOK rule 5).
+      // The chip of the kind in the head: its colour and its soft background (one meaning per colour, with the word, LOOK rule 5).
       KindColour = Table(
           { Kind: "first", Ink: ColourBlue, Soft: ColourBlueSoft },
           { Kind: "reminder", Ink: ColourAmber, Soft: ColourAmberSoft },

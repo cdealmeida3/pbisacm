@@ -1,12 +1,16 @@
-# The one screen of the Power App "SACM messages", the email studio (builds B7, D5 and 0.52.0, D301, D313 to D317, D334), written by
-# hand. To use it: in Power Apps Studio, select the screen in the Tree view, then Paste (Ctrl+V) this whole file
-# (powerbi/README.md §6.6). It is drawn for the place of the app on the page Messages: 1032 × 620 (README §6.4).
-# Three columns, as the mockup of design A (design pass §7):
-#   - Left: the emails ready to send (the tabs choose All, First, Reminder or Escalate). A long message is one email
-#     with its full list as a file (D314).
-#   - Middle: the email exactly as it will arrive (Drafts[Html], D313), with its reference and the manager's name.
-#   - Right: From (the shared SACM mailbox, D315), To, Cc and Subject, which the manager can change; the warning when a
-#     colleague wrote to the same person or about the same cases in the last 24 hours; and the buttons:
+# The one screen of the Power App "SACM messages", the email studio (builds B7, D5, 0.52.0 and R6, D301, D313 to D317,
+# D334, D371 to D373), written by hand. To use it: in Power Apps Studio, select the screen in the Tree view, then Paste
+# (Ctrl+V) this whole file (powerbi/README.md §6.6). It is drawn for the place of the app on the page Messages: the right
+# side, 580 × 620 (README §6.4). From build R6 the list of the emails is a table of the page, at the left (D371): the
+# app gets the one email chosen there (AppEmail, its visual filter Selected email is 1) and shows, from the top:
+#   - The head: the kind and who gets it, the time of the report's data and the changes since then (D334), and Refresh
+#     now (flow F5, once in each window of the refresh rule, D333).
+#   - The fields: To, Cc and Subject, which the manager can change. A new email gets its reference at the first Test to
+#     me, Send, Outlook draft or Teams; until then the subject says "new reference" (D371).
+#   - One line on what happens: sent, a colleague wrote to this person or about these cases in the last 24 hours (then
+#     the buttons wait for Send anyway), or nobody wrote.
+#   - The email exactly as it will arrive (its Html, joined from its pieces, D372), with the line of its file.
+#   - The buttons, and above them why one is grey (LOOK rule 7):
 #       Send (the main button): flow F2 (SACMSend) sends it from the shared mailbox, with its file. Then the app adds the
 #         message to the list SACM Journal (D272: rows are only added) for EVERY part of the email, under its one
 #         reference. No refresh (D332): the email stays in the list, Sent for everyone, until the next refresh (D334).
@@ -14,8 +18,7 @@
 #       Outlook draft: flow F7 (SACMDraft) puts it in the manager's own Drafts, From = the shared mailbox (D315), and
 #         Outlook on the web opens it. The manager sends it there, then answers "Sent from Outlook?". Yes records it.
 #       Teams: opens a Teams chat with the person and the first message, then asks "Did you start the chat?".
-# At the top, the header line (D334): the time of the report's data, the changes since then, and Refresh now (flow F5,
-# once in each window of the refresh rule, D333).
+# After a send the manager chooses the next email in the list of the page: the app cannot move the page's selection.
 # Nothing is sent without a press (D2). One main button (LOOK rule 6); a grey button says why (LOOK rule 7).
 Screens:
   MessagesScreen:
@@ -23,26 +26,26 @@ Screens:
       Fill: =ColourSurface
       OnVisible: |-
         =Set(varAsk, Blank());
-        Set(varOpen, First(Emails).DraftId);
-        Set(varRef, { Id: First(Emails).DraftId, Ref: "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1)) })
+        Set(varAnyway, "");
+        Set(varRef, { Id: "", Ref: "" })
     Children:
-      # ------------------------------------------------------------------ the head: how many, and the tabs
+      # ------------------------------------------------------------------ the head
       - HeadTitle:
           Control: Label
           Properties:
             Text: |-
               =If(
-                  DraftCount = 0, "Nothing to send",
-                  EmailCount & If(EmailCount = 1, " email ready to send", " emails ready to send")) &
-              If(TooManyDrafts, " · the report gives the app 1,000 messages at most: filter the page", "")
+                  DraftCount = 0, "No email chosen",
+                  Switch(ThisEmail.Kind, "first", "First message", "reminder", "Reminder", "escalation", "Escalation", ThisEmail.KindLabel) &
+                  " to " & Coalesce(ThisEmail.ToName, ThisEmail.To, "nobody known yet"))
             Font: =AppFont
             FontWeight: =FontWeight.Semibold
             Size: =12
             Color: =ColourInk
             X: =16
-            Y: =10
-            Width: =232
-            Height: =32
+            Y: =8
+            Width: =Parent.Width - 16 - 136
+            Height: =28
       - ReportLabel:
           Control: Label
           Properties:
@@ -52,10 +55,10 @@ Screens:
             Font: =AppFont
             Size: =9
             Color: =ColourMuted
-            X: =264
-            Y: =8
-            Width: =Parent.Width - 264 - 336 - 128
-            Height: =36
+            X: =16
+            Y: =36
+            Width: =Parent.Width - 16 - 136
+            Height: =20
       - RefreshButton:
           Control: ModernButton@1.0.0
           Properties:
@@ -80,40 +83,23 @@ Screens:
                       Notify(RefreshErrorText, NotificationType.Error)
                   )
               )
-            X: =Parent.Width - 336 - 120
-            Y: =10
+            X: =Parent.Width - 128
+            Y: =12
             Width: =112
             Height: =32
-      - KindTabs:
-          Control: ModernTabList@1.0.0
-          Properties:
-            Items: =KindTabs
-            Default: ="All"
-            Appearance: =TabListAppearance.Subtle
-            Alignment: =TabListAlignment.End
-            BasePaletteColor: =ColourNavy
-            Font: =AppFont
-            Size: =10
-            AccessibleLabel: ="Which emails the list shows"
-            Visible: =DraftCount > 0
-            X: =Parent.Width - 336
-            Y: =8
-            Width: =320
-            Height: =36
       - HeadRule:
           Control: Rectangle
           Properties:
             Fill: =ColourLine
             X: =0
-            Y: =51
+            Y: =60
             Width: =Parent.Width
             Height: =1
-      # ------------------------------------------------------------------ the list
       - EmptyLabel:
           Control: Label
           Properties:
             Text: |-
-              ="No email is ready to send. After the next report, or when a reminder is due, the list shows it here."
+              ="No email is chosen. Choose one in the list at the left of the page. When the list is empty, no email is ready: after the next report, or when a reminder is due, it is listed there."
             Font: =AppFont
             Size: =10.5
             Color: =ColourMuted
@@ -122,237 +108,44 @@ Screens:
             X: =32
             Y: =120
             Width: =Parent.Width - 64
-            Height: =64
-      - DraftGallery:
-          Control: Gallery
-          Variant: Vertical
-          Properties:
-            Items: |-
-              =If(
-                  KindTabs.Selected.Value = "All", Emails,
-                  Filter(Emails, Kind = LookUp(KindOf, Tab = KindTabs.Selected.Value).Kind))
-            Default: =LookUp(Emails, DraftId = varOpen)
-            TemplateSize: =64
-            TemplatePadding: =0
-            TemplateFill: =If(ThisItem.IsSelected, ColourNavySoft, ColourSurface)
-            Visible: =DraftCount > 0
-            OnSelect: |-
-              =Set(varOpen, ThisItem.DraftId);
-              Reset(AnywayCheck);
-              // The journal is read again when an email is opened, so the warning knows a colleague's latest message.
-              Refresh('SACM Journal');
-              If(
-                  IsBlank(ThisItem.Ref) && varRef.Id <> ThisItem.DraftId,
-                  Set(varRef, { Id: ThisItem.DraftId, Ref: "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1)) })
-              )
-            X: =0
-            Y: =52
-            Width: =248
-            Height: =Parent.Height - 52
-          Children:
-            - ItemBar:
-                Control: Rectangle
-                Properties:
-                  Fill: =ColourNavy
-                  Visible: =ThisItem.IsSelected
-                  X: =0
-                  Y: =0
-                  Width: =3
-                  Height: =Parent.TemplateHeight
-            - ItemName:
-                Control: Label
-                Properties:
-                  Text: =Coalesce(ThisItem.ToName, ThisItem.To, "Nobody known yet")
-                  Font: =AppFont
-                  FontWeight: =FontWeight.Semibold
-                  Size: =10.5
-                  Color: =ColourInk
-                  X: =16
-                  Y: =8
-                  Width: =Parent.TemplateWidth - 112
-                  Height: =24
-            - ItemChip:
-                Control: Label
-                Properties:
-                  # The kind in a word, in its colour (LOOK rule 5); Sent once this app sent it.
-                  Text: |-
-                    =If(
-                        (ThisItem.IsSent || ThisItem.SentKey in varSentIds), "Sent",
-                        Switch(ThisItem.Kind, "first", "First", "reminder", "Reminder", "escalation", "Escalate", ThisItem.KindLabel))
-                  Font: =AppFont
-                  FontWeight: =FontWeight.Semibold
-                  Size: =9
-                  Align: =Align.Center
-                  Color: |-
-                    =If((ThisItem.IsSent || ThisItem.SentKey in varSentIds), ColourBlue, Coalesce(LookUp(KindColour, Kind = ThisItem.Kind).Ink, ColourGrey))
-                  Fill: |-
-                    =If((ThisItem.IsSent || ThisItem.SentKey in varSentIds), ColourBlueSoft, Coalesce(LookUp(KindColour, Kind = ThisItem.Kind).Soft, ColourGreySoft))
-                  X: =Parent.TemplateWidth - 92
-                  Y: =10
-                  Width: =80
-                  Height: =20
-            - ItemLine:
-                Control: Label
-                Properties:
-                  Text: |-
-                    =ThisItem.CiCount & If(ThisItem.CiCount = 1, " CI", " CIs") &
-                    If(ThisItem.Topics > 1, " · " & ThisItem.Topics & " kinds", "") &
-                    If(IsBlank(ThisItem.About), "", " · about " & ThisItem.About) &
-                    If(IsBlank(ThisItem.Csv), "", " · with a file") &
-                    " · " & If(IsBlank(ThisItem.AssignedTo), "free", ThisItem.AssignedTo = MeName, "mine", ThisItem.AssignedTo) &
-                    If(!IsBlank(varAsk) && varAsk.Keys = ThisItem.Keys, " · sent? open it", "")
-                  Font: =AppFont
-                  Size: =9
-                  Color: =ColourMuted
-                  X: =16
-                  Y: =34
-                  Width: =Parent.TemplateWidth - 28
-                  Height: =22
-            - ItemRule:
-                Control: Rectangle
-                Properties:
-                  Fill: =ColourLine
-                  X: =0
-                  Y: =Parent.TemplateHeight - 1
-                  Width: =Parent.TemplateWidth
-                  Height: =1
-      - ListRule:
-          Control: Rectangle
-          Properties:
-            Fill: =ColourLine
-            Visible: =DraftCount > 0
-            X: =248
-            Y: =52
-            Width: =1
-            Height: =Parent.Height - 52
-      # ------------------------------------------------------------------ the email as it will arrive
+            Height: =96
+      # ------------------------------------------------------------------ the fields
       - RefValue:
           Control: Label
           Properties:
-            # The reference of the email open: a reminder keeps the one of its first message (D5); a new email gets the
-            # one the app made when the manager opened it ("SACM-" and six letters and digits, as the HTML app). Not shown:
-            # the formulas read it.
+            # The reference of the email: a reminder keeps the one of its first message (D5); a new email gets the one the
+            # app made at its first Test to me, Send, Outlook draft or Teams ("SACM-" and six letters and digits, as the
+            # HTML app), kept under the email's first key while the email stays chosen. Not shown: the formulas read it.
             Text: |-
               =If(
-                  !IsBlank(DraftGallery.Selected.Ref), DraftGallery.Selected.Ref,
-                  varRef.Id = DraftGallery.Selected.DraftId, varRef.Ref,
+                  !IsBlank(ThisEmail.Ref), ThisEmail.Ref,
+                  varRef.Id = ThisEmail.SentKey, varRef.Ref,
                   "")
             Visible: =false
             X: =0
             Y: =0
             Width: =10
             Height: =10
-      - PreviewTitle:
-          Control: Label
-          Properties:
-            Text: |-
-              =Switch(DraftGallery.Selected.Kind, "first", "First message", "reminder", "Reminder", "escalation", "Escalation", DraftGallery.Selected.KindLabel) &
-              " to " & Coalesce(DraftGallery.Selected.ToName, DraftGallery.Selected.To, "nobody known yet")
-            Font: =AppFont
-            FontWeight: =FontWeight.Semibold
-            Size: =11
-            Color: =ColourInk
-            Visible: =DraftCount > 0
-            X: =264
-            Y: =60
-            Width: =Parent.Width - 264 - 288 - 168
-            Height: =28
-      - PreviewRef:
-          Control: Label
-          Properties:
-            Text: =If(IsBlank(RefValue.Text), "Ref. given when you open it", "Ref. " & RefValue.Text)
-            Font: =AppFont
-            Size: =9
-            Color: =ColourMuted
-            Align: =Align.Right
-            Visible: =DraftCount > 0
-            X: =Parent.Width - 288 - 168
-            Y: =60
-            Width: =160
-            Height: =28
-      - FileChip:
-          Control: Label
-          Properties:
-            # A long list (D314): the tables show their first lines, and the full list goes as a file.
-            Text: |-
-              =If(
-                  IsBlank(DraftGallery.Selected.Csv),
-                  DraftGallery.Selected.CiCount & If(DraftGallery.Selected.CiCount = 1, " CI", " CIs") & " · every line is in the email",
-                  DraftGallery.Selected.CiCount & " CIs · long list: the full list goes as the file " & RefValue.Text & ".csv")
-            Font: =AppFont
-            Size: =9
-            Color: =If(IsBlank(DraftGallery.Selected.Csv), ColourMuted, ColourBlue)
-            Visible: =DraftCount > 0
-            X: =264
-            Y: =86
-            Width: =Parent.Width - 264 - 288
-            Height: =20
-      - PreviewView:
-          Control: HtmlViewer
-          Properties:
-            # The email as it goes (Drafts[Html]), with its reference and the manager's name. The modern controls have no
-            # HTML viewer: this one stays classic (D317).
-            HtmlText: |-
-              =Substitute(Substitute(DraftGallery.Selected.Html, "%%REF%%", Coalesce(RefValue.Text, "SACM-······")), "%%SENDER%%", MeHtml)
-            Fill: =ColourMailPage
-            Visible: =DraftCount > 0
-            X: =256
-            Y: =112
-            Width: =Parent.Width - 256 - 280
-            Height: =Parent.Height - 120
-      - FieldsRule:
-          Control: Rectangle
-          Properties:
-            Fill: =ColourLine
-            Visible: =DraftCount > 0
-            X: =Parent.Width - 273
-            Y: =52
-            Width: =1
-            Height: =Parent.Height - 52
-      # ------------------------------------------------------------------ the fields
-      - FromCaption:
-          Control: Label
-          Properties:
-            Text: ="From"
-            Font: =AppFont
-            Size: =9
-            Color: =ColourMuted
-            Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =60
-            Width: =240
-            Height: =18
-      - FromValue:
-          Control: Label
-          Properties:
-            Text: ="The shared SACM mailbox"
-            Font: =AppFont
-            Size: =10
-            Color: =ColourInk
-            Fill: =ColourGreySoft
-            PaddingLeft: =10
-            Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =78
-            Width: =240
-            Height: =32
       - ToCaption:
           Control: Label
           Properties:
             Text: |-
-              =If(DraftGallery.Selected.NobodyAbove, "To (nobody is known above: type the address)", "To")
+              =If(
+                  ThisEmail.NobodyAbove, "To (nobody is known above: type the address)",
+                  IsBlank(ThisEmail.To), "To (no address yet: the line below says why)",
+                  "To")
             Font: =AppFont
             Size: =9
-            Color: =If(DraftGallery.Selected.NobodyAbove && IsBlank(Trim(ToText.Text)), ColourRed, ColourMuted)
+            Color: =If(IsBlank(Trim(ToText.Text)), ColourRed, ColourMuted)
             Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =116
-            Width: =240
+            X: =16
+            Y: =68
+            Width: =(Parent.Width - 48) / 2
             Height: =18
       - ToText:
           Control: ModernTextInput@1.0.0
           Properties:
-            Default: =DraftGallery.Selected.To
+            Default: =ThisEmail.To
             Placeholder: ="name@company; name@company"
             AccessibleLabel: ="To"
             Appearance: =Appearance.Outline
@@ -360,9 +153,9 @@ Screens:
             Font: =AppFont
             Size: =10
             Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =134
-            Width: =240
+            X: =16
+            Y: =86
+            Width: =(Parent.Width - 48) / 2
             Height: =32
       - CcCaption:
           Control: Label
@@ -372,14 +165,14 @@ Screens:
             Size: =9
             Color: =ColourMuted
             Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =172
-            Width: =240
+            X: =32 + (Parent.Width - 48) / 2
+            Y: =68
+            Width: =(Parent.Width - 48) / 2
             Height: =18
       - CcText:
           Control: ModernTextInput@1.0.0
           Properties:
-            Default: =DraftGallery.Selected.Cc
+            Default: =ThisEmail.Cc
             Placeholder: ="Nobody"
             AccessibleLabel: ="Cc"
             Appearance: =Appearance.Outline
@@ -387,9 +180,9 @@ Screens:
             Font: =AppFont
             Size: =10
             Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =190
-            Width: =240
+            X: =32 + (Parent.Width - 48) / 2
+            Y: =86
+            Width: =(Parent.Width - 48) / 2
             Height: =32
       - SubjectCaption:
           Control: Label
@@ -399,25 +192,25 @@ Screens:
             Size: =9
             Color: =ColourMuted
             Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =228
-            Width: =240
+            X: =16
+            Y: =124
+            Width: =Parent.Width - 32
             Height: =18
       - SubjectText:
           Control: ModernTextInput@1.0.0
           Properties:
-            Default: =Substitute(DraftGallery.Selected.Subject, "%%REF%%", RefValue.Text)
-            Type: =TextInputType.Multiline
+            # A new email shows "new reference" in place of its reference; the buttons put the reference there (D371).
+            Default: =Substitute(ThisEmail.Subject, "%%REF%%", If(IsBlank(ThisEmail.Ref), NewRefWords, ThisEmail.Ref))
             AccessibleLabel: ="Subject"
             Appearance: =Appearance.Outline
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
             Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =246
-            Width: =240
-            Height: =56
+            X: =16
+            Y: =142
+            Width: =Parent.Width - 32
+            Height: =32
       - WarnLabel:
           Control: Label
           Properties:
@@ -427,7 +220,7 @@ Screens:
               =With(
                   {
                       toList: ForAll(Split(Lower(Substitute(ToText.Text, ",", ";")), ";") As address, Trim(address.Value)),
-                      keyList: ForAll(Split(DraftGallery.Selected.Keys, Char(10)) As key, Trim(key.Value))
+                      keyList: ForAll(Split(ThisEmail.Keys, Char(10)) As key, Trim(key.Value))
                   },
                   With(
                       {
@@ -463,42 +256,78 @@ Screens:
             Text: |-
               =If(
                   DraftCount = 0, "",
-                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds) && varLast.Key <> DraftGallery.Selected.SentKey,
+                  (ThisEmail.IsSent || ThisEmail.SentKey in varSentIds) && varLast.Key <> ThisEmail.SentKey,
                   // Sent by a colleague, or in another session, since the report's data (D334).
-                  "Sent by " & Coalesce(DraftGallery.Selected.SentBy, MeName) & If(IsBlank(DraftGallery.Selected.SentAt), "", " at " & Text(DraftGallery.Selected.SentAt, "hh:mm")) & ". It leaves the list after the next refresh.",
-                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds),
+                  "Sent by " & Coalesce(ThisEmail.SentBy, MeName) & If(IsBlank(ThisEmail.SentAt), "", " at " & Text(ThisEmail.SentAt, "hh:mm")) & ". It leaves the list after the next refresh: choose another email in the list.",
+                  (ThisEmail.IsSent || ThisEmail.SentKey in varSentIds),
                   Switch(varLast.Channel, "teams", "Teams chat recorded with ", "outlook", "Recorded as sent from Outlook to ", "Sent from the SACM mailbox to ") &
                   varLast.To & " at " & Text(varLast.At, "hh:mm") & ". " & varLast.Cases &
-                  If(varLast.Cases = 1, " case is", " cases are") & " now asked. It leaves the list after the next refresh.",
+                  If(varLast.Cases = 1, " case is", " cases are") & " now asked. Choose the next email in the list at the left.",
                   !IsBlank(WarnLabel.Text), WarnLabel.Text,
                   "Nobody in the team wrote to this person, or about these cases, in the last 24 hours.")
             Font: =AppFont
             Size: =9.5
             Color: |-
-              =If((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds), ColourBlue, !IsBlank(WarnLabel.Text), ColourAmber, ColourGrey)
+              =If((ThisEmail.IsSent || ThisEmail.SentKey in varSentIds), ColourBlue, !IsBlank(WarnLabel.Text), ColourAmber, ColourGrey)
             Fill: |-
-              =If((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds), ColourBlueSoft, !IsBlank(WarnLabel.Text), ColourAmberSoft, ColourGreySoft)
+              =If((ThisEmail.IsSent || ThisEmail.SentKey in varSentIds), ColourBlueSoft, !IsBlank(WarnLabel.Text), ColourAmberSoft, ColourGreySoft)
             PaddingLeft: =10
             PaddingRight: =10
             Visible: =DraftCount > 0
-            X: =Parent.Width - 256
-            Y: =312
-            Width: =240
-            Height: =76
+            X: =16
+            Y: =182
+            Width: =If(AnywayCheck.Visible, Parent.Width - 32 - 136, Parent.Width - 32)
+            Height: =40
       - AnywayCheck:
           Control: ModernCheckbox@1.0.0
           Properties:
+            # Kept for the email it was ticked on (varAnyway holds its first key), so a tick never carries to the next email.
             Label: ="Send anyway"
-            Checked: =false
+            Checked: =varAnyway = ThisEmail.SentKey
+            OnCheck: =Set(varAnyway, ThisEmail.SentKey)
+            OnUncheck: =Set(varAnyway, "")
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
             Visible: |-
-              =DraftCount > 0 && !IsBlank(WarnLabel.Text) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
-            X: =Parent.Width - 256
-            Y: =394
-            Width: =240
+              =DraftCount > 0 && !IsBlank(WarnLabel.Text) && !((ThisEmail.IsSent || ThisEmail.SentKey in varSentIds))
+            X: =Parent.Width - 144
+            Y: =186
+            Width: =128
             Height: =32
+      # ------------------------------------------------------------------ the email as it will arrive
+      - FileChip:
+          Control: Label
+          Properties:
+            # From, the reference and the file of a long list (D314, D315).
+            Text: |-
+              ="From the shared SACM mailbox · " &
+              If(IsBlank(RefValue.Text), "the reference is given at the first Test to me, Send, Outlook draft or Teams", "Ref. " & RefValue.Text) & " · " &
+              If(
+                  IsBlank(ThisEmail.Csv),
+                  ThisEmail.CiCount & If(ThisEmail.CiCount = 1, " CI", " CIs") & ", every line is in the email",
+                  ThisEmail.CiCount & " CIs, the full list goes as the file " & Coalesce(RefValue.Text, "SACM-······") & ".csv")
+            Font: =AppFont
+            Size: =9
+            Color: =If(IsBlank(ThisEmail.Csv), ColourMuted, ColourBlue)
+            Visible: =DraftCount > 0
+            X: =16
+            Y: =228
+            Width: =Parent.Width - 32
+            Height: =36
+      - PreviewView:
+          Control: HtmlViewer
+          Properties:
+            # The email as it goes (its Html, joined from the pieces), with its reference and the manager's name. The
+            # modern controls have no HTML viewer: this one stays classic (D317).
+            HtmlText: |-
+              =Substitute(Substitute(ThisEmail.Html, "%%REF%%", Coalesce(RefValue.Text, "SACM-······")), "%%SENDER%%", MeHtml)
+            Fill: =ColourMailPage
+            Visible: =DraftCount > 0
+            X: =8
+            Y: =268
+            Width: =Parent.Width - 16
+            Height: =Parent.Height - 268 - 104
       # ------------------------------------------------------------------ the buttons
       - SendWhy:
           Control: Label
@@ -507,13 +336,13 @@ Screens:
             Text: |-
               =If(
                   DraftCount = 0, "",
-                  !IsBlank(varAsk) && varAsk.Keys <> DraftGallery.Selected.Keys, "Answer first whether the email to " & varAsk.To & " went: open it in the list.",
-                  IsBlank(RefValue.Text), "Press the email in the list to open it.",
-                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds), "Sent. It leaves the list after the next refresh.",
-                  DraftGallery.Selected.Whole = "cut", "The report gave the app only part of this email (it is too long for the Power Apps visual). Tell the project thread; lower rowsInEmail in Settings to shorten it.",
-                  DraftGallery.Selected.Whole = "unknown", "Add the fields HtmlLength and CsvLength of Drafts to the Power Apps visual (README 6.6).",
-                  IsBlank(Trim(ToText.Text)), "Fill in To first.",
-                  !IsBlank(WarnLabel.Text) && !AnywayCheck.Checked, "Read the warning, then tick Send anyway.",
+                  EmailCount > 1, "The app got " & EmailCount & " emails: give its Power Apps visual the filter Selected email is 1 (README 6.6).",
+                  !IsBlank(varAsk) && varAsk.Keys <> ThisEmail.Keys, "Answer first whether the email to " & varAsk.To & " went: choose it in the list again.",
+                  (ThisEmail.IsSent || ThisEmail.SentKey in varSentIds), "Sent. It leaves the list after the next refresh.",
+                  ThisEmail.Whole = "cut", "The app got only part of this email. Press Refresh in the report's top bar; if it stays, lower rowsInEmail in Settings.",
+                  ThisEmail.Whole = "unknown", "Add the fields HtmlLength and CsvLength of AppEmail to the Power Apps visual (README 6.6).",
+                  IsBlank(Trim(ToText.Text)), Coalesce(ThisEmail.AddressWhy, "Fill in To first."),
+                  !IsBlank(WarnLabel.Text) && varAnyway <> ThisEmail.SentKey, "Read the warning, then tick Send anyway.",
                   "")
             Visible: =false
             X: =0
@@ -524,23 +353,21 @@ Screens:
           Control: Label
           Properties:
             # Why a button is grey, in words above the buttons (LOOK rule 7): Send, Test to me and Outlook draft, then
-            # Teams, then Next email.
+            # Teams.
             Text: |-
               =If(
-                  !IsBlank(SendWhy.Text) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds)), SendWhy.Text,
-                  (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds),
-                  If(IsBlank(LookUp(DraftGallery.AllItems, !(IsSent || SentKey in varSentIds))), "Sent. Every email of the list is recorded.", SendWhy.Text),
+                  !IsBlank(SendWhy.Text), SendWhy.Text,
                   !IsBlank(TeamsWhy.Text), "Teams is off: " & TeamsWhy.Text,
                   "")
             Font: =AppFont
             Size: =9
-            Color: =ColourMuted
+            Color: =If(IsBlank(Trim(ToText.Text)), ColourRed, ColourMuted)
             VerticalAlign: =VerticalAlign.Bottom
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys)
-            X: =Parent.Width - 256
-            Y: =Parent.Height - 160
-            Width: =240
-            Height: =44
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> ThisEmail.Keys)
+            X: =16
+            Y: =Parent.Height - 100
+            Width: =Parent.Width - 32
+            Height: =36
       - OutlookButton:
           Control: ModernButton@1.0.0
           Properties:
@@ -551,22 +378,25 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: ="Put it in your own Drafts in Outlook, From the SACM mailbox, to change it before you send it"
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> ThisEmail.Keys) && !((ThisEmail.IsSent || ThisEmail.SentKey in varSentIds))
             DisplayMode: =If(IsBlank(SendWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
               =With(
                   {
-                      d: DraftGallery.Selected, ref: RefValue.Text, subject: Trim(SubjectText.Text),
+                      d: ThisEmail,
+                      ref: Coalesce(RefValue.Text, "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1))),
                       addresses: Filter(ForAll(Split(Substitute(Trim(ToText.Text), ",", ";"), ";") As address, Trim(address.Value)), !IsBlank(Value)),
                       copies: Filter(ForAll(Split(Substitute(Trim(CcText.Text), ",", ";"), ";") As address, Trim(address.Value)), !IsBlank(Value))
                   },
+                  If(IsBlank(RefValue.Text), Set(varRef, { Id: d.SentKey, Ref: ref }));
                   With(
                       {
+                          subject: Substitute(Trim(SubjectText.Text), NewRefWords, ref),
                           // The draft as Microsoft Graph takes it (POST /me/messages). The flow puts the file in place of
                           // %%CSV%% and the address of the shared mailbox in place of %%FROM%% (README §6.3, F7).
                           message: JSON(
                               {
-                                  subject: subject,
+                                  subject: Substitute(Trim(SubjectText.Text), NewRefWords, ref),
                                   body: { contentType: "HTML", content: Substitute(Substitute(d.Html, "%%REF%%", ref), "%%SENDER%%", MeHtml) },
                                   toRecipients: ForAll(addresses As address, { emailAddress: { address: address.Value } }),
                                   ccRecipients: ForAll(copies As address, { emailAddress: { address: address.Value } }),
@@ -588,10 +418,10 @@ Screens:
                       )
                   )
               )
-            X: =Parent.Width - 256
-            Y: =Parent.Height - 108
+            X: =Parent.Width - 504
+            Y: =Parent.Height - 56
             Width: =116
-            Height: =36
+            Height: =40
       - TeamsButton:
           Control: ModernButton@1.0.0
           Properties:
@@ -602,16 +432,18 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: =Coalesce(TeamsWhy.Text, "Open a Teams chat with the person, with the first message ready")
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> ThisEmail.Keys) && !((ThisEmail.IsSent || ThisEmail.SentKey in varSentIds))
             DisplayMode: =If(IsBlank(SendWhy.Text) && IsBlank(TeamsWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
               =With(
                   {
-                      d: DraftGallery.Selected, ref: RefValue.Text, subject: Trim(SubjectText.Text),
+                      d: ThisEmail,
+                      ref: Coalesce(RefValue.Text, "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1))),
                       users: Filter(ForAll(Split(Substitute(Trim(ToText.Text), ",", ";"), ";") As address, Trim(address.Value)), !IsBlank(Value))
                   },
+                  If(IsBlank(RefValue.Text), Set(varRef, { Id: d.SentKey, Ref: ref }));
                   With(
-                      { chat: Substitute(Substitute(d.Chat, "%%REF%%", ref), "%%SENDER%%", MeName) },
+                      { chat: Substitute(Substitute(d.Chat, "%%REF%%", ref), "%%SENDER%%", MeName), subject: Substitute(Trim(SubjectText.Text), NewRefWords, ref) },
                       // A Teams deep link (teamsLink of the HTML app): a new chat with these people, a topic when they are
                       // more than one, and the first message, which the manager can still change. The app makes no connection.
                       Launch(
@@ -623,18 +455,18 @@ Screens:
                       Set(varAsk, { DraftId: d.DraftId, SentKey: d.SentKey, Channel: "teams", Ref: ref, To: Concat(users, Value, "; "), Cc: "", Subject: subject, Text: chat, Kind: If(d.Kind = "first", "first", "reminder"), Keys: d.Keys, NewKeys: "", FreeKeys: d.FreeKeys })
                   )
               )
-            X: =Parent.Width - 132
-            Y: =Parent.Height - 108
+            X: =Parent.Width - 380
+            Y: =Parent.Height - 56
             Width: =116
-            Height: =36
+            Height: =40
       - TeamsWhy:
           Control: Label
           Properties:
             # Why Teams is grey when Send is on (LOOK rule 7): shown in its tooltip and by WhyLine.
             Text: |-
               =If(
-                  DraftGallery.Selected.Mailbox, "A mailbox gets an email, not a chat.",
-                  DraftGallery.Selected.PartCount > 1 || !IsBlank(DraftGallery.Selected.Csv), "A long list goes by email, with its file.",
+                  ThisEmail.Mailbox, "A mailbox gets an email, not a chat.",
+                  ThisEmail.PartCount > 1 || !IsBlank(ThisEmail.Csv), "A long list goes by email, with its file.",
                   CountRows(Split(Substitute(Trim(ToText.Text), ",", ";"), ";")) > TeamsLimit, "More than " & TeamsLimit & " people: use email.",
                   "")
             Font: =AppFont
@@ -655,14 +487,18 @@ Screens:
             Font: =AppFont
             Size: =10
             Tooltip: ="Send it, with its file, to you only. The cases are not changed."
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
-            DisplayMode: =If(IsBlank(RefValue.Text) || DraftGallery.Selected.Whole <> "yes", DisplayMode.Disabled, DisplayMode.Edit)
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> ThisEmail.Keys) && !((ThisEmail.IsSent || ThisEmail.SentKey in varSentIds))
+            DisplayMode: =If(EmailCount <> 1 || ThisEmail.Whole <> "yes", DisplayMode.Disabled, DisplayMode.Edit)
             OnSelect: |-
               =With(
-                  { d: DraftGallery.Selected, ref: RefValue.Text },
+                  {
+                      d: ThisEmail,
+                      ref: Coalesce(RefValue.Text, "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1)))
+                  },
+                  If(IsBlank(RefValue.Text), Set(varRef, { Id: d.SentKey, Ref: ref }));
                   IfError(
                       SACMTest.Run(
-                          "[TEST for " & Coalesce(Trim(ToText.Text), "nobody yet") & "] " & Trim(SubjectText.Text),
+                          "[TEST for " & Coalesce(Trim(ToText.Text), "nobody yet") & "] " & Substitute(Trim(SubjectText.Text), NewRefWords, ref),
                           Substitute(Substitute(d.Html, "%%REF%%", ref), "%%SENDER%%", MeHtml),
                           d.Csv & "", ref & ".csv");
                       Notify("Test sent to you (" & MeEmail & ") from the shared mailbox" & If(IsBlank(d.Csv), "", ", with the file") & ". The cases are not changed.", NotificationType.Success),
@@ -670,7 +506,7 @@ Screens:
                   )
               )
             X: =Parent.Width - 256
-            Y: =Parent.Height - 60
+            Y: =Parent.Height - 56
             Width: =116
             Height: =40
       - SendButton:
@@ -684,91 +520,65 @@ Screens:
             Size: =10.5
             FontWeight: =FontWeight.Semibold
             Tooltip: ="Send it from the shared SACM mailbox, with its file, and record it on the cases"
-            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> DraftGallery.Selected.Keys) && !((DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds))
+            Visible: =DraftCount > 0 && (IsBlank(varAsk) || varAsk.Keys <> ThisEmail.Keys) && !((ThisEmail.IsSent || ThisEmail.SentKey in varSentIds))
             DisplayMode: =If(IsBlank(SendWhy.Text), DisplayMode.Edit, DisplayMode.Disabled)
             OnSelect: |-
               =Set(varError, "");
               With(
                   {
-                      d: DraftGallery.Selected, ref: RefValue.Text,
-                      to: Trim(ToText.Text), cc: Trim(CcText.Text), subject: Trim(SubjectText.Text)
+                      d: ThisEmail,
+                      ref: Coalesce(RefValue.Text, "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1))),
+                      to: Trim(ToText.Text), cc: Trim(CcText.Text)
                   },
-                  Set(
-                      varSent,
-                      IfError(
-                          SACMSend.Run(to, cc, subject, Substitute(Substitute(d.Html, "%%REF%%", ref), "%%SENDER%%", MeHtml), d.Csv & "", ref & ".csv");
-                          true,
-                          Set(varError, FirstError.Message);
-                          false
-                      )
-                  );
-                  If(
-                      !varSent,
-                      Notify("Not sent: " & varError, NotificationType.Error),
-                      // Recorded as the HTML app records it (recordSent), for every part of the email under its one
-                      // reference (D314): the message on the cases still open, the points new since the first message
-                      // as a first message with the same reference (D161), and the cases nobody had become the
-                      // sender's (D164).
-                      With(
-                          {
-                              still: Concat(Filter(Split(d.Keys, Char(10)) As key, !IsBlank(key.Value) && !(key.Value in Split(d.NewKeys, Char(10)).Value)), Value, Char(10))
-                          },
+                  If(IsBlank(RefValue.Text), Set(varRef, { Id: d.SentKey, Ref: ref }));
+                  With(
+                      { subject: Substitute(Trim(SubjectText.Text), NewRefWords, ref) },
+                      Set(
+                          varSent,
                           IfError(
-                              If(
-                                  !IsBlank(still),
-                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: still, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: d.Kind, Channel: "mailbox" })
-                              );
-                              If(
-                                  !IsBlank(d.NewKeys),
-                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: d.NewKeys, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: "first", Channel: "mailbox" })
-                              );
-                              If(
-                                  !IsBlank(d.FreeKeys) && !IsBlank(MeName),
-                                  Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "assign", Keys: d.FreeKeys, Text: MeName })
-                              );
-                              Notify("Sent from the shared mailbox to " & to & ". It leaves the list after the next refresh.", NotificationType.Success),
-                              Notify("Sent, but not recorded: " & FirstError.Message & ". Add a note on the cases.", NotificationType.Error)
+                              SACMSend.Run(to, cc, subject, Substitute(Substitute(d.Html, "%%REF%%", ref), "%%SENDER%%", MeHtml), d.Csv & "", ref & ".csv");
+                              true,
+                              Set(varError, FirstError.Message);
+                              false
                           )
                       );
-                      Set(varSentIds, varSentIds & d.SentKey);
-                      Set(varLast, { Key: d.SentKey, Channel: "mailbox", To: to, At: Now(), Cases: CountRows(Filter(Split(d.Keys, Char(10)), !IsBlank(Value))) });
-                      Reset(AnywayCheck)
+                      If(
+                          !varSent,
+                          Notify("Not sent: " & varError, NotificationType.Error),
+                          // Recorded as the HTML app records it (recordSent), for every part of the email under its one
+                          // reference (D314): the message on the cases still open, the points new since the first message
+                          // as a first message with the same reference (D161), and the cases nobody had become the
+                          // sender's (D164).
+                          With(
+                              {
+                                  still: Concat(Filter(Split(d.Keys, Char(10)) As key, !IsBlank(key.Value) && !(key.Value in Split(d.NewKeys, Char(10)).Value)), Value, Char(10))
+                              },
+                              IfError(
+                                  If(
+                                      !IsBlank(still),
+                                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: still, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: d.Kind, Channel: "mailbox" })
+                                  );
+                                  If(
+                                      !IsBlank(d.NewKeys),
+                                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "message", Keys: d.NewKeys, Ref: ref, To: to, Cc: cc, Subject: subject, Kind: "first", Channel: "mailbox" })
+                                  );
+                                  If(
+                                      !IsBlank(d.FreeKeys) && !IsBlank(MeName),
+                                      Patch('SACM Journal', Defaults('SACM Journal'), { Title: Text(GUID()), At: Now(), By: MeEmail, ByName: MeName, EntryType: "assign", Keys: d.FreeKeys, Text: MeName })
+                                  );
+                                  Notify("Sent from the shared mailbox to " & to & ". Choose the next email in the list at the left.", NotificationType.Success),
+                                  Notify("Sent, but not recorded: " & FirstError.Message & ". Add a note on the cases.", NotificationType.Error)
+                              )
+                          );
+                          Set(varSentIds, varSentIds & d.SentKey);
+                          Set(varLast, { Key: d.SentKey, Channel: "mailbox", To: to, At: Now(), Cases: CountRows(Filter(Split(d.Keys, Char(10)), !IsBlank(Value))) });
+                          Set(varAnyway, "")
+                      )
                   )
               )
             X: =Parent.Width - 132
-            Y: =Parent.Height - 60
+            Y: =Parent.Height - 56
             Width: =116
-            Height: =40
-      - NextButton:
-          Control: ModernButton@1.0.0
-          Properties:
-            # After Send: the next email of the list that is not sent yet.
-            Text: ="Next email"
-            Icon: ="ArrowRight"
-            Layout: =ButtonLayout.IconAfter
-            Appearance: =ButtonAppearance.Primary
-            BasePaletteColor: =ColourNavy
-            Font: =AppFont
-            Size: =10.5
-            FontWeight: =FontWeight.Semibold
-            Visible: =DraftCount > 0 && (DraftGallery.Selected.IsSent || DraftGallery.Selected.SentKey in varSentIds)
-            DisplayMode: |-
-              =If(IsBlank(LookUp(DraftGallery.AllItems, !(IsSent || SentKey in varSentIds))), DisplayMode.Disabled, DisplayMode.Edit)
-            OnSelect: |-
-              =With(
-                  {
-                      next: Coalesce(
-                          LookUp(DraftGallery.AllItems, Value(Mid(DraftId, 2)) > Value(Mid(DraftGallery.Selected.DraftId, 2)) && !(IsSent || SentKey in varSentIds)),
-                          LookUp(DraftGallery.AllItems, !(IsSent || SentKey in varSentIds)))
-                  },
-                  Set(varOpen, next.DraftId);
-                  Reset(AnywayCheck);
-                  Refresh('SACM Journal');
-                  If(IsBlank(next.Ref), Set(varRef, { Id: next.DraftId, Ref: "SACM-" & Concat(Sequence(6), Mid(RefLetters, RandBetween(1, Len(RefLetters)), 1)) }))
-              )
-            X: =Parent.Width - 256
-            Y: =Parent.Height - 60
-            Width: =240
             Height: =40
       # ------------------------------------------------------------------ after Outlook draft or Teams: did it go?
       - AskLabel:
@@ -781,11 +591,11 @@ Screens:
             Color: =ColourInk
             Fill: =ColourBlueSoft
             PaddingLeft: =10
-            Visible: =!IsBlank(varAsk) && varAsk.Keys = DraftGallery.Selected.Keys
-            X: =Parent.Width - 256
-            Y: =Parent.Height - 116
-            Width: =240
-            Height: =48
+            Visible: =!IsBlank(varAsk) && varAsk.Keys = ThisEmail.Keys
+            X: =16
+            Y: =Parent.Height - 56
+            Width: =Parent.Width - 32 - 256
+            Height: =40
       - NoButton:
           Control: ModernButton@1.0.0
           Properties:
@@ -794,10 +604,10 @@ Screens:
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
-            Visible: =!IsBlank(varAsk) && varAsk.Keys = DraftGallery.Selected.Keys
+            Visible: =!IsBlank(varAsk) && varAsk.Keys = ThisEmail.Keys
             OnSelect: =Set(varAsk, Blank())
             X: =Parent.Width - 256
-            Y: =Parent.Height - 60
+            Y: =Parent.Height - 56
             Width: =116
             Height: =40
       - YesButton:
@@ -810,7 +620,7 @@ Screens:
             Font: =AppFont
             Size: =10.5
             FontWeight: =FontWeight.Semibold
-            Visible: =!IsBlank(varAsk) && varAsk.Keys = DraftGallery.Selected.Keys
+            Visible: =!IsBlank(varAsk) && varAsk.Keys = ThisEmail.Keys
             OnSelect: |-
               =With(
                   {
@@ -841,6 +651,6 @@ Screens:
                   )
               )
             X: =Parent.Width - 132
-            Y: =Parent.Height - 60
+            Y: =Parent.Height - 56
             Width: =116
             Height: =40

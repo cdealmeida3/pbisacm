@@ -3,9 +3,9 @@
   "name": "about",
   "position": {
     "x": 956,
-    "y": 396,
+    "y": 572,
     "z": 4800,
-    "height": 256,
+    "height": 80,
     "width": 300,
     "tabOrder": 4800
   },
@@ -23,12 +23,12 @@
                       "Entity": "Checks"
                     }
                   },
-                  "Property": "Card about"
+                  "Property": "Card numbers"
                 }
               },
-              "queryRef": "Checks.Card about",
-              "nativeQueryRef": "Card about",
-              "displayName": "About this card"
+              "queryRef": "Checks.Card numbers",
+              "nativeQueryRef": "Card numbers",
+              "displayName": "Lines of this card"
             }
           ]
         }
@@ -100,7 +100,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'What the card asks'"
+                  "Value": "'How many lines of this card are to solve, to check, waiting and known'"
                 }
               }
             }
@@ -120,7 +120,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'About this card'"
+                  "Value": "'Lines of this card'"
                 }
               }
             }
@@ -133,19 +133,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Checks"
-                    }
-                  },
-                  "Property": "Card numbers"
+                  "Value": "false"
                 }
               }
             }

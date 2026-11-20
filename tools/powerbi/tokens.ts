@@ -73,18 +73,19 @@ export const APP_SLOTS: Record<string, AppSlot> = {
   mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Assign lines, mark them fixed or in progress, hand over your work, add a note, and save.',
     gets: 'It gets every open line of this page (CaseLines, Queue lines).' },
-  // Build R4 (D361): the app still fills the page until build R6 redraws it for one email. In Desktop the app box is a
-  // strip at the top, and the list of emails (appBoxList) and the email chosen (appBoxHead, appBoxBody) under it.
-  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620, boxHeight: 88,
-    does: 'The email studio: Send, Test to me, Outlook draft and Teams, for each email of the list.',
-    gets: 'It gets the emails ready to send (Drafts). Below: the list and the email chosen, as Desktop shows them.' },
+  // Build R6 (D371): the app on the right side, for the one email chosen in the list at the left (emails). In Desktop the
+  // app box is a strip at the top, and the email chosen (appBoxHead, appBoxBody) under it.
+  messages: { app: 'SACM messages', x: 676, y: 84, width: 580, height: 620, boxHeight: 88,
+    does: 'Send, Test to me, Outlook draft and Teams, for the email chosen in the list at the left.',
+    gets: 'It gets that one email (AppEmail, Selected email is 1). Below: the email chosen, as Desktop shows it.' },
   auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Follow again: select lines of the table, pick Follow again, and save.',
     gets: 'It gets the lines not followed up (CaseLines, Status Not followed up).' },
   auditreview: { app: 'SACM audit', x: 956, y: 84, width: 300, height: 620,
     does: 'Start a new review, mark each CI of the sample same in EPO or not, and change the team\'s settings.',
     gets: 'It gets the CIs of the reviews (ReviewLines).' },
-  card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 300,
+  // Build R6 (D374): 476 high, so the form does not scroll; About this card is short under it.
+  card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 476,
     does: 'Assign the lines of this card, mark them fixed or in progress, share them out, or add a note.',
     gets: 'It gets the open lines of this card (CaseLines, For the app).' },
   // Taller since build D5: the app reads the person's replies (the reply reader), where the table of replies was.
