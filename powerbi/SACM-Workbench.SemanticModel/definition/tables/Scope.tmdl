@@ -1,0 +1,26 @@
+/// The choice above My day and Work queue (D343): Mine and free (the lines assigned to you and the lines nobody has) or Everyone. No relationship: the measures of the two pages read it.
+table Scope
+
+	/// TRUE when the whole team's work is shown: Everyone chosen, or no choice on the page (People, Person and Overview show everyone). My day and Work queue choose Mine and free when they open.
+	measure 'Everyone chosen' = SELECTEDVALUE ( Scope[Choice], "Everyone" ) = "Everyone"
+
+	/// The words of the choice for the line under a title: "yours and the free lines", or "everyone's".
+	measure 'Scope words' =
+			VAR me = [Me]
+			RETURN IF ( [Everyone chosen], "everyone's lines", IF ( ISBLANK ( me ), "the free lines (you are not on the SACM Team list)", me & "'s lines and the free lines" ) )
+		displayFolder: Page notes
+
+	column Choice
+		dataType: string
+		sortByColumn: Order
+		sourceColumn: Choice
+
+	column Order
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: Order
+
+	partition Scope = m
+		mode: import
+		source = ScopeRows

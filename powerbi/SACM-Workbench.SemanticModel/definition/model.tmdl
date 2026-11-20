@@ -64,6 +64,7 @@ ref table JournalKeys
 ref table Replies
 ref table Settings
 ref table Team
+ref table Scope
 ref table ReviewLines
 ref table Activity
 ref table HistoryExpected
