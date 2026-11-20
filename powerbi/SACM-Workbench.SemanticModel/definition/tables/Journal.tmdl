@@ -12,7 +12,7 @@ table Journal
 			RETURN IF ( n > 0, n & IF ( n = 1, " finding", " findings" ) )
 
 	/// Under the title of the timeline (Case, Person): the order, or why the box is empty.
-	measure 'Timeline note' = IF ( COUNTROWS ( DISTINCT ( Journal[Id] ) ) + 0 = 0, "Nothing recorded yet: the team's actions show here.", "What the team did, oldest first." )
+	measure 'Timeline note' = IF ( [CI chosen] <> 1, "No CI chosen: on a card or a person, select a line, then Open CI.", IF ( COUNTROWS ( DISTINCT ( Journal[Id] ) ) + 0 = 0, "Nothing recorded yet: the team's actions show here.", "What the team did, oldest first." ) )
 		displayFolder: Page notes
 
 	/// Under the title of the actions of the period (Audit export).

@@ -639,8 +639,8 @@ why. Do **not** test the limit by pressing Refresh now many times: in My workspa
 ### 6.6 The app SACM messages: the email studio (builds B7 and D5)
 
 The page **Messages** holds the app **SACM messages**, the email studio (D326). It fills the page under the title (X 224,
-Y 84, 1032 × 620) (section 6.4). Under it, since build R4, Desktop shows the list of the emails at the left (who, kind, CIs, subject; a
-person opened from *Prepare email* shows only theirs) and the email chosen at the right: To, Cc, Subject and its first
+Y 84, 1032 × 620) (section 6.4). Under it, since build R4, Desktop shows the list of the emails at the left (who, kind, CIs, subject, state) and
+the email chosen at the right (after *Prepare email*, the email to that person): To, Cc, Subject and its first
 lines (D361). In the service the app covers them. It lists every email ready to send: first messages, reminders that are due and escalations, one per
 person and kind (D300, D314). The words are those of the HTML app, and the check of every pull request compares them
 with it.
@@ -671,10 +671,7 @@ Make it once, as the app of section 6.4:
    Add these fields of **Drafts**, each **Don't summarize**: *DraftId*, *Ref*, *Kind*, *KindLabel*, *To*, *ToName*,
    *Cc*, *Subject*, *Body*, *Chat*, *Keys*, *NewKeys*, *FreeKeys*, *CiCount*, *About*, *NobodyAbove*, *Mailbox*,
    *AssignedTo*, and from build D5 *Html*, *Csv*, *Summary*, *EmailSubject*, *EmailId*, *HtmlLength*, *CsvLength*, and
-   from build 0.52.0 the measure **About → Report at**. From build R4 (D362): in **Filters on this visual** drag the
-   measure **Drafts → For the person**, *is* `1`, **Apply filter**. Then *Prepare email* on *Person* opens the app on
-   that person's emails only; opened from the rail, it lists every email as before. (An app made earlier: add the
-   filter, nothing else changes.)
+   from build 0.52.0 the measure **About → Report at**.
 2. **Create new**. In Studio: **Settings → Updates → New**: turn on **Modern controls and themes**. **Data → Add data →
    SharePoint** → **SACM Journal** and **SACM Team**. **Power Automate → Add flow** → **SACMSend**, **SACMTest**,
    **SACMDraft** and **SACMRefresh** (for the button **Refresh now** at the top).

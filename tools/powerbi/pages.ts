@@ -282,10 +282,10 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
     // which rail.ts writes, at the top of the place and under every other visual of the page (the rail picture apart).
     if (slot) {
       const appBox = visuals.find((visual) => visual.name === 'appBox');
-      const lowest = Math.min(...visuals.filter((visual) => visual.name !== 'appBox' && visual.name !== 'rail').map((visual) => visual.position.z ?? 0));
+      const lowest = Math.min(...visuals.filter((visual) => !APP_BOX.test(visual.name) && visual.name !== 'rail' && !isAppVisual(visual)).map((visual) => visual.position.z ?? 0));
       if (!appBox) problems.push(`${where}: no app box (appBox) on the place of the Power Apps visual ${slot.app}; run npm run powerbi:generate`);
       else if (appBox.position.x !== slot.x || appBox.position.y !== slot.y || appBox.position.width !== slot.width) problems.push(`${where} › appBox: not at the top of the place of ${slot.app} (${slot.x}, ${slot.y}, ${slot.width} wide)`);
-      else if ((appBox.position.z ?? 0) >= lowest) problems.push(`${where} › appBox: not under every other visual (z ${appBox.position.z}), so the app might not cover it`);
+      for (const box of visuals.filter((visual) => APP_BOX.test(visual.name) && (visual.position.z ?? 0) >= lowest)) problems.push(`${where} › ${box.name}: not under every other visual (z ${box.position.z}), so the app might not cover it`);
     }
     if (FLOW_SLOTS[page.name] && !visuals.some((visual) => visual.name === 'railAppBox' && samePlace(visual.position, FLOW_SLOTS[page.name]!))) {
       problems.push(`${where}: no app box (railAppBox) on the place of the button Refresh now; run npm run powerbi:generate`);

@@ -10,7 +10,7 @@ table Replies
 			RETURN IF ( NOT ISBLANK ( here ) && here IN refs, here )
 
 	/// Under the title of the replies (Case, Person).
-	measure 'Replies list note' = IF ( COUNTROWS ( Replies ) + 0 = 0, "No reply yet.", "Every reply filed from the shared mailbox." )
+	measure 'Replies list note' = IF ( [CI chosen] <> 1, "No CI chosen: on a card or a person, select a line, then Open CI.", IF ( COUNTROWS ( Replies ) + 0 = 0, "No reply yet.", "Every reply filed from the shared mailbox." ) )
 		displayFolder: Page notes
 
 	/// A number of Audit: the median days from the first email of a case to its reply, for the replies of the period chosen; blank with no reply.

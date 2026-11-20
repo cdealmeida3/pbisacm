@@ -4,7 +4,7 @@
   "position": {
     "x": 224,
     "y": 180,
-    "z": 3000,
+    "z": 2,
     "height": 524,
     "width": 440,
     "tabOrder": 3000
@@ -62,18 +62,33 @@
             },
             {
               "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Drafts"
+                    }
+                  },
+                  "Property": "ListSubject"
+                }
+              },
+              "queryRef": "Drafts.ListSubject",
+              "nativeQueryRef": "ListSubject",
+              "displayName": "Subject"
+            },
+            {
+              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Drafts"
                     }
                   },
-                  "Property": "Email subject line"
+                  "Property": "Email state"
                 }
               },
-              "queryRef": "Drafts.Email subject line",
-              "nativeQueryRef": "Email subject line",
-              "displayName": "Subject"
+              "queryRef": "Drafts.Email state",
+              "nativeQueryRef": "Email state",
+              "displayName": "State"
             }
           ]
         }
@@ -104,7 +119,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "120D"
+                  "Value": "96D"
                 }
               }
             }
@@ -118,7 +133,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "80D"
+                  "Value": "72D"
                 }
               }
             }
@@ -146,13 +161,27 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "160D"
+                  "Value": "128D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Drafts.Email subject line"
+            "metadata": "Drafts.ListSubject"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "64D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Drafts.Email state"
           }
         }
       ]
@@ -218,57 +247,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "forPerson",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Drafts"
-              }
-            },
-            "Property": "For the person"
-          }
-        },
-        "type": "Advanced",
-        "filter": {
-          "Version": 2,
-          "From": [
-            {
-              "Name": "d",
-              "Entity": "Drafts",
-              "Type": 0
-            }
-          ],
-          "Where": [
-            {
-              "Condition": {
-                "Comparison": {
-                  "ComparisonKind": 0,
-                  "Left": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Source": "d"
-                        }
-                      },
-                      "Property": "For the person"
-                    }
-                  },
-                  "Right": {
-                    "Literal": {
-                      "Value": "1L"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        }
-      }
-    ]
   }
 }

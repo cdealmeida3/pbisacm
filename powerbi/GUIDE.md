@@ -30,8 +30,9 @@ How the report is set up (the workspace, the lists, the apps and the flows) is i
    an escalation, a reminder, the people never asked).
 2. **Select a step and press *Open person*.** The *Person* page shows the next step, the open lines, the last contact
    and everything open with them.
-3. **Select a line of *Open with them* and press *Prepare email*.** The page *Messages* opens on the person: their
-   emails in the list. Choose one: the email studio shows it as it will arrive, with From, To, Cc and Subject.
+3. **Select a line of *Open with them* and press *Prepare email*.** The page *Messages* opens with the email studio:
+   the list of emails, the email as it will arrive, and From, To, Cc and Subject. (In Desktop the email to that person
+   shows first; the published app does so from build R6.)
 4. **Press *Send*.** The email goes out from the shared SACM mailbox, with the full list as a CSV file when it is long.
    The cases are recorded at once; the report shows them after the next refresh (part 2A). *Test to me* sends it to
    you only. *Outlook draft* puts it in your own Drafts, From the shared mailbox, to change it first.
