@@ -5,7 +5,7 @@
     "x": 224,
     "y": 84,
     "z": 3000,
-    "height": 48,
+    "height": 84,
     "width": 464,
     "tabOrder": 3000
   },
@@ -41,14 +41,14 @@
             "rowCount": {
               "expr": {
                 "Literal": {
-                  "Value": "1L"
+                  "Value": "2L"
                 }
               }
             },
             "columnCount": {
               "expr": {
                 "Literal": {
-                  "Value": "5L"
+                  "Value": "3L"
                 }
               }
             }

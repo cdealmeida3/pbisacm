@@ -58,7 +58,6 @@
               },
               "queryRef": "Journal.Action",
               "nativeQueryRef": "Action",
-              "active": true,
               "displayName": "Action"
             },
             {

@@ -28,7 +28,6 @@
               },
               "queryRef": "Checks.Section",
               "nativeQueryRef": "Section",
-              "active": true,
               "displayName": "Section"
             },
             {

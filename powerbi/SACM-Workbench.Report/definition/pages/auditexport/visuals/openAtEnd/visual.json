@@ -73,7 +73,6 @@
               },
               "queryRef": "History.Part",
               "nativeQueryRef": "Part",
-              "active": true,
               "displayName": "Part"
             },
             {
@@ -119,7 +118,6 @@
               },
               "queryRef": "History.StateLabel",
               "nativeQueryRef": "StateLabel",
-              "active": true,
               "displayName": "Listed as"
             }
           ]

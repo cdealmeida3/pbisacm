@@ -365,6 +365,8 @@ export function pageProblems(report: ReportPages, catalogue: Catalogue): string[
         }
       }
       // 13. Codes.
+      if (/^(tableEx|pivotTable)$/.test(visual.visual?.visualType ?? '') && projectionsOf(visual).some((projection) => (projection as { active?: boolean }).active))
+        problems.push(`${at}: a column of the table is "active": Power BI then shows that column only`);
       for (const code of codeColumns(visual)) problems.push(`${at}: shows the column ${code}, which holds a code; show its words (rule 9 of the real-data plan, D369)`);
       // 11. Words.
       for (const { text, button } of textsOf(visual)) for (const problem of wordProblems(text, button)) problems.push(`${at}: "${text}": ${problem}`);

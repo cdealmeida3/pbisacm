@@ -28,7 +28,6 @@
               },
               "queryRef": "CapabilitySheet.NameShown",
               "nativeQueryRef": "NameShown",
-              "active": true,
               "displayName": "Name"
             },
             {

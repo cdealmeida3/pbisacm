@@ -43,7 +43,6 @@
               },
               "queryRef": "Checks.CardLabel",
               "nativeQueryRef": "CardLabel",
-              "active": true,
               "displayName": "Check"
             },
             {

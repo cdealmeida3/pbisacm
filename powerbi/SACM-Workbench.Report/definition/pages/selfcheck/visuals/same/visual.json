@@ -28,7 +28,6 @@
               },
               "queryRef": "SameNumbers.Pair",
               "nativeQueryRef": "Pair",
-              "active": true,
               "displayName": "Pair of numbers"
             },
             {

@@ -73,7 +73,6 @@
               },
               "queryRef": "History.Part",
               "nativeQueryRef": "Part",
-              "active": true,
               "displayName": "Part"
             },
             {
