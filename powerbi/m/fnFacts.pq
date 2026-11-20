@@ -3,7 +3,7 @@
 // responsible for goes to the team (reference/record-teams, D195); a detector may name another CI whose people are asked
 // (ContactCi); a CI from EPO where nobody can be asked goes to the EPO inventory owner (D47). Only a live check asks
 // people (D346): a finding of a proposed check has nobody to ask. NobodyWhy says why nobody is asked, when nobody is
-// (rule 10 of the real-data plan, fnContact): "SACM fixes it", "SACM checks it", "Proposed: nobody is asked until the
+// (rule 10 of the real-data plan, fnContact): "SACM fixes it", "SACM checks it", "Proposed: not sent to anyone until the
 // card is live", or "Nobody to ask: " and the reasons; "" when someone is. Nothing is sent here.
 (findings as list, run as record, packs as list) as list =>
     let
@@ -56,14 +56,14 @@
                 to = contact[To],
                 above = if to = null then null else to[Above],
                 status = if pack = null then "" else Record.FieldOrDefault(pack, "status", ""),
+                sacmWhy = if List.Contains(audience, "sacm") then (if Record.FieldOrDefault(pack, "reviewOnly", false) = true then "SACM checks it" else "SACM fixes it") else "",
                 why = if to <> null then ""
-                    else if List.Contains(audience, "sacm") then (if Record.FieldOrDefault(pack, "reviewOnly", false) = true then "SACM checks it" else "SACM fixes it")
-                    else if contact[Why] <> "" then "Nobody to ask: " & contact[Why]
-                    else "Nobody to ask"
+                    else if sacmWhy <> "" then sacmWhy
+                    else "Nobody to ask: " & (if contact[Why] <> "" then contact[Why] else "the card names nobody else to ask")
             in
                 if pack <> null and status <> "live" then
                     base & [ContactName = "", ContactEmail = "", ContactId = "", ContactVia = "", Cc = {}, EscalateName = "", EscalateEmail = "", EscalateVia = "",
-                        NobodyWhy = if status = "proposed" then "Proposed: nobody is asked until the card is live" else "Not live (" & status & "): nobody is asked until the card is live"]
+                        NobodyWhy = if sacmWhy <> "" then sacmWhy else if status = "proposed" then "Proposed: not sent to anyone until the card is live" else "Not live (" & status & "): not sent to anyone until the card is live"]
                 else if List.Contains(audience, "procurement") then
                     base & [ContactName = "Procurement", ContactEmail = "", ContactId = ReadingRules[procurement][id], ContactVia = ReadingRules[procurement][via], Cc = {}] & nobody & [NobodyWhy = ""]
                 else if team <> null then

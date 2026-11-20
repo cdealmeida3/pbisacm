@@ -24,7 +24,6 @@ table Findings
 	/// The state of one finding as a colour (LOOK.md): red to solve, blue to check, grey waiting or known.
 	measure 'Finding colour' = SWITCH ( SELECTEDVALUE ( Findings[State] ), "open", "#b42318", "review", "#175cd3", "#475467" )
 
-	/// Under the title of the lines of a card (Card): the order, or why the box is empty. Opened from its tab, the page says how to choose a card.
 	/// Under the title of To solve with a person (Card): on a card SACM fixes or checks itself, that nobody is asked and where its lines are (the table shows none, Ask mark); else as Lines note.
 	measure 'Ask lines note' =
 			VAR asks = SELECTEDVALUE ( Checks[Asks] )
@@ -43,6 +42,7 @@ table Findings
 			RETURN IF ( asks <> "SACM", 1 )
 		formatString: 0
 
+	/// Under the title of the lines of a card (Card): the order, or why the box is empty. Opened from its tab, the page says how to choose a card.
 	measure 'Lines note' = SWITCH ( TRUE (), NOT HASONEVALUE ( Checks[CheckId] ), "No card chosen: on All cards, select a card, then Open card.", COUNTROWS ( Findings ) + 0 = 0, "No line: the newest report finds nothing on this card.", "Who is asked about which CI. Owned by, Managed by and Tags are in the export." )
 		displayFolder: Page notes
 

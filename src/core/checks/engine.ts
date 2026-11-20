@@ -289,9 +289,9 @@ export const isSwitchedOff = (pack: Pick<CheckPack, 'status'>): boolean => pack.
  */
 export const asksPeople = (pack: Pick<CheckPack, 'status'> | undefined): boolean => !!pack && pack.status === 'live';
 
-/** Why nobody is asked about a finding of a check that is not live, in words: "Proposed: nobody is asked until the card is live". */
+/** Why nobody is asked about a finding of a check that is not live, in words: "Proposed: not sent to anyone until the card is live". */
 export const notLiveWhy = (pack: Pick<CheckPack, 'status'>): string =>
-  pack.status === 'proposed' ? 'Proposed: nobody is asked until the card is live' : `Not live (${pack.status}): nobody is asked until the card is live`;
+  pack.status === 'proposed' ? 'Proposed: not sent to anyone until the card is live' : `Not live (${pack.status}): not sent to anyone until the card is live`;
 
 /** The checks that run and have a card: every check that is not switched off. */
 export const checksInUse = <T extends Pick<CheckPack, 'status'>>(packs: T[]): T[] => packs.filter((pack) => !isSwitchedOff(pack));

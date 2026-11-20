@@ -111,6 +111,7 @@ All files are UTF-8 JSON, except the journals (one JSON object per line) and the
 | `contactName`, `contactEmail`, `contactId`, `contactVia` | Who is asked, and why this person (`contactId`: user ID, else email, lower case; `''` = nobody found; `procurement-mailbox`, `epo-inventory-owner` and `team:<id>` (a record team, D195) are resolved from the team settings) |
 | `cc` | Who is copied |
 | `escalateName`, `escalateEmail`, `escalateVia` | Who an escalation goes to (`manager` or `department head`; for a person asked as Managed by, from 0.21: `owner`, `manager of owner` or `department head of owner`, D160) |
+| `nobodyWhy` | Why nobody is asked, when `contactName` is empty (from 0.55, D355): "SACM fixes it", "SACM checks it", "Proposed: not sent to anyone until the card is live" (D346), or "Nobody to ask: " and the reasons ("Owned by has no email in the CI report") |
 | `ci` | The CI as the message table shows it: `epoId`, `status`, `supportGroup`, `ownedBy`, `managedBy`, `chips`, `tags` (the tags of the CI, shown on the screen and in Export this list, never in a message), and `contract` for a contract |
 | `state`, `stateWhy` | The state, and why it is not `open` |
 | `source` | What the source holds, in words, when the line was compared with it first (D190): "Primary Responsible is empty in EPO too". It is also the end of `detail`; the message then shows the column "What we found" |
@@ -262,6 +263,7 @@ Files written by older versions open in the current one. Each reader has a defau
 | `loadedBy`, `loadedByName`, `loadedAt` on a load | 0.7 (and no longer written since 0.11) | Who loaded it comes from the `report` events of the journals |
 | `escalateName` …, `ci` on a fact | 0.8 | Nobody is known to escalate to; the message table from the newest run |
 | `escalateVia` `owner` … on a fact | 0.21 | The run was saved with the older rule (the Managed by person's own manager); the next report, or *Run the checks again*, gives the owner |
+| `nobodyWhy` on a fact | 0.55 | The run was saved before; a line nobody is asked about shows *Nobody to ask* without the reason until the next report, or *Run the checks again* |
 | `state` on a fact | 0.9 | `open` |
 | `relationshipReport` on a run | 0.10 | No relationship report was used |
 | `inventory` on a run | 0.13 | The lifecycle review cannot draw from it |

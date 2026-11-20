@@ -556,7 +556,7 @@ test('only a live check asks people: the lines of a proposed check are listed, w
   assert.ok(proposed.length > 0, 'the sample has findings of proposed checks');
   for (const fact of proposed) {
     assert.deepEqual([fact.contactName, fact.contactEmail, fact.contactId, fact.cc.length], ['', '', '', 0], fact.key);
-    assert.equal(fact.nobodyWhy, 'Proposed: nobody is asked until the card is live', fact.key);
+    assert.equal(fact.nobodyWhy, 'Proposed: not sent to anyone until the card is live', fact.key);
   }
   // A live check still asks, and a fact with somebody to ask has no reason.
   const asked = facts.filter((fact) => status.get(fact.checkId) === 'live' && fact.contactName);
@@ -589,4 +589,6 @@ test('why nobody is asked: one reason per entry of the audience, in its order, t
     'Managed by has no email in the CI report; the CI report has no column Owned by');
   assert.equal(nobodyWhy(ci({ owned_by: person({}) }), 'owned_by', ['managerOf(field)', 'otherRoles']), 'Owned by is empty, so nobody above it is known; no other role has an active person with an email');
   assert.equal(nobodyWhy(ci({}), 'owned_by', ['sacm']), '');
+  // Only the role of the problem itself: no reason here, so buildRun says "Nobody to ask: the card names nobody else to ask".
+  assert.equal(nobodyWhy(ci({ owned_by: person({}) }), 'owned_by', ['owned_by']), '');
 });

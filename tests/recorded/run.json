@@ -610,7 +610,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "SACM fixes it"
     },
     {
       "key": "CONTRACT-STATUS:contract:ct000004:status",
@@ -652,7 +652,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "SACM fixes it"
     },
     {
       "key": "CONTRACT-STATUS:contract:ct000005:status",
@@ -694,7 +694,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "SACM fixes it"
     },
     {
       "key": "CONTRACT-TO-CLEAR:contract:ct000002:end",
@@ -733,7 +733,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "SACM fixes it"
     },
     {
       "key": "CONTRACT-TO-CLEAR:contract:ct000002:dailyResponsible",
@@ -772,7 +772,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "SACM fixes it"
     },
     {
       "key": "CONTRACT-UPLOAD:contract:ct000005:vendor",
@@ -1131,7 +1131,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "DESC-QUALITY:members:description",
@@ -1160,7 +1160,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "DESC-QUALITY:members - standard:description",
@@ -1189,7 +1189,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "DESC-QUALITY:close the month:description",
@@ -1221,7 +1221,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "EPO-DIFF:member engine - prod:managed_by",
@@ -1373,7 +1373,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "MAPPING:event engine:mapping",
@@ -1407,7 +1407,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "MAPPING:event desk:mapping",
@@ -1444,7 +1444,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "MAPPING:event gateway - prod:mapping",
@@ -1477,7 +1477,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "NAME-DUPLICATE:fines hub - prod:name",
@@ -1614,7 +1614,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "REL-MISSING:manage fines|ast-0013:bc-below",
@@ -2040,7 +2040,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "SUPPORT-GROUP-INACTIVE:index tool - prod:support_group",
@@ -2271,7 +2271,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "TAG-STATUS-CONFLICT:fines hub - prod:tags",
@@ -2303,7 +2303,7 @@
       "cc": [],
       "escalateName": "",
       "escalateEmail": "",
-      "nobodyWhy": "Proposed: nobody is asked until the card is live"
+      "nobodyWhy": "Proposed: not sent to anyone until the card is live"
     },
     {
       "key": "RESP-MISSING:event gateway - prod:managed_by",

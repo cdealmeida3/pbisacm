@@ -107,21 +107,26 @@ table Checks
 	measure 'Checks in use' = COUNTROWS ( DISTINCT ( Checks[CheckId] ) ) + 0
 		formatString: 0
 
-	/// What the card page says to do: the hint of the check file; on a card that is not live, first that nobody is asked (D346).
+	/// What the card page says to do: the hint of the check file; on a card that is not live, first that nobody is asked (D346); on a card SACM fixes or checks itself, that it does (D355).
 	measure 'Card hint' =
 			VAR cardStatus = SELECTEDVALUE ( Checks[Status] )
 			VAR cardHint = SELECTEDVALUE ( Checks[CardHint] )
+			VAR ownWork =
+			    IF (
+			        SELECTEDVALUE ( Checks[Asks] ) = "SACM",
+			        IF ( SELECTEDVALUE ( Checks[Kind] ) = "fix", "SACM fixes this card itself: open the tab SACM fix list. ", "SACM checks this card itself: open the tab To check. " )
+			    )
 			RETURN
 			    SWITCH (
 			        TRUE (),
 			        ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), "On All cards, select a card, then Open card. Until then the page shows every card.",
-			        cardStatus = "proposed", "Proposed: not sent to anyone until the card is live. " & cardHint,
-			        cardStatus <> "live", "Not live: not sent to anyone until the card is live. " & cardHint,
-			        cardHint
+			        cardStatus = "proposed", "Proposed: not sent to anyone until the card is live. " & ownWork & cardHint,
+			        cardStatus <> "live", "Not live: not sent to anyone until the card is live. " & ownWork & cardHint,
+			        ownWork & cardHint
 			    )
 
-	/// The name of the check on its card page.
-	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & " · " & [Card state], "No card chosen" )
+	/// The name of the check on its card page, with Proposed for a proposed card (D346), and its state.
+	measure 'Card title' = IF ( NOT ISBLANK ( SELECTEDVALUE ( Checks[CheckId] ) ), SELECTEDVALUE ( Checks[CardLabel] ) & IF ( SELECTEDVALUE ( Checks[Status] ) = "proposed", " · Proposed" ) & " · " & [Card state], "No card chosen" )
 
 	/// The line of the section Completeness (D219, src/app/view/cards.ts sectionText): it counts cards, not findings. A card to solve that is not daily work (priority later, D182) counts as when there is time.
 	measure Completeness =
