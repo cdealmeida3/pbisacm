@@ -73,10 +73,11 @@ export const APP_SLOTS: Record<string, AppSlot> = {
   mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Assign lines, mark them fixed or in progress, hand over your work, add a note, and save.',
     gets: 'It gets every open line of this page (CaseLines, Queue lines).' },
-  // Build R4 (D361): the list of emails is a table of the page on the left; the app at the right gets the email chosen.
-  messages: { app: 'SACM messages', x: 680, y: 84, width: 576, height: 620, standInHeight: 96,
-    does: 'Send, Test to me, Outlook draft and Teams, for the email chosen in the list.',
-    gets: 'It gets the one email chosen in the list (Drafts, Selected email). Below: the email as Desktop shows it.' },
+  // Build R4 (D361): the app still fills the page until build R6 redraws it for one email. In Desktop the stand-in is a
+  // strip at the top, and the list of emails (standInList) and the email chosen (standInHead, standInBody) under it.
+  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620, standInHeight: 60,
+    does: 'The email studio: Send, Test to me, Outlook draft and Teams, for each email of the list.',
+    gets: 'It gets the emails ready to send (Drafts). Below: the list and the email chosen, as Desktop shows them.' },
   auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Follow again: select lines of the table, pick Follow again, and save.',
     gets: 'It gets the lines not followed up (CaseLines, Status Not followed up).' },

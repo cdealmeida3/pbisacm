@@ -32,7 +32,7 @@ The report opens on the **My day** page. Look at:
 
 | Page | What you should see |
 |---|---|
-| **My day** | The chip of the reports at the top right ("✓ 5 reports · 11 Nov · up to date"; a press opens Reports). Four numbers: for the samples 1 reply to read (Dee Owner), 1 person to escalate (Ada Example), 1 reminder due (Cy Keeper) and the findings new since the report before (the samples have two CI reports: 4 and 11 November). Below, **Your next steps**: one line per person, in the order of the team's rules (the reply first, then the escalation, the reminder, the people never asked). Select a step and press **Open person** (or right-click, **Drill through**, **Person**). At the right, **Since the last report** per section and **Waiting on others**. |
+| **My day** | The chip of the reports at the top right ("✓ 5 reports · 11 Nov · up to date"; a press opens Reports). Four numbers: for the samples 1 reply to read (Dee Owner), 1 person to escalate (Ada Example), 1 reminder due (Cy Keeper) and the findings new since the report before (the samples have two CI reports: 4 and 11 November). Below, **Your next steps**: one line per person, in the order of the team's rules (the reply first, then the escalation, the reminder, the people never asked). Select a step and press **Open person** (or right-click, **Drill through**, **Person**). At the right, **Since the last report** per section and **Waiting on others**. When *SACM Team* or *SACM Settings* has no row yet, the line under *Your next steps* starts with "Set-up is not finished: open Data check on the page Reports." |
 | **Work queue** | **Mine and free** (chosen when it opens) or **Everyone**. One line per person asked, with the next step, the open lines, the cards, the last message and who has them. The buttons at the top choose a status. The app *SACM actions* sits at the right (section 6.4). |
 | **People** | One line per person with open lines, in the order of the team's rules: the next step, a bar of the open lines, the kinds of problem, the cards, the last time asked. **Find a person** searches the names. Select a person and press **Open person**. |
 | **History** | Two tabs. **What happened**: the 22 events of the sample journal and the replies of the sample list, newest first, in the words of the app, with an icon per kind. The search box (a CI, a person, a card or a reference), the row of kinds and **Who** filter them. **Trend**: to solve, new and solved per report date, the days to fix, and to solve per support group and per class, for the two sample dates. |
@@ -46,7 +46,7 @@ The report opens on the **My day** page. Look at:
 | **Cards** | Two tabs. **Sections**: the three sections side by side, each card with a badge (the number to solve, a tick when OK) and a small line of its report dates. **List**: one row per check, as before. Select a card, then **Open card**. On the list: the three sections (Completeness, Correctness, Compliance) and one row per check in use, with its state in colour (red To solve, blue To check, green OK, grey Not tested), its number and *Partly tested* when a note says what it could not test. Grey cards say why. The row of states (*To solve*, *To check*, *OK*, *Not tested*) and **Topic** filter the cards. Below: the classes that are not checked yet. For the samples the built cards show 25 to solve, 3 to check, 8 OK and 2 not tested (hidden characters: a CSV cannot show them; *Offering parent*: the sample CI report has no Parent column), as in the HTML app. |
 | **Card** (drill through) | On All cards select a card and press **Open card**. **Back**, the card and what it finds, then the tabs **To solve with a person** (the lines by the person to ask, then the kind of problem, with why a line waits), **SACM fix list** (with **Open in ServiceNow**), **To check** (the lines to check first) and **Export** (the columns of the SACM template: **More options (...)**, **Export data** gives the Excel file). At the right the app, *About this card* with the numbers, and **Open CI** for the line selected. A contract shows as `CT…: name`. |
 | **Case** (drill through) | On a card or a person select a line and press **Open CI**. **Back**, the CI and its fields, then the tabs **Problems** (each problem, its state, why it waits, who is asked, the follow-up, **Open in ServiceNow**), **People** (who is asked, copied, who gets an escalation), **Relationships** (every CI above and below it, and whether the line counts), **Timeline** and **Replies**. The app *SACM actions* at the right (section 6.4). |
-| **Person** (drill through) | On My day, People or Overview select a person and press **Open person**: the next step, the open lines, the kinds of problem, the last contact, everything open with them, **Prepare email** (opens Messages) and **Open CI**. Their replies are in the app *SACM actions* at the right (tab **Reply**, section 6.4). |
+| **Person** (drill through) | On My day, People or Overview select a person and press **Open person**: the next step, the open lines, the kinds of problem, the last contact, everything open with them, **Prepare email** (select a line of *Open with them* first: it opens Messages on this person) and **Open CI**. With nobody chosen it shows no line and the tiles say "Choose a person first". *Card* and *Case* show no line until a card or a CI is chosen. Their replies are in the app *SACM actions* at the right (tab **Reply**, section 6.4). |
 | **Mapping backlog** | One line per CI to map with its owner: why it is on the list, the stage of its class, the steps, its criticality and the next step ("Invite the owner to a mapping session", or why it waits). **Lines** filters To solve, To check, Waiting and Planned. Below: the **capability sheet** for Enterprise Architecture (its line says how many, or why it is empty: it needs the Relationship report), every Business Capability with what is above and below it (**Export data** gives the Excel file). For the samples: 4 CIs to map. The backlog has no drill through to the Case page: right-click the CI on the *Mapping backlog* card instead. The stage is the last one the journal sets for the CI (the Power App's *Mapping stage*), else the first stage of the class: in the samples one CI is at *Session held*. |
 | **Contract changes** | The newest Solusi contract file against the one before it: new contracts, contracts no longer in the file, status changes and changed fields. Then the Concluded contracts that end in the next 30 and in the next 90 days (counted from today), and the running contracts without a daily responsible. For information only: nobody is asked. The samples have two Solusi files, an earlier one and the newest, so the page compares them; 2 Concluded contracts end in the next 90 days (none in 30) and 1 has no daily responsible. |
 | **Data check** (hidden page) | Opened with **Data check ›** at the top of Reports. Who you are and whether you are on *SACM Team* (in Desktop with the samples: not on it, counted as the sample member); the rows read from the four lists; each report with what the checks get (the CI report: 26 of the 29 columns the checks read on the samples); the columns found and missing; how many CIs name Owned by, Managed by, Supported by and the manager of Owned by with a name, an email, a user ID and *active*; and the settings the emails need (on the samples the Procurement lead and the request links are missing). |
@@ -597,6 +597,14 @@ moved two apps**: on *Messages* the app fills the page (X `224`, Y `84`, width `
 and the kind buttons left the page), and on *Person* it is taller (height `568`; the table of replies left the page, the
 app reads them).
 
+**Build R4 (0.56.0): a grey box under each place.** In Desktop each place above shows a grey box: the name of the app,
+what it does there and the data it gets ("appears here in the published report"); on My day and Reports the place of
+**Refresh now** shows one too. In the service the app covers its box. The lint allows only that box under an app
+(D359). **Messages in Desktop** (D361): under the app's place the page has the list of the emails at the left and the email
+chosen at the right (To, Cc, Subject and its first lines). In the service the app covers them, as before. Build R6
+redraws the app for one email: then the list stays on the page, the app moves to the right side, and the update script
+moves it for you.
+
 ### 6.5 How many refreshes (the refresh rule, D332 and D333)
 
 In My workspace the semantic model may refresh **8 a day** (section 4A), the scheduled ones and the ones a flow starts
@@ -631,7 +639,9 @@ why. Do **not** test the limit by pressing Refresh now many times: in My workspa
 ### 6.6 The app SACM messages: the email studio (builds B7 and D5)
 
 The page **Messages** holds the app **SACM messages**, the email studio (D326). It fills the page under the title (X 224,
-Y 84, 1032 × 620). It lists every email ready to send: first messages, reminders that are due and escalations, one per
+Y 84, 1032 × 620) (section 6.4). Under it, since build R4, Desktop shows the list of the emails at the left (who, kind, CIs, subject; a
+person opened from *Prepare email* shows only theirs) and the email chosen at the right: To, Cc, Subject and its first
+lines (D361). In the service the app covers them. It lists every email ready to send: first messages, reminders that are due and escalations, one per
 person and kind (D300, D314). The words are those of the HTML app, and the check of every pull request compares them
 with it.
 
@@ -661,7 +671,10 @@ Make it once, as the app of section 6.4:
    Add these fields of **Drafts**, each **Don't summarize**: *DraftId*, *Ref*, *Kind*, *KindLabel*, *To*, *ToName*,
    *Cc*, *Subject*, *Body*, *Chat*, *Keys*, *NewKeys*, *FreeKeys*, *CiCount*, *About*, *NobodyAbove*, *Mailbox*,
    *AssignedTo*, and from build D5 *Html*, *Csv*, *Summary*, *EmailSubject*, *EmailId*, *HtmlLength*, *CsvLength*, and
-   from build 0.52.0 the measure **About → Report at**.
+   from build 0.52.0 the measure **About → Report at**. From build R4 (D362): in **Filters on this visual** drag the
+   measure **Drafts → For the person**, *is* `1`, **Apply filter**. Then *Prepare email* on *Person* opens the app on
+   that person's emails only; opened from the rail, it lists every email as before. (An app made earlier: add the
+   filter, nothing else changes.)
 2. **Create new**. In Studio: **Settings → Updates → New**: turn on **Modern controls and themes**. **Data → Add data →
    SharePoint** → **SACM Journal** and **SACM Team**. **Power Automate → Add flow** → **SACMSend**, **SACMTest**,
    **SACMDraft** and **SACMRefresh** (for the button **Refresh now** at the top).

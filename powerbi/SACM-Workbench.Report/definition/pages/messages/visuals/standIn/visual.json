@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "standIn",
   "position": {
-    "x": 680,
+    "x": 224,
     "y": 84,
     "z": 1,
-    "height": 96,
-    "width": 576,
+    "height": 60,
+    "width": 1032,
     "tabOrder": 9000
   },
   "visual": {
@@ -43,7 +43,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Send, Test to me, Outlook draft and Teams, for the email chosen in the list.",
+                    "value": "The email studio: Send, Test to me, Outlook draft and Teams, for each email of the list.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",
@@ -55,7 +55,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "It gets the one email chosen in the list (Drafts, Selected email). Below: the email as Desktop shows it.",
+                    "value": "It gets the emails ready to send (Drafts). Below: the list and the email chosen, as Desktop shows them.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

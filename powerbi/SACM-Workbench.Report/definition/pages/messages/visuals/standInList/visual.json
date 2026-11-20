@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "emailList",
+  "name": "standInList",
   "position": {
     "x": 224,
-    "y": 84,
+    "y": 152,
     "z": 3000,
-    "height": 620,
+    "height": 552,
     "width": 440,
     "tabOrder": 3000
   },

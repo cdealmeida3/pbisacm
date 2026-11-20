@@ -2,6 +2,16 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.56.0 — The Power BI report: Desktop shows the whole way (R4)
+
+- STALL-LINE
+- **A grey box under every app** (D359). In Desktop each place of a Power App says which app goes there, what it does and the data it gets, and the place of *Refresh now* on My day and Reports says it is a button of the published report. In the service the app covers its box.
+- **Messages in Desktop** (D361): the list of the emails at the left (who, kind, CIs, subject) and the email chosen at the right (To, Cc, Subject and its first lines). In the service the app *SACM messages* stays where it is; build R6 redraws it for one email and moves it to the right.
+- ***Prepare email* opens Messages on the person** (D362). On *Person*, select a line of *Open with them*, then press *Prepare email*: Messages shows only their emails. The table has a new first column *To*. For the app: add the visual filter *Drafts → For the person is 1* (README §6.6 step 1).
+- **Card, Case and Person show nothing until one is chosen** (D363). Opened from the tabs in Desktop they no longer list every line of the team: the line under each title says "No card chosen", "No CI chosen" or "No person chosen", and the Person tiles say "Choose a person first".
+- **A first-time line on My day** (D364): while *SACM Team* or *SACM Settings* is empty, the line under *Your next steps* starts with "Set-up is not finished: open Data check on the page Reports."
+- No check, number or email text changed on the samples.
+
 ## 0.55.0 — The Power BI report: who to ask, and the Data check (R3)
 
 - **Only live cards ask people** (D346, D354). A proposed card still shows its lines on *All cards* and *Card*, with *Proposed* in the new column *Status* and in the card's title, and the line "Proposed: not sent to anyone until the card is live." under its title. Its lines go into no email, no step of My day and no line of Work queue. The HTML app does the same. On the samples the drafts and the next steps are fewer.

@@ -181,7 +181,7 @@ export function copyPack(): string {
     {
       id: 'app-messages', tag: 'App', title: 'SACM messages', why: 'The email studio of the page Messages, with Refresh now at the top.',
       steps: [
-        { title: 'Place the visual', html: 'Page <b>Messages</b> → <b>Visualizations → Power Apps</b>:', extra: place('Messages', 224, 84, 1032, 620) },
+        { title: 'Place the visual', html: 'Page <b>Messages</b> → <b>Visualizations → Power Apps</b>:', extra: place('Messages', 224, 84, 1032, 620, 'Drafts → For the person is 1 (build R4: Prepare email opens it on the person)') },
         { title: 'Fields', html: '', extra: fields('Drafts', ['DraftId', 'Ref', 'Kind', 'KindLabel', 'To', 'ToName', 'Cc', 'Subject', 'Body', 'Chat', 'Keys', 'NewKeys', 'FreeKeys', 'CiCount', 'About', 'NobodyAbove', 'Mailbox', 'AssignedTo', 'Html', 'Csv', 'Summary', 'EmailSubject', 'EmailId', 'HtmlLength', 'CsvLength']) },
         ...appSteps(messagesFolder, 'MessagesScreen', '<b>SACM Journal</b>, <b>SACM Team</b>', '<b>SACMSend</b>, <b>SACMTest</b>, <b>SACMDraft</b>, <b>SACMRefresh</b>', 'SACM messages')
       ]

@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "standInHead",
   "position": {
-    "x": 680,
-    "y": 188,
+    "x": 676,
+    "y": 152,
     "z": 3100,
     "height": 136,
-    "width": 576,
+    "width": 580,
     "tabOrder": 3100
   },
   "visual": {

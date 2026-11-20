@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
   "name": "standInBody",
   "position": {
-    "x": 680,
-    "y": 332,
+    "x": 676,
+    "y": 296,
     "z": 3200,
-    "height": 372,
-    "width": 576,
+    "height": 408,
+    "width": 580,
     "tabOrder": 3200
   },
   "visual": {
