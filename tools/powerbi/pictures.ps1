@@ -366,10 +366,19 @@ foreach ($page in $list) {
   for ($try = 1; $try -le 2; $try++) {
     $open = @((Words (Window)) | Where-Object { $_ -match '^Page \d+ of \d+$' }) | Select-Object -First 1
     if (-not $open -or $open -eq $want) { break }
-    Say "$($page.displayName): the status bar says $open, not $want; clicking the tab again"
+    # Escape closes what may be over the tab strip; then click the middle of the tab, whatever UI Automation says
+    # is under it, and say where, so a next failure can be read in the log.
+    [System.Windows.Forms.SendKeys]::SendWait("{ESC}")
     Start-Sleep -Milliseconds 800
     $again = Find-Tab (Window) $page.displayName
-    if ($again) { $clock.Restart(); Open-Tab $again }
+    if ($again) {
+      $at = Center $again
+      $under = $null
+      try { $under = [System.Windows.Automation.AutomationElement]::FromPoint((New-Object System.Windows.Point($at[0], $at[1]))) } catch { }
+      Say "$($page.displayName): the status bar says $open, not $want; clicking the tab again at $([int]$at[0]),$([int]$at[1]) ($($again.Current.ControlType.ProgrammaticName), under it: '$(if ($under) { $under.Current.Name })')"
+      $clock.Restart()
+      Click $at[0] $at[1]
+    } else { Say "$($page.displayName): the status bar says $open, not $want; no tab found again" }
     Pointer-Away
     Start-Sleep -Milliseconds 300
   }
