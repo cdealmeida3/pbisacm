@@ -13,8 +13,8 @@ table AppEmail
 			RETURN
 			    SUMX (
 			        emails,
-			        VAR id = Drafts[DraftId]
-			        VAR pieces = FILTER ( ALL ( AppEmail ), AppEmail[EmailId] = id && AppEmail[Piece] > 0 )
+			        VAR thisEmail = Drafts[DraftId]
+			        VAR pieces = FILTER ( ALL ( AppEmail ), AppEmail[EmailId] = thisEmail && AppEmail[Piece] > 0 )
 			        VAR joinedHtml = CONCATENATEX ( pieces, AppEmail[Html], "", AppEmail[Piece], ASC )
 			        VAR joinedCsv = CONCATENATEX ( pieces, AppEmail[Csv], "", AppEmail[Piece], ASC )
 			        RETURN IF ( EXACT ( joinedHtml, Drafts[Html] ) && EXACT ( joinedCsv, Drafts[Csv] ), 1, 0 )
