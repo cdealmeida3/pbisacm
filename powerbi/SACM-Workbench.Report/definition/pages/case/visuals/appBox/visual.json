@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "standIn",
+  "name": "appBox",
   "position": {
     "x": 956,
     "y": 84,
     "z": 1,
-    "height": 300,
+    "height": 620,
     "width": 300,
     "tabOrder": 9000
   },
@@ -43,7 +43,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Assign the lines of this card, mark them fixed or in progress, share them out, or add a note.",
+                    "value": "Mark the lines of this CI fixed or in progress, set a stage or a retirement date, stop following, or add a note.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",
@@ -55,7 +55,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "It gets the open lines of this card (CaseLines, For the app).",
+                    "value": "It gets the open lines of this CI (CaseLines, For the app).",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

@@ -10,9 +10,9 @@
 //   - railAbout: the version, the data and how long ago the report was refreshed, at the foot.
 //   - railRefresh (My day and Reports, build 0.52.0, D333): the refresh rule in words, above the place of the button
 //     Refresh now (FLOW_SLOTS), which Carlos adds by hand in the service.
-//   - railStandIn (build R4, D359): on that place, a box that says the button Refresh now comes there in the published
+//   - railAppBox (build R4, D359): on that place, a box that says the button Refresh now comes there in the published
 //     report. The button, added in the service, covers it.
-// And on every page with the place of a Power App (APP_SLOTS): standIn, a box on that place, under everything, with the
+// And on every page with the place of a Power App (APP_SLOTS): appBox, a box on that place, under everything, with the
 // app's name, what it does there, "appears here in the published report" and the data the visual gives it (D359). In
 // Desktop the place is no longer an empty hole; in the service the app covers it.
 // A page navigator would be one visual, but it has no icons and no counts, so the rail is these parts; the lint counts
@@ -262,7 +262,7 @@ export function railVisuals(page: string, height: number): Visual[] {
   return out;
 }
 
-/** The colours of a stand-in (docs/LOOK.md): the second surface with the strong line, as a box that waits for its app. */
+/** The colours of an app box (docs/LOOK.md): the second surface with the strong line, as a box that waits for its app. */
 const MUTED = LOOK.muted!;
 const INK = LOOK.ink!;
 const SURFACE_2 = LOOK['surface-2']!;
@@ -273,18 +273,18 @@ const paragraph = (value: string, size: number, color: string, semibold = false)
   ({ textRuns: [{ value, textStyle: { fontFamily: semibold ? FONT_SEMIBOLD : FONT, fontSize: `${size}pt`, color } }] });
 
 /**
- * The stand-ins of a page (build R4, D359): `standIn` under the place of its Power App, at the bottom of the page's
- * order (z 1, the rail picture is 0), so the app Carlos adds in the service covers it; `railStandIn` on the place of the
+ * The app boxes of a page (build R4, D359): `appBox` under the place of its Power App, at the bottom of the page's
+ * order (z 1, the rail picture is 0), so the app Carlos adds in the service covers it; `railAppBox` on the place of the
  * button Refresh now on the rail. pages.ts allows these, and only these, on a place kept for a visual added by hand.
  */
-export function standInVisuals(page: string): Visual[] {
+export function appBoxVisuals(page: string): Visual[] {
   const out: Visual[] = [];
   const app = APP_SLOTS[page];
   if (app) {
     out.push({
       $schema: VISUAL_SCHEMA,
-      name: 'standIn',
-      position: { x: app.x, y: app.y, z: 1, height: app.standInHeight ?? app.height, width: app.width, tabOrder: 9000 },
+      name: 'appBox',
+      position: { x: app.x, y: app.y, z: 1, height: app.boxHeight ?? app.height, width: app.width, tabOrder: 9000 },
       visual: {
         visualType: 'textbox',
         objects: {
@@ -313,7 +313,7 @@ export function standInVisuals(page: string): Visual[] {
   if (flow) {
     out.push({
       $schema: VISUAL_SCHEMA,
-      name: 'railStandIn',
+      name: 'railAppBox',
       position: { x: flow.x, y: flow.y, z: 1, height: flow.height, width: flow.width, tabOrder: 1002 },
       visual: {
         visualType: 'textbox',
@@ -410,20 +410,20 @@ export function railFiles(): Array<{ file: string; text: string }> {
   const out: Array<{ file: string; text: string }> = [];
   for (const { page, height } of pages()) {
     out.push({ file: join(RESOURCES, railFileName(page)), text: railSvg(page, height) });
-    for (const visual of [...railVisuals(page, height), ...standInVisuals(page)]) out.push({ file: join(PAGES, page, 'visuals', visual.name, 'visual.json'), text: json(visual) });
+    for (const visual of [...railVisuals(page, height), ...appBoxVisuals(page)]) out.push({ file: join(PAGES, page, 'visuals', visual.name, 'visual.json'), text: json(visual) });
   }
   out.push({ file: REPORT_FILE, text: reportJson() });
   return out;
 }
 
-/** The rail parts on disk that the rail no longer has: visual folders named rail… or standIn, and rail pictures. */
+/** The rail parts on disk that the rail no longer has: visual folders named rail… or appBox, and rail pictures. */
 function strayRail(): string[] {
   const wanted = new Set(railFiles().map((entry) => entry.file));
   const stray: string[] = [];
   for (const { page } of pages()) {
     const folder = join(PAGES, page, 'visuals');
     if (!existsSync(folder)) continue;
-    for (const name of readdirSync(folder)) if ((/^rail/.test(name) || name === 'standIn') && !wanted.has(join(folder, name, 'visual.json'))) stray.push(join(folder, name));
+    for (const name of readdirSync(folder)) if ((/^rail/.test(name) || name === 'appBox') && !wanted.has(join(folder, name, 'visual.json'))) stray.push(join(folder, name));
   }
   for (const name of readdirSync(RESOURCES)) if (/^rail-.*\.svg$/.test(name) && !wanted.has(join(RESOURCES, name))) stray.push(join(RESOURCES, name));
   return stray;

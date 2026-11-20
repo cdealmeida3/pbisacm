@@ -173,30 +173,30 @@ test('rule 12 finds a page folder no file names, a half copy and a renamed visua
   }
 });
 
-test('build R4 (D359): a page with an app has its stand-in under it, a page with Refresh now has its rail stand-in; a stand-in off its place or over the others is found', () => {
+test('build R4 (D359): a page with an app has its app box under it, a page with Refresh now has its rail app box; an app box off its place or over the others is found', () => {
   const at = mkdtempSync(join(tmpdir(), 'sacm-standin-'));
   try {
     const definition = join(at, 'definition');
     cpSync(join(root, 'powerbi', 'SACM-Workbench.Report', 'definition'), definition, { recursive: true });
     const file = (pageName: string, visual: string) => join(definition, 'pages', pageName, 'visuals', visual, 'visual.json');
     const lines = () => pageProblems(readPages(definition), readCatalogue());
-    // The app Carlos adds over the stand-in is not "over each other".
+    // The app Carlos adds over the app box is not "over each other".
     mkdirSync(join(definition, 'pages', 'case', 'visuals', 'app'));
     writeFileSync(file('case', 'app'), handAdded({ x: APP_SLOTS.case!.x, y: APP_SLOTS.case!.y, width: APP_SLOTS.case!.width, height: APP_SLOTS.case!.height }));
     assert.deepEqual(lines(), []);
 
-    const standIn = JSON.parse(readFileSync(file('case', 'standIn'), 'utf8'));
-    writeFileSync(file('case', 'standIn'), JSON.stringify({ ...standIn, position: { ...standIn.position, x: standIn.position.x - 8 } }));
-    assert.ok(lines().some((line) => line.includes('Case › standIn: not at the top of the place')), lines().join('\n'));
-    writeFileSync(file('case', 'standIn'), JSON.stringify({ ...standIn, position: { ...standIn.position, z: 99999 } }));
-    assert.ok(lines().some((line) => line.includes('Case › standIn: not under every other visual')), lines().join('\n'));
-    rmSync(join(definition, 'pages', 'case', 'visuals', 'standIn'), { recursive: true });
-    assert.ok(lines().some((line) => line.includes('Case: no stand-in (standIn)')), lines().join('\n'));
-    rmSync(join(definition, 'pages', 'myday', 'visuals', 'railStandIn'), { recursive: true });
-    assert.ok(lines().some((line) => line.includes('My day: no stand-in (railStandIn)')), lines().join('\n'));
-    // A stand-in on a page with no app.
-    cpSync(join(definition, 'pages', 'person', 'visuals', 'standIn'), join(definition, 'pages', 'reports', 'visuals', 'standIn'), { recursive: true });
-    assert.ok(lines().some((line) => line.includes('a stand-in on a page with no place for a Power App')), lines().join('\n'));
+    const appBox = JSON.parse(readFileSync(file('case', 'appBox'), 'utf8'));
+    writeFileSync(file('case', 'appBox'), JSON.stringify({ ...appBox, position: { ...appBox.position, x: appBox.position.x - 8 } }));
+    assert.ok(lines().some((line) => line.includes('Case › appBox: not at the top of the place')), lines().join('\n'));
+    writeFileSync(file('case', 'appBox'), JSON.stringify({ ...appBox, position: { ...appBox.position, z: 99999 } }));
+    assert.ok(lines().some((line) => line.includes('Case › appBox: not under every other visual')), lines().join('\n'));
+    rmSync(join(definition, 'pages', 'case', 'visuals', 'appBox'), { recursive: true });
+    assert.ok(lines().some((line) => line.includes('Case: no app box (appBox)')), lines().join('\n'));
+    rmSync(join(definition, 'pages', 'myday', 'visuals', 'railAppBox'), { recursive: true });
+    assert.ok(lines().some((line) => line.includes('My day: no app box (railAppBox)')), lines().join('\n'));
+    // An app box on a page with no app.
+    cpSync(join(definition, 'pages', 'person', 'visuals', 'appBox'), join(definition, 'pages', 'reports', 'visuals', 'appBox'), { recursive: true });
+    assert.ok(lines().some((line) => line.includes('an app box on a page with no place for a Power App')), lines().join('\n'));
   } finally {
     rmSync(at, { recursive: true, force: true });
   }

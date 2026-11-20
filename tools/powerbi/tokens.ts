@@ -64,18 +64,18 @@ export const GRID = {
 
 /**
  * The places of the Power Apps visuals (powerbi/README.md §6): Carlos sets them by hand in the service, so the report
- * files keep these rectangles free. The lint fails when a visual of the file is over one, apart from the stand-in under
+ * files keep these rectangles free. The lint fails when a visual of the file is over one, apart from the app box under
  * it (build R4, D359): `does` and `gets` are its words, what the app does there and the data the visual gives it.
- * `standInHeight`: the stand-in box is that high at the top of the place (Messages: the email chosen is drawn under it).
+ * `boxHeight`: the app box is that high at the top of the place (Messages: the email chosen is drawn under it).
  */
-export interface AppSlot { app: string; x: number; y: number; width: number; height: number; does: string; gets: string; standInHeight?: number }
+export interface AppSlot { app: string; x: number; y: number; width: number; height: number; does: string; gets: string; boxHeight?: number }
 export const APP_SLOTS: Record<string, AppSlot> = {
   mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Assign lines, mark them fixed or in progress, hand over your work, add a note, and save.',
     gets: 'It gets every open line of this page (CaseLines, Queue lines).' },
-  // Build R4 (D361): the app still fills the page until build R6 redraws it for one email. In Desktop the stand-in is a
-  // strip at the top, and the list of emails (standInList) and the email chosen (standInHead, standInBody) under it.
-  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620, standInHeight: 88,
+  // Build R4 (D361): the app still fills the page until build R6 redraws it for one email. In Desktop the app box is a
+  // strip at the top, and the list of emails (appBoxList) and the email chosen (appBoxHead, appBoxBody) under it.
+  messages: { app: 'SACM messages', x: 224, y: 84, width: 1032, height: 620, boxHeight: 88,
     does: 'The email studio: Send, Test to me, Outlook draft and Teams, for each email of the list.',
     gets: 'It gets the emails ready to send (Drafts). Below: the list and the email chosen, as Desktop shows them.' },
   auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
@@ -99,7 +99,7 @@ export const APP_SLOTS: Record<string, AppSlot> = {
 /**
  * The place of the button Refresh now (the Power Automate visual of flow F6, which Carlos adds by hand in the service,
  * D333): on the rail of My day and Reports, above the line at its foot, under the refresh rule (railRefresh). On the rail
- * it counts as part of the rail (pages.ts rule 2); no visual may sit over it (rule 4) but its stand-in (build R4).
+ * it counts as part of the rail (pages.ts rule 2); no visual may sit over it (rule 4) but its app box (build R4).
  */
 export const FLOW_SLOTS: Record<string, { flow: string; x: number; y: number; width: number; height: number }> = {
   myday: { flow: 'SACM refresh now', x: 16, y: 604, width: 156, height: 40 },

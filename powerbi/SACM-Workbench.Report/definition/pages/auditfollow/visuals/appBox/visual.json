@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "standIn",
+  "name": "appBox",
   "position": {
     "x": 956,
     "y": 84,
@@ -43,7 +43,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Assign lines, mark them fixed or in progress, hand over your work, add a note, and save.",
+                    "value": "Follow again: select lines of the table, pick Follow again, and save.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",
@@ -55,7 +55,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "It gets every open line of this page (CaseLines, Queue lines).",
+                    "value": "It gets the lines not followed up (CaseLines, Status Not followed up).",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",

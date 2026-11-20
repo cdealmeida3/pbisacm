@@ -157,12 +157,11 @@ void Stalled(List<string> failures)
     traceFile.Flush();
     Environment.Exit(0);
 }
-// Every M table in one transaction, as Desktop's own Refresh does (R4 step 0, D360). A commit after each table let Desktop
-// start its own write in between (it creates the model's culture, its Q&A words, once data is there) and wait for the
-// lock of the next table's refresh, while that refresh waited for Desktop to evaluate its query: with a file source the
-// refresh stood still at the table after HistoryRun (JournalKeys) for as long as the job ran. Only when the one refresh
-// fails, one table at a time, so a failing query names itself (a refresh of the whole model says only "An unexpected
-// exception occurred"). Then the calculated tables and columns.
+// Every M table in one transaction, as Desktop's own Refresh does (R4 step 0, D360). A commit after each table let
+// Desktop start a write of its own: it creates the model's culture (its Q&A words) once there is data. That write waited
+// for the lock of the next table's refresh, and the refresh waited for Desktop to run its query. With a file source the
+// check stood still at JournalKeys. Only when the one refresh fails, one table at a time, so a failing query names
+// itself (a refresh of the whole model says only "An unexpected exception occurred"). Then the calculated tables.
 var failed = new List<string>();
 var mTables = database.Model.Tables.Where(table => table.Partitions.Any(partition => partition.SourceType == Tom.PartitionSourceType.M)).ToList();
 Console.WriteLine($"{DateTime.UtcNow:HH:mm:ss} Refreshing the {mTables.Count} tables of Power Query in one transaction");

@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
-  "name": "standIn",
+  "name": "appBox",
   "position": {
     "x": 956,
     "y": 84,
     "z": 1,
-    "height": 568,
+    "height": 620,
     "width": 300,
     "tabOrder": 9000
   },
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "The app SACM actions",
+                    "value": "The app SACM audit",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "10pt",
@@ -43,7 +43,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Read the replies of this person, tick the lines they answer, then Mark answered, Waiting until or Add note.",
+                    "value": "Start a new review, mark each CI of the sample same in EPO or not, and change the team's settings.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",
@@ -55,7 +55,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "It gets the open lines and the replies of this person (CaseLines, For the app).",
+                    "value": "It gets the CIs of the reviews (ReviewLines).",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "9pt",
@@ -172,7 +172,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'The place of the app SACM actions, which appears here in the published report'"
+                  "Value": "'The place of the app SACM audit, which appears here in the published report'"
                 }
               }
             }

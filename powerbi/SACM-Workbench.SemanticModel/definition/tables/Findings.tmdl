@@ -86,7 +86,7 @@ table Findings
 		displayFolder: Page notes
 
 	/// Under the title of the person (Person). Opened from its tab, the page says how to choose a person.
-	measure 'Person note' = IF ( NOT ISFILTERED ( Findings[ContactName] ), "No person chosen: on My day, People or Overview, select a name, then Open person.", "Who they are and why the team asks them." )
+	measure 'Person note' = IF ( [Person chosen] <> 1, "No person chosen: on My day, People or Overview, select a name, then Open person.", "Who they are and why the team asks them." )
 		displayFolder: Page notes
 
 	/// Under the title of what is open with a person (Person).
@@ -383,7 +383,7 @@ table Findings
 		displayFolder: Pictures
 		dataCategory: ImageUrl
 
-	/// The open lines with the person in view (People, Person, Overview): their lines of the newest report, not verified and not set aside; blank hides the person.
+	/// The open lines with the person in view (People, Person, Overview): their lines of the newest report, not verified and not set aside; blank hides the person. With no person in view (the Person page opened without one) 0, so its tile says so (D363). The rows of People and Overview are each a person in view.
 	measure 'Person lines' =
 			VAR n = CALCULATE ( COUNTROWS ( CaseLines ), TREATAS ( VALUES ( Findings[Key] ), CaseLines[Key] ), NOT CaseLines[Status] IN { "Verified", "Not followed up" } )
 			RETURN IF ( NOT ISFILTERED ( Findings[ContactName] ), 0, IF ( n > 0, n ) )
