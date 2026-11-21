@@ -8,11 +8,12 @@
     1. the values of the five parameters (SourceMode, StateMode, SharePointSite, ReportsFolder, ServiceNowAddress)
        from the old SACM-Workbench.SemanticModel/definition/expressions.tmdl into the new one;
     2. the Power Apps and Power Automate visuals of the old pages into the same pages of this version, at the
-       places this version keeps for them (update.json, from APP_SLOTS and FLOW_SLOTS). They come from a report
-       you downloaded from the service (a .pbix, build L1, D376: -Report, or the newest *.pbix in this folder, the
-       folder that holds it or the folder that holds the previous one), and from the previous folder for a page where
-       the .pbix has none. Of the .pbix it reads only the report part (Report/definition), never the data model, and it
-       writes nothing next to it. The parameters always come from the previous folder.
+       places this version keeps for them (update.json, from APP_SLOTS and FLOW_SLOTS).
+       They come from the report you downloaded from the service, a .pbix (build L1, D376). Give it with -Report.
+       Without it, the script takes the newest *.pbix in this folder, in the folder that holds it, or in the folder
+       that holds the previous one, and asks you first. On a page where the .pbix has no app, they come from the
+       previous folder. Of the .pbix it reads only the report part (Report/definition), never the data model. It
+       writes nothing next to the .pbix. The parameters always come from the previous folder.
   It copies nothing else, deletes nothing, never changes the old folder, and prints what it did.
   It works in Windows PowerShell 5.1 and in PowerShell 7. Keep this file in plain ASCII: Windows PowerShell
   reads a file without a byte order mark in the code page of the computer.
@@ -113,7 +114,7 @@ if (-not $Yes) {
 # previous folder (where you unzipped the new version), and you say whether to take it.
 if ($Report -ne '') {
   if (-not (Test-Path -LiteralPath $Report -PathType Leaf)) { Stop-Update "The file $Report does not exist." }
-  $Report = [System.IO.Path]::GetFullPath($Report)
+  $Report = (Resolve-Path -LiteralPath $Report).ProviderPath
 } else {
   $seen = @{}
   $found = @()
@@ -248,16 +249,16 @@ if ($Report -ne '') {
           $reportPublic = @(Get-Property ((Get-EntryText (Read-EntryBytes $entry)) | ConvertFrom-Json) 'publicCustomVisuals' | Where-Object { $null -ne $_ })
           continue
         }
-        $page = [regex]::Match($name, '^Report/definition/pages/([^/]+)/page\.json$')
-        if ($page.Success -and (Test-SafeName $page.Groups[1].Value)) {
-          $reportPages[$page.Groups[1].Value] = Get-Property ((Get-EntryText (Read-EntryBytes $entry)) | ConvertFrom-Json) 'displayName'
+        $pageMatch = [regex]::Match($name, '^Report/definition/pages/([^/]+)/page\.json$')
+        if ($pageMatch.Success -and (Test-SafeName $pageMatch.Groups[1].Value)) {
+          $reportPages[$pageMatch.Groups[1].Value] = Get-Property ((Get-EntryText (Read-EntryBytes $entry)) | ConvertFrom-Json) 'displayName'
           continue
         }
-        $part = [regex]::Match($name, '^Report/definition/pages/([^/]+)/visuals/([^/]+)/(.+)$')
-        if (-not $part.Success -or $name.EndsWith('/')) { continue }
-        $pageKey = $part.Groups[1].Value
-        $visualName = $part.Groups[2].Value
-        $relative = $part.Groups[3].Value
+        $visualMatch = [regex]::Match($name, '^Report/definition/pages/([^/]+)/visuals/([^/]+)/(.+)$')
+        if (-not $visualMatch.Success -or $name.EndsWith('/')) { continue }
+        $pageKey = $visualMatch.Groups[1].Value
+        $visualName = $visualMatch.Groups[2].Value
+        $relative = $visualMatch.Groups[3].Value
         if (-not (Test-SafeName $pageKey) -or -not (Test-SafeName $visualName) -or @($relative.Split('/') | Where-Object { -not (Test-SafeName $_) }).Count -gt 0) { continue }
         if (-not $reportPages.ContainsKey($pageKey)) { $reportPages[$pageKey] = $null }
         $key = "$pageKey/$visualName"
@@ -274,6 +275,8 @@ if ($Report -ne '') {
         $reportVisuals += [pscustomobject]@{ Page = $item.Page; Name = $item.Name; Type = $type; Files = $item.Files }
       }
     }
+  } catch {
+    Stop-Update "The file $Report has a part that cannot be read: $($_.Exception.Message)"
   } finally { $zip.Dispose() }
 }
 
@@ -284,20 +287,17 @@ function Find-Target([string]$pageKey, $display) {
   return $target
 }
 
-# Every visual to carry: those of the .pbix, then those of the previous folder on a page where the .pbix has no app
-# or button (a .pbix saved from Desktop before the apps were added never takes them away).
+# Every visual to carry: those of the .pbix first, then those of the previous folder. A page that gets its app or
+# button from the .pbix takes none from the folder; on the other pages the folder's stay (a .pbix saved from Desktop
+# before the apps were added never takes them away).
 $sources = @()
-$fromReport = @{}
 foreach ($visual in $reportVisuals) {
   $display = $reportPages[$visual.Page]
-  $target = Find-Target $visual.Page $display
-  if ($null -ne $target) { $fromReport[$target] = $true }
-  $sources += [pscustomobject]@{ Page = $visual.Page; Display = $display; Name = $visual.Name; Type = $visual.Type; Folder = $null; Files = $visual.Files; Target = $target }
+  $sources += [pscustomobject]@{ Page = $visual.Page; Display = $display; Name = $visual.Name; Type = $visual.Type; Folder = $null; Files = $visual.Files; Target = (Find-Target $visual.Page $display) }
 }
 foreach ($oldPage in Get-ChildItem -LiteralPath $oldPages -Directory | Sort-Object Name) {
   $display = Get-PageName $oldPage.FullName
   $target = Find-Target $oldPage.Name $display
-  if ($null -ne $target -and $fromReport.ContainsKey($target)) { continue }
   foreach ($app in Get-AppVisuals $oldPage.FullName) {
     $sources += [pscustomobject]@{ Page = $oldPage.Name; Display = $display; Name = $app.Name; Type = $app.Type; Folder = $app.Folder; Files = $null; Target = $target }
   }
@@ -305,10 +305,13 @@ foreach ($oldPage in Get-ChildItem -LiteralPath $oldPages -Directory | Sort-Obje
 
 $copies = @()
 $visualLines = @()
+$fromReport = @{}
 if ($reportNote -ne '') { $visualLines += $reportNote }
 foreach ($app in $sources) {
   $label = if ($null -ne $app.Display) { $app.Display } else { $app.Page }
   $target = $app.Target
+  $isReport = $null -eq $app.Folder
+  if (-not $isReport -and $null -ne $target -and $fromReport.ContainsKey($target)) { continue }
   if ($null -eq $target) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this version has no such page."; continue }
   $pageKey = Split-Path -Leaf $target
   $slot = Get-Property $plan.slots $pageKey
@@ -316,11 +319,15 @@ foreach ($app in $sources) {
   $destination = Join-Path (Join-Path $target 'visuals') $app.Name
   if (Test-Path -LiteralPath $destination) {
     $alreadyFile = Join-Path $destination 'visual.json'
-    if ((Test-Path -LiteralPath $alreadyFile) -and (Get-Visual $alreadyFile).Type -eq $app.Type) { $visualLines += "  $label : $($slot.name) is already here."; continue }
+    if ((Test-Path -LiteralPath $alreadyFile) -and (Get-Visual $alreadyFile).Type -eq $app.Type) {
+      if ($isReport) { $fromReport[$target] = $true }
+      $visualLines += "  $label : $($slot.name) is already here."; continue
+    }
     $visualLines += "  $label : the visual $($app.Name) is not copied: this version has a visual of that name."; continue
   }
   $present = @(Get-AppVisuals $target) + @($copies | Where-Object { $_.Target -eq $target })
   if ($present.Count -gt 0) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this page already has its app."; continue }
+  if ($isReport) { $fromReport[$target] = $true }
   $copies += [pscustomobject]@{ Source = $app.Folder; Files = $app.Files; Target = $target; Destination = $destination; Type = $app.Type; Slot = $slot; Label = $label }
 }
 

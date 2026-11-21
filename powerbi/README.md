@@ -568,8 +568,8 @@ not while you edit it. Publish the report first (section 4).
     lines** *is not blank*, so it gets every open line of the page (the free ones too, for **Share out**).
 13. **Before an update, after you add or change an app**, keep the visuals so that the update carries them (section 1,
     *Update to a new version*, D339, D376): in the service, **File → Download this file → A copy of your report**, and
-    put the `.pbix` next to your current folder (the one of section 1). The update script reads the apps and the
-    buttons from it. Keep it private: it holds your data, and the visuals hold the ids of the company's apps. Never send
+    put the `.pbix` next to your current folder (the one of section 1), or keep it in your private folder and copy it
+    there before the update. The update script reads the apps and the buttons from it. Keep it private: it holds your data, and the visuals hold the ids of the company's apps. Never send
     it or these files to the repository.
     **If the script says the file is in the old format** (an older Desktop or service saves `Report/Layout`): open the
     `.pbix` in Desktop, **File → Save as**, type **Power BI project (\*.pbip)**, name `SACM-Workbench`, into **your

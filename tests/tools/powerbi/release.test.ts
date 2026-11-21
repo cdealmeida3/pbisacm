@@ -345,7 +345,8 @@ test('the update script takes the apps and buttons from a downloaded .pbix besid
     assert.match(run.stdout, /Overview : the visual 0000000000000000dddd .*not copied/);
     assert.ok(!existsSync(join(pages(project), 'people', 'visuals', 'peopleTable')));
     const types = JSON.parse(readFileSync(join(project, 'SACM-Workbench.Report', 'definition', 'report.json'), 'utf8')) as { publicCustomVisuals?: string[] };
-    assert.deepEqual(types.publicCustomVisuals, ['PowerApps_PBI_CV_INVENTED']);
+    // The types of the .pbix's report.json and of the previous folder's, for the visuals copied.
+    assert.deepEqual(types.publicCustomVisuals, ['PowerApps_PBI_CV_INVENTED', 'InventedAutomateVisual']);
     // The new folder keeps every rule of the pages; the .pbix is unchanged and nothing is written next to it.
     const definition = join(project, 'SACM-Workbench.Report', 'definition');
     assert.deepEqual(folderProblems(definition), []);
