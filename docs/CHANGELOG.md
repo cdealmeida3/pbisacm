@@ -2,6 +2,12 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.59.0 — The Power BI report: your layout, and updates from a download (L1)
+
+- **Refresh now is the size you gave it** (D375). On *My day* and *Reports* the place of the button is 156 × 60 at Y 588 (was 156 × 40 at Y 604), so its words fit. The refresh rule moved up above it, so the two do not overlap. Set the button's words in white: **Format → Button → Font colour: White** (README §6.3, F6 step 4). The update moves a button placed before to the new place.
+- **The update reads your downloaded report** (D376). Download the report from the service (**File → Download this file → A copy of your report**) and put the `.pbix` next to your folders. `Update-Workbench.cmd` asks to take the apps and the Refresh now buttons from it, and puts each at its place in the new version. No more *Save as* a Power BI project in Desktop first. It reads only the report part of the file, never the data, and changes nothing in it. The five parameters still come from your previous folder.
+- No check, page or email text changed on the samples.
+
 ## 0.58.0 — The Power BI report: the apps, for good (R6)
 
 - **Messages: the list on the page, the app for one email** (D371). In the service too, the page now shows at the left the buttons *Email*, *Reminder* and *Escalation* and the list of the emails; the app *SACM messages* sits at the right and shows the one email chosen in the list. Choose the next email in the list after you send. A new email gets its reference when you first press a button; until then the subject says "new reference". **Your app needs a change once**: README §6.6, *An app made before build R6*.

@@ -271,3 +271,132 @@ test('the update script looks one folder higher when Windows unzipped into a fol
     rmSync(at, { recursive: true, force: true });
   }
 });
+
+// ---- A report downloaded from the service (.pbix, build L1, D376) ----------------------------------------------
+
+/** A word that is only in the data model of the invented .pbix: the script must never read it or name it. */
+const MODEL_WORD = 'INVENTED_MODEL_PART_NEVER_READ';
+
+/**
+ * An invented .pbix as the service gives it (a zip in the PBIR format): the button Refresh now on My day and Reports at
+ * Carlos's place before build L1 (a little off), with its text in white, a Power App on Case, an app on Overview (no
+ * place there), the app's type in report.json, and a data model that is not JSON (it fails when parsed).
+ */
+function pbixVisual(name: string, type: string, position: { x: number; y: number; width: number; height: number }): string {
+  const visual = JSON.parse(appVisual(name, type, position)) as { visual: { objects: Record<string, unknown> } };
+  visual.visual.objects.buttonText = [{ properties: { text: { expr: { Literal: { Value: "'Refresh now'" } } }, fontColor: { solid: { color: { expr: { ThemeDataColor: { ColorId: 0, Percent: 0 } } } } } } }];
+  return `${JSON.stringify(visual, null, 2)}\n`;
+}
+function pbixFile(path: string, format: 'pbir' | 'layout' = 'pbir'): void {
+  const text = (value: string): Uint8Array => Buffer.from(value, 'utf8');
+  const entries: Array<{ path: string; data: Uint8Array }> = [
+    { path: 'Version', data: text('1.28') },
+    { path: 'DataModel', data: text(`{ not json ${MODEL_WORD}`) }
+  ];
+  if (format === 'layout') {
+    entries.push({ path: 'Report/Layout', data: text('{}') });
+  } else {
+    const page = (key: string, display: string) => ({ path: `Report/definition/pages/${key}/page.json`, data: text(JSON.stringify({ name: key, displayName: display, width: 1280, height: 720 })) });
+    const visual = (key: string, name: string, json: string) => ({ path: `Report/definition/pages/${key}/visuals/${name}/visual.json`, data: text(json) });
+    entries.push(
+      { path: 'Report/definition/report.json', data: text(JSON.stringify({ publicCustomVisuals: ['PowerApps_PBI_CV_INVENTED'] })) },
+      page('myday', 'My day'), page('reports', 'Reports'), page('case', 'Case'), page('overview', 'Overview'), page('people', 'People'),
+      visual('myday', '0000000000000000aaaa', pbixVisual('0000000000000000aaaa', 'InventedAutomateVisual', { x: 16, y: 590, width: 156, height: 60 })),
+      visual('reports', '0000000000000000bbbb', pbixVisual('0000000000000000bbbb', 'InventedAutomateVisual', { x: 16, y: 590, width: 156, height: 60 })),
+      visual('case', '0000000000000000cccc', appVisual('0000000000000000cccc', 'PowerApps_PBI_CV_INVENTED', { x: 950, y: 90, width: 300, height: 600 })),
+      visual('overview', '0000000000000000dddd', appVisual('0000000000000000dddd', 'PowerApps_PBI_CV_INVENTED', { x: 956, y: 84, width: 300, height: 300 })),
+      visual('people', 'peopleTable', `${JSON.stringify({ name: 'peopleTable', position: { x: 204, y: 84, z: 0, width: 600, height: 400 }, visual: { visualType: 'tableEx' } }, null, 2)}\n`)
+    );
+  }
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, zipOf(entries));
+}
+type Placed = { position: Record<string, number>; visual: { visualType: string; objects: Record<string, unknown> } };
+const placedIn = (project: string, page: string, name: string): Placed => JSON.parse(readFileSync(join(pages(project), page, 'visuals', name, 'visual.json'), 'utf8')) as Placed;
+const slotOf = (slot: { x: number; y: number; width: number; height: number }): number[] => [slot.x, slot.y, slot.width, slot.height];
+const placeOf = (visual: Placed): number[] => [visual.position.x!, visual.position.y!, visual.position.width!, visual.position.height!];
+
+test('the update script takes the apps and buttons from a downloaded .pbix beside it, each to its place, text and colour kept', { skip }, () => {
+  const at = mkdtempSync(join(tmpdir(), 'sacm-update-'));
+  try {
+    previousFolder(at);
+    const report = join(at, 'SACM-Workbench.pbix');
+    pbixFile(report);
+    const before = readFileSync(report);
+    const project = newFolder(at);
+    const run = update(project);
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    assert.match(run.stdout, /Report file: +.*SACM-Workbench\.pbix/);
+    // The parameters still come from the previous folder.
+    assert.match(readFileSync(modelFile(project), 'utf8'), new RegExp(`^expression ReportsFolder = ${invented.folder} meta \\[`, 'm'));
+    // The buttons of the .pbix on My day and Reports, at the place of this version; only the place changes.
+    for (const [page, name] of [['myday', '0000000000000000aaaa'], ['reports', '0000000000000000bbbb']] as const) {
+      const button = placedIn(project, page, name);
+      assert.deepEqual(placeOf(button), slotOf(FLOW_SLOTS[page]!), page);
+      assert.deepEqual({ ...button, position: undefined }, { ...(JSON.parse(pbixVisual(name, 'InventedAutomateVisual', { x: 0, y: 0, width: 0, height: 0 })) as object), position: undefined }, page);
+      assert.deepEqual(button.visual.objects.buttonText, [{ properties: { text: { expr: { Literal: { Value: "'Refresh now'" } } }, fontColor: { solid: { color: { expr: { ThemeDataColor: { ColorId: 0, Percent: 0 } } } } } } }]);
+    }
+    // The .pbix wins on the pages where it has an app: the folder's button of My day and its app of Case stay behind.
+    assert.ok(!existsSync(join(pages(project), 'myday', 'visuals', 'f0e1d2c3b4a596877869')), 'the folder\'s button is replaced by the one of the .pbix');
+    assert.ok(!existsSync(join(pages(project), 'case', 'visuals', 'a1b2c3d4e5f6a7b8c9d0')), 'the folder\'s app is replaced by the one of the .pbix');
+    assert.deepEqual(placeOf(placedIn(project, 'case', '0000000000000000cccc')), slotOf(APP_SLOTS.case!));
+    // No place on Overview; a native visual of the .pbix is never copied.
+    assert.ok(!existsSync(join(pages(project), 'overview', 'visuals', '0000000000000000dddd')));
+    assert.match(run.stdout, /Overview : the visual 0000000000000000dddd .*not copied/);
+    assert.ok(!existsSync(join(pages(project), 'people', 'visuals', 'peopleTable')));
+    const types = JSON.parse(readFileSync(join(project, 'SACM-Workbench.Report', 'definition', 'report.json'), 'utf8')) as { publicCustomVisuals?: string[] };
+    // The types of the .pbix's report.json and of the previous folder's, for the visuals copied.
+    assert.deepEqual(types.publicCustomVisuals, ['PowerApps_PBI_CV_INVENTED', 'InventedAutomateVisual']);
+    // The new folder keeps every rule of the pages; the .pbix is unchanged and nothing is written next to it.
+    const definition = join(project, 'SACM-Workbench.Report', 'definition');
+    assert.deepEqual(folderProblems(definition), []);
+    assert.deepEqual(pageProblems(readPages(definition), readCatalogue()), []);
+    assert.ok(readFileSync(report).equals(before));
+    assert.deepEqual(readdirSync(at).sort(), ['SACM-Workbench.pbix', folder, 'powerbi'].sort());
+    // A second run changes nothing.
+    const once = snapshot(project);
+    const again = update(project);
+    assert.equal(again.status, 0, again.stdout + again.stderr);
+    assert.deepEqual(snapshot(project), once);
+    assert.match(again.stdout, /is already here/);
+  } finally {
+    rmSync(at, { recursive: true, force: true });
+  }
+});
+
+test('the update script never reads the data model of the .pbix', { skip }, () => {
+  const at = mkdtempSync(join(tmpdir(), 'sacm-update-'));
+  try {
+    previousFolder(at);
+    const report = join(at, 'elsewhere', 'Downloaded.pbix');
+    pbixFile(report);
+    const project = newFolder(at);
+    const run = update(project, '-Report', report);
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    assert.doesNotMatch(run.stdout + run.stderr, new RegExp(`${MODEL_WORD}|DataModel`));
+    for (const [path, data] of snapshot(project)) assert.ok(!Buffer.from(data, 'base64').toString('utf8').includes(MODEL_WORD), path);
+    assert.deepEqual(placeOf(placedIn(project, 'myday', '0000000000000000aaaa')), slotOf(FLOW_SLOTS.myday!));
+  } finally {
+    rmSync(at, { recursive: true, force: true });
+  }
+});
+
+test('a .pbix in the old format (Report/Layout) says so, and the update carries the apps of the previous folder only', { skip }, () => {
+  const at = mkdtempSync(join(tmpdir(), 'sacm-update-'));
+  try {
+    previousFolder(at);
+    const report = join(at, 'Old.pbix');
+    pbixFile(report, 'layout');
+    const project = newFolder(at);
+    const run = update(project, '-Report', report);
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    assert.match(run.stdout, /Old\.pbix is in the old format .*step 13 of README section 6\.4/);
+    assert.deepEqual(placeOf(placedIn(project, 'case', 'a1b2c3d4e5f6a7b8c9d0')), slotOf(APP_SLOTS.case!));
+    assert.deepEqual(placeOf(placedIn(project, 'myday', 'f0e1d2c3b4a596877869')), slotOf(FLOW_SLOTS.myday!));
+    const missing = update(project, '-Report', join(at, 'none.pbix'));
+    assert.equal(missing.status, 1);
+    assert.match(missing.stdout, /Nothing was changed\. The file .*none\.pbix does not exist/);
+  } finally {
+    rmSync(at, { recursive: true, force: true });
+  }
+});
