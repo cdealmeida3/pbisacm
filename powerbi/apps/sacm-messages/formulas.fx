@@ -13,7 +13,11 @@
 // The texts hold %%REF%% where the reference goes and %%SENDER%% where the manager's name goes: the app fills both when
 // the manager sends (D301). Nothing is sent until a manager presses Send, Test to me, Outlook draft or Teams (D2).
 
-AppRows = PowerBIIntegration.Data;
+// Build A1 (D377, D379): every field of the visual is text, because the visual sends no data to the app when a field is
+// a number or a true/false, and a banner for a blank date. npm run powerbi:generate writes here the typed rows: the rows
+// of the visual read once, each field turned back into a number, true/false or a date (APP_FIELDS of
+// tools/powerbi/tokens.ts). Every other formula reads AppRows, never PowerBIIntegration.Data.
+AppRows = %%TYPED_ROWS%%;
 Drafts = Filter(AppRows, Piece = 0);
 Pieces = Filter(AppRows, Piece > 0);
 DraftCount = CountRows(Drafts);

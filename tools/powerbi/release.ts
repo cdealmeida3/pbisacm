@@ -12,7 +12,8 @@ import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { crc32, deflateRawSync } from 'node:zlib';
 import { NATIVE_TYPES } from './pages.ts';
-import { APP_SLOTS, FLOW_SLOTS } from './tokens.ts';
+import { APP_FIELDS, APP_LAST_FIELD, APP_SLOTS, FLOW_SLOTS } from './tokens.ts';
+import type { AppFilter } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 
@@ -24,20 +25,46 @@ export const releaseFolder = (version: string): string => `SACM-Workbench-${vers
 
 export const packageVersion = (): string => (JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { version: string }).version;
 
-/** One place of a visual Carlos adds by hand in the service: a Power App (APP_SLOTS) or the button Refresh now (FLOW_SLOTS). */
-export interface Slot { kind: 'app' | 'flow'; name: string; x: number; y: number; width: number; height: number }
+/**
+ * One place of a visual Carlos adds by hand in the service: a Power App (APP_SLOTS) or the button Refresh now
+ * (FLOW_SLOTS). An app's place also names the filter its visual has on that page (build A1, D382).
+ */
+export interface Slot { kind: 'app' | 'flow'; name: string; x: number; y: number; width: number; height: number; filter?: AppFilter }
+/** One field of a Power Apps visual, as a visual names it: the table (Entity), the column or measure (Property). */
+export interface VisualField { entity: string; property: string; kind: 'Column' | 'Measure' }
+export interface UpdatePlan {
+  version: string; parameters: string[]; native: string[]; slots: Record<string, Slot>;
+  /** Build A1 (D382): the fields of each app's visual, in order (APP_FIELDS, then About → Report at). */
+  fields: Record<string, VisualField[]>;
+  /**
+   * The fields this version turned into text in place (D378): their empty filter card in a carried visual goes from
+   * Advanced (a number's card) to Categorical (a text's card), as Power BI gives a text field.
+   */
+  nowText: VisualField[];
+}
 
-/** What Update-Workbench.ps1 reads: the version, the parameters to carry, the native types and the place of the app of each page. */
-export function updatePlan(version = packageVersion()): { version: string; parameters: string[]; native: string[]; slots: Record<string, Slot> } {
+/** The fields of each app's visual and the ones made text in place, from APP_FIELDS (D380). */
+export function appFieldPlan(): Pick<UpdatePlan, 'fields' | 'nowText'> {
+  const fields: Record<string, VisualField[]> = {};
+  const nowText: VisualField[] = [];
+  for (const [app, spec] of Object.entries(APP_FIELDS)) {
+    fields[app] = [...spec.fields.map((field): VisualField => ({ entity: spec.table, property: field.field, kind: 'Column' })), { entity: APP_LAST_FIELD.table, property: APP_LAST_FIELD.measure, kind: 'Measure' }];
+    for (const field of spec.fields) if (field.kind !== 'text' && !field.as) nowText.push({ entity: spec.table, property: field.field, kind: 'Column' });
+  }
+  return { fields, nowText };
+}
+
+/** What Update-Workbench.ps1 reads: the version, the parameters to carry, the native types, the place of the app of each page and the fields of the apps. */
+export function updatePlan(version = packageVersion()): UpdatePlan {
   const slots: Record<string, Slot> = {};
-  for (const [page, slot] of Object.entries(APP_SLOTS)) slots[page] = { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height };
+  for (const [page, slot] of Object.entries(APP_SLOTS)) slots[page] = { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height, ...(slot.filter ? { filter: slot.filter } : {}) };
   for (const [page, slot] of Object.entries(FLOW_SLOTS)) {
     // The script finds the place of a copied visual by its page: a page has one place at most.
     if (slots[page]) throw new Error(`The page ${page} has the place of a Power App and of Refresh now; Update-Workbench.ps1 knows one place per page`);
     slots[page] = { kind: 'flow', name: slot.flow, x: slot.x, y: slot.y, width: slot.width, height: slot.height };
   }
   const sorted = Object.fromEntries(Object.entries(slots).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
-  return { version, parameters: [...CARRIED_PARAMETERS], native: [...NATIVE_TYPES].sort(), slots: sorted };
+  return { version, parameters: [...CARRIED_PARAMETERS], native: [...NATIVE_TYPES].sort(), slots: sorted, ...appFieldPlan() };
 }
 
 /** The files of powerbi/ that git keeps, relative to powerbi/, in name order. */

@@ -8,7 +8,7 @@ import { inflateRawSync } from 'node:zlib';
 import { zipEntries } from '../../../src/core/reading/xlsx.ts';
 import { CARRIED_PARAMETERS, packageVersion, releaseEntries, releaseFolder, trackedPowerBiFiles, updatePlan, zipOf } from '../../../tools/powerbi/release.ts';
 import { folderProblems, NATIVE_TYPES, pageProblems, readCatalogue, readPages } from '../../../tools/powerbi/pages.ts';
-import { APP_SLOTS, FLOW_SLOTS } from '../../../tools/powerbi/tokens.ts';
+import { APP_FIELDS, APP_SLOTS, FLOW_SLOTS } from '../../../tools/powerbi/tokens.ts';
 
 /*
  * The zip of a version and its update script (build R1, D339): the zip unpacks into one folder named after the
@@ -82,8 +82,14 @@ test('update.json names the five parameters, the native types and one place per 
   assert.equal(plan.version, version);
   assert.deepEqual(plan.parameters, ['SourceMode', 'StateMode', 'SharePointSite', 'ReportsFolder', 'ServiceNowAddress']);
   assert.deepEqual(new Set(plan.native), NATIVE_TYPES);
-  for (const [page, slot] of Object.entries(APP_SLOTS)) assert.deepEqual(plan.slots[page], { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height });
+  for (const [page, slot] of Object.entries(APP_SLOTS)) assert.deepEqual(plan.slots[page], { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height, ...(slot.filter ? { filter: slot.filter } : {}) });
   for (const [page, slot] of Object.entries(FLOW_SLOTS)) assert.deepEqual(plan.slots[page], { kind: 'flow', name: slot.flow, x: slot.x, y: slot.y, width: slot.width, height: slot.height });
+  // Build A1 (D382): the fields of each app, from APP_FIELDS, and the ones this version made text in place.
+  for (const [app, spec] of Object.entries(APP_FIELDS)) {
+    assert.deepEqual(plan.fields[app], [...spec.fields.map((field) => ({ entity: spec.table, property: field.field, kind: 'Column' })), { entity: 'About', property: 'Report at', kind: 'Measure' }], app);
+  }
+  assert.deepEqual(plan.nowText.map((field) => `${field.entity}.${field.property}`).sort(),
+    ['AppEmail.CiCount', 'AppEmail.CsvLength', 'AppEmail.HtmlLength', 'AppEmail.Mailbox', 'AppEmail.NobodyAbove', 'AppEmail.Piece', 'CaseLines.RetireOn']);
   const model = readFileSync(join(root, 'powerbi', 'SACM-Workbench.SemanticModel', 'definition', 'expressions.tmdl'), 'utf8');
   for (const name of CARRIED_PARAMETERS) assert.match(model, new RegExp(`^expression ${name} = [^\\n]*? meta \\[IsParameterQuery = true`, 'm'), name);
 });
@@ -396,6 +402,126 @@ test('a .pbix in the old format (Report/Layout) says so, and the update carries 
     const missing = update(project, '-Report', join(at, 'none.pbix'));
     assert.equal(missing.status, 1);
     assert.match(missing.stdout, /Nothing was changed\. The file .*none\.pbix does not exist/);
+  } finally {
+    rmSync(at, { recursive: true, force: true });
+  }
+});
+
+// ---- Carlos's report of 22 Nov 2026: every app and button of his comes over (build A1, D382, plan §6) ------------
+
+/*
+ * The fixture tests/tools/powerbi/fixtures/carlos-report/ has the shape of the report part of Carlos's .pbix of
+ * 22 Nov 2026: the same pages, the same 8 visuals (six Power Apps, two buttons Refresh now) with their fields, order,
+ * filter cards, filters and places, and invented ids (app, environment, flow, visual and filter names). It was made from
+ * his file by a tool that is not in the repository; node tools/powerbi/pbix-apps.ts gives the same listing for his file
+ * and for this folder. The test zips it as a .pbix, as the service gives it.
+ */
+const FIXTURE = join(import.meta.dirname, 'fixtures', 'carlos-report');
+function fixtureEntries(): Array<{ path: string; data: Uint8Array }> {
+  const entries: Array<{ path: string; data: Uint8Array }> = [{ path: 'Version', data: Buffer.from('1.28') }, { path: 'DataModel', data: Buffer.from(`{ not json ${MODEL_WORD}`) }];
+  const walk = (dir: string, prefix: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      if (entry.isDirectory()) walk(join(dir, entry.name), `${prefix}${entry.name}/`);
+      else entries.push({ path: `${prefix}${entry.name}`, data: readFileSync(join(dir, entry.name)) });
+    }
+  };
+  walk(FIXTURE, '');
+  return entries;
+}
+type Fixture = { name: string; position: Record<string, number>; visual: { visualType: string; query: unknown; objects: unknown }; filterConfig?: { filters: Array<{ name: string; type: string; field: { Column?: { Property: string } }; filter?: unknown }> } };
+const fixtureVisual = (page: string): { name: string; json: Fixture } => {
+  const folder = join(FIXTURE, 'Report', 'definition', 'pages', page, 'visuals');
+  const name = readdirSync(folder)[0]!;
+  return { name, json: JSON.parse(readFileSync(join(folder, name, 'visual.json'), 'utf8')) as Fixture };
+};
+const APP_PAGES = ['case', 'card', 'person', 'mywork', 'auditfollow', 'messages'] as const;
+const NUMBER_CARDS = ['Piece', 'CiCount', 'HtmlLength', 'CsvLength'];
+
+test('the fixture of Carlos\'s report has his 8 visuals, with invented ids only', async () => {
+  const { appListing, reportFiles } = await import('../../../tools/powerbi/pbix-apps.ts');
+  const listing = appListing(reportFiles(FIXTURE));
+  assert.equal(listing.filter((line) => !line.startsWith(' ')).length, 8);
+  for (const page of APP_PAGES) assert.ok(listing.some((line) => line.includes(`(${page}): Power Apps at`)), page);
+  // His places: Card and Person 620 high, Work queue at Y 83 (the script puts them at their slots).
+  assert.ok(listing.includes('Card (card): Power Apps at 956.05, 83.85, 299.85 x 619.75'));
+  assert.ok(listing.includes('Work queue (mywork): Power Apps at 956.05, 82.94, 299.85 x 619.75'));
+  assert.ok(listing.includes('  filter CaseLines.Queue lines: Advanced, not = null'));
+  assert.ok(listing.includes("  filter CaseLines.Status: Advanced, = 'Not followed up'"));
+  const text = fixtureEntries().map((entry) => Buffer.from(entry.data).toString('utf8')).join('\n');
+  for (const guid of text.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi) ?? []) assert.match(guid, /^00000000-0000-0000-0000-0000000[0-9a-f]{5}$/, guid);
+});
+
+test('the update carries every app and button of Carlos\'s report whole: fields, order, filters, app link, at the places of this version', { skip }, () => {
+  const at = mkdtempSync(join(tmpdir(), 'sacm-update-'));
+  try {
+    previousFolder(at);
+    const report = join(at, 'SACM-Workbench-2026-11-22.pbix');
+    writeFileSync(report, zipOf(fixtureEntries()));
+    const project = newFolder(at);
+    const run = update(project, '-Report', report);
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    for (const page of [...APP_PAGES, 'myday', 'reports']) {
+      const { name, json: before } = fixtureVisual(page);
+      const after = JSON.parse(readFileSync(join(pages(project), page, 'visuals', name, 'visual.json'), 'utf8')) as Fixture;
+      const slot = APP_SLOTS[page] ?? FLOW_SLOTS[page]!;
+      assert.deepEqual(placeOf(after as never), slotOf(slot), `${page}: at its place`);
+      assert.equal(after.position.z, before.position.z, page);
+      // The type, the fields in their order and the app link (objects) come over as they were.
+      assert.deepEqual(after.visual, before.visual, `${page}: the visual as it was`);
+      // The filters: the same, but the empty cards of the four numbers of Messages are now the cards of a text.
+      const want = (before.filterConfig?.filters ?? []).map((card) => (page === 'messages' && !card.filter && NUMBER_CARDS.includes(card.field.Column?.Property ?? '') ? { ...card, type: 'Categorical' } : card));
+      assert.deepEqual(after.filterConfig?.filters ?? [], want, `${page}: the filters`);
+      assert.deepEqual({ ...after, position: undefined, filterConfig: undefined }, { ...before, position: undefined, filterConfig: undefined }, page);
+    }
+    assert.match(run.stdout, /Messages : 4 filter card\(s\) of fields now text made Categorical\./);
+    for (const label of ['Case', 'Card', 'Person', 'Work queue', 'Not followed']) {
+      assert.match(run.stdout, new RegExp(`${label} : SACM actions, 17 fields as this version wants, filter kept, app link kept\\.`), label);
+    }
+    assert.match(run.stdout, /Messages : SACM messages, 28 fields as this version wants, filter kept, app link kept\./);
+    assert.doesNotMatch(run.stdout + run.stderr, new RegExp(`${MODEL_WORD}|DataModel`));
+    // The new folder keeps every rule of the pages; a second run changes nothing.
+    const definition = join(project, 'SACM-Workbench.Report', 'definition');
+    assert.deepEqual(folderProblems(definition), []);
+    assert.deepEqual(pageProblems(readPages(definition), readCatalogue()), []);
+    const once = snapshot(project);
+    const again = update(project, '-Report', report);
+    assert.equal(again.status, 0, again.stdout + again.stderr);
+    assert.deepEqual(snapshot(project), once);
+    assert.match(again.stdout, /Messages : SACM messages, 28 fields as this version wants, filter kept, app link kept\./);
+  } finally {
+    rmSync(at, { recursive: true, force: true });
+  }
+});
+
+test('the update says what an app visual lacks: a field, the filter, the app link; a card with a condition on a field now text stays', { skip }, () => {
+  const at = mkdtempSync(join(tmpdir(), 'sacm-update-'));
+  try {
+    previousFolder(at);
+    const entries = fixtureEntries().map((entry) => {
+      if (!entry.path.endsWith('visual.json')) return entry;
+      const json = JSON.parse(Buffer.from(entry.data).toString('utf8')) as Fixture & { visual: { query: { queryState: { table: { projections: Array<{ field: { Column?: { Property: string } } }> } } }; objects: { general?: unknown } } };
+      if (entry.path.includes('/case/')) json.visual.query.queryState.table.projections = json.visual.query.queryState.table.projections.filter((projection) => projection.field.Column?.Property !== 'RetireOn');
+      if (entry.path.includes('/card/')) json.filterConfig = { filters: [] };
+      if (entry.path.includes('/person/')) delete json.visual.objects.general;
+      if (entry.path.includes('/messages/')) {
+        const piece = json.filterConfig!.filters.find((card) => card.field.Column?.Property === 'Piece')!;
+        piece.filter = { Version: 2, From: [{ Name: 'a', Entity: 'AppEmail', Type: 0 }], Where: [] };
+      }
+      return { path: entry.path, data: Buffer.from(`${JSON.stringify(json, null, 2)}\n`) };
+    });
+    const report = join(at, 'Changed.pbix');
+    writeFileSync(report, zipOf(entries));
+    const project = newFolder(at);
+    const run = update(project, '-Report', report);
+    assert.equal(run.status, 0, run.stdout + run.stderr);
+    assert.match(run.stdout, /Case : SACM actions, missing CaseLines\.RetireOn, fix the fields in Power Apps data of the visual \(README section 6\.4\), then \.\.\. > Edit, filter kept, app link kept\./);
+    assert.match(run.stdout, /Card : SACM actions, 17 fields as this version wants, no filter For the app is 1: add it in Filters on this visual, app link kept\./);
+    assert.match(run.stdout, /Person : SACM actions, 17 fields as this version wants, filter kept, no app link: choose the app again/);
+    assert.match(run.stdout, /Messages : the filter on Piece has a condition\. Piece is text from this version/);
+    assert.match(run.stdout, /Messages : 3 filter card\(s\) of fields now text made Categorical\./);
+    const { name } = fixtureVisual('messages');
+    const messages = JSON.parse(readFileSync(join(pages(project), 'messages', 'visuals', name, 'visual.json'), 'utf8')) as Fixture;
+    assert.equal(messages.filterConfig!.filters.find((card) => card.field.Column?.Property === 'Piece')!.type, 'Advanced');
   } finally {
     rmSync(at, { recursive: true, force: true });
   }

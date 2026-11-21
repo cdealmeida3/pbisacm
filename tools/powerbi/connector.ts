@@ -11,6 +11,7 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { readExpressions, readTables } from './tmdl.ts';
+import type { TextOf } from './tmdl.ts';
 import { unitQuery, unitQueryNames } from './units.ts';
 import { historyStart, numberArgument, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { mText } from './generate.ts';
@@ -74,9 +75,30 @@ export function evaluatedNames(): string[] {
 }
 
 /** The M a calculated table of the fixed form (D284) gives, from the member Run (or HistoryRun): its part's rows, its columns renamed. */
-export function calculatedM(table: { name: string; source?: string; part: string; columns: Array<[string, string]> }): string {
-  const pairs = table.columns.map(([name, source]) => `{${mText(source)}, ${mText(name)}}`).join(', ');
-  return `let\n    rows = Table.SelectRows(${table.source ?? 'Run'}, each [Part] = ${mText(table.part)}),\n    picked = Table.SelectColumns(rows, {${table.columns.map(([, source]) => mText(source)).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
+export function calculatedM(table: { name: string; source?: string; part: string; columns: Array<[string, string, TextOf?]> }): string {
+  if (!table.columns.some(([, , textOf]) => textOf)) {
+    const pairs = table.columns.map(([name, source]) => `{${mText(source)}, ${mText(name)}}`).join(', ');
+    return `let\n    rows = Table.SelectRows(${table.source ?? 'Run'}, each [Part] = ${mText(table.part)}),\n    picked = Table.SelectColumns(rows, {${table.columns.map(([, source]) => mText(source)).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
+  }
+  // A column turned into text for a Power App (D377), as the DAX of the calculated table does: FORMAT "0" and
+  // "yyyy-mm-dd" with the culture en-US (blank stays blank), IF ( x, "true", "false" ) (blank gives "false").
+  const convert: Record<TextOf, (value: string) => string> = {
+    number: (value) => `Number.ToText(${value}, "0", "en-US")`,
+    date: (value) => `Date.ToText(${value}, [Format = "yyyy-MM-dd", Culture = "en-US"])`,
+    yesno: (value) => `if ${value} = true then "true" else "false"`
+  };
+  const temp = (name: string): string => `Text for the app ${name}`;
+  let step = 'rows';
+  const steps: string[] = [];
+  table.columns.forEach(([name, source, textOf], at) => {
+    if (!textOf) return;
+    const next = `text${at}`;
+    steps.push(`    ${next} = Table.AddColumn(${step}, ${mText(temp(name))}, each ${convert[textOf](`[#${mText(source)}]`)}, type nullable text),`);
+    step = next;
+  });
+  const picked = table.columns.map(([name, source, textOf]) => (textOf ? temp(name) : source));
+  const pairs = table.columns.map(([name], at) => `{${mText(picked[at]!)}, ${mText(name)}}`).join(', ');
+  return `let\n    rows = Table.SelectRows(${table.source ?? 'Run'}, each [Part] = ${mText(table.part)}),\n${steps.join('\n')}\n    picked = Table.SelectColumns(${step}, {${picked.map(mText).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
 }
 
 export interface ConnectorOptions {

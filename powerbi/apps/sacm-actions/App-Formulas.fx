@@ -102,7 +102,31 @@ ExceptionMonths = With({ raw: Trim(Last(Filter('SACM Settings', Title = "excepti
 // Lines: the rows the Power Apps visual of the page gives (the fields of CaseLines, README §6.4): the lines of the page,
 // or the ones selected in the report. Me: the person signed in, found by their email in the list SACM Team.
 
-Lines = PowerBIIntegration.Data;
+// Build A1 (D377, D379): every field of the visual is text, because the visual sends no data to the app when a field is
+// a number or a true/false, and a banner for a blank date. npm run powerbi:generate writes here the typed rows: the rows
+// of the visual read once, each field turned back into a number, true/false or a date (APP_FIELDS of
+// tools/powerbi/tokens.ts). Every other formula reads Lines, never PowerBIIntegration.Data.
+Lines = ForAll(
+    PowerBIIntegration.Data,
+    {
+        Key: ThisRecord.Key,
+        CheckId: ThisRecord.CheckId,
+        CiName: ThisRecord.CiName,
+        Status: ThisRecord.Status,
+        AssignedTo: ThisRecord.AssignedTo,
+        Person: ThisRecord.Person,
+        Actions: ThisRecord.Actions,
+        Stages: ThisRecord.Stages,
+        StageId: ThisRecord.StageId,
+        ExceptionReason: ThisRecord.ExceptionReason,
+        RetireOn: If(IsBlank(ThisRecord.RetireOn), Blank(), Date(Value(Mid(ThisRecord.RetireOn, 1, 4)), Value(Mid(ThisRecord.RetireOn, 6, 2)), Value(Mid(ThisRecord.RetireOn, 9, 2)))),
+        ContactName: ThisRecord.ContactName,
+        ShareTo: ThisRecord.ShareTo,
+        LastRef: ThisRecord.LastRef,
+        Step: ThisRecord.Step,
+        Card: ThisRecord.Card
+    }
+);
 LineCount = CountRows(Lines);
 // The Power Apps visual gives the app 1,000 rows at most (Microsoft's limit). At 1,000 the app cannot tell whether there
 // are more, so it acts on none: Save is off until fewer lines are selected or filtered.

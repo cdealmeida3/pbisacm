@@ -68,34 +68,86 @@ export const GRID = {
  * it (build R4, D359): `does` and `gets` are its words, what the app does there and the data the visual gives it.
  * `boxHeight`: the app box is that high at the top of the place (Messages: the email chosen is drawn under it).
  */
-export interface AppSlot { app: string; x: number; y: number; width: number; height: number; does: string; gets: string; boxHeight?: number }
+export interface AppSlot { app: AppName; x: number; y: number; width: number; height: number; does: string; gets: string; boxHeight?: number; filter?: AppFilter }
+/**
+ * The filter of the visual on its page (README §6.4, §6.6), so the update script can say whether a carried visual still
+ * has it (build A1, D382): a measure or a column of the model and the condition in words.
+ */
+export interface AppFilter { entity: string; property: string; kind: 'Measure' | 'Column'; words: string }
+const FOR_THE_APP: AppFilter = { entity: 'CaseLines', property: 'For the app', kind: 'Measure', words: 'For the app is 1' };
 export const APP_SLOTS: Record<string, AppSlot> = {
   mywork: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Assign lines, mark them fixed or in progress, hand over your work, add a note, and save.',
-    gets: 'It gets every open line of this page (CaseLines, Queue lines).' },
+    gets: 'It gets every open line of this page (CaseLines, Queue lines).',
+    filter: { entity: 'CaseLines', property: 'Queue lines', kind: 'Measure', words: 'Queue lines is not blank' } },
   // Build R6 (D371): the app on the right side, for the one email chosen in the list at the left (emails). In Desktop the
   // app box is a strip at the top, and the email chosen (appBoxHead, appBoxBody) under it.
   messages: { app: 'SACM messages', x: 676, y: 84, width: 580, height: 620, boxHeight: 88,
     does: 'Send, Test to me, Outlook draft and Teams, for the email chosen in the list at the left.',
-    gets: 'It gets that one email (AppEmail, Selected email is 1). Below: the email chosen, as Desktop shows it.' },
+    gets: 'It gets that one email (AppEmail, Selected email is 1). Below: the email chosen, as Desktop shows it.',
+    filter: { entity: 'AppEmail', property: 'Selected email', kind: 'Measure', words: 'Selected email is 1' } },
   auditfollow: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Follow again: select lines of the table, pick Follow again, and save.',
-    gets: 'It gets the lines not followed up (CaseLines, Status Not followed up).' },
+    gets: 'It gets the lines not followed up (CaseLines, Status Not followed up).',
+    filter: { entity: 'CaseLines', property: 'Status', kind: 'Column', words: 'Status is Not followed up' } },
   auditreview: { app: 'SACM audit', x: 956, y: 84, width: 300, height: 620,
     does: 'Start a new review, mark each CI of the sample same in EPO or not, and change the team\'s settings.',
     gets: 'It gets the CIs of the reviews (ReviewLines).' },
   // Build R6 (D374): 476 high, so the form does not scroll; About this card is short under it.
   card: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 476,
     does: 'Assign the lines of this card, mark them fixed or in progress, share them out, or add a note.',
-    gets: 'It gets the open lines of this card (CaseLines, For the app).' },
+    gets: 'It gets the open lines of this card (CaseLines, For the app).', filter: FOR_THE_APP },
   // Taller since build D5: the app reads the person's replies (the reply reader), where the table of replies was.
   person: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 568,
     does: 'Read the replies of this person, tick the lines they answer, then Mark answered, Waiting until or Add note.',
-    gets: 'It gets the open lines and the replies of this person (CaseLines, For the app).' },
+    gets: 'It gets the open lines and the replies of this person (CaseLines, For the app).', filter: FOR_THE_APP },
   case: { app: 'SACM actions', x: 956, y: 84, width: 300, height: 620,
     does: 'Mark the lines of this CI fixed or in progress, set a stage or a retirement date, stop following, or add a note.',
-    gets: 'It gets the open lines of this CI (CaseLines, For the app).' }
+    gets: 'It gets the open lines of this CI (CaseLines, For the app).', filter: FOR_THE_APP }
 };
+
+/**
+ * What the app turns a field of its visual back into (build A1, D377, D379): every field the Power Apps visual gets is
+ * text, because the visual refused a number (Messages got no data at all) and a blank date (a banner on Case). The
+ * generated named formula of each app (typedRows of tools/powerbi/actions.ts) turns it back: `text` as it is, `number`
+ * with Value, `yesno` "true"/"false", `date` "yyyy-mm-dd" (blank when "").
+ */
+export type AppFieldKind = 'text' | 'number' | 'yesno' | 'date';
+/** One field of a visual: the column of the model, what the app turns it into, and (for a `…Text` twin, D378) the name the app uses. */
+export interface AppField { field: string; kind: AppFieldKind; as?: string }
+export type AppName = 'SACM actions' | 'SACM messages' | 'SACM audit';
+/** The fields of the visual of one app: its table, the name of its typed rows in the app (Lines or AppRows) and its fields in order. */
+export interface AppFields { table: string; rows: string; fields: AppField[] }
+const asText = (...names: string[]): AppField[] => names.map((field) => ({ field, kind: 'text' }));
+/**
+ * The fields of the three Power Apps visuals, in the order README §6.4, §6.6 and §6.8 give them (D380): the one home
+ * of these lists. The generator, the copy pack, the plain paste files, README, update.json and the lint read it. Every
+ * visual also gets the measure APP_LAST_FIELD last.
+ */
+export const APP_FIELDS: Record<AppName, AppFields> = {
+  'SACM actions': { table: 'CaseLines', rows: 'Lines', fields: [
+    ...asText('Key', 'CheckId', 'CiName', 'Status', 'AssignedTo', 'Person', 'Actions', 'Stages', 'StageId', 'ExceptionReason'),
+    { field: 'RetireOn', kind: 'date' },
+    ...asText('ContactName', 'ShareTo', 'LastRef', 'Step', 'Card')
+  ] },
+  'SACM messages': { table: 'AppEmail', rows: 'AppRows', fields: [
+    ...asText('Row', 'DraftId', 'EmailId'), { field: 'Piece', kind: 'number' },
+    ...asText('Ref', 'Kind', 'KindLabel', 'To', 'ToName', 'Cc', 'Subject', 'Chat', 'Keys', 'NewKeys', 'FreeKeys'),
+    { field: 'CiCount', kind: 'number' }, ...asText('About'), { field: 'NobodyAbove', kind: 'yesno' }, { field: 'Mailbox', kind: 'yesno' },
+    ...asText('AssignedTo', 'Summary', 'EmailSubject'), { field: 'HtmlLength', kind: 'number' }, { field: 'CsvLength', kind: 'number' },
+    ...asText('AddressWhy', 'Html', 'Csv')
+  ] },
+  'SACM audit': { table: 'ReviewLines', rows: 'Lines', fields: [
+    ...asText('Review'), { field: 'IsNextText', kind: 'yesno', as: 'IsNext' }, { field: 'IsCurrentText', kind: 'yesno', as: 'IsCurrent' },
+    { field: 'ReviewDateText', kind: 'date', as: 'ReviewDate' }, ...asText('Report'), { field: 'ReportDateText', kind: 'date', as: 'ReportDate' },
+    ...asText('Group', 'CiKey', 'CiName', 'ClassLabel', 'ClassName', 'EpoId', 'Status', 'EpoStatus'), { field: 'AgreesText', kind: 'yesno', as: 'Agrees' },
+    ...asText('Result', 'ResultLabel'), { field: 'EpoDateText', kind: 'date', as: 'EpoDate' }, { field: 'OrderText', kind: 'number', as: 'Order' }
+  ] }
+};
+/** The measure every app visual gets last (build 0.52.0, D334): the time of the report's data, already text (D377). */
+export const APP_LAST_FIELD = { table: 'About', measure: 'Report at' } as const;
+/** The measures a Power Apps visual may get: they return text (D377). */
+export const APP_TEXT_MEASURES = [`${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}]`];
 
 /**
  * The place of the button Refresh now (the Power Automate visual of flow F6, which Carlos adds by hand in the service,

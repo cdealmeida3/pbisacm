@@ -2,6 +2,15 @@
 
 What changed in each version, in words for SACM managers. Newest first. The version is in `package.json`; the app shows the same number. Every version was built and merged as one pull request (number in brackets). Pull request and commit numbers up to version 0.38.0 refer to the private archive of this repository.
 
+## 0.60.0 — The Power BI report: the apps read every field (A1)
+
+- **The app SACM messages gets its data** (D377). Every field a Power Apps visual gets is now text: numbers, true/false and dates too. Before, *SACM messages* got no data at all ("expected 'number' but got 'string'"), and on *Case* an empty retire date gave a banner. Each app turns the text back into numbers and dates in one place (`Lines`, or `AppRows` in *SACM messages*), so no screen changed (D379).
+- **Your visuals keep their fields** (D378). The fields only the apps use keep their names and change type. *ReviewLines* gets seven new fields for the app *SACM audit*, in the folder *For the app* (`IsNextText`, `OrderText` and the others).
+- **The pastes work in your Studio** (D381). The controls have no version (`ModernButton`, not `ModernButton@1.0.0`); the tick box is set with *Default*; the tab list takes `{Value: "…"}` and *Align*. These are your hand fixes of 21 Nov; the lint now refuses the old forms (D384).
+- **The update carries your work in the service, and checks it** (D382). Every app visual keeps its place, its fields, its filters and its app link. A filter card of a field that is now text becomes a text card. For each page with an app, `Update-Workbench.cmd` says if the visual has the fields of this version, its filter and its app link, or what to fix by hand. It was tested on a copy with the shape of your report of 22 Nov, with invented ids.
+- **The paste files come from a tool** (D383): the six `.txt` files in the project files are made again from the repository after each version.
+- The field lists of README §6.4, §6.6 and §6.8 come from one list in the code (D380). No check, page or email text changed on the samples.
+
 ## 0.59.0 — The Power BI report: your layout, and updates from a download (L1)
 
 - **Refresh now is the size you gave it** (D375). On *My day* and *Reports* the place of the button is 156 × 60 at Y 588 (was 156 × 40 at Y 604), so its words fit. The refresh rule moved up above it, so the two do not overlap. Set the button's words in white: **Format → Button → Font colour: White** (README §6.3, F6 step 4). The update moves a button placed before to the new place.

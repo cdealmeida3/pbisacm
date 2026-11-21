@@ -405,6 +405,14 @@ export async function parityProblems(folder: string): Promise<string[]> {
   const review = reviewLines(key.reviewed, named(SAMPLE_FILES.ci, RECORD_DATE), sampleEvents(), key.cases, systemsById(epoSystems), RECORD_DATE);
   problems.push(...compare('ReviewLines', rows('ReviewLines').map((row) => ({ ...row, Line: `${norm(row.Review)}|${norm(row.CiKey)}` })),
     review.map((row) => ({ ...row, Line: `${row.Review}|${row.CiKey}` })), 'Line', Object.keys(review[0] ?? {}).filter((field) => field !== 'Review' && field !== 'CiKey')));
+  // Build A1 (D378): the text twins of ReviewLines for the app SACM audit say the same as the columns they double.
+  const yesno = (value: unknown): string => (value === true ? 'true' : 'false');
+  const day = (value: unknown): string => norm(value).slice(0, 10);
+  for (const row of rows('ReviewLines')) {
+    const twins: Array<[string, string]> = [['IsNextText', yesno(row.IsNext)], ['IsCurrentText', yesno(row.IsCurrent)], ['AgreesText', yesno(row.Agrees)],
+      ['ReviewDateText', day(row.ReviewDate)], ['ReportDateText', day(row.ReportDate)], ['EpoDateText', day(row.EpoDate)], ['OrderText', norm(row.Order)]];
+    for (const [twin, want] of twins) if (norm(row[twin]) !== want) problems.push(`ReviewLines ${norm(row.Review)}|${norm(row.CiKey)}: ${twin} is "${norm(row[twin])}", expected "${want}"`);
+  }
   const expected = (await expectedHistory()).map((item, at) => ({ Metric: item.metric, Expected: item.expected, Order: at + 1 }));
   problems.push(...compare('HistoryExpected', rows('HistoryExpected'), expected, 'Metric', ['Expected', 'Order']));
 

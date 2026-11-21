@@ -425,7 +425,7 @@ expression StateLists = Json.Document("{""journal"":{""list"":""SACM Journal"","
 	queryGroup: Packed
 
 /// GENERATED from package.json. The version of the Workbench.
-expression WorkbenchVersion = "0.59.0"
+expression WorkbenchVersion = "0.60.0"
 	queryGroup: Packed
 
 /// The 128 ASCII characters, as a list made once: Text.Remove(text, AsciiCharacters) = "" when a text is ASCII only.

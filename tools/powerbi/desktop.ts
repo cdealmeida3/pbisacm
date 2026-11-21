@@ -17,7 +17,7 @@ import { join } from 'node:path';
 import { readPages, readTabGroups, textsOf } from './pages.ts';
 import { historyStart, REAL_SIZE_COPIES, scaledSampleFiles } from './scaled.ts';
 import { mText } from './generate.ts';
-import { CELL_PADDING, TEXT, textWidth } from './tokens.ts';
+import { APP_FIELDS, CELL_PADDING, TEXT, textWidth } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 const PAGES = join(root, 'powerbi', 'SACM-Workbench.Report', 'definition', 'pages');
@@ -295,6 +295,27 @@ export function blankRowQueries(): VisualQuery[] {
   return queries;
 }
 
+/**
+ * One query per field a Power Apps visual gets that is a number, a true/false or a date turned into text (build A1,
+ * D377): how many rows hold a text the app cannot turn back (typedRows of actions.ts). A number is digits, a true/false
+ * "true" or "false", a date yyyy-mm-dd; a blank number or date is "" (FORMAT of a blank). The judge wants 0.
+ */
+export function appTextQueries(): VisualQuery[] {
+  const queries: VisualQuery[] = [];
+  for (const [app, spec] of Object.entries(APP_FIELDS)) {
+    for (const { field, kind } of spec.fields) {
+      if (kind === 'text') continue;
+      const column = `'${spec.table}'[${field}]`;
+      const bad = kind === 'yesno' ? `NOT ${column} IN { "true", "false" }`
+        : kind === 'number' ? `${column} <> "" && ( ISERROR ( VALUE ( ${column} ) ) || CONTAINSSTRING ( ${column}, "." ) || CONTAINSSTRING ( ${column}, "," ) )`
+        : `${column} <> "" && NOT ( LEN ( ${column} ) = 10 && MID ( ${column}, 5, 1 ) = "-" && MID ( ${column}, 8, 1 ) = "-" && NOT ISERROR ( DATE ( VALUE ( LEFT ( ${column}, 4 ) ), VALUE ( MID ( ${column}, 6, 2 ) ), VALUE ( MID ( ${column}, 9, 2 ) ) ) ) )`;
+      queries.push({ page: 'Model', pageName: 'model', visual: `${spec.table}.${field}`, type: 'apptext', title: `${app}: ${column} as ${kind}`, groups: [], values: ['Not readable'],
+        dax: `EVALUATE ROW ( "v0", COUNTROWS ( FILTER ( ${spec.table}, ${bad} ) ) + 0 )` });
+    }
+  }
+  return queries;
+}
+
 /** The columns of the drill-through pages, so the runner can ask for their values first. */
 export function drillColumns(): string[] {
   const order = readJson<{ pageOrder: string[] }>(join(PAGES, 'pages.json')).pageOrder;
@@ -394,6 +415,12 @@ export function judge(results: Results, pictures?: Pictures): { problems: string
       // A value of the many side with no row on the one side gives the one side a blank row (D349).
       const count = Number(lines[0]?.[0] ?? 0);
       if (count > 0) problems.push(`Relationship ${query.visual} (${query.title}): ${count === 1 ? 'one value' : `${count} values`} of the many side ${count === 1 ? 'has' : 'have'} no row on the one side, so that table gets a blank row`);
+      continue;
+    }
+    if (query.type === 'apptext') {
+      // A field of a Power Apps visual turned into text that the app cannot turn back (D377).
+      const count = Number(lines[0]?.[0] ?? 0);
+      if (count > 0) problems.push(`Power Apps field ${query.title}: ${count} ${count === 1 ? 'row holds' : 'rows hold'} a text the app cannot turn back (build A1, D377)`);
       continue;
     }
     if (query.type === 'text') {
@@ -542,7 +569,7 @@ if (import.meta.main) {
   const [command, file, extra] = process.argv.slice(2);
   if (command === 'queries' && file) {
     const drills = extra && existsSync(extra) ? new Map(Object.entries(readJson<Record<string, string[]>>(extra))) : new Map<string, string[]>();
-    const queries = [...queriesOf(drills), ...blankRowQueries()];
+    const queries = [...queriesOf(drills), ...blankRowQueries(), ...appTextQueries()];
     writeFileSync(file, JSON.stringify({ drillColumns: drillColumns(), queries }, null, 1));
     console.log(`${queries.length} queries of ${new Set(queries.map((query) => `${query.pageName}/${query.visual}`)).size} visuals written to ${file}`);
   } else if (command === 'pages' && file) {

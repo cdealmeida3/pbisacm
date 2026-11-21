@@ -14,7 +14,8 @@ import { handedToOwner } from '../../src/app/view/fix-list.ts';
 import { loadPacks, loadReferences } from '../../src/hosts/cli.ts';
 import { NUMBER_RANGES } from '../../src/app/state/store.ts';
 import { ROWS_IN_EMAIL_RANGE } from './email.ts';
-import { emailColours, FONT, lightColours } from './tokens.ts';
+import { APP_FIELDS, emailColours, FONT, lightColours } from './tokens.ts';
+import type { AppField, AppName } from './tokens.ts';
 import { refreshFormulas } from './refresh.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -184,9 +185,44 @@ export function appFormulas(statuses: readonly string[], statusWord: (status: st
     '// Settings screen of the app SACM audit, build B8, D308), a whole number in its range (D158), else the default.',
     `ExceptionMonths = With({ raw: Trim(Last(Filter('SACM Settings', Title = "exceptionMonths")).Value) }, If(IsMatch(raw, "\\d+") && Value(raw) >= ${NUMBER_RANGES.exceptionMonths.min} && Value(raw) <= ${NUMBER_RANGES.exceptionMonths.max}, Value(raw), ${months}));`,
     '',
-    readFileSync(FORMULAS_FILE, 'utf8').replace(/\r\n/g, '\n').trimEnd(),
+    withTypedRows(readFileSync(FORMULAS_FILE, 'utf8').replace(/\r\n/g, '\n').trimEnd(), 'SACM actions', FORMULAS_FILE),
     ''
   ].join('\n');
+}
+
+/** The place in formulas.fx where the generator writes the typed rows of the visual (D379): `Lines = %%TYPED_ROWS%%;`. */
+export const TYPED_ROWS_MARK = '%%TYPED_ROWS%%';
+
+/** The Power Fx that turns one text field of the visual back into what the app uses (D377, D379). */
+function typedField({ field, kind, as }: AppField): string {
+  const value = `ThisRecord.${field}`;
+  const name = as ?? field;
+  // Only digits come in (FORMAT "0" and "yyyy-mm-dd" of the model), so Value reads them the same in every language.
+  const part = (start: number, length: number): string => `Value(Mid(${value}, ${start}, ${length}))`;
+  switch (kind) {
+    case 'text': return `${name}: ${value}`;
+    case 'number': return `${name}: If(IsBlank(${value}), Blank(), Value(${value}))`;
+    case 'yesno': return `${name}: ${value} = "true"`;
+    case 'date': return `${name}: If(IsBlank(${value}), Blank(), Date(${part(1, 4)}, ${part(6, 2)}, ${part(9, 2)}))`;
+  }
+}
+
+/**
+ * The typed rows of an app (D379): the rows of its Power Apps visual, read once, every field turned from text back into
+ * the type the formulas and screens use, under the names they use (APP_FIELDS of tokens.ts). The expression after
+ * `Lines =` (`AppRows =` in SACM messages).
+ */
+export function typedRows(app: AppName): string {
+  const { fields } = APP_FIELDS[app];
+  return `ForAll(\n    PowerBIIntegration.Data,\n    {\n${fields.map((field) => `        ${typedField(field)}`).join(',\n')}\n    }\n)`;
+}
+
+/** formulas.fx with its typed rows written in (the mark replaced): exactly one mark, on the line of the rows. */
+export function withTypedRows(formulas: string, app: AppName, file: string): string {
+  const rows = APP_FIELDS[app].rows;
+  const line = `${rows} = ${TYPED_ROWS_MARK};`;
+  if (formulas.split(TYPED_ROWS_MARK).length !== 2 || !formulas.includes(line)) throw new Error(`${file}: write the line "${line}" once; the generator puts the typed rows of the visual there (D379)`);
+  return formulas.replace(line, `${rows} = ${typedRows(app)};`);
 }
 
 /** The App of the app source (schema pa-yaml v3.0): its named formulas and the screen it opens on. */
@@ -257,7 +293,7 @@ export function auditFormulas(labels: Record<string, string>, defaults: Record<s
     `SettingCatalog = Table(\n${settings.join(',\n')}\n);`,
     `ReviewResults = Table(\n${results.map((result) => `    { Id: ${fx(result.id)}, Label: ${fx(result.label)} }`).join(',\n')}\n);`,
     '',
-    readFileSync(AUDIT_FORMULAS_FILE, 'utf8').replace(/\r\n/g, '\n').trimEnd(),
+    withTypedRows(readFileSync(AUDIT_FORMULAS_FILE, 'utf8').replace(/\r\n/g, '\n').trimEnd(), 'SACM audit', AUDIT_FORMULAS_FILE),
     ''
   ].join('\n');
 }
@@ -271,7 +307,7 @@ export function messagesFormulas(): string {
     appLook(),
     '',
     refreshFormulas(),
-    readFileSync(MESSAGES_FORMULAS_FILE, 'utf8').replace(/\r\n/g, '\n').trimEnd(),
+    withTypedRows(readFileSync(MESSAGES_FORMULAS_FILE, 'utf8').replace(/\r\n/g, '\n').trimEnd(), 'SACM messages', MESSAGES_FORMULAS_FILE),
     ''
   ].join('\n');
 }

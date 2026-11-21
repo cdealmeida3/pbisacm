@@ -219,6 +219,69 @@ table ReviewLines
 		isNameInferred
 		sourceColumn: [Order]
 
+	/// IsNext as text for the app SACM audit (D377, D378): "true" or "false". In the folder For the app: only the Power Apps visual gets it (a hidden field cannot be added to a visual in the service).
+	column IsNextText
+		dataType: string
+		isDataTypeInferred
+		summarizeBy: none
+		displayFolder: For the app
+		isNameInferred
+		sourceColumn: [IsNextText]
+
+	/// IsCurrent as text for the app SACM audit (D377, D378): "true" or "false". In the folder For the app: only the Power Apps visual gets it (a hidden field cannot be added to a visual in the service).
+	column IsCurrentText
+		dataType: string
+		isDataTypeInferred
+		summarizeBy: none
+		displayFolder: For the app
+		isNameInferred
+		sourceColumn: [IsCurrentText]
+
+	/// ReviewDate as text for the app SACM audit (D377, D378): yyyy-mm-dd, "" when blank. In the folder For the app: only the Power Apps visual gets it (a hidden field cannot be added to a visual in the service).
+	column ReviewDateText
+		dataType: string
+		isDataTypeInferred
+		summarizeBy: none
+		displayFolder: For the app
+		isNameInferred
+		sourceColumn: [ReviewDateText]
+
+	/// ReportDate as text for the app SACM audit (D377, D378): yyyy-mm-dd, "" when blank. In the folder For the app: only the Power Apps visual gets it (a hidden field cannot be added to a visual in the service).
+	column ReportDateText
+		dataType: string
+		isDataTypeInferred
+		summarizeBy: none
+		displayFolder: For the app
+		isNameInferred
+		sourceColumn: [ReportDateText]
+
+	/// Agrees as text for the app SACM audit (D377, D378): "true" or "false". In the folder For the app: only the Power Apps visual gets it (a hidden field cannot be added to a visual in the service).
+	column AgreesText
+		dataType: string
+		isDataTypeInferred
+		summarizeBy: none
+		displayFolder: For the app
+		isNameInferred
+		sourceColumn: [AgreesText]
+
+	/// EpoDate as text for the app SACM audit (D377, D378): yyyy-mm-dd, "" when blank. In the folder For the app: only the Power Apps visual gets it (a hidden field cannot be added to a visual in the service).
+	column EpoDateText
+		dataType: string
+		isDataTypeInferred
+		summarizeBy: none
+		displayFolder: For the app
+		isNameInferred
+		sourceColumn: [EpoDateText]
+
+	/// Order as text for the app SACM audit (D377, D378): a whole number. In the folder For the app: only the Power Apps visual gets it (a hidden field cannot be added to a visual in the service).
+	column OrderText
+		dataType: string
+		isDataTypeInferred
+		summarizeBy: none
+		displayFolder: For the app
+		isNameInferred
+		sourceColumn: [OrderText]
+
 	partition ReviewLines = calculated
 		mode: import
 		source =
@@ -252,5 +315,12 @@ table ReviewLines
 					"Reminders", Run[ReviewLines.Reminders],
 					"EscalatedOn", Run[ReviewLines.EscalatedOn],
 					"EpoDate", Run[ReviewLines.EpoDate],
-					"Order", Run[ReviewLines.Order]
+					"Order", Run[ReviewLines.Order],
+					"IsNextText", IF ( Run[ReviewLines.IsNext], "true", "false" ),
+					"IsCurrentText", IF ( Run[ReviewLines.IsCurrent], "true", "false" ),
+					"ReviewDateText", FORMAT ( Run[ReviewLines.ReviewDate], "yyyy-mm-dd", "en-US" ),
+					"ReportDateText", FORMAT ( Run[ReviewLines.ReportDate], "yyyy-mm-dd", "en-US" ),
+					"AgreesText", IF ( Run[ReviewLines.Agrees], "true", "false" ),
+					"EpoDateText", FORMAT ( Run[ReviewLines.EpoDate], "yyyy-mm-dd", "en-US" ),
+					"OrderText", FORMAT ( Run[ReviewLines.Order], "0", "en-US" )
 				)

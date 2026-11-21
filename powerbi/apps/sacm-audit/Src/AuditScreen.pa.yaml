@@ -29,7 +29,7 @@ Screens:
             Width: =Parent.Width - 32 - 120
             Height: =28
       - RefreshButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             # The only control that asks for a refresh (D332, lint): flow F5 refreshes at most once in each window (D333)
             # and answers what happened. The same formula in the three apps.
@@ -70,12 +70,13 @@ Screens:
             Width: =Parent.Width - 32
             Height: =32
       - Tabs:
-          Control: ModernTabList@1.0.0
+          Control: ModernTabList
           Properties:
             Items: =["Lifecycle review", "Settings"]
-            Default: ="Lifecycle review"
+            Default: |-
+              ={Value: "Lifecycle review"}
             Appearance: =TabListAppearance.Underline
-            Alignment: =TabListAlignment.Start
+            Align: =Align.Left
             BasePaletteColor: =ColourNavy
             Font: =AppFont
             Size: =10
@@ -114,7 +115,7 @@ Screens:
             Width: =Parent.Width - 32
             Height: =40
       - NewReviewButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="New review"
             Icon: ="Add"
@@ -157,10 +158,10 @@ Screens:
             Height: =Parent.Height - 212 - 196
           Children:
             - MarkCheck:
-                Control: ModernCheckbox@1.0.0
+                Control: ModernCheckbox
                 Properties:
                   Label: =""
-                  Checked: =false
+                  Default: =false
                   AccessibleLabel: ="Mark " & ThisItem.CiName
                   BasePaletteColor: =ColourNavy
                   X: =0
@@ -219,7 +220,7 @@ Screens:
                   Width: =Parent.TemplateWidth
                   Height: =1
       - ResultPick:
-          Control: ModernDropdown@1.0.0
+          Control: ModernDropdown
           Properties:
             Items: =ReviewResults
             Default: =First(ReviewResults)
@@ -234,7 +235,7 @@ Screens:
             Width: =Parent.Width - 32
             Height: =36
       - NoteText:
-          Control: ModernTextInput@1.0.0
+          Control: ModernTextInput
           Properties:
             Default: =""
             Placeholder: ="Note (what EPO says)"
@@ -249,7 +250,7 @@ Screens:
             Width: =Parent.Width - 32
             Height: =36
       - MarkButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Save the mark"
             Icon: ="Checkmark"
@@ -281,7 +282,7 @@ Screens:
             Width: =Parent.Width - 32
             Height: =40
       - SameButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Mark " & CountRows(AgreeingLines) & " same in EPO"
             Appearance: =ButtonAppearance.Outline
@@ -350,7 +351,7 @@ Screens:
                   Width: =Parent.TemplateWidth - 84
                   Height: =32
             - ValueInput:
-                Control: ModernTextInput@1.0.0
+                Control: ModernTextInput
                 Properties:
                   Default: =Text(ThisItem.Current)
                   AccessibleLabel: =ThisItem.Label
@@ -392,7 +393,7 @@ Screens:
             Width: =Parent.Width - 32
             Height: =48
       - SaveSettingsButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Save the settings"
             Icon: ="Save"

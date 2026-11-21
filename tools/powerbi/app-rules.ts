@@ -25,6 +25,8 @@ import type { AppAction } from './actions.ts';
 import { STATE_LISTS } from './history.ts';
 import type { EventType } from '../../src/core/cases/cases.ts';
 import { gateExpressions } from './refresh.ts';
+import { APP_FIELDS, APP_LAST_FIELD, APP_TEXT_MEASURES } from './tokens.ts';
+import type { AppFields, AppName } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
 export const FLOWS_FILE = join(root, 'powerbi', 'apps', 'flows.json');
@@ -296,17 +298,38 @@ const MODERN_TEXT = ['BasePaletteColor', 'Font', 'Size', 'Color', 'FontWeight', 
   'PaddingTop', 'PaddingBottom', 'PaddingLeft', 'PaddingRight'];
 /**
  * The modern controls the apps use (Fluent 2, D317), each with the properties Microsoft's page of the control gives
- * (learn.microsoft.com, modern controls, 2026). The version is written, so Power Apps Studio makes exactly this control
- * when the YAML is pasted, whatever comes later.
+ * (learn.microsoft.com, modern controls, 2026), corrected by what Carlos's Power Apps Studio accepted on 21 Nov 2026
+ * (build A1, D381): his Studio is the answer key. No version is written (`ModernButton`, never `ModernButton@1.0.0`):
+ * Studio then makes its current control; a pinned old version has other property names (PA2108, PA2105).
  */
 export const MODERN_CONTROLS: Record<string, string[]> = {
-  'ModernButton@1.0.0': [...BASE, ...MODERN_TEXT, 'Text', 'Align', 'VerticalAlign', 'Appearance', 'Icon', 'IconStyle', 'IconRotation', 'Layout'],
-  'ModernTextInput@1.0.0': [...BASE, ...MODERN_TEXT, 'Default', 'Placeholder', 'Type', 'TriggerOutput', 'MaxLength', 'Required', 'ValidationState', 'OnChange', 'Align', 'Appearance', 'Fill'],
-  'ModernCheckbox@1.0.0': [...BASE, ...MODERN_TEXT, 'Label', 'Checked', 'OnCheck', 'OnUncheck'],
-  'ModernTabList@1.0.0': [...BASE, ...MODERN_TEXT, 'Items', 'Default', 'OnChange', 'Align', 'Alignment', 'Appearance'],
-  'ModernDropdown@1.0.0': [...BASE, ...MODERN_TEXT, 'Items', 'Default', 'ItemDisplayText', 'Required', 'ValidationState', 'OnChange', 'Appearance'],
-  'ModernDatePicker@1.0.0': [...BASE, ...MODERN_TEXT, 'DefaultDate', 'Placeholder', 'Format', 'StartDate', 'EndDate', 'StartOfWeek', 'OnChange']
+  ModernButton: [...BASE, ...MODERN_TEXT, 'Text', 'Align', 'VerticalAlign', 'Appearance', 'Icon', 'IconStyle', 'IconRotation', 'Layout'],
+  ModernTextInput: [...BASE, ...MODERN_TEXT, 'Default', 'Placeholder', 'Type', 'TriggerOutput', 'MaxLength', 'Required', 'ValidationState', 'OnChange', 'Align', 'Appearance', 'Fill'],
+  // The tick is set with Default (Studio refuses Checked as an input: PA2108); a formula still reads X.Checked.
+  ModernCheckbox: [...BASE, ...MODERN_TEXT, 'Label', 'Default', 'OnCheck', 'OnUncheck'],
+  // Default is a record of Items ({Value: "Reply"}); the side is Align (Align.Left, Align.Right): Alignment is refused.
+  ModernTabList: [...BASE, ...MODERN_TEXT, 'Items', 'Default', 'OnChange', 'Align', 'Appearance'],
+  ModernDropdown: [...BASE, ...MODERN_TEXT, 'Items', 'Default', 'ItemDisplayText', 'Required', 'ValidationState', 'OnChange', 'Appearance'],
+  ModernDatePicker: [...BASE, ...MODERN_TEXT, 'DefaultDate', 'Placeholder', 'Format', 'StartDate', 'EndDate', 'StartOfWeek', 'OnChange']
 };
+/** What Carlos's Studio said about a property, for the message of the lint (D381). */
+const REFUSED: Record<string, Record<string, string>> = {
+  ModernCheckbox: { Checked: 'Studio refuses Checked as an input of the modern tick box (PA2108 "Unknown property \'Checked\'", 21 Nov 2026): set it with Default; a formula still reads X.Checked (D381)' },
+  ModernTabList: { Alignment: 'Studio refuses Alignment on the modern tab list: the property is Align, with Align.Left or Align.Right (D381)' }
+};
+
+/**
+ * Whether the Default of a modern tab list is a record of its Items (D381): `={Value: "Reply"}`, or an If whose
+ * branches are such records. A plain text ("Reply") gives "Expected a value compatible with 'Items'" in Studio.
+ */
+export function tabDefaultOk(formula: string): boolean {
+  const text = formula.trim().replace(/^=/, '').trim();
+  if (/^\{\s*Value\s*:/.test(text)) return true;
+  if (!/^If\(/.test(text)) return false;
+  // Every branch of the If (after a comma) is a record, never a bare text.
+  return /\{\s*Value\s*:/.test(text) && !/,\s*"(?:[^"]|"")*"\s*[,)]/.test(text);
+}
+
 /**
  * The classic controls that stay (D317): Power Apps has no modern list (gallery), HTML viewer or shape, and a label
  * of a gallery or a panel stays a classic label (the modern Text has no scroll).
@@ -323,10 +346,20 @@ export function controlProblems(file: string, json: unknown): string[] {
     for (const entry of children ?? []) {
       for (const [name, control] of Object.entries(entry)) {
         const type = control.Control ?? '';
-        const known = MODERN_CONTROLS[type];
-        if (!known && !CLASSIC_KEPT.has(type)) problems.push(`App: ${where} ${name} is a ${type || 'control with no type'}: use a modern control of MODERN_CONTROLS (D317)`);
+        if (type.includes('@')) {
+          problems.push(`App: ${where} ${name} is a ${type}: write the control without a version (${type.slice(0, type.indexOf('@'))}): Studio makes its current control (D381)`);
+        }
+        const bare = type.replace(/@.*$/, '');
+        const known = MODERN_CONTROLS[bare];
+        if (!known && !CLASSIC_KEPT.has(bare)) problems.push(`App: ${where} ${name} is a ${type || 'control with no type'}: use a modern control of MODERN_CONTROLS (D317)`);
         if (known) for (const property of Object.keys(control.Properties ?? {})) {
-          if (!known.includes(property)) problems.push(`App: ${where} ${name} (${type}) has the property ${property}, which the control does not have`);
+          const refused = REFUSED[bare]?.[property];
+          if (refused) problems.push(`App: ${where} ${name} (${bare}) has the property ${property}: ${refused}`);
+          else if (!known.includes(property)) problems.push(`App: ${where} ${name} (${bare}) has the property ${property}, which the control does not have`);
+        }
+        const tabDefault = control.Properties?.Default;
+        if (bare === 'ModernTabList' && typeof tabDefault === 'string' && !tabDefaultOk(tabDefault)) {
+          problems.push(`App: ${where} ${name} (ModernTabList) has the Default ${tabDefault.trim()}: it must be a record of Items, {Value: "…"} (Studio: "Expected a value compatible with 'Items'", D381)`);
         }
         walk(control.Children);
       }
@@ -335,4 +368,82 @@ export function controlProblems(file: string, json: unknown): string[] {
   const screens = (json as { Screens?: Record<string, Control> } | null)?.Screens ?? {};
   for (const screen of Object.values(screens)) walk(screen.Children);
   return problems;
+}
+
+/* ------------------------------------------------------------------ the fields of the visuals (build A1, D377 to D380) */
+
+/** A table of the model as the rule needs it: its columns with their data types, and its measures. */
+export interface ModelTable { name: string; columns: Array<{ name: string; dataType: string }>; measures: Array<{ name: string }> }
+
+/**
+ * The problems of the fields of the Power Apps visuals (D377): every field of APP_FIELDS is a column of its table with
+ * dataType string, and the measure every visual gets last is a text measure of APP_TEXT_MEASURES.
+ */
+export function appFieldProblems(tables: ModelTable[], fields: Record<string, AppFields> = APP_FIELDS): string[] {
+  const problems: string[] = [];
+  const byName = new Map(tables.map((table) => [table.name, table]));
+  const why = 'the Power Apps visual sends numbers, true/false and blank dates in a form the app cannot read (D377)';
+  for (const [app, spec] of Object.entries(fields)) {
+    const table = byName.get(spec.table);
+    if (!table) { problems.push(`App fields: ${app} gets the table ${spec.table}, which is not in the model`); continue; }
+    const names = new Set<string>();
+    for (const { field } of spec.fields) {
+      if (names.has(field)) problems.push(`App fields: ${app} gets ${spec.table}[${field}] twice`);
+      names.add(field);
+      const column = table.columns.find((item) => item.name === field);
+      if (!column) problems.push(`App fields: ${app} gets ${spec.table}[${field}], which is not a column of the model`);
+      else if (column.dataType !== 'string') problems.push(`App fields: ${spec.table}[${field}] of ${app} is ${column.dataType}: make it text (dataType: string): ${why}`);
+    }
+  }
+  const last = byName.get(APP_LAST_FIELD.table);
+  if (!last?.measures.some((measure) => measure.name === APP_LAST_FIELD.measure)) problems.push(`App fields: the measure ${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}] every app gets is not in the model`);
+  if (!APP_TEXT_MEASURES.includes(`${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}]`)) problems.push(`App fields: ${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}] is not a text measure of APP_TEXT_MEASURES: ${why}`);
+  return problems;
+}
+
+/**
+ * The problems of where an app reads its visual (D379): only its typed rows (`Lines = ForAll(PowerBIIntegration.Data, …`)
+ * and the refresh rule (ReportAt and the header line, refreshFormulas of refresh.ts) read PowerBIIntegration.Data; every
+ * other formula and every screen reads the typed rows, so a field is turned from text in one place.
+ */
+export function dataReadProblems(file: string, text: string, rows: string): string[] {
+  const where = file.replace(/^.*powerbi\//, 'powerbi/');
+  const allowed = [
+    new RegExp(`^\\s*=?${rows} = ForAll\\($`), /^\s*PowerBIIntegration\.Data,$/, /^\s*=?ReportAt = If\(IsBlank\(First\(PowerBIIntegration\.Data\)\.'Report at'\)/,
+    /^\s*IsBlank\(ReportAt\) && !IsEmpty\(PowerBIIntegration\.Data\), "Add the field Report at/
+  ];
+  const problems: string[] = [];
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
+  let typedStart = false;
+  lines.forEach((line, at) => {
+    const code = line.replace(/\/\/.*$/, '');
+    if (!code.includes('PowerBIIntegration.Data')) { typedStart = new RegExp(`^\\s*=?${rows} = ForAll\\($`).test(code); return; }
+    // The line after "Lines = ForAll(" is the data of the visual; anywhere else that line is not allowed.
+    const ok = allowed.slice(2).some((pattern) => pattern.test(code)) || (typedStart && allowed[1]!.test(code));
+    typedStart = false;
+    if (!ok) problems.push(`App: ${where}:${at + 1} reads PowerBIIntegration.Data: read ${rows}, the typed rows of the visual (D379), so every field is turned from text in one place`);
+  });
+  return problems;
+}
+
+/**
+ * The problems of the typed rows of an app (D379): the formula `<rows> = ForAll(PowerBIIntegration.Data, { … })` is
+ * there once, and names every field of APP_FIELDS once, in order, under the name the app uses.
+ */
+export function typedRowsProblems(file: string, text: string, app: AppName): string[] {
+  const where = file.replace(/^.*powerbi\//, 'powerbi/');
+  const spec = APP_FIELDS[app];
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
+  const starts = lines.flatMap((line, at) => (new RegExp(`^\\s*=?${spec.rows} = ForAll\\($`).test(line) ? [at] : []));
+  if (starts.length !== 1) return [`App: ${where} has ${starts.length} typed rows "${spec.rows} = ForAll(" (D379): it must have one; run npm run powerbi:generate`];
+  const found: Array<[string, string]> = [];
+  for (let at = starts[0]! + 1; at < lines.length && !/^\s*\);$/.test(lines[at]!); at++) {
+    const field = /^\s*(\w+): .*?ThisRecord\.(\w+)/.exec(lines[at]!);
+    if (field) found.push([field[1]!, field[2]!]);
+  }
+  const want = spec.fields.map(({ field, as }): [string, string] => [as ?? field, field]);
+  if (JSON.stringify(found) !== JSON.stringify(want)) {
+    return [`App: ${where} the typed rows give ${found.map(([name, field]) => (name === field ? name : `${name} (${field})`)).join(', ')}; APP_FIELDS of ${app} wants ${want.map(([name, field]) => (name === field ? name : `${name} (${field})`)).join(', ')} (D379, D380): run npm run powerbi:generate`];
+  }
+  return [];
 }

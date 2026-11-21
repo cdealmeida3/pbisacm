@@ -455,11 +455,11 @@ table CaseLines
 		isNameInferred
 		sourceColumn: [ExceptionEnded]
 
+	/// The retirement date the journal set, as text yyyy-mm-dd ("" when none): only the Power App reads it, and the Power
+	/// Apps visual sends a blank date as '', which the app refuses with a banner (build A1, D377).
 	column RetireOn
-		dataType: dateTime
+		dataType: string
 		isDataTypeInferred
-		formatString: d mmm yyyy
-		summarizeBy: none
 		isNameInferred
 		sourceColumn: [RetireOn]
 
@@ -611,7 +611,7 @@ table CaseLines
 					"ExceptionReason", Run[CaseLines.ExceptionReason],
 					"ReviewOn", Run[CaseLines.ReviewOn],
 					"ExceptionEnded", Run[CaseLines.ExceptionEnded],
-					"RetireOn", Run[CaseLines.RetireOn],
+					"RetireOn", FORMAT ( Run[CaseLines.RetireOn], "yyyy-mm-dd", "en-US" ),
 					"VerifiedOn", Run[CaseLines.VerifiedOn],
 					"FixedBy", Run[CaseLines.FixedBy],
 					"FixedOn", Run[CaseLines.FixedOn],

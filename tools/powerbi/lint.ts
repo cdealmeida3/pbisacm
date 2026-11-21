@@ -35,7 +35,9 @@ import { lightColours } from './tokens.ts';
 import { connectorSource } from './connector.ts';
 import { loadPackFiles } from '../../src/hosts/cli.ts';
 import { APP_FOLDERS } from './actions.ts';
-import { callProblems, catalogueProblems, columnProblems, controlProblems, flowProblems } from './app-rules.ts';
+import { appFieldProblems, callProblems, catalogueProblems, columnProblems, controlProblems, dataReadProblems, flowProblems, typedRowsProblems } from './app-rules.ts';
+import { APP_FIELDS } from './tokens.ts';
+import type { AppName } from './tokens.ts';
 import type { Formula } from './app-rules.ts';
 import { folderProblems, pageProblems, readCatalogue, readPages, THEME_SCHEMA_FILE, themeProblems } from './pages.ts';
 
@@ -278,7 +280,13 @@ for (const table of calculatedTables) {
   if (!partsOf(madeBy[source]!).has(part)) problems.push(`Run: table ${table.name} takes the part "${part}", which ${madeBy[source]} does not make`);
   const want = queryColumns(table).map((column) => column.name).join(', ');
   if (taken.map(([name]) => name).join(', ') !== want) problems.push(`Run: table ${table.name} takes the columns [${taken.map(([name]) => name).join(', ')}], its TMDL file declares [${want}]`);
-  for (const [name, column] of taken) if (column !== `${part}.${name}`) problems.push(`Run: table ${table.name} takes ${name} from ${source}[${column}], not ${source}[${part}.${name}]`);
+  for (const [name, column, textOf] of taken) {
+    // A text twin for a Power App (D378) takes the column it doubles: OrderText from ReviewLines.Order.
+    const own = textOf && name.endsWith('Text') && column === `${part}.${name.slice(0, -'Text'.length)}`;
+    if (column !== `${part}.${name}` && !own) problems.push(`Run: table ${table.name} takes ${name} from ${source}[${column}], not ${source}[${part}.${name}]`);
+    const declared = table.columns.find((item) => item.name === name);
+    if (textOf && declared?.dataType !== 'string') problems.push(`Run: table ${table.name} turns ${name} into text (D377), but its column is ${declared?.dataType ?? 'missing'}: make it dataType: string`);
+  }
 }
 const relationshipsText = readFileSync(join(MODEL, 'relationships.tmdl'), 'utf8');
 for (const source of SOURCE_TABLES) {
@@ -302,6 +310,17 @@ done.push(`Run: ${calculatedTables.length} calculated tables take their part of 
 /* 9. App */
 problems.push(...catalogueProblems(undefined, expressions.find((expression) => expression.name === 'fnCaseActions')?.m ?? ''), ...flowProblems(), ...columnProblems());
 const appFiles = APP_FOLDERS.flatMap((folder) => filesUnder(folder, /(\.pa\.yaml|App-Formulas\.fx)$/));
+// Build A1 (D377 to D380): every field of a visual is text, and each app reads its visual only in its typed rows.
+problems.push(...appFieldProblems(tables));
+const appOfFolder: Array<[string, AppName]> = [[APP_FOLDERS[0]!, 'SACM actions'], [APP_FOLDERS[1]!, 'SACM messages'], [APP_FOLDERS[2]!, 'SACM audit']];
+for (const [folder, app] of appOfFolder) {
+  for (const file of filesUnder(folder, /(\.pa\.yaml|App-Formulas\.fx)$/)) {
+    const text = readFileSync(file, 'utf8');
+    problems.push(...dataReadProblems(file, text, APP_FIELDS[app].rows));
+    if (/(App-Formulas\.fx|App\.pa\.yaml)$/.test(file)) problems.push(...typedRowsProblems(file, text, app));
+  }
+}
+done.push('App: every field of the three Power Apps visuals is a text column (D377), each app reads its visual only in its typed rows, with every field in order (D379)');
 if (process.argv.includes('--no-dotnet')) {
   done.push('App: catalogue and flows checked; the app source NOT PARSED (--no-dotnet). The CI parses it.');
 } else {

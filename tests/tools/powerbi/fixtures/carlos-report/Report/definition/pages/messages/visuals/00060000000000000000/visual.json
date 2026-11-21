@@ -1,0 +1,883 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "00060000000000000000",
+  "position": {
+    "x": 676,
+    "y": 84,
+    "z": 21001,
+    "height": 620,
+    "width": 580,
+    "tabOrder": 21001
+  },
+  "visual": {
+    "visualType": "PowerApps_PBI_CV_INVENTED",
+    "query": {
+      "queryState": {
+        "table": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Row"
+                }
+              },
+              "queryRef": "AppEmail.Row",
+              "nativeQueryRef": "Row"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "DraftId"
+                }
+              },
+              "queryRef": "AppEmail.DraftId",
+              "nativeQueryRef": "DraftId"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "EmailId"
+                }
+              },
+              "queryRef": "AppEmail.EmailId",
+              "nativeQueryRef": "EmailId"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Piece"
+                }
+              },
+              "queryRef": "AppEmail.Piece",
+              "nativeQueryRef": "Piece"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Ref"
+                }
+              },
+              "queryRef": "AppEmail.Ref",
+              "nativeQueryRef": "Ref"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Kind"
+                }
+              },
+              "queryRef": "AppEmail.Kind",
+              "nativeQueryRef": "Kind"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "KindLabel"
+                }
+              },
+              "queryRef": "AppEmail.KindLabel",
+              "nativeQueryRef": "KindLabel"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "To"
+                }
+              },
+              "queryRef": "AppEmail.To",
+              "nativeQueryRef": "To"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "ToName"
+                }
+              },
+              "queryRef": "AppEmail.ToName",
+              "nativeQueryRef": "ToName"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Cc"
+                }
+              },
+              "queryRef": "AppEmail.Cc",
+              "nativeQueryRef": "Cc"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Subject"
+                }
+              },
+              "queryRef": "AppEmail.Subject",
+              "nativeQueryRef": "Subject"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Chat"
+                }
+              },
+              "queryRef": "AppEmail.Chat",
+              "nativeQueryRef": "Chat"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Keys"
+                }
+              },
+              "queryRef": "AppEmail.Keys",
+              "nativeQueryRef": "Keys"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "NewKeys"
+                }
+              },
+              "queryRef": "AppEmail.NewKeys",
+              "nativeQueryRef": "NewKeys"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "FreeKeys"
+                }
+              },
+              "queryRef": "AppEmail.FreeKeys",
+              "nativeQueryRef": "FreeKeys"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "CiCount"
+                }
+              },
+              "queryRef": "AppEmail.CiCount",
+              "nativeQueryRef": "CiCount"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "About"
+                }
+              },
+              "queryRef": "AppEmail.About",
+              "nativeQueryRef": "About"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "NobodyAbove"
+                }
+              },
+              "queryRef": "AppEmail.NobodyAbove",
+              "nativeQueryRef": "NobodyAbove"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Mailbox"
+                }
+              },
+              "queryRef": "AppEmail.Mailbox",
+              "nativeQueryRef": "Mailbox"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "AssignedTo"
+                }
+              },
+              "queryRef": "AppEmail.AssignedTo",
+              "nativeQueryRef": "AssignedTo"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Summary"
+                }
+              },
+              "queryRef": "AppEmail.Summary",
+              "nativeQueryRef": "Summary"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "EmailSubject"
+                }
+              },
+              "queryRef": "AppEmail.EmailSubject",
+              "nativeQueryRef": "EmailSubject"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "HtmlLength"
+                }
+              },
+              "queryRef": "AppEmail.HtmlLength",
+              "nativeQueryRef": "HtmlLength"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "CsvLength"
+                }
+              },
+              "queryRef": "AppEmail.CsvLength",
+              "nativeQueryRef": "CsvLength"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "AddressWhy"
+                }
+              },
+              "queryRef": "AppEmail.AddressWhy",
+              "nativeQueryRef": "AddressWhy"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Html"
+                }
+              },
+              "queryRef": "AppEmail.Html",
+              "nativeQueryRef": "Html"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "AppEmail"
+                    }
+                  },
+                  "Property": "Csv"
+                }
+              },
+              "queryRef": "AppEmail.Csv",
+              "nativeQueryRef": "Csv"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "About"
+                    }
+                  },
+                  "Property": "Report at"
+                }
+              },
+              "queryRef": "About.Report at",
+              "nativeQueryRef": "Report at"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "appId": {
+              "expr": {
+                "Literal": {
+                  "Value": "'/providers/Microsoft.PowerApps/apps/00000000-0000-0000-0000-00000000a001'"
+                }
+              }
+            },
+            "someSettings": {
+              "expr": {
+                "Literal": {
+                  "Value": "'12345'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "f0570000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Row"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0580000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "DraftId"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0590000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "EmailId"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0600000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Piece"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f0610000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Ref"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0620000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Kind"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0630000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "KindLabel"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0640000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "To"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0650000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "ToName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0660000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Cc"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0670000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Subject"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0680000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Chat"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0690000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Keys"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0700000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "NewKeys"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0710000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "FreeKeys"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0720000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "CiCount"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f0730000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "About"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0740000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "NobodyAbove"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0750000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Mailbox"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0760000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "AssignedTo"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0770000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Summary"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0780000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "EmailSubject"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0790000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "HtmlLength"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f0800000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "CsvLength"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f0810000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "AddressWhy"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0820000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Html"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0830000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Csv"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0840000000000000000",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "About"
+              }
+            },
+            "Property": "Report at"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f0850000000000000000",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "AppEmail"
+              }
+            },
+            "Property": "Selected email"
+          }
+        },
+        "type": "Advanced",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "a",
+              "Entity": "AppEmail",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Comparison": {
+                  "ComparisonKind": 0,
+                  "Left": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Selected email"
+                    }
+                  },
+                  "Right": {
+                    "Literal": {
+                      "Value": "1L"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      }
+    ]
+  }
+}
