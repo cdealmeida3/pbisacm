@@ -103,8 +103,8 @@ export const APP_SLOTS: Record<string, AppSlot> = {
  * it counts as part of the rail (pages.ts rule 2); no visual may sit over it (rule 4) but its app box (build R4).
  */
 export const FLOW_SLOTS: Record<string, { flow: string; x: number; y: number; width: number; height: number }> = {
-  myday: { flow: 'SACM refresh now', x: 16, y: 604, width: 156, height: 40 },
-  reports: { flow: 'SACM refresh now', x: 16, y: 604, width: 156, height: 40 }
+  myday: { flow: 'SACM refresh now', x: 16, y: 588, width: 156, height: 60 },
+  reports: { flow: 'SACM refresh now', x: 16, y: 588, width: 156, height: 60 }
 };
 
 /** The space a table's column needs beside its header text (the padding of the cell and the sort arrow), in px. */

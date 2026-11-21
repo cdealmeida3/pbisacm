@@ -206,7 +206,7 @@ export function copyPack(): string {
       id: 'button', tag: 'Button', title: 'Refresh now', why: 'Flow F6 on the pages My day and Reports, in the place the rail keeps for it.',
       steps: [
         { title: 'Add it', html: 'Page <b>My day</b> → <b>Visualizations → Power Automate</b>. Add one field (any, for example <b>Runs → ReportDate</b>). <b>… → Edit</b> → pick <b>SACM refresh now</b> → <b>Apply</b>.', extra: slot('myday', 'My day') },
-        { title: 'Its text', html: '<b>Format → Button → Text</b>:', rows: [{ label: 'Button text', value: 'Refresh now' }] },
+        { title: 'Its text', html: '<b>Format → Button → Text</b>, then <b>Format → Button → Font colour</b>: <b>White</b> (it reads on the navy rail, D375):', rows: [{ label: 'Button text', value: 'Refresh now' }] },
         { title: 'Copy it', html: '<b>Ctrl+C</b>, page <b>Reports</b>, <b>Ctrl+V</b>, same place. Save the report.' }
       ]
     }

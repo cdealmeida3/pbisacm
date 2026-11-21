@@ -80,16 +80,23 @@ of the new pages.
    (your folder of 0.52.0 or older) and `Documents\SACM\SACM-Workbench-0.53.0`. In *Extract All*, choose the folder
    that holds your current folder (`Documents\SACM`): Windows proposes a new folder named after the zip, and the script
    then looks one folder higher too.
-   **Apps you already added in the service** (section 6): before your first update, do step 13 of section 6.4 once, so
-   your folder holds them. Otherwise the update has no app to carry and you add them again by hand (below).
+   **Apps you already added in the service** (section 6): download the report from the service (**File → Download
+   this file → A copy of your report**, step 13 of section 6.4) and put the `.pbix` in the same folder, next to your
+   current folder. The script takes the apps and the Refresh now buttons from it (from build L1, 0.59.0, D376).
+   Without it, the update carries the apps your previous folder holds, if any; otherwise you add them again by hand
+   (below).
 4. In the new folder, **double-click `Update-Workbench.cmd`.** A window opens. It finds your previous folder (the newest
-   older `SACM-Workbench-…` next to it, else `powerbi`), or asks you to paste its path. Answer `Y`.
+   older `SACM-Workbench-…` next to it, else `powerbi`), or asks you to paste its path. Answer `Y`. When it finds a
+   downloaded report (`*.pbix` in the new folder, next to it or next to your previous folder) it asks
+   *Take the apps and buttons from SACM-Workbench.pbix (date)?*: answer `Y` when it is the newest download.
 5. It copies only what is yours, and says each step:
    - the values of the five parameters **SourceMode**, **StateMode**, **SharePointSite**, **ReportsFolder** and
      **ServiceNowAddress**, so you do not type them again;
    - the **Power Apps** and the **Refresh now** buttons you added (section 6), each to the same page, at the place this
-     version keeps for it. They are in your folder only after step 13 of section 6.4.
-   It copies nothing else, deletes nothing and never changes the previous folder.
+     version keeps for it. They come from the downloaded `.pbix`; on a page where it has none, from your previous
+     folder. Of the `.pbix` the script reads only the report part, never the data, and it changes nothing in it.
+   It copies nothing else, deletes nothing and never changes the previous folder or the `.pbix`.
+   **From 0.58.0 or older to 0.59.0:** the script moves the Refresh now buttons to their new place (Y `588`, 60 high).
    **From 0.57.0 or older to 0.58.0:** the script moves the app of *Messages* to the right side and the app of *Card*
    to its taller place. After you publish, the app of *Messages* needs its new fields, filter, formulas and screen:
    section 6.6, *An app made before build R6*.
@@ -342,7 +349,7 @@ value and text to paste, in the same order.
 | 9 | The app SACM actions on Case, then copied to Card, Person, Work queue and Not followed | Section 6.4 | (in the app) the top line "Report data from …"; a note you save appears under *Done lately*, and after a refresh *Lists read* counts one more SACM Journal entry |
 | 10 | The app SACM messages on Messages (fields of AppEmail, filter Selected email is 1) | Section 6.6 | (in the app) the email chosen in the list, whole. *Self-check*, *Numbers that must agree*: "Emails ready = emails the app gets whole" agrees |
 | 11 | The app SACM audit on Lifecycle review, and the button Refresh now on My day and Reports | Sections 6.8 and 6.3 (F6) | A change of a setting in the app's Settings screen shows in *Settings the emails need* after a refresh |
-| 12 | Keep the apps in your folder for the next update | Section 6.4 step 13 | (nothing: the next update carries them) |
+| 12 | Before the next update, download the report next to your folder | Section 6.4 step 13 | (nothing: the next update carries the apps from it) |
 | 13 | Try it: a note, a test email to yourself, a review | Sections 6.4 and 6.6 | After a refresh, *Lists read* counts the new SACM Journal entries |
 
 ### 6.1 Check first (question Q4)
@@ -436,11 +443,13 @@ scheduled refresh (it stays in the flow, never in the repository).
 3. After *Create item*, a parallel branch with **Configure run after: has failed** only: Control → **Terminate**,
    Status **Succeeded** (a used window is not an error). No Delay. Save.
 4. In the report (Desktop or the service, edit mode), on the page *My day*: **Visualizations → Power Automate**. Put it
-   on the left rail, in the place the page keeps free for it: X `16`, Y `604`, width `156`, height `40` (**Format →
+   on the left rail, in the place the page keeps free for it: X `16`, Y `588`, width `156`, height `60` (**Format →
    General → Properties → Size and position**). Add one field to it (any, for example *Runs → ReportDate*: the flow does
-   not use it). **... → Edit → pick the flow** `SACM refresh now` → **Apply**. **Format → Button → Text**: `Refresh now`.
+   not use it). **... → Edit → pick the flow** `SACM refresh now` → **Apply**. **Format → Button → Text**: `Refresh now`;
+   **Format → Button → Font colour**: **White**, so it reads on the navy rail (D375).
    The rule is written above it (*Refresh rule*): the button cannot show the flow's answer, so the line says why a press
-   changed nothing.
+   changed nothing. A button placed before build L1 (0.59.0) sits at Y `604`, 40 high: the update script moves it to the
+   new place for you (section 1, *Update to a new version*).
 5. Copy the button (Ctrl+C) to the page *Reports* (Ctrl+V), at the same place.
 6. Share the flow: on its page, **Run only users**: the group `SACM managers`, and **Use this connection** for Power BI
    and SharePoint, as in F5.
@@ -557,11 +566,14 @@ not while you edit it. Publish the report first (section 4).
 12. **Copy the visual** (Ctrl+C) to the pages **Card**, **Person** and **Work queue** (Ctrl+V). It keeps the same app. Set
     its size and position as in the table below. On *Work queue* change the filter of the visual to **CaseLines → Queue
     lines** *is not blank*, so it gets every open line of the page (the free ones too, for **Share out**).
-13. **Once, after you add or change an app**, keep the visuals in your own folder, so that the next update carries them
-    (section 1, *Update to a new version*, D339): in the service, **File → Download this file → A copy of your report**;
-    open the `.pbix` in Desktop; **File → Save as**, type **Power BI project (\*.pbip)**, name `SACM-Workbench`, into
-    **your current folder** (the one of section 1), over its files. Then delete the downloaded `.pbix`. Do not send these
-    files to the repository: the visuals hold the ids of the company's apps.
+13. **Before an update, after you add or change an app**, keep the visuals so that the update carries them (section 1,
+    *Update to a new version*, D339, D376): in the service, **File → Download this file → A copy of your report**, and
+    put the `.pbix` next to your current folder (the one of section 1). The update script reads the apps and the
+    buttons from it. Keep it private: it holds your data, and the visuals hold the ids of the company's apps. Never send
+    it or these files to the repository.
+    **If the script says the file is in the old format** (an older Desktop or service saves `Report/Layout`): open the
+    `.pbix` in Desktop, **File → Save as**, type **Power BI project (\*.pbip)**, name `SACM-Workbench`, into **your
+    current folder**, over its files, then delete the `.pbix` and run the update again.
 
 How to try it: on the Case page of a test CI, tab **Actions**, pick **Note**, type a word, **Save**. The app says
 *Saved*; the line appears under **Done lately** at once, with *not in the report yet*, and the top line counts one
@@ -615,7 +627,7 @@ them in **Format → General → Properties → Size and position**:
 | Not followed | SACM actions (Follow again) | 956 | 84 | 300 | 620 |
 | Messages | SACM messages (the email studio) | 676 | 84 | 580 | 620 |
 | Lifecycle review | SACM audit | 956 | 84 | 300 | 620 |
-| My day, Reports | the button **Refresh now** (F6, a Power Automate visual, section 6.3) | 16 | 604 | 156 | 40 |
+| My day, Reports | the button **Refresh now** (F6, a Power Automate visual, section 6.3) | 16 | 588 | 156 | 60 |
 
 An app placed before build D1 (0.46.0) keeps its old place: move it to the place above. Build D2 (0.47.0) renamed the
 page *My work* to *Work queue*: an app already on it stays where it is. **Build D3 (0.48.0) moved the app of Case**:
@@ -629,6 +641,10 @@ what it does there and the data it gets ("appears here in the published report")
 **Refresh now** shows one too. In the service the app covers its box. The lint allows only that box under an app
 (D359). **Messages in Desktop** (D361): under the app's place the page shows the email chosen (To, Cc, Subject and its
 first lines). In the service the app covers it.
+
+**Build L1 (0.59.0) made the place of Refresh now 156 × 60, at Y 588** (D375), the size you gave the button, so the
+words fit; the refresh rule moved up above it. The update script moves a button placed before to the new place. Set
+its words in white: **Format → Button → Font colour: White**.
 
 **Build R6 (0.58.0) moved two apps, and the update script moves them for you** (section 1, *Update to a new version*):
 on *Messages* the app is on the right side (X `676`, Y `84`, width `580`, height `620`), next to the list of the emails,

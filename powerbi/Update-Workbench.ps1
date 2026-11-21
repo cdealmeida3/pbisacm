@@ -1,19 +1,25 @@
 <#
   Update-Workbench.ps1 - carries your own settings from the previous SACM Workbench folder into this one
   (build R1, decision D339). Double-click Update-Workbench.cmd beside it, or run:
-      powershell -NoProfile -ExecutionPolicy Bypass -File Update-Workbench.ps1 [-From <previous folder>] [-Yes]
+      powershell -NoProfile -ExecutionPolicy Bypass -File Update-Workbench.ps1 [-From <previous folder>]
+        [-Report <file.pbix>] [-Yes]
 
   It copies only what is yours:
     1. the values of the five parameters (SourceMode, StateMode, SharePointSite, ReportsFolder, ServiceNowAddress)
        from the old SACM-Workbench.SemanticModel/definition/expressions.tmdl into the new one;
     2. the Power Apps and Power Automate visuals of the old pages into the same pages of this version, at the
-       places this version keeps for them (update.json, from APP_SLOTS and FLOW_SLOTS).
+       places this version keeps for them (update.json, from APP_SLOTS and FLOW_SLOTS). They come from a report
+       you downloaded from the service (a .pbix, build L1, D376: -Report, or the newest *.pbix in this folder, the
+       folder that holds it or the folder that holds the previous one), and from the previous folder for a page where
+       the .pbix has none. Of the .pbix it reads only the report part (Report/definition), never the data model, and it
+       writes nothing next to it. The parameters always come from the previous folder.
   It copies nothing else, deletes nothing, never changes the old folder, and prints what it did.
   It works in Windows PowerShell 5.1 and in PowerShell 7. Keep this file in plain ASCII: Windows PowerShell
   reads a file without a byte order mark in the code page of the computer.
 #>
 param(
   [string]$From = '',
+  [string]$Report = '',
   [switch]$Yes
 )
 
@@ -102,6 +108,33 @@ if (-not $Yes) {
   if ($answer -notmatch '^\s*[Yy]') { Stop-Update 'You answered No.' }
 }
 
+# --- The report you downloaded from the service (a .pbix), if any ------------------------------------------------
+# Given with -Report; else the newest *.pbix in the new folder, the folder that holds it or the folder that holds the
+# previous folder (where you unzipped the new version), and you say whether to take it.
+if ($Report -ne '') {
+  if (-not (Test-Path -LiteralPath $Report -PathType Leaf)) { Stop-Update "The file $Report does not exist." }
+  $Report = [System.IO.Path]::GetFullPath($Report)
+} else {
+  $seen = @{}
+  $found = @()
+  foreach ($folder in @($hereFull, (Split-Path -Parent $hereFull), (Split-Path -Parent $From))) {
+    if ($null -eq $folder -or $folder -eq '' -or $seen.ContainsKey($folder) -or -not (Test-Path -LiteralPath $folder)) { continue }
+    $seen[$folder] = $true
+    $found += @(Get-ChildItem -LiteralPath $folder -File -Filter '*.pbix')
+  }
+  $newest = $found | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  if ($null -ne $newest) {
+    $when = $newest.LastWriteTime.ToString('yyyy-MM-dd HH:mm', [System.Globalization.CultureInfo]::InvariantCulture)
+    $take = $true
+    if (-not $Yes) {
+      $answer = Read-Host "Take the apps and buttons from $($newest.Name) ($when)? (Y/N)"
+      $take = $answer -match '^\s*[Yy]'
+    }
+    if ($take) { $Report = $newest.FullName }
+  }
+}
+if ($Report -ne '') { Write-Host "Report file:     $Report" }
+
 # --- 1. The parameters ---------------------------------------------------------------------------------------------
 $oldModelFile = Join-Path $From 'SACM-Workbench.SemanticModel/definition/expressions.tmdl'
 $newModelFile = Join-Path $here 'SACM-Workbench.SemanticModel/definition/expressions.tmdl'
@@ -176,28 +209,119 @@ foreach ($folder in Get-ChildItem -LiteralPath $newPages -Directory) {
   if ($null -ne $display) { $newByDisplay[$display] = $folder.FullName }
 }
 
+# --- The visuals of the downloaded report (.pbix), read from its report part only --------------------------------
+# A .pbix is a zip. Only the entries under Report/definition/ are read: report.json, each page.json and the files of
+# each visual. The data model (DataModel) and every other part are never opened.
+$reportVisuals = @()
+$reportPages = @{}
+$reportPublic = @()
+$reportNote = ''
+function Read-EntryBytes($entry) {
+  $stream = $entry.Open()
+  try {
+    $memory = New-Object System.IO.MemoryStream
+    $stream.CopyTo($memory)
+    return ,$memory.ToArray()
+  } finally { $stream.Dispose() }
+}
+function Get-EntryText([byte[]]$bytes) {
+  $reader = New-Object System.IO.StreamReader -ArgumentList @((New-Object System.IO.MemoryStream -ArgumentList @(,$bytes)), $utf8, $true)
+  try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+}
+# A name of a folder inside the report: no empty part, no . or .., no characters a folder cannot have.
+function Test-SafeName([string]$name) { return ($name -ne '') -and ($name -ne '.') -and ($name -ne '..') -and ($name.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars()) -lt 0) }
+if ($Report -ne '') {
+  try {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($Report)
+  } catch { Stop-Update "The file $Report cannot be read as a Power BI report (.pbix): $($_.Exception.Message)" }
+  try {
+    $names = @($zip.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
+    if (-not ($names | Where-Object { $_.StartsWith('Report/definition/') })) {
+      if ($names -contains 'Report/Layout') { $reportNote = "  $([System.IO.Path]::GetFileName($Report)) is in the old format (Report/Layout): its apps are not read. Do step 13 of README section 6.4 instead (Save as a Power BI project), then run this again." }
+      else { $reportNote = "  $([System.IO.Path]::GetFileName($Report)) has no report part (Report/definition): its apps are not read." }
+    } else {
+      $byKey = @{}
+      foreach ($entry in $zip.Entries) {
+        $name = $entry.FullName.Replace('\', '/')
+        if ($name -eq 'Report/definition/report.json') {
+          $reportPublic = @(Get-Property ((Get-EntryText (Read-EntryBytes $entry)) | ConvertFrom-Json) 'publicCustomVisuals' | Where-Object { $null -ne $_ })
+          continue
+        }
+        $page = [regex]::Match($name, '^Report/definition/pages/([^/]+)/page\.json$')
+        if ($page.Success -and (Test-SafeName $page.Groups[1].Value)) {
+          $reportPages[$page.Groups[1].Value] = Get-Property ((Get-EntryText (Read-EntryBytes $entry)) | ConvertFrom-Json) 'displayName'
+          continue
+        }
+        $part = [regex]::Match($name, '^Report/definition/pages/([^/]+)/visuals/([^/]+)/(.+)$')
+        if (-not $part.Success -or $name.EndsWith('/')) { continue }
+        $pageKey = $part.Groups[1].Value
+        $visualName = $part.Groups[2].Value
+        $relative = $part.Groups[3].Value
+        if (-not (Test-SafeName $pageKey) -or -not (Test-SafeName $visualName) -or @($relative.Split('/') | Where-Object { -not (Test-SafeName $_) }).Count -gt 0) { continue }
+        if (-not $reportPages.ContainsKey($pageKey)) { $reportPages[$pageKey] = $null }
+        $key = "$pageKey/$visualName"
+        if (-not $byKey.ContainsKey($key)) { $byKey[$key] = [pscustomobject]@{ Page = $pageKey; Name = $visualName; Files = @() } }
+        $byKey[$key].Files += [pscustomobject]@{ Path = $relative; Bytes = (Read-EntryBytes $entry) }
+      }
+      foreach ($key in ($byKey.Keys | Sort-Object)) {
+        $item = $byKey[$key]
+        $main = $item.Files | Where-Object { $_.Path -eq 'visual.json' } | Select-Object -First 1
+        if ($null -eq $main) { continue }
+        $json = (Get-EntryText $main.Bytes) | ConvertFrom-Json
+        $type = Get-Property (Get-Property $json 'visual') 'visualType'
+        if (-not (Test-AppVisual ([pscustomobject]@{ Type = $type }))) { continue }
+        $reportVisuals += [pscustomobject]@{ Page = $item.Page; Name = $item.Name; Type = $type; Files = $item.Files }
+      }
+    }
+  } finally { $zip.Dispose() }
+}
+
+# The new page a visual of the old page goes to: the same folder name, else the same name you see.
+function Find-Target([string]$pageKey, $display) {
+  $target = $newByName[$pageKey]
+  if ($null -eq $target -and $null -ne $display) { $target = $newByDisplay[$display] }
+  return $target
+}
+
+# Every visual to carry: those of the .pbix, then those of the previous folder on a page where the .pbix has no app
+# or button (a .pbix saved from Desktop before the apps were added never takes them away).
+$sources = @()
+$fromReport = @{}
+foreach ($visual in $reportVisuals) {
+  $display = $reportPages[$visual.Page]
+  $target = Find-Target $visual.Page $display
+  if ($null -ne $target) { $fromReport[$target] = $true }
+  $sources += [pscustomobject]@{ Page = $visual.Page; Display = $display; Name = $visual.Name; Type = $visual.Type; Folder = $null; Files = $visual.Files; Target = $target }
+}
+foreach ($oldPage in Get-ChildItem -LiteralPath $oldPages -Directory | Sort-Object Name) {
+  $display = Get-PageName $oldPage.FullName
+  $target = Find-Target $oldPage.Name $display
+  if ($null -ne $target -and $fromReport.ContainsKey($target)) { continue }
+  foreach ($app in Get-AppVisuals $oldPage.FullName) {
+    $sources += [pscustomobject]@{ Page = $oldPage.Name; Display = $display; Name = $app.Name; Type = $app.Type; Folder = $app.Folder; Files = $null; Target = $target }
+  }
+}
+
 $copies = @()
 $visualLines = @()
-foreach ($oldPage in Get-ChildItem -LiteralPath $oldPages -Directory | Sort-Object Name) {
-  foreach ($app in Get-AppVisuals $oldPage.FullName) {
-    $display = Get-PageName $oldPage.FullName
-    $label = if ($null -ne $display) { $display } else { $oldPage.Name }
-    $target = $newByName[$oldPage.Name]
-    if ($null -eq $target -and $null -ne $display) { $target = $newByDisplay[$display] }
-    if ($null -eq $target) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this version has no such page."; continue }
-    $pageKey = Split-Path -Leaf $target
-    $slot = Get-Property $plan.slots $pageKey
-    if ($null -eq $slot) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this version keeps no place for an app on this page. Add it again by hand if you still need it (README section 6)."; continue }
-    $destination = Join-Path (Join-Path $target 'visuals') $app.Name
-    if (Test-Path -LiteralPath $destination) {
-      $alreadyFile = Join-Path $destination 'visual.json'
-      if ((Test-Path -LiteralPath $alreadyFile) -and (Get-Visual $alreadyFile).Type -eq $app.Type) { $visualLines += "  $label : $($slot.name) is already here."; continue }
-      $visualLines += "  $label : the visual $($app.Name) is not copied: this version has a visual of that name."; continue
-    }
-    $present = @(Get-AppVisuals $target) + @($copies | Where-Object { $_.Target -eq $target })
-    if ($present.Count -gt 0) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this page already has its app."; continue }
-    $copies += [pscustomobject]@{ Source = $app.Folder; Target = $target; Destination = $destination; Type = $app.Type; Slot = $slot; Label = $label }
+if ($reportNote -ne '') { $visualLines += $reportNote }
+foreach ($app in $sources) {
+  $label = if ($null -ne $app.Display) { $app.Display } else { $app.Page }
+  $target = $app.Target
+  if ($null -eq $target) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this version has no such page."; continue }
+  $pageKey = Split-Path -Leaf $target
+  $slot = Get-Property $plan.slots $pageKey
+  if ($null -eq $slot) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this version keeps no place for an app on this page. Add it again by hand if you still need it (README section 6)."; continue }
+  $destination = Join-Path (Join-Path $target 'visuals') $app.Name
+  if (Test-Path -LiteralPath $destination) {
+    $alreadyFile = Join-Path $destination 'visual.json'
+    if ((Test-Path -LiteralPath $alreadyFile) -and (Get-Visual $alreadyFile).Type -eq $app.Type) { $visualLines += "  $label : $($slot.name) is already here."; continue }
+    $visualLines += "  $label : the visual $($app.Name) is not copied: this version has a visual of that name."; continue
   }
+  $present = @(Get-AppVisuals $target) + @($copies | Where-Object { $_.Target -eq $target })
+  if ($present.Count -gt 0) { $visualLines += "  $label : the visual $($app.Name) ($($app.Type)) is not copied: this page already has its app."; continue }
+  $copies += [pscustomobject]@{ Source = $app.Folder; Files = $app.Files; Target = $target; Destination = $destination; Type = $app.Type; Slot = $slot; Label = $label }
 }
 
 # --- 3. The visual types of the apps, for report.json --------------------------------------------------------------
@@ -205,7 +329,7 @@ $oldReport = (Read-Text (Join-Path $From 'SACM-Workbench.Report/definition/repor
 $newReportFile = Join-Path $here 'SACM-Workbench.Report/definition/report.json'
 $newReportText = Read-Text $newReportFile
 $newReport = $newReportText | ConvertFrom-Json
-$oldPublic = @(Get-Property $oldReport 'publicCustomVisuals')
+$oldPublic = @(Get-Property $oldReport 'publicCustomVisuals') + @($reportPublic)
 $newPublic = @(Get-Property $newReport 'publicCustomVisuals' | Where-Object { $null -ne $_ })
 $public = @($newPublic)
 foreach ($copy in $copies) {
@@ -229,7 +353,16 @@ if ($reportChanged) {
 foreach ($copy in $copies) {
   $visuals = Join-Path $copy.Target 'visuals'
   if (-not (Test-Path -LiteralPath $visuals)) { New-Item -ItemType Directory -Path $visuals | Out-Null }
-  Copy-Item -LiteralPath $copy.Source -Destination $copy.Destination -Recurse
+  if ($null -ne $copy.Source) {
+    Copy-Item -LiteralPath $copy.Source -Destination $copy.Destination -Recurse
+  } else {
+    foreach ($part in $copy.Files) {
+      $path = Join-Path $copy.Destination ($part.Path.Replace('/', [System.IO.Path]::DirectorySeparatorChar))
+      $parent = Split-Path -Parent $path
+      if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent | Out-Null }
+      if ($part.Path -eq 'visual.json') { Write-Text $path (Get-EntryText $part.Bytes) } else { [System.IO.File]::WriteAllBytes($path, $part.Bytes) }
+    }
+  }
   $file = Join-Path $copy.Destination 'visual.json'
   Write-Text $file (Set-Position (Read-Text $file) $copy.Slot)
   $visualLines += "  $($copy.Label) : $($copy.Slot.name) copied, at X $($copy.Slot.x), Y $($copy.Slot.y), $($copy.Slot.width) x $($copy.Slot.height)."
@@ -242,7 +375,7 @@ Write-Host 'Parameters:'
 foreach ($line in $parameterLines) { Write-Host $line }
 Write-Host ''
 Write-Host 'Power Apps and Refresh now:'
-if ($visualLines.Count -eq 0) { Write-Host '  none in the previous folder. Add them in the service (README section 6), then keep them as README section 6.4 step 13 says.' }
+if ($visualLines.Count -eq 0) { Write-Host '  none in the previous folder or the report file. Add them in the service (README section 6), then download the report next time (README section 6.4 step 13).' }
 foreach ($line in $visualLines) { Write-Host $line }
 Write-Host ''
 Write-Host 'Nothing else was copied and nothing was deleted. The previous folder is unchanged.'
