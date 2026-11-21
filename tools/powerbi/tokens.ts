@@ -116,8 +116,11 @@ export type AppFieldKind = 'text' | 'number' | 'yesno' | 'date';
 /** One field of a visual: the column of the model, what the app turns it into, and (for a `…Text` twin, D378) the name the app uses. */
 export interface AppField { field: string; kind: AppFieldKind; as?: string }
 export type AppName = 'SACM actions' | 'SACM messages' | 'SACM audit';
-/** The fields of the visual of one app: its table, the name of its typed rows in the app (Lines or AppRows) and its fields in order. */
-export interface AppFields { table: string; rows: string; fields: AppField[] }
+/**
+ * The fields of the visual of one app: its table, the name of its typed rows in the app (Lines or AppRows), its fields in
+ * order, and the section of powerbi/README.md that sets the app up (the update script names it).
+ */
+export interface AppFields { table: string; rows: string; readme: string; fields: AppField[] }
 const asText = (...names: string[]): AppField[] => names.map((field) => ({ field, kind: 'text' }));
 /**
  * The fields of the three Power Apps visuals, in the order README §6.4, §6.6 and §6.8 give them (D380): the one home
@@ -125,19 +128,19 @@ const asText = (...names: string[]): AppField[] => names.map((field) => ({ field
  * visual also gets the measure APP_LAST_FIELD last.
  */
 export const APP_FIELDS: Record<AppName, AppFields> = {
-  'SACM actions': { table: 'CaseLines', rows: 'Lines', fields: [
+  'SACM actions': { table: 'CaseLines', rows: 'Lines', readme: '6.4', fields: [
     ...asText('Key', 'CheckId', 'CiName', 'Status', 'AssignedTo', 'Person', 'Actions', 'Stages', 'StageId', 'ExceptionReason'),
     { field: 'RetireOn', kind: 'date' },
     ...asText('ContactName', 'ShareTo', 'LastRef', 'Step', 'Card')
   ] },
-  'SACM messages': { table: 'AppEmail', rows: 'AppRows', fields: [
+  'SACM messages': { table: 'AppEmail', rows: 'AppRows', readme: '6.6', fields: [
     ...asText('Row', 'DraftId', 'EmailId'), { field: 'Piece', kind: 'number' },
     ...asText('Ref', 'Kind', 'KindLabel', 'To', 'ToName', 'Cc', 'Subject', 'Chat', 'Keys', 'NewKeys', 'FreeKeys'),
     { field: 'CiCount', kind: 'number' }, ...asText('About'), { field: 'NobodyAbove', kind: 'yesno' }, { field: 'Mailbox', kind: 'yesno' },
     ...asText('AssignedTo', 'Summary', 'EmailSubject'), { field: 'HtmlLength', kind: 'number' }, { field: 'CsvLength', kind: 'number' },
     ...asText('AddressWhy', 'Html', 'Csv')
   ] },
-  'SACM audit': { table: 'ReviewLines', rows: 'Lines', fields: [
+  'SACM audit': { table: 'ReviewLines', rows: 'Lines', readme: '6.8', fields: [
     ...asText('Review'), { field: 'IsNextText', kind: 'yesno', as: 'IsNext' }, { field: 'IsCurrentText', kind: 'yesno', as: 'IsCurrent' },
     { field: 'ReviewDateText', kind: 'date', as: 'ReviewDate' }, ...asText('Report'), { field: 'ReportDateText', kind: 'date', as: 'ReportDate' },
     ...asText('Group', 'CiKey', 'CiName', 'ClassLabel', 'ClassName', 'EpoId', 'Status', 'EpoStatus'), { field: 'AgreesText', kind: 'yesno', as: 'Agrees' },
@@ -146,8 +149,6 @@ export const APP_FIELDS: Record<AppName, AppFields> = {
 };
 /** The measure every app visual gets last (build 0.52.0, D334): the time of the report's data, already text (D377). */
 export const APP_LAST_FIELD = { table: 'About', measure: 'Report at' } as const;
-/** The measures a Power Apps visual may get: they return text (D377). */
-export const APP_TEXT_MEASURES = [`${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}]`];
 
 /**
  * The place of the button Refresh now (the Power Automate visual of flow F6, which Carlos adds by hand in the service,

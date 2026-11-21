@@ -434,7 +434,10 @@ function Get-FieldKey($field) {
 function Update-FilterCards([string]$text, [string]$label) {
   $notes = @()
   $changed = 0
-  $head = [regex]::Match($text, '"filters"\s*:\s*\[')
+  # The filter cards of the visual: the array filters of filterConfig (a filter card holds "filter", never "filters").
+  $config = [regex]::Match($text, '"filterConfig"\s*:\s*\{')
+  if (-not $config.Success) { return [pscustomobject]@{ Text = $text; Changed = 0; Notes = $notes } }
+  $head = [regex]::new('"filters"\s*:\s*\[').Match($text, $config.Index)
   if (-not $head.Success) { return [pscustomobject]@{ Text = $text; Changed = 0; Notes = $notes } }
   $items = Get-ArrayItems $text ($head.Index + $head.Length - 1)
   for ($k = $items.Count - 1; $k -ge 0; $k--) {
@@ -471,8 +474,8 @@ function Get-AppCheck([string]$text, $slot, [string]$label) {
   }
   $want = @()
   foreach ($field in @(Get-Property $planFields $slot.name)) { if ($null -ne $field) { $want += "$($field.entity)|$($field.property)" } }
-  $missing = @($want | Where-Object { $got -notcontains $_ })
-  $extra = @($got | Where-Object { $want -notcontains $_ })
+  $missing = @($want | Where-Object { $got -cnotcontains $_ })
+  $extra = @($got | Where-Object { $want -cnotcontains $_ })
   $parts = @()
   if ($missing.Count -eq 0 -and $extra.Count -eq 0 -and (($got -join ',') -ceq ($want -join ','))) {
     $parts += "$($want.Count) fields as this version wants"
@@ -481,7 +484,7 @@ function Get-AppCheck([string]$text, $slot, [string]$label) {
     if ($missing.Count -gt 0) { $parts += "missing $(& $short $missing)" }
     if ($extra.Count -gt 0) { $parts += "not used $(& $short $extra)" }
     if ($missing.Count -eq 0 -and $extra.Count -eq 0) { $parts += 'the fields are in another order' }
-    $parts += 'fix the fields in Power Apps data of the visual (README section 6.4), then ... > Edit'
+    $parts += "fix the fields in Power Apps data of the visual (README section $($slot.readme)), then More options (...) > Edit"
   }
   $filter = Get-Property $slot 'filter'
   if ($null -ne $filter) {
@@ -505,7 +508,9 @@ foreach ($page in Get-ChildItem -LiteralPath $newPages -Directory | Sort-Object 
   if ($null -eq $slot -or $slot.kind -ne 'app') { continue }
   $display = Get-PageName $page.FullName
   $label = if ($null -ne $display) { $display } else { $page.Name }
-  foreach ($app in Get-AppVisuals $page.FullName) {
+  $apps = @(Get-AppVisuals $page.FullName)
+  if ($apps.Count -eq 0) { $fieldLines += "  $label : no app $($slot.name) yet. Add it when you set it up (README section $($slot.readme))." }
+  foreach ($app in $apps) {
     $file = Join-Path $app.Folder 'visual.json'
     $text = Read-Text $file
     $result = Update-FilterCards $text $label

@@ -25,7 +25,7 @@ import type { AppAction } from './actions.ts';
 import { STATE_LISTS } from './history.ts';
 import type { EventType } from '../../src/core/cases/cases.ts';
 import { gateExpressions } from './refresh.ts';
-import { APP_FIELDS, APP_LAST_FIELD, APP_TEXT_MEASURES } from './tokens.ts';
+import { APP_FIELDS, APP_LAST_FIELD } from './tokens.ts';
 import type { AppFields, AppName } from './tokens.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -373,12 +373,38 @@ export function controlProblems(file: string, json: unknown): string[] {
 /* ------------------------------------------------------------------ the fields of the visuals (build A1, D377 to D380) */
 
 /** A table of the model as the rule needs it: its columns with their data types, and its measures. */
-export interface ModelTable { name: string; columns: Array<{ name: string; dataType: string }>; measures: Array<{ name: string }> }
+export interface ModelTable { name: string; columns: Array<{ name: string; dataType: string }>; measures: Array<{ name: string; dax: string }> }
 
 /**
  * The problems of the fields of the Power Apps visuals (D377): every field of APP_FIELDS is a column of its table with
- * dataType string, and the measure every visual gets last is a text measure of APP_TEXT_MEASURES.
+ * dataType string, and the measure every visual gets last returns text (textMeasure).
  */
+/**
+ * Whether a measure returns text: every result of its last RETURN (or of the whole expression), each branch of an IF,
+ * is BLANK (), a text in quotes, a FORMAT ( … ) or such parts joined with &.
+ */
+export function textMeasure(dax: string): boolean {
+  const body = (dax.split(/\bRETURN\b/).at(-1) ?? '').trim();
+  // Take away the conditions of IF ( condition, then, else ): only the results are left.
+  const results = body.replace(/^IF\s*\(\s*ISBLANK\s*\(\s*[\w\[\]']+\s*\)\s*,/, '').replace(/\)\s*$/, '').trim();
+  const parts = splitTop(results, ',').flatMap((part) => splitTop(part, '&')).map((part) => part.trim());
+  return parts.length > 0 && parts.every((part) => /^BLANK\s*\(\s*\)$/.test(part) || /^"[^"]*"$/.test(part) || /^FORMAT\s*\(.*\)$/s.test(part)) && parts.some((part) => !/^BLANK/.test(part));
+}
+/** Splits a text at a sign outside brackets and texts. */
+function splitTop(text: string, sign: string): string[] {
+  const out: string[] = [];
+  let depth = 0; let inText = false; let start = 0;
+  for (let at = 0; at < text.length; at++) {
+    const char = text[at];
+    if (char === '"') inText = !inText;
+    else if (!inText && char === '(') depth++;
+    else if (!inText && char === ')') depth--;
+    else if (!inText && depth === 0 && char === sign) { out.push(text.slice(start, at)); start = at + 1; }
+  }
+  out.push(text.slice(start));
+  return out;
+}
+
 export function appFieldProblems(tables: ModelTable[], fields: Record<string, AppFields> = APP_FIELDS): string[] {
   const problems: string[] = [];
   const byName = new Map(tables.map((table) => [table.name, table]));
@@ -395,9 +421,10 @@ export function appFieldProblems(tables: ModelTable[], fields: Record<string, Ap
       else if (column.dataType !== 'string') problems.push(`App fields: ${spec.table}[${field}] of ${app} is ${column.dataType}: make it text (dataType: string): ${why}`);
     }
   }
-  const last = byName.get(APP_LAST_FIELD.table);
-  if (!last?.measures.some((measure) => measure.name === APP_LAST_FIELD.measure)) problems.push(`App fields: the measure ${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}] every app gets is not in the model`);
-  if (!APP_TEXT_MEASURES.includes(`${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}]`)) problems.push(`App fields: ${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}] is not a text measure of APP_TEXT_MEASURES: ${why}`);
+  const lastName = `${APP_LAST_FIELD.table}[${APP_LAST_FIELD.measure}]`;
+  const last = byName.get(APP_LAST_FIELD.table)?.measures.find((measure) => measure.name === APP_LAST_FIELD.measure);
+  if (!last) problems.push(`App fields: the measure ${lastName} every app gets is not in the model`);
+  else if (!textMeasure(last.dax)) problems.push(`App fields: the measure ${lastName} every app gets must return text: end it with FORMAT ( … ) or a text joined with &, BLANK () where there is none: ${why}`);
   return problems;
 }
 

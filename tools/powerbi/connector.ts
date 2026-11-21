@@ -76,10 +76,6 @@ export function evaluatedNames(): string[] {
 
 /** The M a calculated table of the fixed form (D284) gives, from the member Run (or HistoryRun): its part's rows, its columns renamed. */
 export function calculatedM(table: { name: string; source?: string; part: string; columns: Array<[string, string, TextOf?]> }): string {
-  if (!table.columns.some(([, , textOf]) => textOf)) {
-    const pairs = table.columns.map(([name, source]) => `{${mText(source)}, ${mText(name)}}`).join(', ');
-    return `let\n    rows = Table.SelectRows(${table.source ?? 'Run'}, each [Part] = ${mText(table.part)}),\n    picked = Table.SelectColumns(rows, {${table.columns.map(([, source]) => mText(source)).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
-  }
   // A column turned into text for a Power App (D377), as the DAX of the calculated table does: FORMAT "0" and
   // "yyyy-mm-dd" with the culture en-US (blank stays blank), IF ( x, "true", "false" ) (blank gives "false").
   const convert: Record<TextOf, (value: string) => string> = {
@@ -98,7 +94,7 @@ export function calculatedM(table: { name: string; source?: string; part: string
   });
   const picked = table.columns.map(([name, source, textOf]) => (textOf ? temp(name) : source));
   const pairs = table.columns.map(([name], at) => `{${mText(picked[at]!)}, ${mText(name)}}`).join(', ');
-  return `let\n    rows = Table.SelectRows(${table.source ?? 'Run'}, each [Part] = ${mText(table.part)}),\n${steps.join('\n')}\n    picked = Table.SelectColumns(${step}, {${picked.map(mText).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
+  return `let\n    rows = Table.SelectRows(${table.source ?? 'Run'}, each [Part] = ${mText(table.part)}),\n${steps.map((line) => `${line}\n`).join('')}    picked = Table.SelectColumns(${step}, {${picked.map(mText).join(', ')}})\nin\n    Table.RenameColumns(picked, {${pairs}})`;
 }
 
 export interface ConnectorOptions {

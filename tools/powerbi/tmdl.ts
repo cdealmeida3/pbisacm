@@ -8,6 +8,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import type { AppFieldKind } from './tokens.ts';
 
 export const MODEL = join(import.meta.dirname, '..', '..', 'powerbi', 'SACM-Workbench.SemanticModel', 'definition');
 
@@ -26,7 +27,7 @@ export interface Calculated { source: SourceTable; part: string; columns: Array<
  * whole number with FORMAT "0", a date with FORMAT "yyyy-mm-dd" (both with the culture en-US, so every computer writes
  * the same text), a true/false as "true" or "false". Nothing else.
  */
-export type TextOf = 'number' | 'date' | 'yesno';
+export type TextOf = Exclude<AppFieldKind, 'text'>;
 const TEXT_OF: Array<[TextOf, RegExp]> = [
   ['number', /^FORMAT \( (Run|HistoryRun)\[([^\]]+)\], "0", "en-US" \)$/],
   ['date', /^FORMAT \( (Run|HistoryRun)\[([^\]]+)\], "yyyy-mm-dd", "en-US" \)$/],

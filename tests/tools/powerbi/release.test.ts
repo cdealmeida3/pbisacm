@@ -82,7 +82,7 @@ test('update.json names the five parameters, the native types and one place per 
   assert.equal(plan.version, version);
   assert.deepEqual(plan.parameters, ['SourceMode', 'StateMode', 'SharePointSite', 'ReportsFolder', 'ServiceNowAddress']);
   assert.deepEqual(new Set(plan.native), NATIVE_TYPES);
-  for (const [page, slot] of Object.entries(APP_SLOTS)) assert.deepEqual(plan.slots[page], { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height, ...(slot.filter ? { filter: slot.filter } : {}) });
+  for (const [page, slot] of Object.entries(APP_SLOTS)) assert.deepEqual(plan.slots[page], { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height, ...(slot.filter ? { filter: slot.filter } : {}), readme: APP_FIELDS[slot.app].readme });
   for (const [page, slot] of Object.entries(FLOW_SLOTS)) assert.deepEqual(plan.slots[page], { kind: 'flow', name: slot.flow, x: slot.x, y: slot.y, width: slot.width, height: slot.height });
   // Build A1 (D382): the fields of each app, from APP_FIELDS, and the ones this version made text in place.
   for (const [app, spec] of Object.entries(APP_FIELDS)) {
@@ -478,6 +478,8 @@ test('the update carries every app and button of Carlos\'s report whole: fields,
       assert.match(run.stdout, new RegExp(`${label} : SACM actions, 17 fields as this version wants, filter kept, app link kept\\.`), label);
     }
     assert.match(run.stdout, /Messages : SACM messages, 28 fields as this version wants, filter kept, app link kept\./);
+    // The app SACM audit is not made yet in the report: its page says so.
+    assert.match(run.stdout, /Lifecycle review : no app SACM audit yet\. Add it when you set it up \(README section 6\.8\)\./);
     assert.doesNotMatch(run.stdout + run.stderr, new RegExp(`${MODEL_WORD}|DataModel`));
     // The new folder keeps every rule of the pages; a second run changes nothing.
     const definition = join(project, 'SACM-Workbench.Report', 'definition');
@@ -514,7 +516,7 @@ test('the update says what an app visual lacks: a field, the filter, the app lin
     const project = newFolder(at);
     const run = update(project, '-Report', report);
     assert.equal(run.status, 0, run.stdout + run.stderr);
-    assert.match(run.stdout, /Case : SACM actions, missing CaseLines\.RetireOn, fix the fields in Power Apps data of the visual \(README section 6\.4\), then \.\.\. > Edit, filter kept, app link kept\./);
+    assert.match(run.stdout, /Case : SACM actions, missing CaseLines\.RetireOn, fix the fields in Power Apps data of the visual \(README section 6\.4\), then More options \(\.\.\.\) > Edit, filter kept, app link kept\./);
     assert.match(run.stdout, /Card : SACM actions, 17 fields as this version wants, no filter For the app is 1: add it in Filters on this visual, app link kept\./);
     assert.match(run.stdout, /Person : SACM actions, 17 fields as this version wants, filter kept, no app link: choose the app again/);
     assert.match(run.stdout, /Messages : the filter on Piece has a condition\. Piece is text from this version/);

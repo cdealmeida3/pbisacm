@@ -29,9 +29,9 @@ export const packageVersion = (): string => (JSON.parse(readFileSync(join(root, 
  * One place of a visual Carlos adds by hand in the service: a Power App (APP_SLOTS) or the button Refresh now
  * (FLOW_SLOTS). An app's place also names the filter its visual has on that page (build A1, D382).
  */
-export interface Slot { kind: 'app' | 'flow'; name: string; x: number; y: number; width: number; height: number; filter?: AppFilter }
+export interface Slot { kind: 'app' | 'flow'; name: string; x: number; y: number; width: number; height: number; filter?: AppFilter; readme?: string }
 /** One field of a Power Apps visual, as a visual names it: the table (Entity), the column or measure (Property). */
-export interface VisualField { entity: string; property: string; kind: 'Column' | 'Measure' }
+export type VisualField = Omit<AppFilter, 'words'>;
 export interface UpdatePlan {
   version: string; parameters: string[]; native: string[]; slots: Record<string, Slot>;
   /** Build A1 (D382): the fields of each app's visual, in order (APP_FIELDS, then About → Report at). */
@@ -57,7 +57,7 @@ export function appFieldPlan(): Pick<UpdatePlan, 'fields' | 'nowText'> {
 /** What Update-Workbench.ps1 reads: the version, the parameters to carry, the native types, the place of the app of each page and the fields of the apps. */
 export function updatePlan(version = packageVersion()): UpdatePlan {
   const slots: Record<string, Slot> = {};
-  for (const [page, slot] of Object.entries(APP_SLOTS)) slots[page] = { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height, ...(slot.filter ? { filter: slot.filter } : {}) };
+  for (const [page, slot] of Object.entries(APP_SLOTS)) slots[page] = { kind: 'app', name: slot.app, x: slot.x, y: slot.y, width: slot.width, height: slot.height, ...(slot.filter ? { filter: slot.filter } : {}), readme: APP_FIELDS[slot.app].readme };
   for (const [page, slot] of Object.entries(FLOW_SLOTS)) {
     // The script finds the place of a copied visual by its page: a page has one place at most.
     if (slots[page]) throw new Error(`The page ${page} has the place of a Power App and of Refresh now; Update-Workbench.ps1 knows one place per page`);

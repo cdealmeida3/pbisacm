@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { appActions } from '../../../tools/powerbi/actions.ts';
-import { appFieldProblems, appFlows, callProblems, catalogueProblems, columnProblems, controlProblems, dataReadProblems, flowProblems, typedRowsProblems } from '../../../tools/powerbi/app-rules.ts';
+import { appFieldProblems, appFlows, textMeasure, callProblems, catalogueProblems, columnProblems, controlProblems, dataReadProblems, flowProblems, typedRowsProblems } from '../../../tools/powerbi/app-rules.ts';
 import { readTables } from '../../../tools/powerbi/tmdl.ts';
 import { APP_FIELDS } from '../../../tools/powerbi/tokens.ts';
 import type { AppName } from '../../../tools/powerbi/tokens.ts';
@@ -267,6 +267,13 @@ test('every field of APP_FIELDS is a text column of the model, and the measure e
   assert.ok(problems.some((line) => line.includes('CaseLines[RetireOn] of SACM actions is dateTime')));
   assert.ok(problems.some((line) => line.includes('ReviewLines[Nowhere], which is not a column')));
   assert.equal(problems.length, 3, problems.join('\n'));
+  // The measure Report at as a date, not text: refused.
+  const asDate = readTables().map((table) => (table.name !== 'About' ? table : { ...table, measures: table.measures.map((measure) =>
+    (measure.name === 'Report at' ? { ...measure, dax: 'MAX ( About[RefreshedUtc] )' } : measure)) }));
+  assert.deepEqual(appFieldProblems(asDate).map((line) => line.slice(0, 67)), ['App fields: the measure About[Report at] every app gets must return']);
+  assert.ok(textMeasure('VAR r = MAX ( T[x] ) RETURN IF ( ISBLANK ( r ), BLANK (), FORMAT ( r, "yyyy-mm-dd", "en-US" ) & "T" & FORMAT ( r, "hh:nn:ss", "en-US" ) & "Z" )'));
+  assert.ok(!textMeasure('VAR r = MAX ( T[x] ) RETURN IF ( ISBLANK ( r ), BLANK (), r )'));
+  assert.ok(!textMeasure('COUNTROWS ( T )'));
 });
 
 test('each app reads PowerBIIntegration.Data only in its typed rows and the refresh rule; the typed rows name every field in order (D379)', () => {
@@ -314,5 +321,8 @@ test('README §6.4, §6.6 and §6.8 list the fields of APP_FIELDS, in order, and
     const names = [...found[1]!.matchAll(/\*([A-Za-z]+)\*(?!\*)/g)].map((match) => match[1]);
     assert.deepEqual(names, spec.fields.map((field) => field.field), app);
     assert.match(found[1]!, /and last the measure\s+\*\*About →\s+Report at\*\*$/, app);
+    // The list is in the section the update script names for the app.
+    const section = readme.slice(0, found.index).split(/^### /m).at(-1) ?? '';
+    assert.ok(section.startsWith(`${spec.readme} `), `${app}: the list is not in README section ${spec.readme}`);
   }
 });

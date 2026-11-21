@@ -28,7 +28,7 @@ export function reportFiles(path: string): Map<string, string> {
       const name = entry.name.replace(/\\/g, '/');
       if (!name.startsWith('Report/definition/') || name.endsWith('/')) continue;
       const data = zip.subarray(entry.dataStart, entry.dataStart + entry.compressedSize);
-      files.set(name.slice('Report/definition/'.length), (entry.method === 8 ? inflateRawSync(data) : Buffer.from(data)).toString('utf8').replace(/^﻿/, ''));
+      files.set(name.slice('Report/definition/'.length), (entry.method === 8 ? inflateRawSync(data) : Buffer.from(data)).toString('utf8').replace(/^\uFEFF/, ''));
     }
     return files;
   }
@@ -37,7 +37,7 @@ export function reportFiles(path: string): Map<string, string> {
   const walk = (dir: string, prefix: string): void => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       if (entry.isDirectory()) walk(join(dir, entry.name), `${prefix}${entry.name}/`);
-      else files.set(`${prefix}${entry.name}`, readFileSync(join(dir, entry.name), 'utf8').replace(/^﻿/, ''));
+      else files.set(`${prefix}${entry.name}`, readFileSync(join(dir, entry.name), 'utf8').replace(/^\uFEFF/, ''));
     }
   };
   walk(base, '');
