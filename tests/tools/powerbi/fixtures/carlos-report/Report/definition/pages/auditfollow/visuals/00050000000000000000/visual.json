@@ -1,0 +1,575 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "00050000000000000000",
+  "position": {
+    "x": 956.0506329113923,
+    "y": 83.84810126582278,
+    "z": 24001,
+    "height": 619.7468354430379,
+    "width": 299.8481012658228,
+    "tabOrder": 24001
+  },
+  "visual": {
+    "visualType": "PowerApps_PBI_CV_INVENTED",
+    "query": {
+      "queryState": {
+        "table": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Key"
+                }
+              },
+              "queryRef": "CaseLines.Key",
+              "nativeQueryRef": "Key"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "CheckId"
+                }
+              },
+              "queryRef": "CaseLines.CheckId",
+              "nativeQueryRef": "CheckId"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "CiName"
+                }
+              },
+              "queryRef": "CaseLines.CiName",
+              "nativeQueryRef": "CiName"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "CaseLines.Status",
+              "nativeQueryRef": "Status"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "AssignedTo"
+                }
+              },
+              "queryRef": "CaseLines.AssignedTo",
+              "nativeQueryRef": "AssignedTo"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Person"
+                }
+              },
+              "queryRef": "CaseLines.Person",
+              "nativeQueryRef": "Person"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Actions"
+                }
+              },
+              "queryRef": "CaseLines.Actions",
+              "nativeQueryRef": "Actions"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Stages"
+                }
+              },
+              "queryRef": "CaseLines.Stages",
+              "nativeQueryRef": "Stages"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "StageId"
+                }
+              },
+              "queryRef": "CaseLines.StageId",
+              "nativeQueryRef": "StageId"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "ExceptionReason"
+                }
+              },
+              "queryRef": "CaseLines.ExceptionReason",
+              "nativeQueryRef": "ExceptionReason"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "RetireOn"
+                }
+              },
+              "queryRef": "CaseLines.RetireOn",
+              "nativeQueryRef": "RetireOn"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "ContactName"
+                }
+              },
+              "queryRef": "CaseLines.ContactName",
+              "nativeQueryRef": "ContactName"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "ShareTo"
+                }
+              },
+              "queryRef": "CaseLines.ShareTo",
+              "nativeQueryRef": "ShareTo"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "LastRef"
+                }
+              },
+              "queryRef": "CaseLines.LastRef",
+              "nativeQueryRef": "LastRef"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Step"
+                }
+              },
+              "queryRef": "CaseLines.Step",
+              "nativeQueryRef": "Step"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CaseLines"
+                    }
+                  },
+                  "Property": "Card"
+                }
+              },
+              "queryRef": "CaseLines.Card",
+              "nativeQueryRef": "Card"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "About"
+                    }
+                  },
+                  "Property": "Report at"
+                }
+              },
+              "queryRef": "About.Report at",
+              "nativeQueryRef": "Report at"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "appId": {
+              "expr": {
+                "Literal": {
+                  "Value": "'/providers/Microsoft.PowerApps/apps/00000000-0000-0000-0000-00000000a001'"
+                }
+              }
+            },
+            "someSettings": {
+              "expr": {
+                "Literal": {
+                  "Value": "'12345'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "f0390000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Key"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0400000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "CheckId"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0410000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "CiName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0420000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Status"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0430000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "AssignedTo"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0440000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Person"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0450000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Actions"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0460000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Stages"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0470000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "StageId"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0480000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "ExceptionReason"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0490000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "RetireOn"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0500000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "ContactName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0510000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "ShareTo"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0520000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "LastRef"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0530000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Step"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0540000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Card"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f0550000000000000000",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "About"
+              }
+            },
+            "Property": "Report at"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "f0560000000000000000",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "CaseLines"
+              }
+            },
+            "Property": "Status"
+          }
+        },
+        "type": "Advanced",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "c",
+              "Entity": "CaseLines",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Comparison": {
+                  "ComparisonKind": 0,
+                  "Left": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "c"
+                        }
+                      },
+                      "Property": "Status"
+                    }
+                  },
+                  "Right": {
+                    "Literal": {
+                      "Value": "'Not followed up'"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User"
+      }
+    ]
+  }
+}

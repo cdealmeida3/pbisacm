@@ -538,12 +538,13 @@ not while you edit it. Publish the report first (section 4).
 1. Open the report, **Edit**. Go to the page **Case**. **Visualizations → Power Apps**. Place it on the right, beside
    the tabs: **Format → General → Properties → Size and position**: X `956`, Y `84`, width `300`,
    height `620`. (Each page keeps a free place for its app; the table at the end of this section lists them all.)
-2. With the visual selected, add these fields of **CaseLines** to **Power Apps data**, in this order: *Key*, *CheckId*,
-   *CiName*, *Status*, *AssignedTo*, *Person*, *Actions*, *Stages*, *StageId*, *ExceptionReason*, *RetireOn*,
-   *ContactName*, *ShareTo* (from build B7), *LastRef*, *Step* and *Card* (from build D5, for the reply reader), and last
-   the measure **About → Report at** (from build 0.52.0: the time of the report's data, for the top line of the app). An
-   app made earlier gets a new field when you add it and edit the app from the visual, then paste the new
-   `App-Formulas.fx` and `ActionsScreen.pa.yaml`. For each column: the arrow next to it → **Don't summarize**.
+2. With the visual selected, add these fields of **CaseLines** to **Power Apps data**, in this order:
+   <!-- app-fields: SACM actions -->*Key*, *CheckId*, *CiName*, *Status*, *AssignedTo*, *Person*, *Actions*, *Stages*,
+   *StageId*, *ExceptionReason*, *RetireOn*, *ContactName*, *ShareTo*, *LastRef*, *Step*, *Card*, and last the measure
+   **About → Report at**<!-- /app-fields --> (the time of the report's data, for the top line of the app). Every field
+   is text (build A1, D377): the app turns them back into dates and numbers. An app made earlier gets a new field when
+   you add it and edit the app from the visual, then paste the new `App-Formulas.fx`. For each column: the arrow next to
+   it → **Don't summarize**.
 3. In the visual's filters (**Filters on this visual**): drag the measure **CaseLines → For the app**, *Show items when
    the value* **is** `1`, **Apply filter**. The app then gets only the lines of the case shown.
 4. In the visual: **Create new**. Power Apps Studio opens with a new app that is bound to the report.
@@ -726,10 +727,12 @@ the app joins them (D372).
 Make it once, as the app of section 6.4:
 
 1. In the report (the service, **Edit**), page **Messages**: **Visualizations → Power Apps**, at X 676, Y 84, 580 × 620.
-   Add these fields of **AppEmail**, in this order, each **Don't summarize**: *Row*, *DraftId*, *EmailId*, *Piece*,
-   *Ref*, *Kind*, *KindLabel*, *To*, *ToName*, *Cc*, *Subject*, *Chat*, *Keys*, *NewKeys*, *FreeKeys*, *CiCount*,
-   *About*, *NobodyAbove*, *Mailbox*, *AssignedTo*, *Summary*, *EmailSubject*, *HtmlLength*, *CsvLength*, *AddressWhy*,
-   *Html*, *Csv*, and last the measure **About → Report at**.
+   Add these fields of **AppEmail**, in this order, each **Don't summarize**:
+   <!-- app-fields: SACM messages -->*Row*, *DraftId*, *EmailId*, *Piece*, *Ref*, *Kind*, *KindLabel*, *To*, *ToName*,
+   *Cc*, *Subject*, *Chat*, *Keys*, *NewKeys*, *FreeKeys*, *CiCount*, *About*, *NobodyAbove*, *Mailbox*, *AssignedTo*,
+   *Summary*, *EmailSubject*, *HtmlLength*, *CsvLength*, *AddressWhy*, *Html*, *Csv*, and last the measure **About →
+   Report at**<!-- /app-fields -->. Every field is text (build A1, D377): the app turns them back into numbers and
+   true/false.
 2. **Filters on this visual**: drag the measure **AppEmail → Selected email**, *Show items when the value* **is** `1`,
    **Apply filter**. The app then gets only the email chosen in the list.
 3. **Create new**. In Studio: **Settings → Updates → New**: turn on **Modern controls and themes**. **Data → Add data →
@@ -822,10 +825,12 @@ number outside its range cannot be saved.
 Make it once, as the app of section 6.4:
 
 1. In the report (the service, **Edit**), page **Lifecycle review**: **Visualizations → Power Apps**, at the right of the
-   tables (X 956, Y 84, 300 × 620). Add these fields of **ReviewLines**, each **Don't summarize**: *Review*, *IsNext*, *IsCurrent*,
-   *ReviewDate*, *Report*, *ReportDate*, *Group*, *CiKey*, *CiName*, *ClassLabel*, *ClassName*, *EpoId*, *Status*,
-   *EpoStatus*, *Agrees*, *Result*, *ResultLabel*, *EpoDate*, *Order*, and from build 0.52.0 the measure **About →
-   Report at**.
+   tables (X 956, Y 84, 300 × 620). Add these fields of **ReviewLines**, in this order, each **Don't summarize**:
+   <!-- app-fields: SACM audit -->*Review*, *IsNextText*, *IsCurrentText*, *ReviewDateText*, *Report*, *ReportDateText*,
+   *Group*, *CiKey*, *CiName*, *ClassLabel*, *ClassName*, *EpoId*, *Status*, *EpoStatus*, *AgreesText*, *Result*,
+   *ResultLabel*, *EpoDateText*, *OrderText*, and last the measure **About → Report at**<!-- /app-fields -->. Every
+   field is text (build A1, D377): the fields that end in *Text* are in the folder **For the app** of *ReviewLines*, and
+   the app turns them back into dates, numbers and true/false.
 2. **Create new**. In Studio: **Data → Add data → SharePoint** → **SACM Journal**, **SACM Team** and **SACM Settings**.
    **Power Automate → Add flow** → **SACMRefresh** (for the button **Refresh now** at the top).
 3. **App → Formulas**: paste `apps/sacm-audit/App-Formulas.fx`. Paste `apps/sacm-audit/Src/AuditScreen.pa.yaml` on

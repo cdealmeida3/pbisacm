@@ -8,6 +8,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import type { AppFieldKind } from './tokens.ts';
 
 export const MODEL = join(import.meta.dirname, '..', '..', 'powerbi', 'SACM-Workbench.SemanticModel', 'definition');
 
@@ -20,7 +21,35 @@ export interface Table { name: string; file: string; columns: Column[]; measures
  * A calculated table of the fixed form of D284: the hidden table it splits (Run, or HistoryRun for the history, D290),
  * the part it shows, and each column with the column of that table it takes.
  */
-export interface Calculated { source: SourceTable; part: string; columns: Array<[string, string]> }
+export interface Calculated { source: SourceTable; part: string; columns: Array<[string, string, TextOf?]> }
+/**
+ * How a column of a calculated table may turn its column of Run into text for a Power Apps visual (build A1, D377): a
+ * whole number with FORMAT "0", a date with FORMAT "yyyy-mm-dd" (both with the culture en-US, so every computer writes
+ * the same text), a true/false as "true" or "false". Nothing else.
+ */
+export type TextOf = Exclude<AppFieldKind, 'text'>;
+const TEXT_OF: Array<[TextOf, RegExp]> = [
+  ['number', /^FORMAT \( (Run|HistoryRun)\[([^\]]+)\], "0", "en-US" \)$/],
+  ['date', /^FORMAT \( (Run|HistoryRun)\[([^\]]+)\], "yyyy-mm-dd", "en-US" \)$/],
+  ['yesno', /^IF \( (Run|HistoryRun)\[([^\]]+)\], "true", "false" \)$/]
+];
+
+/** The items of a DAX argument list, split at the commas outside brackets and texts. */
+function splitArguments(text: string): string[] {
+  const items: string[] = [];
+  let depth = 0;
+  let inText = false;
+  let start = 0;
+  for (let at = 0; at < text.length; at++) {
+    const char = text[at]!;
+    if (char === '"') inText = !inText;
+    else if (!inText && (char === '(' || char === '[')) depth++;
+    else if (!inText && (char === ')' || char === ']')) depth--;
+    else if (!inText && depth === 0 && char === ',') { items.push(text.slice(start, at)); start = at + 1; }
+  }
+  items.push(text.slice(start));
+  return items;
+}
 /** The hidden tables the calculated tables split: Run (the newest report, refreshed in full) and HistoryRun (every report date, incremental). */
 export const SOURCE_TABLES = ['Run', 'HistoryRun'] as const;
 export type SourceTable = typeof SOURCE_TABLES[number];
@@ -30,6 +59,8 @@ export type SourceTable = typeof SOURCE_TABLES[number];
  * column taken from the column <Part>.<Column> of that table.
  *   SELECTCOLUMNS ( FILTER ( Run, Run[Part] = "Findings" ), "Key", Run[Findings.Key], ... )
  *   SELECTCOLUMNS ( FILTER ( HistoryRun, HistoryRun[Part] = "History" ), "Key", HistoryRun[History.Key], ... )
+ * A column a Power Apps visual gets may turn its column into text (TextOf, build A1, D377):
+ *   "Piece", FORMAT ( Run[AppEmail.Piece], "0", "en-US" )
  * Any other DAX fails with the file and the line.
  */
 export function readCalculated(dax: string, where: string): Calculated {
@@ -38,12 +69,17 @@ export function readCalculated(dax: string, where: string): Calculated {
   if (!head) throw new Error(`${where}: a calculated table must be SELECTCOLUMNS ( FILTER ( Run, Run[Part] = "<part>" ), "<column>", Run[<part>.<column>], ... ) (or the same with HistoryRun)`);
   const source = head[1] as SourceTable;
   const part = head[2]!;
-  const columns: Array<[string, string]> = [];
-  const items = head[3]!.split(/,(?=\s*")/);
-  for (const item of items) {
-    const found = /^\s*"([^"]+)",\s*(Run|HistoryRun)\[([^\]]+)\]\s*$/.exec(item);
-    if (!found || found[2] !== source) throw new Error(`${where}: "${item.trim()}" is not "<column>", ${source}[<part>.<column>]`);
-    columns.push([found[1]!, found[3]!]);
+  const columns: Array<[string, string, TextOf?]> = [];
+  const items = splitArguments(head[3]!);
+  if (items.length % 2) throw new Error(`${where}: every column of a calculated table is "<column>", ${source}[<part>.<column>]`);
+  for (let at = 0; at < items.length; at += 2) {
+    const name = /^\s*"([^"]+)"\s*$/.exec(items[at]!)?.[1];
+    const value = items[at + 1]!.trim();
+    const plain = /^(Run|HistoryRun)\[([^\]]+)\]$/.exec(value);
+    const converted = TEXT_OF.map(([kind, pattern]) => [kind, pattern.exec(value)] as const).find(([, found]) => found);
+    const found = plain ?? converted?.[1];
+    if (!name || !found || found[1] !== source) throw new Error(`${where}: "${items[at]!.trim()}, ${value}" is not "<column>", ${source}[<part>.<column>] (or one of the texts for a Power App, D377)`);
+    columns.push(plain ? [name, found[2]!] : [name, found[2]!, converted![0]]);
   }
   return { source, part, columns };
 }

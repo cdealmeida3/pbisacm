@@ -47,7 +47,10 @@ test('every table reads from its own query <Table>Rows or is a part of Run, and 
     // A calculated table (D284) takes its rows from Run: its part, its columns in order.
     if (table.partitionKind === 'calculated') {
       assert.equal(table.calculated!.part, table.name);
-      assert.deepEqual(table.calculated!.columns, queryColumns(table).map((column) => [column.name, `${table.name}.${column.name}`]));
+      // A column turned into text for a Power App (D377) takes its own column; a text twin (…Text, D378) the column it doubles.
+      const twin = (name: string): boolean => name.endsWith('Text') && table.calculated!.columns.some(([other, , textOf]) => other === name && textOf) && table.columns.some((other) => other.name === name.slice(0, -'Text'.length));
+      assert.deepEqual(table.calculated!.columns.map(([name, column]) => [name, column]),
+        queryColumns(table).map((column) => [column.name, `${table.name}.${twin(column.name) ? column.name.slice(0, -'Text'.length) : column.name}`]));
       continue;
     }
     // HistoryRun names RangeStart and RangeEnd itself: Power BI Desktop refuses its refresh policy otherwise (D290).

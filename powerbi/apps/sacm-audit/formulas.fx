@@ -6,7 +6,11 @@
 // of each lifecycle review, then the CIs a new review would draw from the newest CI report (Review "next"). The app only
 // adds rows to the lists SACM Journal and SACM Settings (D272); it changes or removes none, and sends nothing.
 
-Lines = PowerBIIntegration.Data;
+// Build A1 (D377, D379): every field of the visual is text, because the visual sends no data to the app when a field is
+// a number or a true/false, and a banner for a blank date. npm run powerbi:generate writes here the typed rows: the rows
+// of the visual read once, each field turned back into a number, true/false or a date (APP_FIELDS of
+// tools/powerbi/tokens.ts). Every other formula reads Lines, never PowerBIIntegration.Data.
+Lines = %%TYPED_ROWS%%;
 LineCount = CountRows(Lines);
 // The Power Apps visual gives the app 1,000 rows at most (Microsoft's limit).
 TooManyLines = LineCount >= 1000;

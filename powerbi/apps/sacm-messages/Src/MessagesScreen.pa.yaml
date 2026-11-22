@@ -60,7 +60,7 @@ Screens:
             Width: =Parent.Width - 16 - 136
             Height: =20
       - RefreshButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             # The only control that asks for a refresh (D332, lint): flow F5 refreshes at most once in each window (D333)
             # and answers what happened. The same formula in the three apps.
@@ -143,7 +143,7 @@ Screens:
             Width: =(Parent.Width - 48) / 2
             Height: =18
       - ToText:
-          Control: ModernTextInput@1.0.0
+          Control: ModernTextInput
           Properties:
             Default: =ThisEmail.To
             Placeholder: ="name@company; name@company"
@@ -170,7 +170,7 @@ Screens:
             Width: =(Parent.Width - 48) / 2
             Height: =18
       - CcText:
-          Control: ModernTextInput@1.0.0
+          Control: ModernTextInput
           Properties:
             Default: =ThisEmail.Cc
             Placeholder: ="Nobody"
@@ -197,7 +197,7 @@ Screens:
             Width: =Parent.Width - 32
             Height: =18
       - SubjectText:
-          Control: ModernTextInput@1.0.0
+          Control: ModernTextInput
           Properties:
             # A new email shows "new reference" in place of its reference; the buttons put the reference there (D371).
             Default: =Substitute(ThisEmail.Subject, "%%REF%%", If(IsBlank(ThisEmail.Ref), NewRefWords, ThisEmail.Ref))
@@ -279,11 +279,11 @@ Screens:
             Width: =If(AnywayCheck.Visible, Parent.Width - 32 - 136, Parent.Width - 32)
             Height: =40
       - AnywayCheck:
-          Control: ModernCheckbox@1.0.0
+          Control: ModernCheckbox
           Properties:
             # Kept for the email it was ticked on (varAnyway holds its first key), so a tick never carries to the next email.
             Label: ="Send anyway"
-            Checked: =varAnyway = ThisEmail.SentKey
+            Default: =varAnyway = ThisEmail.SentKey
             OnCheck: =Set(varAnyway, ThisEmail.SentKey)
             OnUncheck: =Set(varAnyway, "")
             BasePaletteColor: =ColourNavy
@@ -370,7 +370,7 @@ Screens:
             Width: =Parent.Width - 32
             Height: =36
       - OutlookButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Outlook draft"
             Icon: ="Mail"
@@ -424,7 +424,7 @@ Screens:
             Width: =116
             Height: =40
       - TeamsButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Teams"
             Icon: ="Chat"
@@ -479,7 +479,7 @@ Screens:
             Width: =10
             Height: =10
       - TestButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Test to me"
             Icon: ="Eye"
@@ -511,7 +511,7 @@ Screens:
             Width: =116
             Height: =40
       - SendButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Send"
             Icon: ="Send"
@@ -598,7 +598,7 @@ Screens:
             Width: =Parent.Width - 32 - 256
             Height: =40
       - NoButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="No"
             Appearance: =ButtonAppearance.Secondary
@@ -612,7 +612,7 @@ Screens:
             Width: =116
             Height: =40
       - YesButton:
-          Control: ModernButton@1.0.0
+          Control: ModernButton
           Properties:
             Text: ="Yes"
             Icon: ="Checkmark"

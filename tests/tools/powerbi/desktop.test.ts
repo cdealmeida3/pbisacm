@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { blankRowQueries, boundTexts, brokenWords, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf, realSizeExpressions, withExpression, wrappedWords } from '../../../tools/powerbi/desktop.ts';
+import { appTextQueries, blankRowQueries, boundTexts, brokenWords, daxLiteral, judge, judgeLook, judgePictures, pageList, queriesOf, queryOf, realSizeExpressions, withExpression, wrappedWords } from '../../../tools/powerbi/desktop.ts';
 import type { Pictures, Results, VisualQuery } from '../../../tools/powerbi/desktop.ts';
 
 /*
@@ -202,4 +202,15 @@ test('build R5 (D366): a pair of numbers of Self-check that does not agree fails
   const results: Results = { opened: true, modelErrors: [], results: [{ query, rows: [['A = B', '3', '3', 'Yes'], ['C = D', '44', '21', 'No']] }] };
   const { problems } = judge(results);
   assert.deepEqual(problems.filter((line) => line.includes('do not agree')), ['Self-check › same: "C = D" do not agree (44 and 21): two pages give two numbers for one word']);
+});
+
+test('build A1 (D377): one query per number, true/false or date of a Power Apps visual asks for the texts the app cannot turn back', () => {
+  const queries = appTextQueries();
+  assert.deepEqual(queries.map((query) => query.visual), ['CaseLines.RetireOn', 'AppEmail.Piece', 'AppEmail.CiCount', 'AppEmail.NobodyAbove', 'AppEmail.Mailbox', 'AppEmail.HtmlLength', 'AppEmail.CsvLength',
+    'ReviewLines.IsNextText', 'ReviewLines.IsCurrentText', 'ReviewLines.ReviewDateText', 'ReviewLines.ReportDateText', 'ReviewLines.AgreesText', 'ReviewLines.EpoDateText', 'ReviewLines.OrderText']);
+  const mailbox = queries.find((query) => query.visual === 'AppEmail.Mailbox')!;
+  assert.equal(mailbox.dax, 'EVALUATE ROW ( "v0", COUNTROWS ( FILTER ( AppEmail, NOT \'AppEmail\'[Mailbox] IN { "true", "false" } ) ) + 0 )');
+  const { problems } = judge({ opened: true, modelErrors: [], results: [{ query: mailbox, rows: [['3']] }, { query: queries[0]!, rows: [['0']] }] });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0]!, /Power Apps field SACM messages: 'AppEmail'\[Mailbox\] as yesno: 3 rows hold a text the app cannot turn back/);
 });

@@ -1,4 +1,4 @@
-/// Build R6 (D372): the rows the app SACM messages gets, for the one email chosen on Messages (its visual filter: Selected email is 1). Built by Power Query (fnAppEmailPart): one row per part of each email (Piece 0, the fields of Drafts the app reads), and the email's Html and Csv cut into pieces of 20,000 characters (Piece 1, 2, …), because the Power Apps visual is reported to cut a text of about 32,000 characters: the app joins the pieces in order and checks their length against HtmlLength and CsvLength. No relationship: Selected email reads the choice of the list (Drafts) itself.
+/// Build R6 (D372): the rows the app SACM messages gets, for the one email chosen on Messages (its visual filter: Selected email is 1). Built by Power Query (fnAppEmailPart): one row per part of each email (Piece 0, the fields of Drafts the app reads), and the email's Html and Csv cut into pieces of 20,000 characters (Piece 1, 2, …), because the Power Apps visual is reported to cut a text of about 32,000 characters: the app joins the pieces in order and checks their length against HtmlLength and CsvLength. Every column is text (build A1, D377): the Power Apps visual sends the app no data at all when a field is a number or a true/false. No relationship: Selected email reads the choice of the list (Drafts) itself.
 table AppEmail
 
 	/// Build R6 (D371, D372): 1 on the rows of the email chosen on Messages (Drafts[Chosen email]: the email chosen in the list; else the email to the person of Prepare email; else the first of the list). The filter of the Power Apps visual of Messages, so the app gets one email.
@@ -7,16 +7,16 @@ table AppEmail
 			RETURN IF ( NOT ISBLANK ( chosen ) && SELECTEDVALUE ( AppEmail[EmailId] ) = chosen, 1 )
 		formatString: 0
 
-	/// Self-check (D372): the emails whose pieces, joined in order, are their whole Html and Csv. SameNumbers compares it with the number of emails.
+	/// Self-check (D372): the emails whose pieces, joined in order, are their whole Html and Csv. SameNumbers compares it with the number of emails. Piece is text (D377): the pieces sort by VALUE, so piece 10 comes after piece 9.
 	measure 'Emails whole in pieces' =
 			VAR emails = FILTER ( ALL ( Drafts ), Drafts[DraftId] = Drafts[EmailId] )
 			RETURN
 			    SUMX (
 			        emails,
 			        VAR thisEmail = Drafts[DraftId]
-			        VAR pieces = FILTER ( ALL ( AppEmail ), AppEmail[EmailId] = thisEmail && AppEmail[Piece] > 0 )
-			        VAR joinedHtml = CONCATENATEX ( pieces, AppEmail[Html], "", AppEmail[Piece], ASC )
-			        VAR joinedCsv = CONCATENATEX ( pieces, AppEmail[Csv], "", AppEmail[Piece], ASC )
+			        VAR pieces = FILTER ( ALL ( AppEmail ), AppEmail[EmailId] = thisEmail && AppEmail[Piece] <> "0" )
+			        VAR joinedHtml = CONCATENATEX ( pieces, AppEmail[Html], "", VALUE ( AppEmail[Piece] ), ASC )
+			        VAR joinedCsv = CONCATENATEX ( pieces, AppEmail[Csv], "", VALUE ( AppEmail[Piece] ), ASC )
 			        RETURN IF ( EXACT ( joinedHtml, Drafts[Html] ) && EXACT ( joinedCsv, Drafts[Csv] ), 1, 0 )
 			    ) + 0
 		formatString: #,0
@@ -42,12 +42,10 @@ table AppEmail
 		isNameInferred
 		sourceColumn: [EmailId]
 
-	/// 0 on a part (one per draft); 1, 2, … on the pieces of the email's texts, in their order.
+	/// "0" on a part (one per draft); "1", "2", … on the pieces of the email's texts, in their order. Text for the Power App (D377): the app turns it back into a number.
 	column Piece
-		dataType: int64
+		dataType: string
 		isDataTypeInferred
-		formatString: 0
-		summarizeBy: none
 		isNameInferred
 		sourceColumn: [Piece]
 
@@ -128,12 +126,10 @@ table AppEmail
 		isNameInferred
 		sourceColumn: [FreeKeys]
 
-	/// On a part: its CIs.
+	/// On a part: its CIs, as text for the Power App (D377).
 	column CiCount
-		dataType: int64
+		dataType: string
 		isDataTypeInferred
-		formatString: 0
-		summarizeBy: none
 		isNameInferred
 		sourceColumn: [CiCount]
 
@@ -144,19 +140,17 @@ table AppEmail
 		isNameInferred
 		sourceColumn: [About]
 
-	/// On a part: an escalation nobody is known for (D160).
+	/// On a part: an escalation nobody is known for (D160): "true" or "false", text for the Power App (D377).
 	column NobodyAbove
-		dataType: boolean
+		dataType: string
 		isDataTypeInferred
-		summarizeBy: none
 		isNameInferred
 		sourceColumn: [NobodyAbove]
 
-	/// On a part: to the Procurement mailbox.
+	/// On a part: to the Procurement mailbox: "true" or "false", text for the Power App (D377).
 	column Mailbox
-		dataType: boolean
+		dataType: string
 		isDataTypeInferred
-		summarizeBy: none
 		isNameInferred
 		sourceColumn: [Mailbox]
 
@@ -181,21 +175,17 @@ table AppEmail
 		isNameInferred
 		sourceColumn: [EmailSubject]
 
-	/// On a part: the length of the email's Html (first part only), so the app knows it got all of it.
+	/// On a part: the length of the email's Html (first part only), so the app knows it got all of it. Text for the Power App (D377).
 	column HtmlLength
-		dataType: int64
+		dataType: string
 		isDataTypeInferred
-		formatString: 0
-		summarizeBy: none
 		isNameInferred
 		sourceColumn: [HtmlLength]
 
-	/// On a part: the length of the email's file (first part only).
+	/// On a part: the length of the email's file (first part only). Text for the Power App (D377).
 	column CsvLength
-		dataType: int64
+		dataType: string
 		isDataTypeInferred
-		formatString: 0
-		summarizeBy: none
 		isNameInferred
 		sourceColumn: [CsvLength]
 
@@ -228,7 +218,7 @@ table AppEmail
 					"Row", Run[AppEmail.Row],
 					"DraftId", Run[AppEmail.DraftId],
 					"EmailId", Run[AppEmail.EmailId],
-					"Piece", Run[AppEmail.Piece],
+					"Piece", FORMAT ( Run[AppEmail.Piece], "0", "en-US" ),
 					"Ref", Run[AppEmail.Ref],
 					"Kind", Run[AppEmail.Kind],
 					"KindLabel", Run[AppEmail.KindLabel],
@@ -240,15 +230,15 @@ table AppEmail
 					"Keys", Run[AppEmail.Keys],
 					"NewKeys", Run[AppEmail.NewKeys],
 					"FreeKeys", Run[AppEmail.FreeKeys],
-					"CiCount", Run[AppEmail.CiCount],
+					"CiCount", FORMAT ( Run[AppEmail.CiCount], "0", "en-US" ),
 					"About", Run[AppEmail.About],
-					"NobodyAbove", Run[AppEmail.NobodyAbove],
-					"Mailbox", Run[AppEmail.Mailbox],
+					"NobodyAbove", IF ( Run[AppEmail.NobodyAbove], "true", "false" ),
+					"Mailbox", IF ( Run[AppEmail.Mailbox], "true", "false" ),
 					"AssignedTo", Run[AppEmail.AssignedTo],
 					"Summary", Run[AppEmail.Summary],
 					"EmailSubject", Run[AppEmail.EmailSubject],
-					"HtmlLength", Run[AppEmail.HtmlLength],
-					"CsvLength", Run[AppEmail.CsvLength],
+					"HtmlLength", FORMAT ( Run[AppEmail.HtmlLength], "0", "en-US" ),
+					"CsvLength", FORMAT ( Run[AppEmail.CsvLength], "0", "en-US" ),
 					"AddressWhy", Run[AppEmail.AddressWhy],
 					"Html", Run[AppEmail.Html],
 					"Csv", Run[AppEmail.Csv]

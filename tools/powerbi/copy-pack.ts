@@ -7,7 +7,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve, isAbsolute } from 'node:path';
 import { APP_FOLDERS } from './actions.ts';
-import { APP_SLOTS, FLOW_SLOTS } from './tokens.ts';
+import { APP_FIELDS, APP_SLOTS, FLOW_SLOTS } from './tokens.ts';
+import type { AppName } from './tokens.ts';
 import { TIME_ZONE, gateExpressions, refreshRule, refreshRuleText, windowStarts } from './refresh.ts';
 
 const root = join(import.meta.dirname, '..', '..');
@@ -44,8 +45,10 @@ export function copyPack(): string {
     if (!found) throw new Error(`copy pack: the page ${page} keeps no place for a visual added by hand`);
     return place(label, found.x, found.y, found.width, found.height, filter);
   };
-  const fields = (table: string, names: string[]): string =>
-    `<p>From the table <b>${esc(table)}</b>, drag these into <b>Power Apps data</b>, in this order, and last the measure <b>About → Report at</b> (new in 0.52.0). On each column: the small arrow → <b>Don't summarize</b>.</p><ol class="fields">${[...names, 'Report at'].map((name) => `<li>${esc(name)}</li>`).join('')}</ol>${row({ label: 'The list (to tick off)', value: [...names, 'Report at (About)'].join(', ') })}`;
+  /** The fields of an app's visual, from APP_FIELDS (D380): every one is text (D377). */
+  const fields = (app: AppName): string => fieldList(APP_FIELDS[app].table, APP_FIELDS[app].fields.map((field) => field.field));
+  const fieldList = (table: string, names: string[]): string =>
+    `<p>From the table <b>${esc(table)}</b>, drag these into <b>Power Apps data</b>, in this order, and last the measure <b>About → Report at</b>. Every field is text (build A1): the app turns them back. On each column: the small arrow → <b>Don't summarize</b>.</p><ol class="fields">${[...names, 'Report at'].map((name) => `<li>${esc(name)}</li>`).join('')}</ol>${row({ label: 'The list (to tick off)', value: [...names, 'Report at (About)'].join(', ') })}`;
   const card = (item: Card): string =>
     `<section class="card" id="${item.id}"><header><span class="tag">${esc(item.tag)}</span><h3>${esc(item.title)}</h3></header><p class="why">${item.why}</p>${item.name ? row({ label: 'Flow name', value: item.name }) : ''}<ol class="steps">${item.steps
       .map((step, index) => `<li class="step"><div class="sn">${index + 1}</div><div class="sb"><h4>${esc(step.title)}</h4>${step.html ? `<p>${step.html}</p>` : ''}${(step.rows ?? []).map(row).join('')}${step.extra ?? ''}${step.after ? `<p class="small">${step.after}</p>` : ''}</div></li>`)
@@ -179,7 +182,7 @@ export function copyPack(): string {
       id: 'app-actions', tag: 'App', title: 'SACM actions', why: 'Notes, status, assign, stop following, the reply reader, and Refresh now at the top. Made once on Case, then copied.',
       steps: [
         { title: 'Place the visual', html: 'Report in the service → <b>Edit</b> → page <b>Case</b> → <b>Visualizations → Power Apps</b>. <b>Format → General → Properties → Size and position</b>:', extra: slot('case', 'Case', 'CaseLines → For the app is 1') },
-        { title: 'Fields', html: '', extra: fields('CaseLines', ['Key', 'CheckId', 'CiName', 'Status', 'AssignedTo', 'Person', 'Actions', 'Stages', 'StageId', 'ExceptionReason', 'RetireOn', 'ContactName', 'ShareTo', 'LastRef', 'Step', 'Card']) },
+        { title: 'Fields', html: '', extra: fields('SACM actions') },
         { title: 'Filter', html: '<b>Filters on this visual</b>: drag the measure <b>CaseLines → For the app</b>, show items when the value <b>is</b> <b>1</b>, <b>Apply filter</b>.' },
         ...appSteps(actionsFolder, 'ActionsScreen', '<b>SACM Journal</b>, <b>SACM Team</b>, <b>SACM Settings</b>, <b>SACM Replies</b>', '<b>SACMRefresh</b>', 'SACM actions'),
         { title: 'Copy it to the other pages', html: 'Ctrl+C the visual, Ctrl+V on each page, then its place and filter:', extra: [slot('card', 'Card', 'For the app is 1'), slot('person', 'Person', 'For the app is 1'), slot('mywork', 'Work queue', 'CaseLines → Queue lines is not blank'), slot('auditfollow', 'Not followed', 'CaseLines → Status is Not followed up')].join(''), rows: [{ label: 'Not followed: filter value', value: 'Not followed up' }] }
@@ -189,7 +192,7 @@ export function copyPack(): string {
       id: 'app-messages', tag: 'App', title: 'SACM messages', why: 'The email studio of the page Messages, with Refresh now at the top.',
       steps: [
         { title: 'Place the visual', html: 'Page <b>Messages</b> → <b>Visualizations → Power Apps</b>, at the right of the list of emails (build R6). An app made before R6: the update script moved it here; paste the new formulas and screen below.', extra: slot('messages', 'Messages', 'AppEmail → Selected email is 1') },
-        { title: 'Fields', html: '', extra: fields('AppEmail', ['Row', 'DraftId', 'EmailId', 'Piece', 'Ref', 'Kind', 'KindLabel', 'To', 'ToName', 'Cc', 'Subject', 'Chat', 'Keys', 'NewKeys', 'FreeKeys', 'CiCount', 'About', 'NobodyAbove', 'Mailbox', 'AssignedTo', 'Summary', 'EmailSubject', 'HtmlLength', 'CsvLength', 'AddressWhy', 'Html', 'Csv']) },
+        { title: 'Fields', html: '', extra: fields('SACM messages') },
         { title: 'Filter', html: '<b>Filters on this visual</b>: drag the measure <b>AppEmail → Selected email</b>, show items when the value <b>is</b> <b>1</b>, <b>Apply filter</b>. The app then gets only the email chosen in the list. An app made before R6 had the fields of <b>Drafts</b>: remove them all, add these, then <b>… → Edit</b>.' },
         ...appSteps(messagesFolder, 'MessagesScreen', '<b>SACM Journal</b>, <b>SACM Team</b>', '<b>SACMSend</b>, <b>SACMTest</b>, <b>SACMDraft</b>, <b>SACMRefresh</b>', 'SACM messages')
       ]
@@ -198,7 +201,7 @@ export function copyPack(): string {
       id: 'app-audit', tag: 'App', title: 'SACM audit', why: 'The lifecycle review and the settings, on the page Lifecycle review, with Refresh now at the top.',
       steps: [
         { title: 'Place the visual', html: 'Page <b>Lifecycle review</b> → <b>Visualizations → Power Apps</b>:', extra: slot('auditreview', 'Lifecycle review') },
-        { title: 'Fields', html: '', extra: fields('ReviewLines', ['Review', 'IsNext', 'IsCurrent', 'ReviewDate', 'Report', 'ReportDate', 'Group', 'CiKey', 'CiName', 'ClassLabel', 'ClassName', 'EpoId', 'Status', 'EpoStatus', 'Agrees', 'Result', 'ResultLabel', 'EpoDate', 'Order']) },
+        { title: 'Fields', html: '', extra: fields('SACM audit') },
         ...appSteps(auditFolder, 'AuditScreen', '<b>SACM Journal</b>, <b>SACM Team</b>, <b>SACM Settings</b>', '<b>SACMRefresh</b>', 'SACM audit')
       ]
     },

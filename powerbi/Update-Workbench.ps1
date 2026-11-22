@@ -14,6 +14,10 @@
        that holds the previous one, and asks you first. On a page where the .pbix has no app, they come from the
        previous folder. Of the .pbix it reads only the report part (Report/definition), never the data model. It
        writes nothing next to the .pbix. The parameters always come from the previous folder.
+    3. (build A1, D382) In each Power Apps visual of the new folder: the empty filter card of a field this version
+       turned into text (update.json, nowText) becomes the card of a text (Categorical); a card with a condition stays,
+       with a line. Then one line per page with an app: are its fields the ones this version wants, in order, is its
+       filter there, is its app link there. It renames no field and adds none: what is missing you add by hand.
   It copies nothing else, deletes nothing, never changes the old folder, and prints what it did.
   It works in Windows PowerShell 5.1 and in PowerShell 7. Keep this file in plain ASCII: Windows PowerShell
   reads a file without a byte order mark in the code page of the computer.
@@ -377,6 +381,148 @@ foreach ($copy in $copies) {
 if ($reportChanged) { Write-Text $newReportFile $newReportText }
 if ($newModel -cne $newModelBefore) { Write-Text $newModelFile $newModel }
 
+# --- 4. The fields of the apps (build A1, D382) ----------------------------------------------------------------------
+# Every field of a Power Apps visual is text from build A1 (D377). A field that was a number keeps, in a visual made
+# before, the empty filter card of a number (Advanced); it becomes the card of a text (Categorical), as Power BI gives a
+# text field. Then each app visual is compared with the fields this version wants (update.json, fields).
+$nowText = @{}
+foreach ($field in @(Get-Property $plan 'nowText')) { if ($null -ne $field) { $nowText["$($field.entity)|$($field.property)"] = $true } }
+$planFields = Get-Property $plan 'fields'
+
+# The objects of the JSON array that opens at $open in $text: the index and length of each, texts skipped.
+function Get-ArrayItems([string]$text, [int]$open) {
+  $items = @()
+  $depth = 0
+  $inText = $false
+  $escape = $false
+  $itemStart = -1
+  for ($i = $open; $i -lt $text.Length; $i++) {
+    $c = $text[$i]
+    if ($inText) {
+      if ($escape) { $escape = $false } elseif ($c -eq [char]92) { $escape = $true } elseif ($c -eq [char]34) { $inText = $false }
+      continue
+    }
+    if ($c -eq [char]34) { $inText = $true; continue }
+    if ($c -eq [char]'[' -or $c -eq [char]'{') {
+      $depth++
+      if ($depth -eq 2 -and $c -eq [char]'{') { $itemStart = $i }
+      continue
+    }
+    if ($c -eq [char]']' -or $c -eq [char]'}') {
+      if ($depth -eq 2 -and $c -eq [char]'}' -and $itemStart -ge 0) { $items += [pscustomobject]@{ Index = $itemStart; Length = $i - $itemStart + 1 }; $itemStart = -1 }
+      $depth--
+      if ($depth -le 0) { break }
+    }
+  }
+  return ,$items
+}
+# The table and the column or measure a field of a visual names ("CaseLines|Key"); a summarized column too.
+function Get-FieldKey($field) {
+  if ($null -eq $field) { return $null }
+  $aggregation = Get-Property $field 'Aggregation'
+  if ($null -ne $aggregation) { $field = Get-Property $aggregation 'Expression' }
+  foreach ($kind in @('Column', 'Measure')) {
+    $item = Get-Property $field $kind
+    if ($null -ne $item) {
+      $entity = Get-Property (Get-Property (Get-Property $item 'Expression') 'SourceRef') 'Entity'
+      return "$entity|$(Get-Property $item 'Property')"
+    }
+  }
+  return $null
+}
+# The text of a visual with the empty filter cards of the fields now text turned Categorical, and the lines to print.
+function Update-FilterCards([string]$text, [string]$label) {
+  $notes = @()
+  $changed = 0
+  # The filter cards of the visual: the array filters of filterConfig (a filter card holds "filter", never "filters").
+  $config = [regex]::Match($text, '"filterConfig"\s*:\s*\{')
+  if (-not $config.Success) { return [pscustomobject]@{ Text = $text; Changed = 0; Notes = $notes } }
+  $head = [regex]::new('"filters"\s*:\s*\[').Match($text, $config.Index)
+  if (-not $head.Success) { return [pscustomobject]@{ Text = $text; Changed = 0; Notes = $notes } }
+  $items = Get-ArrayItems $text ($head.Index + $head.Length - 1)
+  for ($k = $items.Count - 1; $k -ge 0; $k--) {
+    $item = $items[$k]
+    $body = $text.Substring($item.Index, $item.Length)
+    $card = $body | ConvertFrom-Json
+    $key = Get-FieldKey (Get-Property $card 'field')
+    if ($null -eq $key -or -not $nowText.ContainsKey($key)) { continue }
+    $name = $key.Substring($key.IndexOf('|') + 1)
+    if ($null -ne (Get-Property $card 'filter')) { $notes += "  $label : the filter on $name has a condition. $name is text from this version: check the condition in the visual's filters."; continue }
+    if ((Get-Property $card 'type') -cne 'Advanced') { continue }
+    $types = [regex]::Matches($body, '"type"\s*:\s*"Advanced"')
+    if ($types.Count -ne 1) { continue }
+    $body = $body.Substring(0, $types[0].Index) + '"type": "Categorical"' + $body.Substring($types[0].Index + $types[0].Length)
+    $text = $text.Substring(0, $item.Index) + $body + $text.Substring($item.Index + $item.Length)
+    $changed++
+  }
+  return [pscustomobject]@{ Text = $text; Changed = $changed; Notes = $notes }
+}
+# One line on an app visual: its fields against the ones this version wants, its filter, its app link.
+function Get-AppCheck([string]$text, $slot, [string]$label) {
+  $json = $text | ConvertFrom-Json
+  $visual = Get-Property $json 'visual'
+  $got = @()
+  $state = Get-Property (Get-Property $visual 'query') 'queryState'
+  if ($null -ne $state) {
+    foreach ($role in $state.PSObject.Properties) {
+      foreach ($projection in @(Get-Property $role.Value 'projections')) {
+        if ($null -eq $projection) { continue }
+        $key = Get-FieldKey (Get-Property $projection 'field')
+        if ($null -ne $key) { $got += $key }
+      }
+    }
+  }
+  $want = @()
+  foreach ($field in @(Get-Property $planFields $slot.name)) { if ($null -ne $field) { $want += "$($field.entity)|$($field.property)" } }
+  $missing = @($want | Where-Object { $got -cnotcontains $_ })
+  $extra = @($got | Where-Object { $want -cnotcontains $_ })
+  $parts = @()
+  if ($missing.Count -eq 0 -and $extra.Count -eq 0 -and (($got -join ',') -ceq ($want -join ','))) {
+    $parts += "$($want.Count) fields as this version wants"
+  } else {
+    $short = { param($list) ($list | ForEach-Object { $_.Replace('|', '.') }) -join ', ' }
+    if ($missing.Count -gt 0) { $parts += "missing $(& $short $missing)" }
+    if ($extra.Count -gt 0) { $parts += "not used $(& $short $extra)" }
+    if ($missing.Count -eq 0 -and $extra.Count -eq 0) { $parts += 'the fields are in another order' }
+    $parts += "fix the fields in Power Apps data of the visual (README section $($slot.readme)), then More options (...) > Edit"
+  }
+  $filter = Get-Property $slot 'filter'
+  if ($null -ne $filter) {
+    $kept = $false
+    $config = Get-Property $json 'filterConfig'
+    foreach ($card in @(Get-Property $config 'filters')) {
+      if ($null -eq $card -or $null -eq (Get-Property $card 'filter')) { continue }
+      if ((Get-FieldKey (Get-Property $card 'field')) -ceq "$($filter.entity)|$($filter.property)") { $kept = $true }
+    }
+    if ($kept) { $parts += 'filter kept' } else { $parts += "no filter $($filter.words): add it in Filters on this visual" }
+  }
+  $appId = $null
+  foreach ($entry in @(Get-Property (Get-Property $visual 'objects') 'general')) { if ($null -ne $entry) { $found = Get-Property (Get-Property $entry 'properties') 'appId'; if ($null -ne $found) { $appId = $found } } }
+  if ($null -ne $appId) { $parts += 'app link kept' } else { $parts += 'no app link: choose the app again (Choose app in the visual)' }
+  return "  $label : $($slot.name), $($parts -join ', ')."
+}
+
+$fieldLines = @()
+foreach ($page in Get-ChildItem -LiteralPath $newPages -Directory | Sort-Object Name) {
+  $slot = Get-Property $plan.slots $page.Name
+  if ($null -eq $slot -or $slot.kind -ne 'app') { continue }
+  $display = Get-PageName $page.FullName
+  $label = if ($null -ne $display) { $display } else { $page.Name }
+  $apps = @(Get-AppVisuals $page.FullName)
+  if ($apps.Count -eq 0) { $fieldLines += "  $label : no app $($slot.name) yet. Add it when you set it up (README section $($slot.readme))." }
+  foreach ($app in $apps) {
+    $file = Join-Path $app.Folder 'visual.json'
+    $text = Read-Text $file
+    $result = Update-FilterCards $text $label
+    if ($result.Changed -gt 0) {
+      Write-Text $file $result.Text
+      $fieldLines += "  $label : $($result.Changed) filter card(s) of fields now text made Categorical."
+    }
+    $fieldLines += $result.Notes
+    $fieldLines += Get-AppCheck $result.Text $slot $label
+  }
+}
+
 Write-Host ''
 Write-Host 'Parameters:'
 foreach ($line in $parameterLines) { Write-Host $line }
@@ -384,6 +530,10 @@ Write-Host ''
 Write-Host 'Power Apps and Refresh now:'
 if ($visualLines.Count -eq 0) { Write-Host '  none in the previous folder or the report file. Add them in the service (README section 6), then download the report next time (README section 6.4 step 13).' }
 foreach ($line in $visualLines) { Write-Host $line }
+Write-Host ''
+Write-Host 'The fields of the apps (every field is text from build A1):'
+if ($fieldLines.Count -eq 0) { Write-Host '  no app in this folder yet.' }
+foreach ($line in $fieldLines) { Write-Host $line }
 Write-Host ''
 Write-Host 'Nothing else was copied and nothing was deleted. The previous folder is unchanged.'
 Write-Host "Now open SACM-Workbench.pbip in $hereFull and press Refresh."
